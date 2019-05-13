@@ -1,0 +1,14 @@
+{
+  "menu": [
+    {
+      "id": "tools",
+      "submenu": [
+        {
+          "label": "Toast",
+          "id": "tool.openapi",
+          "command": "openapi:show-toast"
+        }
+      ]
+    }
+  ]
+}
