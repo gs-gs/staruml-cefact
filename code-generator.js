@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 const codegen = require('./codegen-utils');
-var yaml = require('write-yaml');
+const openApiGen = require('./openApi-generator');
 
 class CodeGenerator {
 
@@ -41,26 +41,20 @@ class CodeGenerator {
 
     generate(elem, basePath, options){
         console.log('Code Generator',elem,basePath,options);
+
+     
+
         fs.mkdirSync(basePath)
         var i,len
      
         for (i = 0, len = elem.ownedElements.length; i < len; i++) {
             var def = elem.ownedElements[i];
              if (def instanceof  type.UMLPackage) {
-                
-                this.writeSchema(def,basePath,options);           
+                //  this.writeSchema(def,basePath,options);   
+                var schemaWriter = new openApiGen.OpenApiGenerator(); 
+                schemaWriter.generate(basePath,def,options);      
             }
-        }
-
-
-      
-
-        // codeWriter.writeLine("info: {description: "+elem.name + ", title:" + elem.name+"}");
-        // codeWriter.writeLine("openapi: 3.0.0");
-        // codeWriter.writeLine("paths:");
-        // codeWriter.indent();
-
-     
+        }          
     }
 
 
@@ -68,33 +62,27 @@ class CodeGenerator {
         var basePath = path.join(fullPath, elem.name + '.yml')
         var i,len
         var codeWriter;
-      
         codeWriter = new codegen.CodeWriter(this.getIndentString(options))
         codeWriter.writeLine()
         codeWriter.writeLine('components:');
         codeWriter.indent();
         codeWriter.writeLine('schemas:');
         codeWriter.indent();
-        console.log(codeWriter.getData().includes('schem'));
-
+     
         for (i = 0, len = elem.ownedElements.length; i < len; i++) {
             var def = elem.ownedElements[i];
              if (def instanceof type.UMLClass) {
-                 console.log(def);
-                codeWriter.writeLine(def.name+":");
-               
-                this.writeProperties(codeWriter,def,options); 
-                
-               
-                
+                // codeWriter.writeLine(def.name+":");               
+                this.writeProperties(codeWriter,def,options,);              
+                               
             }
         }
-        codeWriter.outdent();
-        codeWriter.outdent();
 
-       
+        codeWriter.outdent();
+        codeWriter.outdent();
+        
         fs.writeFileSync(basePath, codeWriter.getData());       
-      
+    
     }
 
 
@@ -105,7 +93,7 @@ class CodeGenerator {
      * @param {Object} options
      */
     writeProperties (codeWriter, elem, options) {
-
+        codeWriter.writeLine(elem.name+":");  
         codeWriter.indent();
         if(elem.attributes.length>0){
             codeWriter.writeLine("properties:");  
@@ -132,8 +120,7 @@ class CodeGenerator {
         
         codeWriter.outdent();  
         if(elem.ownedElements.length>0){
-            var data = (this.writeAssociatClass(codeWriter,elem,options)).getData();
-            codeWriter.writeLine(data);
+            this.writeAssociatClass(codeWriter,elem,options);
         } 
  
 
@@ -163,21 +150,28 @@ class CodeGenerator {
 
     writeAssociatClass(codeWriter,elem,options){
 
-        var i,len
-        var subCodeWriter;      
-        subCodeWriter = new codegen.CodeWriter(this.getIndentString(options))
+        var i,len;
+        var assocClassSet = [];
         for (i = 0, len = elem.ownedElements.length; i < len; i++) {
-            var assocClass = elem.ownedElements[i];    
-            if (assocClass instanceof type.UMLAssociation && !(this.stringExistMoreTime(codeWriter.getData(),"{$ref: '#/components/schemas/"+assocClass.end2.reference.name+"'}"))) {
-                
-                subCodeWriter.indent();
-                subCodeWriter.indent();
-                subCodeWriter.writeLine(assocClass.end2.reference.name+":");
-                
-                this.writeProperties(subCodeWriter,assocClass.end2.reference,options); 
+            var assocClass = elem.ownedElements[i];  
+            if (assocClass instanceof type.UMLAssociation){
+                var filterClass = assocClassSet.filter(function(item){
+                    return item == assocClass.end2.reference.name;
+                });
+
+                if(filterClass.length==0){
+                    // this.writeProperties(codeWriter,assocClass.end2.reference,options);     
+                    assocClassSet.push(assocClass.end2.reference.name)                
+                }
             }
+
+            // if (assocClass instanceof type.UMLAssociation && !(this.stringExistMoreTime(codeWriter.getData(),"{$ref: '#/components/schemas/"+assocClass.end2.reference.name+"'}") )) {
+            //     // && !(this.stringExistMoreTime(codeWriter.getData(),"{$ref: '#/components/schemas/"+assocClass.end2.reference.name+"'}"))
+            //     codeWriter.writeLine(assocClass.end2.reference.name+":");
+                
+            //     this.writeProperties(codeWriter,assocClass.end2.reference,options); 
+            // }
         }
-        return subCodeWriter;
     }
     
 
