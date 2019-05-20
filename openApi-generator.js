@@ -33,31 +33,37 @@ class OpenApiGenerator {
     }
 
     generate(fullPath,elem,options){
-        console.log('OPen API Generator',elem);
-        var basePath = path.join(fullPath, elem.name + '.yml')
-        var i,len
-        var codeWriter;
-        codeWriter = new codegen.CodeWriter(this.getIndentString(options));
-        codeWriter.writeLine()
-            codeWriter.writeLine('components:');
-            codeWriter.indent();
-            codeWriter.writeLine('schemas:');
-            codeWriter.indent();
-
-            for (i = 0, len = elem.ownedElements.length; i < len; i++) {
-                var def = elem.ownedElements[i];
-               
-                if (def instanceof type.UMLClass) {
-                    // codeWriter.writeLine(def.name+":");               
-                    this.writeProperties(codeWriter,def,options);              
-                                
-                }
-            }
-        
-            codeWriter.outdent();
-            codeWriter.outdent();
+         var _this =this;   
+         if (elem instanceof type.UMLPackage) {
             
-            fs.writeFileSync(basePath, codeWriter.getData());     
+            if (Array.isArray(elem.ownedElements)) {
+              elem.ownedElements.forEach(child => {                
+                    if(child instanceof type.UMLClass){
+                        console.log(child);
+                        setTimeout(function() {  _this.findClass(child,  options); },10);
+                       
+                    }
+              })
+            }
+
+            setTimeout(function() {
+                console.log(_this.schemas);      
+
+                    var resArr = [];
+                   _this.schemas.forEach(item => {
+                        var filter = resArr.filter(subItem =>{
+                            return subItem.name==item.name;
+                        })
+                        if(filter.length==0){
+                        resArr.push(item);
+                        }
+                   });
+                   
+                   _this.writeClass(resArr,fullPath, options,elem);
+                  
+            },1000);
+           
+          } 
     }
 
 
@@ -69,111 +75,83 @@ class OpenApiGenerator {
      * @param {type.Model} elem
      * @param {Object} options
      */
-    writeProperties (codeWriter, elem, options) {
-        try{
+    findClass ( elem, options) {
+        var _this =this;  
+        _this.schemas.push(elem);
+                if (elem.ownedElements.length>0) {
+                    elem.ownedElements.forEach(child => {                    
+                        if(child instanceof type.UMLAssociation){
+                            console.log("Child Class");
+                            var filter = _this.schemas.filter(function(item){
+                                return item.name==child.end2.reference.name;
+                            });
+                            if(filter.length<=0){
+                                setTimeout(function() {   _this.findClass(child.end2.reference,options); },10);
+                            }
 
-            var filterClass = this.schemas.filter(function(item){
-                return item==elem.name;
-            });
-            if(filterClass.length==0){
-                codeWriter.writeLine(elem.name+":");  
-                codeWriter.indent();
-                if(elem.attributes.length>0){
-                    codeWriter.writeLine("properties:");  
-                    codeWriter.indent();
-
-                    var i,len
-                    for (i = 0, len = elem.attributes.length; i < len; i++) {
-                        var attr = elem.attributes[i];
-                        if(attr.multiplicity==="0..*"){
-                            codeWriter.writeLine(attr.name+":");
-                            codeWriter.indent();
-                            codeWriter.writeLine("items: {description: "+attr.documentation+", type: string}");   
-                            codeWriter.writeLine("type: array");
-                            codeWriter.outdent();  
-                        }else{
-                            codeWriter.writeLine(attr.name+": {description: "+attr.documentation+", type: string}");   
-                        
+                             filter = _this.schemas.filter(function(item){
+                                return item.name==child.end1.reference.name;
+                            });
+                            if(filter.length<=0){
+                                setTimeout(function() {   _this.findClass(child.end1.reference,options); },10);
+                            }
                         }
-                    }
-                    codeWriter.outdent();           
-                }
-                
-                this.writeAssociation(codeWriter,elem,options);   
-                
-                codeWriter.outdent(); 
+                    })
+                }                   
+      
+    }
 
-                if( elem.ownedElements.length>0){
-                    this.writeAssociatClass(codeWriter,elem,options);
+    writeClass(classes,fullPath, options,mainElem){
+        var basePath = path.join(fullPath, mainElem.name + '.yml')
+        var codeWriter;
+        codeWriter = new codegen.CodeWriter(this.getIndentString(options))
+        codeWriter.writeLine()
+        codeWriter.writeLine('components:');
+        codeWriter.indent();
+        codeWriter.writeLine('schemas:');
+        codeWriter.indent();
+        classes.forEach(objClass => {
+            codeWriter.writeLine(objClass.name+":");  
+            codeWriter.indent();
+            codeWriter.writeLine("properties:");  
+            codeWriter.indent();
+
+            var i,len
+            for (i = 0, len = objClass.attributes.length; i < len; i++) {
+                var attr = objClass.attributes[i];
+                if(attr.multiplicity==="0..*"){
+                    codeWriter.writeLine(attr.name+":");
+                    codeWriter.indent();
+                    codeWriter.writeLine("items: {description: '"+attr.documentation+"', type: string}");   
+                    codeWriter.writeLine("type: array");
+                    codeWriter.outdent();  
+                }else{
+                    codeWriter.writeLine(attr.name+": {description: '"+attr.documentation+"', type: string}");   
+                
+                }
+            }
+
+             for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
+                var assoc = objClass.ownedElements[i];
+                if (assoc instanceof type.UMLAssociation) {
+                    codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name+"'}");  
                 } 
-                this.schemas.push(elem.name);
+
             }
-            
-        }catch(error){
-            console.log("writeProperties Error ",error);
-        }
 
-    }
 
-    /**
-     * Write Association $ref
-     * @param {StringWriter} codeWriter
-     * @param {type.Model} elem
-     * @param {Object} options
-     */
-    writeAssociation (codeWriter, elem, options) {
-        try{
-            if(elem.ownedElements.length>0){
-                codeWriter.indent();
-                var i,len
-                for (i = 0, len = elem.ownedElements.length; i < len; i++) {
-                    var assoc = elem.ownedElements[i];
-                    if (assoc instanceof type.UMLAssociation) {
-                        codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name+"'}");  
-                    } 
 
-                }
-                codeWriter.outdent();         
-            }
-        }catch(error){
-            console.log("writeAssociation Error ",error);
-        }
+            codeWriter.outdent();
+            codeWriter.outdent();
+        });     
+        codeWriter.outdent();
+        codeWriter.outdent();
         
+        fs.writeFileSync(basePath, codeWriter.getData());  
     }
 
-    writeAssociatClass(codeWriter,elem,options){
-        try{
-            var i,len;
-            for (i = 0, len = elem.ownedElements.length; i < len; i++) {
-                var assocClass = elem.ownedElements[i];  
-            
-
-                if (assocClass instanceof type.UMLAssociation ) {
-                    // && !(this.stringExistMoreTime(codeWriter.getData(),"{$ref: '#/components/schemas/"+assocClass.end2.reference.name+"'}"))
-                    // codeWriter.writeLine(assocClass.end2.reference.name+":");
-
-                    var filterClass = this.schemas.filter(function(item){
-                        return item==assocClass.end2.reference.name;
-                    });
-                    if(filterClass.length==0){
-                        this.writeProperties(codeWriter,assocClass.end2.reference,options); 
-                    }
-
-                    // filterClass = this.schemas.filter(function(item){
-                    //     return item==assocClass.end1.reference.name;
-                    // });
-                    // if(filterClass.length==0){
-                    //     this.writeProperties(codeWriter,assocClass.end1.reference,options,true); 
-                    // }
-                }
-            }
-
-            
-
-        }catch(error){
-            console.log("writeAssociatClass Error ",error);
-        }
-    }
+   
+    
 
 }
 

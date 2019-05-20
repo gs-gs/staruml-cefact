@@ -41,8 +41,9 @@ class CodeGenerator {
 
     generate(elem, basePath, options){
         console.log('Code Generator',elem,basePath,options);
-
-     
+        // fs.mkdirSync(basePath)
+        // var schemaWriter = new openApiGen.OpenApiGenerator(); 
+        // schemaWriter.generate(basePath,elem,options);
 
         fs.mkdirSync(basePath)
         var i,len

@@ -10,7 +10,7 @@ function _handleGenerate(base, path, options) {
       .showDialog("Select the package to generate from", null, null)  //type.UMLPackage
       .then(function({ buttonId, returnValue }) {
          if (buttonId === "ok") {
-          if (returnValue instanceof type.Project ) { //|| returnValue instanceof type.UMLPackage
+          if (returnValue instanceof type.Project) { //|| returnValue instanceof type.UMLPackage
             base = returnValue;
             console.log(base,path,options);
           //  openFolder(base, path, options);
