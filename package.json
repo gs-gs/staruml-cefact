@@ -1,1 +1,10 @@
-{}
+{
+    "name": "gs-gs.staruml-cefact",
+    "title": "OpenAPI",
+    "description": "OperAPI generator from UML.",
+    "version": "1.0.0",
+    "engines": {
+        "staruml": ">=3.0.0"
+    },
+    "dependencies": {}
+}
