@@ -41,21 +41,21 @@ class CodeGenerator {
 
     generate(elem, basePath, options){
         console.log('Code Generator',elem,basePath,options);
-        // fs.mkdirSync(basePath)
-        // var schemaWriter = new openApiGen.OpenApiGenerator(); 
-        // schemaWriter.generate(basePath,elem,options);
-
         fs.mkdirSync(basePath)
-        var i,len
+        var schemaWriter = new openApiGen.OpenApiGenerator(); 
+        schemaWriter.generate(basePath,elem,options);
+
+        // fs.mkdirSync(basePath)
+        // var i,len
      
-        for (i = 0, len = elem.ownedElements.length; i < len; i++) {
-            var def = elem.ownedElements[i];
-             if (def instanceof  type.UMLPackage) {
-                //  this.writeSchema(def,basePath,options);   
-                var schemaWriter = new openApiGen.OpenApiGenerator(); 
-                schemaWriter.generate(basePath,def,options);      
-            }
-        }          
+        // for (i = 0, len = elem.ownedElements.length; i < len; i++) {
+        //     var def = elem.ownedElements[i];
+        //      if (def instanceof  type.UMLPackage) {
+        //         //  this.writeSchema(def,basePath,options);   
+        //         var schemaWriter = new openApiGen.OpenApiGenerator(); 
+        //         schemaWriter.generate(basePath,def,options);      
+        //     }
+        // }          
     }
 
 

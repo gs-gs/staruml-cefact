@@ -4,7 +4,7 @@
       "id": "tools",
       "submenu": [
         {
-          "label": "Toast",
+          "label": "OpenAPI",
           "id": "tool.openapi",
           "command": "openapi:show-toast"
         }
