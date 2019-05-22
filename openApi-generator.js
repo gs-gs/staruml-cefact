@@ -43,7 +43,7 @@ class OpenApiGenerator {
     generate(fullPath,elem,options){
        
                 
-         var _this =this;   
+         let _this =this;   
          if (elem instanceof type.UMLPackage) {
             
             if (Array.isArray(elem.ownedElements)) {
@@ -51,15 +51,18 @@ class OpenApiGenerator {
                     if(child instanceof type.UMLClass){
                          setTimeout(function() {  _this.findClass(child,  options); },10);
                        
+                    }else if(child instanceof type.UMLInterface){
+                        
+                        _this.operations.push(child);
                     }
                    
               })
             }
 
             setTimeout(function() {
-                    var resArr = [];
+                    let resArr = [];
                    _this.schemas.forEach(item => {
-                        var filter = resArr.filter(subItem =>{
+                        let filter = resArr.filter(subItem =>{
                             return subItem._id==item._id;
                         })
                         if(filter.length==0){
@@ -74,32 +77,32 @@ class OpenApiGenerator {
                 console.log(resArr);
 
 
-                var uniqArr = [];
+                let uniqArr = [];
 
-                var isDuplicate = false;
+                let isDuplicate = false;
                 resArr.forEach(item=>{
-                        var filter = uniqArr.filter(subItem=>{
+                        let filter = uniqArr.filter(subItem=>{
                             return item.name==subItem.name
                         });
                         if(filter.length==0){
                             uniqArr.push(item);
                         }else{
-                            isDuplicate = true;
+                            // isDuplicate = true;
                             
-                            // var firstElem = uniqArr.indexOf(filter[0]);
-                            // uniqArr[firstElem].attributes = uniqArr[firstElem].attributes.concat(item.attributes);
-                            // uniqArr[firstElem].ownedElements = uniqArr[firstElem].attributes.concat(item.ownedElements);
+                            let firstElem = uniqArr.indexOf(filter[0]);
+                            uniqArr[firstElem].attributes = uniqArr[firstElem].attributes.concat(item.attributes);
+                            uniqArr[firstElem].ownedElements = uniqArr[firstElem].ownedElements.concat(item.ownedElements);
                         }
                 });
 
-                // console.log(uniqArr);  
+                console.log(uniqArr);  
                 if(!isDuplicate){
-                     _this.writeClass(resArr,fullPath, options,elem);
+                     _this.writeClass(uniqArr,fullPath, options,elem);
                 }else{
                     app.dialogs.showErrorDialog("There is duplicate class for same name.");                           
                 }
              
-            },1000);
+            },1500);
            
           } 
     }
@@ -108,54 +111,41 @@ class OpenApiGenerator {
   
 
     /**
-     * Write Properties
-     * @param {StringWriter} codeWriter
+     * Find Class
      * @param {type.Model} elem
      * @param {Object} options
      */
-    findClass ( elem, options) {
-        var _this =this;  
+    findClass(elem, options) {
+        let _this =this;  
         _this.schemas.push(elem);
-                if (elem.ownedElements.length>0) {
-                    elem.ownedElements.forEach(child => {                    
-                        if(child instanceof type.UMLAssociation){
-                             // var filter = _this.schemas.filter(function(item){
-                            //     return item.name==child.end2.reference.name;
-                            // });
-                            // if(filter.length<=0){
-                                setTimeout(function() {   _this.findClass(child.end2.reference,options); },5);
-                            // }
-
-                            //  filter = _this.schemas.filter(function(item){
-                            //     return item.name==child.end1.reference.name;
-                            // });
-                            // if(filter.length<=0){
-                            //     setTimeout(function() {   _this.findClass(child.end1.reference,options); },10);
-                            // }
+        if (elem.ownedElements.length>0) {
+            elem.ownedElements.forEach(child => {                    
+                if(child instanceof type.UMLAssociation){
+                    // let filter = _this.schemas.filter(function(item){
+                    //     return item.name==child.end2.reference.name;
+                    // });
+                    // if(filter.length<=0){
+                        if(child.end1.reference.name!=child.end2.reference.name){
+                            setTimeout(function() {   _this.findClass(child.end2.reference,options); },5);
                         }
-                    });
-
-                    // elem.ownedElements.forEach(child => {                    
-                    //     if(child instanceof type.UMLAssociation){
-                            
-
-                    //         var filter = _this.schemas.filter(function(item){
-                    //             return item.name==child.end1.reference.name;
-                    //         });
-                    //         if(filter.length<=0){
-                    //             setTimeout(function() {   _this.findClass(child.end1.reference,options); },10);
-                    //         }
-                    //     }
-                    // })
-                }                   
+                    // }                           
+                }
+            });                   
+        }                 
       
     }
 
   
-
+    /**
+     * Write Class (Schema)
+     * @param {array} classes
+     * @param {string} fullPath for generate yml
+     * @param {Object} options
+     * @param {type.package} mainElem package element
+     */
     writeClass(classes,fullPath, options,mainElem){
-        var basePath = path.join(fullPath, mainElem.name + '.yml')
-        var codeWriter;
+        let basePath = path.join(fullPath, mainElem.name + '.yml')
+        let codeWriter;
         codeWriter = new codegen.CodeWriter(this.getIndentString(options))
         codeWriter.writeLine()
         codeWriter.writeLine('components:');
@@ -168,12 +158,12 @@ class OpenApiGenerator {
             codeWriter.writeLine("properties:");  
             codeWriter.indent();
 
-            var arrAttr = [];
+            let arrAttr = [];
 
-            var i,len;
+            let i,len;
             for (i = 0, len = objClass.attributes.length; i < len; i++) {
-                var attr = objClass.attributes[i];
-                var filterAttr = arrAttr.filter(item=>{
+                let attr = objClass.attributes[i];
+                let filterAttr = arrAttr.filter(item=>{
                     return item.name==attr.name;
                 });
                 if(filterAttr.length==0){
@@ -181,26 +171,26 @@ class OpenApiGenerator {
                     if(attr.multiplicity==="0..*"){
                         codeWriter.writeLine(attr.name+":");
                         codeWriter.indent();
-                        codeWriter.writeLine("items: {description: '"+ (attr.documentation?attr.documentation:"missing description")+"', type:"+ this.getType()+" }");   
+                        codeWriter.writeLine("items: {description: '"+ (attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+ this.getType()+" }");   
                         codeWriter.writeLine("type: array");
                         codeWriter.outdent();  
                     }else{
-                        codeWriter.writeLine(attr.name+": {description: '"+(attr.documentation?attr.documentation:"missing description")+"', type:"+  this.getType() +" }");   
+                        codeWriter.writeLine(attr.name+": {description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+  this.getType() +" }");   
                     
                     }
                     arrAttr.push(attr);
                 }
             }
 
-            var arrAssoc = [];
+            let arrAssoc = [];
             for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
-                var assoc = objClass.ownedElements[i];
-                var filterAssoc = arrAssoc.filter(item=>{
+                let assoc = objClass.ownedElements[i];
+                let filterAssoc = arrAssoc.filter(item=>{
                     return item.name==assoc.name;
                 });
                 if(filterAssoc.length==0){
                     if (assoc instanceof type.UMLAssociation) {
-                        codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name+"_"+ assoc.end2.reference._id +"'}");  
+                        codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");  
                     } 
                     arrAssoc.push(assoc);
                 }
@@ -210,8 +200,6 @@ class OpenApiGenerator {
             codeWriter.outdent();
         });    
         
-        
-        
 
         codeWriter.outdent();
         codeWriter.outdent();
@@ -220,28 +208,42 @@ class OpenApiGenerator {
         codeWriter.writeLine("openapi: 3.0.0");
         codeWriter.writeLine("paths:" + (this.operations.length==0?" {}":""));
 
-        this.writeOperation(codeWriter,options,mainElem);
-
-
-        
+       
+        this.writeOperation(codeWriter,options,mainElem); 
+        codeWriter.writeLine("servers: []");
+      
         fs.writeFileSync(basePath, codeWriter.getData());  
     }  
 
+    /**
+     * Write Operation (Path)
+     * @param {codeWriter} codeWriter
+     * @param {Object} options
+     * @param {type.package} mainElem package element
+     */
     writeOperation(codeWriter,options,mainElem){
-        var interReal = app.repository.select(mainElem.name+"::@UMLInterfaceRealization")
-        console.log(interReal);
+        let interReal = app.repository.select("@UMLInterfaceRealization")
+        
+        this.operations.forEach(objOperation => {
+                let filterInterface = interReal.filter(itemInterface =>{
+                    return itemInterface.target.name == objOperation.name;
+                });
+                if(filterInterface.length>0){
+                    let objInterface = filterInterface[0];
+        //         }
+        // })
 
-        interReal.forEach(objInterface => {
+        // interReal.forEach(objInterface => {
             codeWriter.indent();
             codeWriter.writeLine("/"+objInterface.target.name+":");
             codeWriter.indent();
-            objInterface.target.operations.forEach(objOperation => {
+            objInterface.target.operations.forEach(objOperation =>{
                 if(objOperation.name=="GET"){
                     codeWriter.writeLine("get:");
                     codeWriter.indent();
                     codeWriter.writeLine("description: Get a list of " +objInterface.source.name);
                     codeWriter.writeLine("parameters: []");
-                    codeWriter.writeLine("response:");
+                    codeWriter.writeLine("responses:");
                     codeWriter.indent();
                     codeWriter.writeLine("'200':");
                     codeWriter.indent();
@@ -280,7 +282,7 @@ class OpenApiGenerator {
                     codeWriter.writeLine("required: true");
                     codeWriter.outdent();
 
-                    codeWriter.writeLine("response:");
+                    codeWriter.writeLine("responses:");
                     codeWriter.indent();
                     codeWriter.writeLine("'201':");
                     codeWriter.indent();
@@ -294,6 +296,7 @@ class OpenApiGenerator {
                     codeWriter.writeLine("description: Created");
                     codeWriter.outdent();
                     codeWriter.outdent();
+
                     codeWriter.outdent();
                    
                 }
@@ -309,7 +312,7 @@ class OpenApiGenerator {
                     codeWriter.writeLine("description: Get single " +objInterface.source.name+" by Id");
 
                     codeWriter.writeLine("parameters:");
-                    codeWriter.writeLine("- description:");
+                    codeWriter.writeLine("- description: id parameter");
                     codeWriter.indent();
                     codeWriter.writeLine("in: path");
                     codeWriter.writeLine("name: "+objInterface.target.attributes[0].name);
@@ -318,7 +321,7 @@ class OpenApiGenerator {
                     codeWriter.outdent();
 
 
-                    codeWriter.writeLine("response:");
+                    codeWriter.writeLine("responses:");
                     codeWriter.indent();
                     codeWriter.writeLine("'200':");
                     codeWriter.indent();
@@ -342,7 +345,7 @@ class OpenApiGenerator {
                     codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
 
                     codeWriter.writeLine("parameters:");
-                    codeWriter.writeLine("- description:");
+                    codeWriter.writeLine("- description: id parameter");
                     codeWriter.indent();
                     codeWriter.writeLine("in: path");
                     codeWriter.writeLine("name: "+objInterface.target.attributes[0].name);
@@ -351,7 +354,7 @@ class OpenApiGenerator {
                     codeWriter.outdent();
 
 
-                    codeWriter.writeLine("response:");
+                    codeWriter.writeLine("responses:");
                     codeWriter.indent();
                     codeWriter.writeLine("'204': {description: No Content}");
                    codeWriter.outdent();
@@ -374,7 +377,7 @@ class OpenApiGenerator {
                     codeWriter.outdent();
 
 
-                    codeWriter.writeLine("response:");
+                    codeWriter.writeLine("responses:");
                     codeWriter.indent();
                     codeWriter.writeLine("'200':");
                     codeWriter.indent();
@@ -389,19 +392,25 @@ class OpenApiGenerator {
                    
                     codeWriter.outdent();
                     
-                   codeWriter.outdent();
                     codeWriter.outdent();
-                    
+                    codeWriter.outdent();                   
                    
                 }
             });
             codeWriter.outdent();
-            codeWriter.outdent();       
+            codeWriter.outdent();  
+         }     
         });
+    }
+
+    /**
+     * Description replace (') with ('')
+     * @param {string} desc
+     */
+    buildDescription(desc){
+        return desc.replace(/\'/g, "''")
     }
     
 }
-
-
 
 exports.OpenApiGenerator = OpenApiGenerator;

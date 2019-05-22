@@ -7,7 +7,7 @@ function _handleGenerate(base, path, options) {
   // If base is not assigned, popup ElementPicker
   if (!base) {
     app.elementPickerDialog
-      .showDialog("Select the package to generate from", null, null)  //type.UMLPackage
+      .showDialog("Select the package or project to generate from", null, null)  //type.UMLPackage
       .then(function({ buttonId, returnValue }) {
          if (buttonId === "ok") {
           if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
@@ -22,9 +22,7 @@ function _handleGenerate(base, path, options) {
           }
         }
       });
-  } else {
-  //  openFolder(base, path, options);
-  }
+  } 
 }
 
 const PREF_DEBUG_KEY = "openapi:debug.status";
@@ -40,7 +38,7 @@ function getGenOptions() {
 }
 
 function init () {
-  app.commands.register('openapi:show-toast', _handleGenerate)
+  app.commands.register('openapi:show-toast', _handleGenerate);
 }
 
 exports.init = init
