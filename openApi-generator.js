@@ -41,6 +41,12 @@ class OpenApiGenerator {
     }
 
     generate(fullPath,elem,options){
+
+        // let interReal = app.repository.select("@UMLInterfaceRealization")
+        // console.log(interReal);
+        // let interGeal = app.repository.select("@UMLGeneralization")
+        // console.log(interGeal);
+        
        
                 
          let _this =this;   
@@ -78,6 +84,7 @@ class OpenApiGenerator {
 
 
                 let uniqArr = [];
+                let duplicateClasses =[];
 
                 let isDuplicate = false;
                 resArr.forEach(item=>{
@@ -87,8 +94,8 @@ class OpenApiGenerator {
                         if(filter.length==0){
                             uniqArr.push(item);
                         }else{
-                            // isDuplicate = true;
-                            
+                            isDuplicate = true;
+                            duplicateClasses.push(item.name);
                             let firstElem = uniqArr.indexOf(filter[0]);
                             uniqArr[firstElem].attributes = uniqArr[firstElem].attributes.concat(item.attributes);
                             uniqArr[firstElem].ownedElements = uniqArr[firstElem].ownedElements.concat(item.ownedElements);
@@ -99,7 +106,7 @@ class OpenApiGenerator {
                 if(!isDuplicate){
                      _this.writeClass(uniqArr,fullPath, options,elem);
                 }else{
-                    app.dialogs.showErrorDialog("There is duplicate class for same name.");                           
+                    app.dialogs.showErrorDialog("There "+ (duplicateClasses.length>1?"are":"is") +" duplicate "+ duplicateClasses.join() + (duplicateClasses.length>1?" classes":" class") + " for same name.");                           
                 }
              
             },1500);
@@ -147,15 +154,19 @@ class OpenApiGenerator {
         let basePath = path.join(fullPath, mainElem.name + '.yml')
         let codeWriter;
         codeWriter = new codegen.CodeWriter(this.getIndentString(options))
-        codeWriter.writeLine()
         codeWriter.writeLine('components:');
         codeWriter.indent();
-        codeWriter.writeLine('schemas:');
+        codeWriter.writeLine('schemas:' + (classes.length==0?" {}":""));
         codeWriter.indent();
         classes.forEach(objClass => {
+
+            let accosElems = objClass.ownedElements.filter(item=>{
+                return item instanceof type.UMLAssociation;
+            });
+
             codeWriter.writeLine(objClass.name+":" );  
             codeWriter.indent();
-            codeWriter.writeLine("properties:");  
+            codeWriter.writeLine("properties:" + ((objClass.attributes.length==0 && accosElems.length==0)?" {}":""));  
             codeWriter.indent();
 
             let arrAttr = [];
@@ -185,14 +196,14 @@ class OpenApiGenerator {
             let arrAssoc = [];
             for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
                 let assoc = objClass.ownedElements[i];
-                let filterAssoc = arrAssoc.filter(item=>{
-                    return item.name==assoc.name;
-                });
-                if(filterAssoc.length==0){
-                    if (assoc instanceof type.UMLAssociation) {
-                        codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");  
-                    } 
-                    arrAssoc.push(assoc);
+                if (assoc instanceof type.UMLAssociation) {
+                    let filterAssoc = arrAssoc.filter(item=>{
+                        return item.name==assoc.name;
+                    });
+                    if(filterAssoc.length==0 && assoc.name!=""){
+                            codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}"); 
+                            arrAssoc.push(assoc); 
+                    }                    
                 }
             }
 
@@ -223,7 +234,7 @@ class OpenApiGenerator {
      */
     writeOperation(codeWriter,options,mainElem){
         let interReal = app.repository.select("@UMLInterfaceRealization")
-        
+        console.log(interReal);
         this.operations.forEach(objOperation => {
                 let filterInterface = interReal.filter(itemInterface =>{
                     return itemInterface.target.name == objOperation.name;
@@ -269,19 +280,8 @@ class OpenApiGenerator {
                     codeWriter.indent();
                     codeWriter.writeLine("description:  Create a new " +objInterface.source.name);
 
-                    codeWriter.writeLine('requestBody:');
-                    codeWriter.indent();
-                    codeWriter.writeLine("content:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("application/json:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+objInterface.source.name+"'}"); 
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                    codeWriter.writeLine("description: ''");
-                    codeWriter.writeLine("required: true");
-                    codeWriter.outdent();
-
+                    this.buildRequestBody(codeWriter, objInterface);
+                   
                     codeWriter.writeLine("responses:");
                     codeWriter.indent();
                     codeWriter.writeLine("'201':");
@@ -303,23 +303,22 @@ class OpenApiGenerator {
             })
             codeWriter.outdent();
            
+            let checkOperationArr = objInterface.target.operations.filter(item => {
+                return item.name=="GET" || item.name=="PUT" || item.name=="DELTE";
+            });
+
+            if(checkOperationArr.length>0){
             codeWriter.writeLine("/"+objInterface.target.name+"/{"+objInterface.target.attributes[0].name+"}:");
             codeWriter.indent();
+            let attr = objInterface.target.attributes[0];
+                   
             objInterface.target.operations.forEach(objOperation => {
                 if(objOperation.name=="GET"){
                     codeWriter.writeLine("get:");
                     codeWriter.indent();
                     codeWriter.writeLine("description: Get single " +objInterface.source.name+" by Id");
 
-                    codeWriter.writeLine("parameters:");
-                    codeWriter.writeLine("- description: id parameter");
-                    codeWriter.indent();
-                    codeWriter.writeLine("in: path");
-                    codeWriter.writeLine("name: "+objInterface.target.attributes[0].name);
-                    codeWriter.writeLine("required: true");
-                    codeWriter.writeLine("schema: {type: string}");
-                    codeWriter.outdent();
-
+                    this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
 
                     codeWriter.writeLine("responses:");
                     codeWriter.indent();
@@ -344,16 +343,9 @@ class OpenApiGenerator {
                     codeWriter.indent();
                     codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
 
-                    codeWriter.writeLine("parameters:");
-                    codeWriter.writeLine("- description: id parameter");
-                    codeWriter.indent();
-                    codeWriter.writeLine("in: path");
-                    codeWriter.writeLine("name: "+objInterface.target.attributes[0].name);
-                    codeWriter.writeLine("required: true");
-                    codeWriter.writeLine("schema: {type: string}");
-                    codeWriter.outdent();
+                    this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
 
-
+                  
                     codeWriter.writeLine("responses:");
                     codeWriter.indent();
                     codeWriter.writeLine("'204': {description: No Content}");
@@ -367,15 +359,8 @@ class OpenApiGenerator {
                     codeWriter.indent();
                     codeWriter.writeLine("description: Update an existing " +objInterface.source.name);
 
-                    codeWriter.writeLine("parameters:");
-                    codeWriter.writeLine("- description: id parameter");
-                    codeWriter.indent();
-                    codeWriter.writeLine("in: path");
-                    codeWriter.writeLine("name: "+objInterface.target.attributes[0].name);
-                    codeWriter.writeLine("required: true");
-                    codeWriter.writeLine("schema: {type: string}");
-                    codeWriter.outdent();
-
+                  
+                    this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
 
                     codeWriter.writeLine("responses:");
                     codeWriter.indent();
@@ -397,6 +382,7 @@ class OpenApiGenerator {
                    
                 }
             });
+            }
             codeWriter.outdent();
             codeWriter.outdent();  
          }     
@@ -410,6 +396,33 @@ class OpenApiGenerator {
     buildDescription(desc){
         return desc.replace(/\'/g, "''")
     }
+
+    buildParameter(codeWriter, name,  type,  description,  required,  schema) {
+        codeWriter.writeLine("parameters:");
+        codeWriter.writeLine("- description: " + description);
+        codeWriter.indent();
+        codeWriter.writeLine("in: " + type);
+        codeWriter.writeLine("name: "+name);
+        codeWriter.writeLine("required: " + required);
+        codeWriter.writeLine("schema: " + schema);
+        codeWriter.outdent();
+    }
+
+     buildRequestBody(codeWriter, objInterface) {
+        codeWriter.writeLine('requestBody:');
+        codeWriter.indent();
+        codeWriter.writeLine("content:");
+        codeWriter.indent();
+        codeWriter.writeLine("application/json:");
+        codeWriter.indent();
+        codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+objInterface.source.name+"'}"); 
+        codeWriter.outdent();
+        codeWriter.outdent();
+        codeWriter.writeLine("description: ''");
+        codeWriter.writeLine("required: true");
+        codeWriter.outdent();      
+    }
+  
     
 }
 
