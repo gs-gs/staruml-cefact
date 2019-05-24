@@ -111,10 +111,8 @@ class OpenApiGenerator {
              
             },1500);
            
-          } 
+        } 
     }
-
-
   
 
     /**
@@ -201,8 +199,17 @@ class OpenApiGenerator {
                         return item.name==assoc.name;
                     });
                     if(filterAssoc.length==0 && assoc.name!=""){
-                            codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}"); 
-                            arrAssoc.push(assoc); 
+
+                        if(assoc.end2.multiplicity==="0..*"){
+                            codeWriter.writeLine(assoc.name+":");
+                            codeWriter.indent();
+                            codeWriter.writeLine("items: {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");   
+                            codeWriter.writeLine("type: array");
+                            codeWriter.outdent();
+                        }else{
+                            codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");                            
+                        }       
+                        arrAssoc.push(assoc); 
                     }                    
                 }
             }
