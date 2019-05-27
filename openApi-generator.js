@@ -176,20 +176,28 @@ class OpenApiGenerator {
                     return item.name==attr.name;
                 });
                 if(filterAttr.length==0){
-
+                    codeWriter.writeLine(attr.name+":");
                     if(attr.multiplicity==="0..*"){
-                        codeWriter.writeLine(attr.name+":");
                         codeWriter.indent();
-                        codeWriter.writeLine("items: {description: '"+ (attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+ this.getType()+" }");   
+                        codeWriter.writeLine("items: {description: '"+ (attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+ this.getType(attr.type)+" }");   
                         codeWriter.writeLine("type: array");
                         codeWriter.outdent();  
                     }else{
-                        codeWriter.writeLine(attr.name+": {description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+  this.getType() +" }");   
-                    
+                        codeWriter.indent();
+                        codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                        codeWriter.writeLine("type: "+  this.getType() );
+                        if(attr.type instanceof type.UMLEnumeration){
+                            codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+                        }
+
+                        codeWriter.outdent(); 
                     }
                     arrAttr.push(attr);
                 }
             }
+
+
+            let arrGeneral = [];
 
             let arrAssoc = [];
             for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
@@ -211,10 +219,28 @@ class OpenApiGenerator {
                         }       
                         arrAssoc.push(assoc); 
                     }                    
+                }else if(assoc instanceof type.UMLGeneralization){
+                    arrGeneral.push(assoc);
                 }
             }
 
+
+            
+
             codeWriter.outdent();
+
+            if(arrGeneral.length>0){
+                codeWriter.writeLine("allOf:");
+                codeWriter.indent();
+                arrGeneral.forEach(generalizeClass => {
+                   
+                    codeWriter.writeLine("- $ref: '#/components/schemas/"+generalizeClass.target.name +"'");
+                    codeWriter.writeLine("- type: object");
+                });
+                codeWriter.outdent();                
+            }
+           
+
             codeWriter.outdent();
         });    
         
@@ -248,151 +274,146 @@ class OpenApiGenerator {
                 });
                 if(filterInterface.length>0){
                     let objInterface = filterInterface[0];
-        //         }
-        // })
+       
+                    codeWriter.indent();
+                    codeWriter.writeLine("/"+objInterface.target.name+":");
+                    codeWriter.indent();
+                    objInterface.target.operations.forEach(objOperation =>{
+                        if(objOperation.name=="GET"){
+                            codeWriter.writeLine("get:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("description: Get a list of " +objInterface.source.name);
+                            codeWriter.writeLine("parameters: []");
+                            codeWriter.writeLine("responses:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("'200':");
+                            codeWriter.indent();
+                            codeWriter.writeLine("content:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("application/json:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("schema:"); 
+                            codeWriter.indent();
+                            codeWriter.writeLine("items: {$ref: '#/components/schemas/"+objInterface.source.name+"'}");
+                            codeWriter.writeLine("type: array");   
+                            codeWriter.outdent();
+                            codeWriter.outdent();
+                            codeWriter.outdent();
+                            codeWriter.writeLine("description: OK");
+                            codeWriter.outdent();
+                            codeWriter.outdent();
+                            codeWriter.outdent();
+                        
+                        }
+                        else if(objOperation.name=="POST"){
+                            codeWriter.writeLine("post:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("description:  Create a new " +objInterface.source.name);
 
-        // interReal.forEach(objInterface => {
-            codeWriter.indent();
-            codeWriter.writeLine("/"+objInterface.target.name+":");
-            codeWriter.indent();
-            objInterface.target.operations.forEach(objOperation =>{
-                if(objOperation.name=="GET"){
-                    codeWriter.writeLine("get:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("description: Get a list of " +objInterface.source.name);
-                    codeWriter.writeLine("parameters: []");
-                    codeWriter.writeLine("responses:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("'200':");
-                    codeWriter.indent();
-                    codeWriter.writeLine("content:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("application/json:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("schema:"); 
-                    codeWriter.indent();
-                    codeWriter.writeLine("items: {$ref: '#/components/schemas/"+objInterface.source.name+"'}");
-                    codeWriter.writeLine("type: array");   
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                    codeWriter.writeLine("description: OK");
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                   
-                }
-                else if(objOperation.name=="POST"){
-                    codeWriter.writeLine("post:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("description:  Create a new " +objInterface.source.name);
+                            this.buildRequestBody(codeWriter, objInterface);
+                        
+                            codeWriter.writeLine("responses:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("'201':");
+                            codeWriter.indent();
+                            codeWriter.writeLine("content:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("application/json:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+objInterface.source.name+"'}"); 
+                            codeWriter.outdent();
+                            codeWriter.outdent();
+                            codeWriter.writeLine("description: Created");
+                            codeWriter.outdent();
+                            codeWriter.outdent();
 
-                    this.buildRequestBody(codeWriter, objInterface);
-                   
-                    codeWriter.writeLine("responses:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("'201':");
-                    codeWriter.indent();
-                    codeWriter.writeLine("content:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("application/json:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+objInterface.source.name+"'}"); 
+                            codeWriter.outdent();
+                        
+                        }
+                    });
                     codeWriter.outdent();
-                    codeWriter.outdent();
-                    codeWriter.writeLine("description: Created");
-                    codeWriter.outdent();
-                    codeWriter.outdent();
+                
+                    let checkOperationArr = objInterface.target.operations.filter(item => {
+                        return item.name=="GET" || item.name=="PUT" || item.name=="DELTE";
+                    });
 
-                    codeWriter.outdent();
-                   
-                }
-            })
-            codeWriter.outdent();
-           
-            let checkOperationArr = objInterface.target.operations.filter(item => {
-                return item.name=="GET" || item.name=="PUT" || item.name=="DELTE";
-            });
+                    if(checkOperationArr.length>0){
+                        codeWriter.writeLine("/"+objInterface.target.name+"/{"+objInterface.target.attributes[0].name+"}:");
+                        codeWriter.indent();
+                        let attr = objInterface.target.attributes[0];
+                            
+                        objInterface.target.operations.forEach(objOperation => {
+                            if(objOperation.name=="GET"){
+                                codeWriter.writeLine("get:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("description: Get single " +objInterface.source.name+" by Id");
 
-            if(checkOperationArr.length>0){
-            codeWriter.writeLine("/"+objInterface.target.name+"/{"+objInterface.target.attributes[0].name+"}:");
-            codeWriter.indent();
-            let attr = objInterface.target.attributes[0];
-                   
-            objInterface.target.operations.forEach(objOperation => {
-                if(objOperation.name=="GET"){
-                    codeWriter.writeLine("get:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("description: Get single " +objInterface.source.name+" by Id");
+                                this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
 
-                    this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
+                                codeWriter.writeLine("responses:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("'200':");
+                                codeWriter.indent();
+                                codeWriter.writeLine("content:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("application/json:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+ objInterface.source.name +"'}"); 
+                            
+                                codeWriter.outdent();
+                                codeWriter.outdent();
+                                codeWriter.writeLine("description: OK");
+                                codeWriter.outdent();
+                                codeWriter.outdent();
+                                codeWriter.outdent();
+                            
+                            }
+                            else  if(objOperation.name=="DELETE"){
+                                codeWriter.writeLine("delete:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
 
-                    codeWriter.writeLine("responses:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("'200':");
-                    codeWriter.indent();
-                    codeWriter.writeLine("content:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("application/json:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+ objInterface.source.name +"'}"); 
-                   
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                    codeWriter.writeLine("description: OK");
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                   
-                }
-                else  if(objOperation.name=="DELETE"){
-                    codeWriter.writeLine("delete:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
+                                this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
+                            
+                                codeWriter.writeLine("responses:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("'204': {description: No Content}");
+                                codeWriter.outdent();
+                                codeWriter.outdent();
+                                
+                            
+                            }
+                            else  if(objOperation.name=="PUT"){
+                                codeWriter.writeLine("put:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("description: Update an existing " +objInterface.source.name);
+                            
+                                this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
 
-                    this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
-
-                  
-                    codeWriter.writeLine("responses:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("'204': {description: No Content}");
-                   codeWriter.outdent();
-                    codeWriter.outdent();
-                    
-                   
-                }
-                else  if(objOperation.name=="PUT"){
-                    codeWriter.writeLine("put:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("description: Update an existing " +objInterface.source.name);
-
-                  
-                    this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
-
-                    codeWriter.writeLine("responses:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("'200':");
-                    codeWriter.indent();
-                    codeWriter.writeLine("content:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("application/json:");
-                    codeWriter.indent();
-                    codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+ objInterface.source.name +"'}");
-                    codeWriter.outdent();
-                    codeWriter.outdent();
-                    codeWriter.writeLine("description: OK");
-                   
-                    codeWriter.outdent();
-                    
-                    codeWriter.outdent();
-                    codeWriter.outdent();                   
-                   
-                }
-            });
-            }
-            codeWriter.outdent();
-            codeWriter.outdent();  
-         }     
+                                codeWriter.writeLine("responses:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("'200':");
+                                codeWriter.indent();
+                                codeWriter.writeLine("content:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("application/json:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+ objInterface.source.name +"'}");
+                                codeWriter.outdent();
+                                codeWriter.outdent();
+                                codeWriter.writeLine("description: OK");
+                            
+                                codeWriter.outdent();
+                                
+                                codeWriter.outdent();
+                                codeWriter.outdent();                   
+                            
+                            }
+                        });
+                    }
+                codeWriter.outdent();
+                codeWriter.outdent();  
+                }     
         });
     }
 
@@ -428,6 +449,12 @@ class OpenApiGenerator {
         codeWriter.writeLine("description: ''");
         codeWriter.writeLine("required: true");
         codeWriter.outdent();      
+    }
+
+
+    getEnumerationLiteral(objEnum){
+        let result = objEnum.literals.map(a => a.name);
+        return (result);
     }
   
     
