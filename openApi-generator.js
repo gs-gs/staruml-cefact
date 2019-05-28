@@ -40,14 +40,7 @@ class OpenApiGenerator {
         } else return "string";
     }
 
-    generate(fullPath,elem,options){
-
-        // let interReal = app.repository.select("@UMLInterfaceRealization")
-        // console.log(interReal);
-        // let interGeal = app.repository.select("@UMLGeneralization")
-        // console.log(interGeal);
-        
-       
+    generate(fullPath,elem,options){      
                 
          let _this =this;   
          if (elem instanceof type.UMLPackage) {
@@ -177,7 +170,7 @@ class OpenApiGenerator {
                 });
                 if(filterAttr.length==0){
                     codeWriter.writeLine(attr.name+":");
-                    if(attr.multiplicity==="0..*"){
+                    if(attr.multiplicity==="1..*" || attr.multiplicity==="0..*"){
                         codeWriter.indent();
                         codeWriter.writeLine("items: {description: '"+ (attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+ this.getType(attr.type)+" }");   
                         codeWriter.writeLine("type: array");
@@ -189,8 +182,16 @@ class OpenApiGenerator {
                         if(attr.type instanceof type.UMLEnumeration){
                             codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
                         }
+                        // if(attr.multiplicity==="1"){
+                        //     codeWriter.writeLine("required: true");
+                        // }
 
                         codeWriter.outdent(); 
+                    }
+                    if(attr.defaultValue!=""){
+                        codeWriter.indent();
+                        codeWriter.writeLine("default: '" + attr.defaultValue + "'");
+                        codeWriter.outdent();
                     }
                     arrAttr.push(attr);
                 }
@@ -208,24 +209,26 @@ class OpenApiGenerator {
                     });
                     if(filterAssoc.length==0 && assoc.name!=""){
 
-                        if(assoc.end2.multiplicity==="0..*"){
-                            codeWriter.writeLine(assoc.name+":");
-                            codeWriter.indent();
-                            codeWriter.writeLine("items: {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");   
-                            codeWriter.writeLine("type: array");
-                            codeWriter.outdent();
+                        if(assoc.end1.aggregation=="shared"){
+                            this.writeAssociationProperties(codeWriter,assoc);
                         }else{
-                            codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");                            
-                        }       
+                            if(assoc.end2.multiplicity==="0..*"){
+                                codeWriter.writeLine(assoc.name+":");
+                                codeWriter.indent();
+                                codeWriter.writeLine("items: {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");   
+                                codeWriter.writeLine("type: array");
+                                codeWriter.outdent();
+                            }else{
+                                codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");                            
+                            } 
+                        }      
                         arrAssoc.push(assoc); 
                     }                    
                 }else if(assoc instanceof type.UMLGeneralization){
                     arrGeneral.push(assoc);
                 }
             }
-
-
-            
+           
 
             codeWriter.outdent();
 
@@ -240,7 +243,9 @@ class OpenApiGenerator {
                 codeWriter.outdent();                
             }
            
-
+            if(this.getRequiredAttributes(arrAttr).length>0){
+                codeWriter.writeLine("required: ["+ this.getRequiredAttributes(arrAttr)+"]" );
+            }
             codeWriter.outdent();
         });    
         
@@ -282,6 +287,12 @@ class OpenApiGenerator {
                         if(objOperation.name=="GET"){
                             codeWriter.writeLine("get:");
                             codeWriter.indent();
+
+                            codeWriter.writeLine("tags:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("- " + objInterface.target.name);
+                            codeWriter.outdent();
+        
                             codeWriter.writeLine("description: Get a list of " +objInterface.source.name);
                             codeWriter.writeLine("parameters: []");
                             codeWriter.writeLine("responses:");
@@ -308,6 +319,12 @@ class OpenApiGenerator {
                         else if(objOperation.name=="POST"){
                             codeWriter.writeLine("post:");
                             codeWriter.indent();
+
+                            codeWriter.writeLine("tags:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("- " + objInterface.target.name);
+                            codeWriter.outdent();
+
                             codeWriter.writeLine("description:  Create a new " +objInterface.source.name);
 
                             this.buildRequestBody(codeWriter, objInterface);
@@ -338,17 +355,23 @@ class OpenApiGenerator {
                     });
 
                     if(checkOperationArr.length>0){
-                        codeWriter.writeLine("/"+objInterface.target.name+"/{"+objInterface.target.attributes[0].name+"}:");
+                        objInterface.target.attributes.forEach( operationAttribute => {
+                        codeWriter.writeLine("/"+objInterface.target.name+"/{"+operationAttribute.name+"}:");
                         codeWriter.indent();
-                        let attr = objInterface.target.attributes[0];
                             
                         objInterface.target.operations.forEach(objOperation => {
                             if(objOperation.name=="GET"){
                                 codeWriter.writeLine("get:");
                                 codeWriter.indent();
-                                codeWriter.writeLine("description: Get single " +objInterface.source.name+" by Id");
 
-                                this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
+                                codeWriter.writeLine("tags:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("- " + objInterface.target.name);
+                                codeWriter.outdent();
+
+                                codeWriter.writeLine("description: Get single " +objInterface.source.name+" by " + operationAttribute.name);
+
+                                this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
 
                                 codeWriter.writeLine("responses:");
                                 codeWriter.indent();
@@ -371,9 +394,15 @@ class OpenApiGenerator {
                             else  if(objOperation.name=="DELETE"){
                                 codeWriter.writeLine("delete:");
                                 codeWriter.indent();
+
+                                codeWriter.writeLine("tags:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("- " + objInterface.target.name);
+                                codeWriter.outdent();
+
                                 codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
 
-                                this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
+                                this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
                             
                                 codeWriter.writeLine("responses:");
                                 codeWriter.indent();
@@ -386,9 +415,15 @@ class OpenApiGenerator {
                             else  if(objOperation.name=="PUT"){
                                 codeWriter.writeLine("put:");
                                 codeWriter.indent();
+
+                                codeWriter.writeLine("tags:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("- " + objInterface.target.name);
+                                codeWriter.outdent();
+
                                 codeWriter.writeLine("description: Update an existing " +objInterface.source.name);
                             
-                                this.buildParameter(codeWriter,objInterface.target.attributes[0].name,"path",(attr.documentation?this.buildDescription(attr.documentation):"missing description"),true,"{type: string}")
+                                this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
 
                                 codeWriter.writeLine("responses:");
                                 codeWriter.indent();
@@ -410,6 +445,8 @@ class OpenApiGenerator {
                             
                             }
                         });
+                        codeWriter.outdent();    
+                    });
                     }
                 codeWriter.outdent();
                 codeWriter.outdent();  
@@ -425,6 +462,15 @@ class OpenApiGenerator {
         return desc.replace(/\'/g, "''")
     }
 
+    /**
+     * @function buildParameter
+     * @param {codeWriter} codeWriter
+     * @param {string} name
+     * @param {string} type
+     * @param {string} description
+     * @param {boolean} required
+     * @param {string} schema 
+     */
     buildParameter(codeWriter, name,  type,  description,  required,  schema) {
         codeWriter.writeLine("parameters:");
         codeWriter.writeLine("- description: " + description);
@@ -436,6 +482,11 @@ class OpenApiGenerator {
         codeWriter.outdent();
     }
 
+    /**
+     * @function buildRequestBody
+     * @param {codewrite} codeWriter 
+     * @param {interface} objInterface 
+     */
      buildRequestBody(codeWriter, objInterface) {
         codeWriter.writeLine('requestBody:');
         codeWriter.indent();
@@ -451,13 +502,55 @@ class OpenApiGenerator {
         codeWriter.outdent();      
     }
 
-
+    /**
+     * @function getEnumerationLiteral
+     * @param {UMLEnumaration} objEnum 
+     */
     getEnumerationLiteral(objEnum){
         let result = objEnum.literals.map(a => a.name);
         return (result);
     }
-  
-    
+
+    /**
+     * @function getRequiredAttributes
+     * @param {UMLAttributes[]} arrAttributes 
+     */
+    getRequiredAttributes(arrAttributes){
+
+        let requiredAttr = [];
+         arrAttributes.forEach(item => {
+            if(item.multiplicity=="1" || item.multiplicity=="1..*"){
+                requiredAttr.push(item.name);
+            }
+            
+        });
+        return (requiredAttr);
+    }
+
+    /**
+     * 
+     * @param {codeWriter} codeWriter 
+     * @param {UMLAssociation} assciation 
+     */
+    writeAssociationProperties(codeWriter, assciation){
+        codeWriter.writeLine(assciation.name+":");
+        codeWriter.indent();
+        codeWriter.writeLine("properties:");
+        codeWriter.indent();
+        
+        assciation.end2.reference.attributes.forEach(attr => {
+            if(attr.isID){
+                codeWriter.writeLine(attr.name+":");
+                codeWriter.indent();
+                codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                codeWriter.outdent();
+            }
+        });
+        codeWriter.outdent();
+        codeWriter.outdent();
+    }
+      
 }
 
 exports.OpenApiGenerator = OpenApiGenerator;
