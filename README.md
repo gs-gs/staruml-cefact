@@ -1,5 +1,7 @@
 # UML -> OpenAPI3.0 Generator for StarUML
 
+![Raw](https://rfc.unprotocols.org/spec:2/COSS/raw.svg) v0.1
+
 This StarUML extension is an implementation of the UML->API technical specification at https://edi3.org/uml-profile/. Please review the specification before using this extension because it provides some insight into the UML constructs that are supported and how they map to OpenAPI3.0 specifications.
 
 ## Using the extension.
