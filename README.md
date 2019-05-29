@@ -1,19 +1,30 @@
-# staruml-cefact
-StarUML extensions to support UN/CEFACT edi3 tools &amp; methods specifications..
+# UML -> OpenAPI3.0 Generator for StarUML
 
-#How to add Extension:
+![Raw](https://rfc.unprotocols.org/spec:2/COSS/raw.svg) v0.1
 
-Install using code : 
+This StarUML extension is an implementation of the UML->API technical specification at https://edi3.org/uml-profile/. Please review the specification before using this extension because it provides some insight into the UML constructs that are supported and how they map to OpenAPI3.0 specifications.
 
-    Download Extension from : https://github.com/gs-gs/staruml-cefact
+## Using the extension.
 
-    Add folder in :
+Install the extension in the usual way for [StarUML extensions](https://docs.staruml.io/user-guide/managing-extensions#install-extension).  Then select Tools->OpenAPI from your StarUML menu, select the UML package for generation and click OK.  That's it.
 
-    MacOS: ~/Library/Application Support/StarUML/extensions/user
-    Windows: C:\Users\<user>\AppData\Roaming\StarUML\extensions\user
-    Linux: ~/.config/StarUML/extensions/user 
+## About this extension
 
-Or Installed in StarUML Application.
+* Title : OpenAPI3.0 Generator
+* description : Implementation of UML to API generator in accordance with https://edi3.org/uml-profile/.  
+* License : GPL3
+* Author : 
+   * GoSource Pty Ltd
+   * info@gosource.com.au
+   * https://gosource.com.au
 
-  Tools -> Extension Manager
-  Install From url -> Paste Extesion url  (https://github.com/gs-gs/staruml-cefact)
+## Support or contribution to this extension
+
+* Raise a ticket in this repo
+* Make a pull request to this repo
+
+## Support on the underlying UML->API specification
+
+* join the [edi3.org slack](https://edi3.org/community/)
+* raise a ticket in https://github.com/edi3/edi3-uml-profile
+
