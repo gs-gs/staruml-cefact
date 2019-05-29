@@ -10,8 +10,7 @@ Install the extension in the usual way for [StarUML extensions](https://docs.sta
 
 ## About this extension
 
-* Name : OpenAPI3
-* Title : UML to OpenAPI3.0 generator for StarUML
+* Title : OpenAPI3.0 Generator
 * description : Implementation of UML to API generator in accordance with https://edi3.org/uml-profile/.  
 * License : GPL3
 * Author : 
