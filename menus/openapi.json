@@ -6,7 +6,9 @@
         {
           "label": "OpenAPI",
           "id": "tool.openapi",
-          "command": "openapi:show-toast"
+          "submenu": [
+            { "label": "Generate API", "id": "tools.openapi.generate", "command": "openapi:show-toast" }
+          ]
         }
       ]
     }

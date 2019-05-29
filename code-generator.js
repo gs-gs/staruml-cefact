@@ -1,7 +1,5 @@
 
 const fs = require('fs')
-const path = require('path')
-const codegen = require('./codegen-utils');
 const openApiGen = require('./openApi-generator');
 
 class CodeGenerator {
@@ -40,7 +38,6 @@ class CodeGenerator {
     }
 
     generate(elem, basePath, options){
-        console.log('Code Generator',elem);
         if (elem instanceof  type.UMLPackage) {
             fs.mkdirSync(basePath)
              let schemaWriter = new openApiGen.OpenApiGenerator(); 
@@ -59,9 +56,7 @@ class CodeGenerator {
             }   
         }       
     }
-
-
-    
+   
 }
 
 /**

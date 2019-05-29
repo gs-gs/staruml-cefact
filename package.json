@@ -1,10 +1,15 @@
 {
     "name": "gs-gs.staruml-cefact",
-    "title": "OpenAPI",
-    "description": "OperAPI generator from UML.",
-    "version": "1.0.0",
+    "title": "OpenAPI3.0 Generator",
+    "description": "Implementation of UML to API generator in accordance with https://edi3.org/uml-profile/.",
+    "version": "0.1.0",
     "engines": {
         "staruml": ">=3.0.0"
     },
-    "dependencies": {}
+    "author": {
+        "name": "GoSource Pty Ltd",
+        "email": "info@gosource.com.au",
+        "url": "https://gosource.com.au"
+    },
+    "license": "MIT"
 }
