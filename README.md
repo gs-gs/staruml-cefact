@@ -17,8 +17,13 @@ Install the extension in the usual way for [StarUML extensions](https://docs.sta
    * info@gosource.com.au
    * https://gosource.com.au
 
-## Contributing
+## Support or contribution to this extension
 
 * Raise a ticket in this repo
 * Make a pull request to this repo
+
+## Support on the underlying UML->API specification
+
 * join the [edi3.org slack](https://edi3.org/community/)
+* raise a ticket in https://github.com/edi3/edi3-uml-profile
+
