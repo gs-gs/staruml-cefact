@@ -5,3 +5,11 @@ This StarUML extension is an implementation of the UML->API technical specificat
 ## Using the extension.
 
 Install the extension in the usual way for [StarUML extensions](https://docs.staruml.io/user-guide/managing-extensions#install-extension).  Then select Tools->OpenAPI from your StarUML menu, select the UML package for generation and click OK.  That's it.
+
+## About this extension
+
+* Name : OpenAPI3
+* Title : UML to OpenAPI3.0 generator for StarUML
+* Author : GoSource Pty ltd
+* description : Implementation of UML to API generator in accordance with https://edi3.org/uml-profile/.  
+* License : GPL3
