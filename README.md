@@ -10,6 +10,9 @@ Install the extension in the usual way for [StarUML extensions](https://docs.sta
 
 * Name : OpenAPI3
 * Title : UML to OpenAPI3.0 generator for StarUML
-* Author : GoSource Pty Ltd
 * description : Implementation of UML to API generator in accordance with https://edi3.org/uml-profile/.  
 * License : GPL3
+* Author : 
+   * GoSource Pty Ltd
+   * info@gosource.com.au
+   * https://gosource.com.au
