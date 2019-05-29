@@ -1,19 +1,7 @@
-# staruml-cefact
-StarUML extensions to support UN/CEFACT edi3 tools &amp; methods specifications..
+# UML -> OpenAPI3.0 Generator for StarUML
 
-#How to add Extension:
+This StarUML extension is an implementation of the UML->API technical specification at https://edi3.org/uml-profile/. Please review the specification before using this extension because it provides some insight into the UML constructs that are supported and how them map to OpenAPI3.0 specifications.
 
-Install using code : 
+## Using the extension.
 
-    Download Extension from : https://github.com/gs-gs/staruml-cefact
-
-    Add folder in :
-
-    MacOS: ~/Library/Application Support/StarUML/extensions/user
-    Windows: C:\Users\<user>\AppData\Roaming\StarUML\extensions\user
-    Linux: ~/.config/StarUML/extensions/user 
-
-Or Installed in StarUML Application.
-
-  Tools -> Extension Manager
-  Install From url -> Paste Extesion url  (https://github.com/gs-gs/staruml-cefact)
+Install the extension in the usual way for [StarUML extensions](https://docs.staruml.io/user-guide/managing-extensions#install-extension).  Then select Tools->OpenAPI from your StarUML menu, select the UML package for generation and click OK.  That's it.
