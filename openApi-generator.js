@@ -1,5 +1,5 @@
-const fs = require('fs')
-const path = require('path')
+const fs = require('fs');
+const path = require('path');
 const codegen = require('./codegen-utils');
 
 class OpenApiGenerator {
@@ -32,6 +32,13 @@ class OpenApiGenerator {
         }
     }
 
+
+    /**
+     * @function getType
+     * @description Get attribute type number,boolean,string 
+     * @returns string 
+     * @param {string} starUMLType 
+     */
     getType(starUMLType) {
         if (starUMLType==="Numeric") {
             return "number";
@@ -49,33 +56,30 @@ class OpenApiGenerator {
               elem.ownedElements.forEach(child => {                
                     if(child instanceof type.UMLClass){
                          setTimeout(function() {  _this.findClass(child,  options); },10);
-                       
+                        //  _this.schemas.push(child);
                     }else if(child instanceof type.UMLInterface){
                         
                         _this.operations.push(child);
                     }
                    
-              })
+              });
             }
 
             setTimeout(function() {
-                    let resArr = [];
-                   _this.schemas.forEach(item => {
-                        let filter = resArr.filter(subItem =>{
-                            return subItem._id==item._id;
-                        })
-                        if(filter.length==0){
-                             resArr.push(item);
-                        }
-                   });
+                let resArr = [];
+                _this.schemas.forEach(item => {
+                    let filter = resArr.filter(subItem =>{
+                        return subItem._id==item._id;
+                    });
+                    if(filter.length==0){
+                        resArr.push(item);
+                    }
+                });
       
                 resArr.sort(function(a, b) {                     
                     return a.name.localeCompare(b.name);
                 });
-
-                console.log(resArr);
-
-
+              
                 let uniqArr = [];
                 let duplicateClasses =[];
 
@@ -95,14 +99,13 @@ class OpenApiGenerator {
                         }
                 });
 
-                console.log(uniqArr);  
                 if(!isDuplicate){
                      _this.writeClass(uniqArr,fullPath, options,elem);
                 }else{
                     app.dialogs.showErrorDialog("There "+ (duplicateClasses.length>1?"are":"is") +" duplicate "+ duplicateClasses.join() + (duplicateClasses.length>1?" classes":" class") + " for same name.");                           
                 }
              
-            },1500);
+            },1000);
            
         } 
     }
@@ -119,18 +122,12 @@ class OpenApiGenerator {
         if (elem.ownedElements.length>0) {
             elem.ownedElements.forEach(child => {                    
                 if(child instanceof type.UMLAssociation){
-                    // let filter = _this.schemas.filter(function(item){
-                    //     return item.name==child.end2.reference.name;
-                    // });
-                    // if(filter.length<=0){
-                        if(child.end1.reference.name!=child.end2.reference.name){
-                            setTimeout(function() {   _this.findClass(child.end2.reference,options); },5);
-                        }
-                    // }                           
+                    if(child.end1.reference.name!=child.end2.reference.name){
+                        setTimeout(function() {   _this.findClass(child.end2.reference,options); },5);
+                    }                                               
                 }
             });                   
-        }                 
-      
+        }            
     }
 
   
@@ -142,6 +139,9 @@ class OpenApiGenerator {
      * @param {type.package} mainElem package element
      */
     writeClass(classes,fullPath, options,mainElem){
+
+        let classLink = app.repository.select("@UMLAssociationClassLink")
+      
         let basePath = path.join(fullPath, mainElem.name + '.yml')
         let codeWriter;
         codeWriter = new codegen.CodeWriter(this.getIndentString(options))
@@ -178,13 +178,10 @@ class OpenApiGenerator {
                     }else{
                         codeWriter.indent();
                         codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
-                        codeWriter.writeLine("type: "+  this.getType() );
+                        codeWriter.writeLine("type: "+  this.getType(attr.type) );
                         if(attr.type instanceof type.UMLEnumeration){
                             codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
-                        }
-                        // if(attr.multiplicity==="1"){
-                        //     codeWriter.writeLine("required: true");
-                        // }
+                        }             
 
                         codeWriter.outdent(); 
                     }
@@ -212,7 +209,7 @@ class OpenApiGenerator {
                         if(assoc.end1.aggregation=="shared"){
                             this.writeAssociationProperties(codeWriter,assoc);
                         }else{
-                            if(assoc.end2.multiplicity==="0..*"){
+                            if(assoc.end2.multiplicity==="0..*" || assoc.end2.multiplicity==="1..*"){
                                 codeWriter.writeLine(assoc.name+":");
                                 codeWriter.indent();
                                 codeWriter.writeLine("items: {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");   
@@ -228,7 +225,16 @@ class OpenApiGenerator {
                     arrGeneral.push(assoc);
                 }
             }
+
+            let assocClassLink = classLink.filter(item => {
+                return item.associationSide.end1.reference._id==objClass._id;
+            });
+
            
+            if(assocClassLink.length>0)
+            {
+                this.writeAssociationClassProperties(codeWriter,assocClassLink[0]);
+            }
 
             codeWriter.outdent();
 
@@ -267,12 +273,9 @@ class OpenApiGenerator {
     /**
      * Write Operation (Path)
      * @param {codeWriter} codeWriter
-     * @param {Object} options
-     * @param {type.package} mainElem package element
      */
-    writeOperation(codeWriter,options,mainElem){
+    writeOperation(codeWriter){
         let interReal = app.repository.select("@UMLInterfaceRealization")
-        console.log(interReal);
         this.operations.forEach(objOperation => {
                 let filterInterface = interReal.filter(itemInterface =>{
                     return itemInterface.target.name == objOperation.name;
@@ -284,7 +287,7 @@ class OpenApiGenerator {
                     codeWriter.writeLine("/"+objInterface.target.name+":");
                     codeWriter.indent();
                     objInterface.target.operations.forEach(objOperation =>{
-                        if(objOperation.name=="GET"){
+                        if(objOperation.name.toUpperCase()=="GET"){
                             codeWriter.writeLine("get:");
                             codeWriter.indent();
 
@@ -313,10 +316,9 @@ class OpenApiGenerator {
                             codeWriter.writeLine("description: OK");
                             codeWriter.outdent();
                             codeWriter.outdent();
-                            codeWriter.outdent();
-                        
+                            codeWriter.outdent();                        
                         }
-                        else if(objOperation.name=="POST"){
+                        else if(objOperation.name.toUpperCase()=="POST"){
                             codeWriter.writeLine("post:");
                             codeWriter.indent();
 
@@ -344,10 +346,10 @@ class OpenApiGenerator {
                             codeWriter.outdent();
                             codeWriter.outdent();
 
-                            codeWriter.outdent();
-                        
+                            codeWriter.outdent();                        
                         }
                     });
+
                     codeWriter.outdent();
                 
                     let checkOperationArr = objInterface.target.operations.filter(item => {
@@ -360,7 +362,7 @@ class OpenApiGenerator {
                         codeWriter.indent();
                             
                         objInterface.target.operations.forEach(objOperation => {
-                            if(objOperation.name=="GET"){
+                            if(objOperation.name.toUpperCase()=="GET"){
                                 codeWriter.writeLine("get:");
                                 codeWriter.indent();
 
@@ -391,7 +393,7 @@ class OpenApiGenerator {
                                 codeWriter.outdent();
                             
                             }
-                            else  if(objOperation.name=="DELETE"){
+                            else  if(objOperation.name.toUpperCase()=="DELETE"){
                                 codeWriter.writeLine("delete:");
                                 codeWriter.indent();
 
@@ -408,11 +410,10 @@ class OpenApiGenerator {
                                 codeWriter.indent();
                                 codeWriter.writeLine("'204': {description: No Content}");
                                 codeWriter.outdent();
-                                codeWriter.outdent();
-                                
+                                codeWriter.outdent();                               
                             
                             }
-                            else  if(objOperation.name=="PUT"){
+                            else  if(objOperation.name.toUpperCase()=="PUT"){
                                 codeWriter.writeLine("put:");
                                 codeWriter.indent();
 
@@ -424,7 +425,7 @@ class OpenApiGenerator {
                                 codeWriter.writeLine("description: Update an existing " +objInterface.source.name);
                             
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
-
+                                this.buildRequestBody(codeWriter, objInterface);
                                 codeWriter.writeLine("responses:");
                                 codeWriter.indent();
                                 codeWriter.writeLine("'200':");
@@ -439,10 +440,27 @@ class OpenApiGenerator {
                                 codeWriter.writeLine("description: OK");
                             
                                 codeWriter.outdent();
-                                
                                 codeWriter.outdent();
-                                codeWriter.outdent();                   
-                            
+                                codeWriter.outdent();
+                            }else if(objOperation.name.toUpperCase()=="PATCH"){
+                                codeWriter.writeLine("patch:");
+                                codeWriter.indent();
+    
+                                codeWriter.writeLine("tags:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("- " + objInterface.target.name);
+                                codeWriter.outdent();
+    
+                                codeWriter.writeLine("description:  Update " +objInterface.source.name);
+                                this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
+                              
+                                this.buildRequestBody(codeWriter, objInterface);
+                        
+                                codeWriter.writeLine("responses:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("'204': {description: No Content}");
+                                codeWriter.outdent();
+                                codeWriter.outdent(); 
                             }
                         });
                         codeWriter.outdent();    
@@ -549,6 +567,51 @@ class OpenApiGenerator {
         });
         codeWriter.outdent();
         codeWriter.outdent();
+    }
+
+
+    /**
+     * @function writeAssociationClassProperties
+     * @param {codeWriter} codeWriter 
+     * @param {UMLAssociationClass} associationClass 
+     */
+    writeAssociationClassProperties(codeWriter, associationClass){
+
+        var end2Attributes = associationClass.associationSide.end2.reference.attributes;
+        var classSideAtributes = associationClass.classSide.attributes;
+        codeWriter.writeLine(associationClass.classSide.name+":");
+        codeWriter.indent();
+       
+        codeWriter.writeLine("properties:");
+        codeWriter.indent();
+
+        classSideAtributes.forEach(attr => {
+                codeWriter.writeLine(attr.name+":");
+                codeWriter.indent();
+                codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                if(attr.type instanceof type.UMLEnumeration){
+                    codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+                }   
+                codeWriter.outdent();
+          
+        });
+
+        end2Attributes.forEach(attr => {
+            if(attr.isID){
+                codeWriter.writeLine(attr.name+":");
+                codeWriter.indent();
+                codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                if(attr.type instanceof type.UMLEnumeration){
+                    codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+                }   
+                codeWriter.outdent();
+            }
+        });
+        codeWriter.outdent();
+        codeWriter.outdent();
+
     }
       
 }
