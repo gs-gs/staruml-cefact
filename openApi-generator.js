@@ -101,11 +101,12 @@ class OpenApiGenerator {
 
                 if(!isDuplicate){
                      _this.writeClass(uniqArr,fullPath, options,elem);
+                     
                 }else{
                     app.dialogs.showErrorDialog("There "+ (duplicateClasses.length>1?"are":"is") +" duplicate "+ duplicateClasses.join() + (duplicateClasses.length>1?" classes":" class") + " for same name.");                           
                 }
              
-            },1000);
+            },500);
            
         } 
     }

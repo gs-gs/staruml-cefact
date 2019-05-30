@@ -38,23 +38,28 @@ class CodeGenerator {
     }
 
     generate(elem, basePath, options){
-        if (elem instanceof  type.UMLPackage) {
-            fs.mkdirSync(basePath)
-             let schemaWriter = new openApiGen.OpenApiGenerator(); 
-            schemaWriter.generate(basePath,elem,options);
-        }
-        else{
-            fs.mkdirSync(basePath)
-            let i,len
-        
-            for (i = 0, len = elem.ownedElements.length; i < len; i++) {
-                let def = elem.ownedElements[i];
-                if (def instanceof  type.UMLPackage) {
-                    let schemaWriter = new openApiGen.OpenApiGenerator(); 
-                    schemaWriter.generate(basePath,def,options);      
-                }
-            }   
-        }       
+        try{
+            if (elem instanceof  type.UMLPackage) {
+                fs.mkdirSync(basePath)
+                let schemaWriter = new openApiGen.OpenApiGenerator(); 
+                schemaWriter.generate(basePath,elem,options,true);
+            }
+            else{
+                fs.mkdirSync(basePath);
+                let i,len
+            
+                for (i = 0, len = elem.ownedElements.length; i < len; i++) {
+                    let def = elem.ownedElements[i];
+                    if (def instanceof  type.UMLPackage) {
+                        let schemaWriter = new openApiGen.OpenApiGenerator(); 
+                        schemaWriter.generate(basePath,def,options,false);      
+                    }
+                }   
+            }  
+            app.toast.info("OpenAPI generation completed");
+        } catch (e) {
+          app.toast.error("Generation Failed!");
+        }   
     }
    
 }
