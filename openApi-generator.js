@@ -276,7 +276,7 @@ class OpenApiGenerator {
      * @param {codeWriter} codeWriter
      */
     writeOperation(codeWriter){
-        let interReal = app.repository.select("@UMLInterfaceRealization")
+        let interReal = app.repository.select("@UMLInterfaceRealization");
         this.operations.forEach(objOperation => {
                 let filterInterface = interReal.filter(itemInterface =>{
                     return itemInterface.target.name == objOperation.name;
@@ -373,7 +373,7 @@ class OpenApiGenerator {
                                 codeWriter.outdent();
 
                                 codeWriter.writeLine("description: Get single " +objInterface.source.name+" by " + operationAttribute.name);
-
+                                codeWriter.writeLine("parameters:");
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
 
                                 codeWriter.writeLine("responses:");
@@ -404,7 +404,7 @@ class OpenApiGenerator {
                                 codeWriter.outdent();
 
                                 codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
-
+                                codeWriter.writeLine("parameters:");
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
                             
                                 codeWriter.writeLine("responses:");
@@ -424,7 +424,7 @@ class OpenApiGenerator {
                                 codeWriter.outdent();
 
                                 codeWriter.writeLine("description: Update an existing " +objInterface.source.name);
-                            
+                                codeWriter.writeLine("parameters:");
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
                                 this.buildRequestBody(codeWriter, objInterface);
                                 codeWriter.writeLine("responses:");
@@ -453,6 +453,7 @@ class OpenApiGenerator {
                                 codeWriter.outdent();
     
                                 codeWriter.writeLine("description:  Update " +objInterface.source.name);
+                                codeWriter.writeLine("parameters:");
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
                               
                                 this.buildRequestBody(codeWriter, objInterface);
@@ -467,9 +468,22 @@ class OpenApiGenerator {
                         codeWriter.outdent();    
                     });
                     }
+
+                    if(objInterface.target.ownedElements.length>0){
+                        console.log("Interface Relationship : ",objInterface);
+                        let interfaceRelation = objInterface.target.ownedElements;
+                        interfaceRelation.forEach(interAsso => {
+                            if(interAsso instanceof type.UMLAssociation){
+                                if(interAsso.end2.aggregation=="composite"){
+                                    this.writeInterfaceComposite(codeWriter,objInterface, interAsso);
+                                }
+                            }
+                        });
+                    }
+
                 codeWriter.outdent();
                 codeWriter.outdent();  
-                }     
+            }     
         });
     }
 
@@ -491,7 +505,7 @@ class OpenApiGenerator {
      * @param {string} schema 
      */
     buildParameter(codeWriter, name,  type,  description,  required,  schema) {
-        codeWriter.writeLine("parameters:");
+        // codeWriter.writeLine("parameters:");
         codeWriter.writeLine("- description: " + description);
         codeWriter.indent();
         codeWriter.writeLine("in: " + type);
@@ -613,6 +627,87 @@ class OpenApiGenerator {
         codeWriter.outdent();
         codeWriter.outdent();
 
+    }
+
+
+    writeInterfaceComposite(codeWriter,interfaceRealization, interfaceAssociation){
+        let end1Interface = interfaceAssociation.end1;
+        let end2Interface = interfaceAssociation.end2;
+        
+       interfaceRealization.target.operations.forEach(objOperation =>{
+            if(objOperation.name.toUpperCase()=="GET"){
+                codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+"/{"+end1Interface.reference.attributes[0].name+"}:");
+                codeWriter.indent();
+                codeWriter.writeLine("get:");
+                codeWriter.indent();
+
+                codeWriter.writeLine("tags:");
+                codeWriter.indent();
+                codeWriter.writeLine("- " + interfaceRealization.target.name);
+                codeWriter.outdent();
+
+                codeWriter.writeLine("description: Get a list of " +interfaceRealization.source.name);
+                codeWriter.writeLine("parameters:");
+                this.buildParameter(codeWriter,end2Interface.reference.attributes[0].name,"path",(end2Interface.reference.attributes[0].documentation?this.buildDescription(end2Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
+                this.buildParameter(codeWriter,end1Interface.reference.attributes[0].name,"path",(end1Interface.reference.attributes[0].documentation?this.buildDescription(end1Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
+                              
+                codeWriter.writeLine("responses:");
+                codeWriter.indent();
+                codeWriter.writeLine("'200':");
+                codeWriter.indent();
+                codeWriter.writeLine("content:");
+                codeWriter.indent();
+                codeWriter.writeLine("application/json:");
+                codeWriter.indent();
+                codeWriter.writeLine("schema:"); 
+                codeWriter.indent();
+                codeWriter.writeLine("items: {$ref: '#/components/schemas/"+interfaceRealization.source.name+"'}");
+                codeWriter.writeLine("type: array");   
+                codeWriter.outdent();
+                codeWriter.outdent();
+                codeWriter.outdent();
+                codeWriter.writeLine("description: OK");
+                codeWriter.outdent();
+                codeWriter.outdent();
+                codeWriter.outdent();    
+                codeWriter.outdent();                      
+            }
+            else if(objOperation.name.toUpperCase()=="POST"){
+                codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+":");
+                codeWriter.indent();
+                codeWriter.writeLine("post:");
+                codeWriter.indent();
+
+                codeWriter.writeLine("tags:");
+                codeWriter.indent();
+                codeWriter.writeLine("- " + interfaceRealization.target.name);
+                codeWriter.outdent();
+
+                codeWriter.writeLine("description:  Create a new " +interfaceRealization.source.name);
+                codeWriter.writeLine("parameters:");
+                this.buildParameter(codeWriter,end2Interface.reference.attributes[0].name,"path",(end2Interface.reference.attributes[0].documentation?this.buildDescription(end2Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
+               
+                this.buildRequestBody(codeWriter, interfaceRealization);
+            
+                codeWriter.writeLine("responses:");
+                codeWriter.indent();
+                codeWriter.writeLine("'201':");
+                codeWriter.indent();
+                codeWriter.writeLine("content:");
+                codeWriter.indent();
+                codeWriter.writeLine("application/json:");
+                codeWriter.indent();
+                codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+interfaceRealization.source.name+"'}"); 
+                codeWriter.outdent();
+                codeWriter.outdent();
+                codeWriter.writeLine("description: Created");
+                codeWriter.outdent();
+                codeWriter.outdent();
+
+                codeWriter.outdent();  
+                codeWriter.outdent();                        
+            }
+        });        
     }
       
 }
