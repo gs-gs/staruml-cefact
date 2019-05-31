@@ -561,7 +561,7 @@ class OpenApiGenerator {
     }
 
     /**
-     * 
+     * @function writeAssociationProperties
      * @param {codeWriter} codeWriter 
      * @param {UMLAssociation} assciation 
      */
@@ -629,14 +629,19 @@ class OpenApiGenerator {
 
     }
 
-
+    /**
+     * @function writeInterfaceComposite
+     * @param {codeWriter} codeWriter 
+     * @param {UMLInterfaceRealization} interfaceRealization 
+     * @param {UMLAssociation} interfaceAssociation 
+     */
     writeInterfaceComposite(codeWriter,interfaceRealization, interfaceAssociation){
         let end1Interface = interfaceAssociation.end1;
         let end2Interface = interfaceAssociation.end2;
         
        interfaceRealization.target.operations.forEach(objOperation =>{
             if(objOperation.name.toUpperCase()=="GET"){
-                codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+"/{"+end1Interface.reference.attributes[0].name+"}:");
+                codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.name +"_"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+"/{"+end1Interface.reference.name +"_"+end1Interface.reference.attributes[0].name+"}:");
                 codeWriter.indent();
                 codeWriter.writeLine("get:");
                 codeWriter.indent();
@@ -648,8 +653,8 @@ class OpenApiGenerator {
 
                 codeWriter.writeLine("description: Get a list of " +interfaceRealization.source.name);
                 codeWriter.writeLine("parameters:");
-                this.buildParameter(codeWriter,end2Interface.reference.attributes[0].name,"path",(end2Interface.reference.attributes[0].documentation?this.buildDescription(end2Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
-                this.buildParameter(codeWriter,end1Interface.reference.attributes[0].name,"path",(end1Interface.reference.attributes[0].documentation?this.buildDescription(end1Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
+                this.buildParameter(codeWriter,end2Interface.reference.name +"_"+ end2Interface.reference.attributes[0].name,"path",(end2Interface.reference.attributes[0].documentation?this.buildDescription(end2Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
+                this.buildParameter(codeWriter,end1Interface.reference.name +"_"+end1Interface.reference.attributes[0].name,"path",(end1Interface.reference.attributes[0].documentation?this.buildDescription(end1Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
                               
                 codeWriter.writeLine("responses:");
                 codeWriter.indent();
@@ -706,6 +711,29 @@ class OpenApiGenerator {
 
                 codeWriter.outdent();  
                 codeWriter.outdent();                        
+            }else if(objOperation.name.toUpperCase()=="DELETE"){
+                codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.name +"_"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+"/{"+end1Interface.reference.name +"_"+end1Interface.reference.attributes[0].name+"}:");
+                codeWriter.indent();
+                codeWriter.writeLine("delete:");
+                codeWriter.indent();
+
+                codeWriter.writeLine("tags:");
+                codeWriter.indent();
+                codeWriter.writeLine("- " + objInterface.target.name);
+                codeWriter.outdent();
+
+                codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
+                codeWriter.writeLine("parameters:");
+                this.buildParameter(codeWriter,end2Interface.reference.name +"_"+ end2Interface.reference.attributes[0].name,"path",(end2Interface.reference.attributes[0].documentation?this.buildDescription(end2Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
+                this.buildParameter(codeWriter,end1Interface.reference.name +"_"+end1Interface.reference.attributes[0].name,"path",(end1Interface.reference.attributes[0].documentation?this.buildDescription(end1Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
+               
+                codeWriter.writeLine("responses:");
+                codeWriter.indent();
+                codeWriter.writeLine("'204': {description: No Content}");
+                codeWriter.outdent();
+                codeWriter.outdent();   
+                codeWriter.outdent();                              
+            
             }
         });        
     }
