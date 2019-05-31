@@ -641,6 +641,45 @@ class OpenApiGenerator {
         
        interfaceRealization.target.operations.forEach(objOperation =>{
             if(objOperation.name.toUpperCase()=="GET"){
+                
+                
+                /* Get all list */
+                codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.name +"_"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+":");
+                codeWriter.indent();
+                codeWriter.writeLine("get:");
+                codeWriter.indent();
+
+                codeWriter.writeLine("tags:");
+                codeWriter.indent();
+                codeWriter.writeLine("- " + interfaceRealization.target.name);
+                codeWriter.outdent();
+
+                codeWriter.writeLine("description: Get a list of " +interfaceRealization.source.name);
+                codeWriter.writeLine("parameters:");
+                this.buildParameter(codeWriter,end2Interface.reference.name +"_"+ end2Interface.reference.attributes[0].name,"path",(end2Interface.reference.attributes[0].documentation?this.buildDescription(end2Interface.reference.attributes[0].documentation):"missing description"),true,"{type: string}")
+                              
+                codeWriter.writeLine("responses:");
+                codeWriter.indent();
+                codeWriter.writeLine("'200':");
+                codeWriter.indent();
+                codeWriter.writeLine("content:");
+                codeWriter.indent();
+                codeWriter.writeLine("application/json:");
+                codeWriter.indent();
+                codeWriter.writeLine("schema:"); 
+                codeWriter.indent();
+                codeWriter.writeLine("items: {$ref: '#/components/schemas/"+interfaceRealization.source.name+"'}");
+                codeWriter.writeLine("type: array");   
+                codeWriter.outdent();
+                codeWriter.outdent();
+                codeWriter.outdent();
+                codeWriter.writeLine("description: OK");
+                codeWriter.outdent();
+                codeWriter.outdent();
+                codeWriter.outdent();    
+                codeWriter.outdent();   
+
+                /* Get single element record */
                 codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.name +"_"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+"/{"+end1Interface.reference.name +"_"+end1Interface.reference.attributes[0].name+"}:");
                 codeWriter.indent();
                 codeWriter.writeLine("get:");
@@ -664,18 +703,15 @@ class OpenApiGenerator {
                 codeWriter.indent();
                 codeWriter.writeLine("application/json:");
                 codeWriter.indent();
-                codeWriter.writeLine("schema:"); 
-                codeWriter.indent();
-                codeWriter.writeLine("items: {$ref: '#/components/schemas/"+interfaceRealization.source.name+"'}");
-                codeWriter.writeLine("type: array");   
-                codeWriter.outdent();
+                codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+interfaceRealization.source.name+"'}");
+               
                 codeWriter.outdent();
                 codeWriter.outdent();
                 codeWriter.writeLine("description: OK");
                 codeWriter.outdent();
                 codeWriter.outdent();
                 codeWriter.outdent();    
-                codeWriter.outdent();                      
+                codeWriter.outdent(); 
             }
             else if(objOperation.name.toUpperCase()=="POST"){
                 codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+":");
