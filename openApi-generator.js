@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const codegen = require('./codegen-utils');
-
+const yaml = require('js-yaml');
 class OpenApiGenerator {
 
      /**
@@ -143,7 +143,7 @@ class OpenApiGenerator {
 
         let classLink = app.repository.select("@UMLAssociationClassLink")
       
-        let basePath = path.join(fullPath, mainElem.name + '.yml')
+        let basePath = path.join(fullPath, mainElem.name + '.json')
         let codeWriter;
         codeWriter = new codegen.CodeWriter(this.getIndentString(options))
         codeWriter.writeLine('components:');
@@ -267,8 +267,16 @@ class OpenApiGenerator {
        
         this.writeOperation(codeWriter,options,mainElem); 
         codeWriter.writeLine("servers: []");
+
+        try {
+            var doc = yaml.safeLoad(codeWriter.getData());
+            console.log(doc);
+            fs.writeFileSync(basePath, JSON.stringify(doc,null,4));  
+        } catch (e) {
+            console.log(e);
+        }
       
-        fs.writeFileSync(basePath, codeWriter.getData());  
+        // fs.writeFileSync(basePath, codeWriter.getData());  
     }  
 
     /**
@@ -640,8 +648,7 @@ class OpenApiGenerator {
         let end2Interface = interfaceAssociation.end2;
         
        interfaceRealization.target.operations.forEach(objOperation =>{
-            if(objOperation.name.toUpperCase()=="GET"){
-                
+            if(objOperation.name.toUpperCase()=="GET"){                
                 
                 /* Get all list */
                 codeWriter.writeLine("/"+end2Interface.reference.name+"/{"+end2Interface.reference.name +"_"+end2Interface.reference.attributes[0].name+"}/"+end1Interface.reference.name+":");
