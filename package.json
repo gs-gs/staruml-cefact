@@ -11,5 +11,8 @@
         "email": "info@gosource.com.au",
         "url": "https://gosource.com.au"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "js-yaml": "^3.13.1"
+    }
 }
