@@ -123,7 +123,7 @@ class OpenApiGenerator {
         if (elem.ownedElements.length>0) {
             elem.ownedElements.forEach(child => {                    
                 if(child instanceof type.UMLAssociation){
-                    if(child.end1.reference.name!=child.end2.reference.name){
+                    if(child.end1.reference.name!=child.end2.reference.name ){
                         setTimeout(function() {   _this.findClass(child.end2.reference,options); },5);
                     }                                               
                 }
@@ -141,9 +141,11 @@ class OpenApiGenerator {
      */
     writeClass(classes,fullPath, options,mainElem){
 
-        let classLink = app.repository.select("@UMLAssociationClassLink")
-      
-        let basePath = path.join(fullPath, mainElem.name + '.json')
+        let classLink = app.repository.select("@UMLAssociationClassLink");
+        let basePath = path.join(fullPath, mainElem.name + '.json');
+       
+        let arrIdClasses = [];
+        
         let codeWriter;
         codeWriter = new codegen.CodeWriter(this.getIndentString(options))
         codeWriter.writeLine('components:');
@@ -155,9 +157,14 @@ class OpenApiGenerator {
             let accosElems = objClass.ownedElements.filter(item=>{
                 return item instanceof type.UMLAssociation;
             });
+          
+            let assocSideClassLink = classLink.filter(item => {
+                return item.associationSide.end2.reference._id==objClass._id;
+            });
 
             codeWriter.writeLine(objClass.name+":" );  
             codeWriter.indent();
+            codeWriter.writeLine("type: object"); 
             codeWriter.writeLine("properties:" + ((objClass.attributes.length==0 && accosElems.length==0)?" {}":""));  
             codeWriter.indent();
 
@@ -169,35 +176,46 @@ class OpenApiGenerator {
                 let filterAttr = arrAttr.filter(item=>{
                     return item.name==attr.name;
                 });
-                if(filterAttr.length==0){
-                    codeWriter.writeLine(attr.name+":");
-                    if(attr.multiplicity==="1..*" || attr.multiplicity==="0..*"){
-                        codeWriter.indent();
-                        codeWriter.writeLine("items: {description: '"+ (attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+ this.getType(attr.type)+" }");   
-                        codeWriter.writeLine("type: array");
-                        /**
-                        * Add MinItems of multiplicity is 1..*
-                        */
-                        if( attr.multiplicity==="1..*"){
-                            codeWriter.writeLine("minItems: 1");
-                        }
-                        codeWriter.outdent();  
-                    }else{
-                        codeWriter.indent();
-                        codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
-                        codeWriter.writeLine("type: "+  this.getType(attr.type) );
-                        if(attr.type instanceof type.UMLEnumeration){
-                            codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
-                        }             
-
-                        codeWriter.outdent(); 
-                    }
-                    if(attr.defaultValue!=""){
-                        codeWriter.indent();
-                        codeWriter.writeLine("default: '" + attr.defaultValue + "'");
-                        codeWriter.outdent();
-                    }
+                if(filterAttr.length==0 ){
                     arrAttr.push(attr);
+                    if(assocSideClassLink.length>0 && attr.isID)
+                    {
+                        continue;
+                    }
+                    // if(!attr.isID ){
+                        codeWriter.writeLine(attr.name+":");
+                        if(attr.multiplicity==="1..*" || attr.multiplicity==="0..*"){
+                            codeWriter.indent();
+                            codeWriter.writeLine("items:");   
+                            codeWriter.indent();
+                            codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                            codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                            codeWriter.outdent();  
+                            codeWriter.writeLine("type: array");
+                            /**
+                             * Add MinItems of multiplicity is 1..*
+                             */
+                            if( attr.multiplicity==="1..*"){
+                                codeWriter.writeLine("minItems: 1");
+                            }
+                            codeWriter.outdent();  
+                        }else{
+                            codeWriter.indent();
+                            codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                            codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                            if(attr.type instanceof type.UMLEnumeration){
+                                codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+                            }             
+
+                            codeWriter.outdent(); 
+                        }
+                        if(attr.defaultValue!=""){
+                            codeWriter.indent();
+                            codeWriter.writeLine("default: '" + attr.defaultValue + "'");
+                            codeWriter.outdent();
+                        }
+                    // }
+                    
                 }
             }
 
@@ -205,6 +223,7 @@ class OpenApiGenerator {
             let arrGeneral = [];
 
             let arrAssoc = [];
+            let aggregationClasses = [];
             for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
                 let assoc = objClass.ownedElements[i];
                 if (assoc instanceof type.UMLAssociation) {
@@ -214,21 +233,28 @@ class OpenApiGenerator {
                     if(filterAssoc.length==0 && assoc.name!=""){
 
                         if(assoc.end1.aggregation=="shared"){
-                            this.writeAssociationProperties(codeWriter,assoc);
+                            // this.writeAssociationProperties(codeWriter,assoc);
+                            aggregationClasses.push(assoc.end2.reference);
+                            codeWriter.writeLine(assoc.end2.reference.name+":");
+                            codeWriter.indent();
+                            codeWriter.writeLine("allOf:");
+                            codeWriter.indent();
+                            codeWriter.writeLine("- $ref: '#/components/schemas/"+assoc.end2.reference.name +"Ids'");
+                            codeWriter.writeLine("- type: object");
+                            codeWriter.outdent();
+                            codeWriter.outdent();
                         }else{
                             if(assoc.end2.multiplicity==="0..*" || assoc.end2.multiplicity==="1..*"){
                                 codeWriter.writeLine(assoc.name+":");
                                 codeWriter.indent();
                                 codeWriter.writeLine("items: {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");   
                                 codeWriter.writeLine("type: array");
-
                                 /**
                                  * Add MinItems of multiplicity is 1..*
                                  */
                                 if( assoc.end2.multiplicity.multiplicity==="1..*"){
                                     codeWriter.writeLine("minItems: 1");
                                 }
-                                
                                 codeWriter.outdent();
                             }else{
                                 codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");                            
@@ -256,18 +282,48 @@ class OpenApiGenerator {
             if(arrGeneral.length>0){
                 codeWriter.writeLine("allOf:");
                 codeWriter.indent();
-                arrGeneral.forEach(generalizeClass => {
-                   
+                arrGeneral.forEach(generalizeClass => {                   
                     codeWriter.writeLine("- $ref: '#/components/schemas/"+generalizeClass.target.name +"'");
                     codeWriter.writeLine("- type: object");
                 });
                 codeWriter.outdent();                
+            }
+
+            let filterAttributes =arrAttr.filter(item =>{
+                return item.isID;
+            });
+
+                
+
+            if(filterAttributes.length>0 && assocSideClassLink.length>0){
+                codeWriter.writeLine("allOf:");
+                codeWriter.indent();
+                codeWriter.writeLine("- $ref: '#/components/schemas/"+objClass.name +"Ids'");
+                codeWriter.writeLine("- type: object");
+                codeWriter.outdent();       
             }
            
             if(this.getRequiredAttributes(arrAttr).length>0){
                 codeWriter.writeLine("required: ["+ this.getRequiredAttributes(arrAttr)+"]" );
             }
             codeWriter.outdent();
+
+             /**
+             * Write sceparate schema for isID property
+             **/  
+            if(assocSideClassLink.length>0){
+                aggregationClasses.push(objClass);
+                // this.writeAssociationProperties(codeWriter,objClass);
+            }
+            aggregationClasses.forEach(itemClass => {
+                let filter = arrIdClasses.filter(subItem =>{
+                    return itemClass.name==subItem.name;
+                });
+                if(filter.length==0){
+                    this.writeAssociationProperties(codeWriter,itemClass);
+                    arrIdClasses.push(itemClass)
+                }
+            });    
         });    
         
 
@@ -282,6 +338,9 @@ class OpenApiGenerator {
         this.writeOperation(codeWriter,options,mainElem); 
         codeWriter.writeLine("servers: []");
 
+        /**
+         * Convert yml data to JSON
+         */
         try {
             var doc = yaml.safeLoad(codeWriter.getData());
             console.log(doc);
@@ -290,7 +349,7 @@ class OpenApiGenerator {
             console.log(e);
         }
       
-        // fs.writeFileSync(basePath, codeWriter.getData());  
+        fs.writeFileSync(basePath, codeWriter.getData());  
     }  
 
     /**
@@ -492,7 +551,6 @@ class OpenApiGenerator {
                     }
 
                     if(objInterface.target.ownedElements.length>0){
-                        console.log("Interface Relationship : ",objInterface);
                         let interfaceRelation = objInterface.target.ownedElements;
                         interfaceRelation.forEach(interAsso => {
                             if(interAsso instanceof type.UMLAssociation){
@@ -588,39 +646,64 @@ class OpenApiGenerator {
      * @param {UMLAssociation} assciation 
      */
     writeAssociationProperties(codeWriter, assciation){
-        codeWriter.writeLine(assciation.name+":");
-        codeWriter.indent();
-        codeWriter.writeLine("properties:");
-        codeWriter.indent();
-        
-        assciation.end2.reference.attributes.forEach(attr => {
-            if(attr.isID){
-                codeWriter.writeLine(attr.name+":");              
 
-                if(attr.multiplicity==="1..*" || attr.multiplicity==="0..*"){
-                    codeWriter.indent();
-                    codeWriter.writeLine("items: {description: '"+ (attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+ this.getType(attr.type)+" }");   
-                    codeWriter.writeLine("type: array");
-                    /**
-                     * Add MinItems of multiplicity is 1..*
-                     */
-                    if( attr.multiplicity==="1..*"){
-                        codeWriter.writeLine("minItems: 1");
-                    }
-                    codeWriter.outdent();  
-                }else{
-                    codeWriter.indent();
-                    codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
-                    codeWriter.writeLine("type: "+  this.getType(attr.type) );
-                    if(attr.type instanceof type.UMLEnumeration){
-                        codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
-                    }             
-                    codeWriter.outdent(); 
-                }         
-            }
+       
+        let tempClass;
+        if(assciation instanceof type.UMLAssociation){
+            tempClass = assciation.end2.reference;
+          
+        }else{
+            tempClass = assciation;           
+        }
+
+        let filterAttributes = tempClass.attributes.filter(item =>{
+            return item.isID;
         });
-        codeWriter.outdent();
-        codeWriter.outdent();
+
+        if(filterAttributes.length>0){
+
+            codeWriter.writeLine( (assciation instanceof type.UMLAssociation)?(assciation.name+":"):(tempClass.name+"Ids:") );
+            codeWriter.indent();
+            codeWriter.writeLine("type: object");
+            codeWriter.writeLine("properties:");
+            codeWriter.indent();
+               
+            filterAttributes.forEach(attr => {
+                    
+                    codeWriter.writeLine(attr.name+":");
+                    if(attr.multiplicity==="1..*" || attr.multiplicity==="0..*"){
+                        codeWriter.indent();
+                        codeWriter.writeLine("items:");   
+                        codeWriter.indent();
+                        codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                        codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                        codeWriter.outdent();  
+                        codeWriter.writeLine("type: array");
+                        /**
+                         * Add MinItems of multiplicity is 1..*
+                         */
+                        if( attr.multiplicity==="1..*"){
+                            codeWriter.writeLine("minItems: 1");
+                        }
+                        codeWriter.outdent();  
+                    }else{
+                        codeWriter.indent();
+                        codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                        codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                        if(attr.type instanceof type.UMLEnumeration){
+                            codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+                        }             
+                        codeWriter.outdent(); 
+                    }                   
+            });
+
+            codeWriter.outdent();
+           
+            if(this.getRequiredAttributes(filterAttributes).length>0)
+                codeWriter.writeLine("required: ["+ this.getRequiredAttributes(filterAttributes)+"]");
+            
+            codeWriter.outdent();
+        }
     }
 
 
@@ -636,35 +719,41 @@ class OpenApiGenerator {
         codeWriter.writeLine(associationClass.classSide.name+":");
         codeWriter.indent();
        
-        codeWriter.writeLine("properties:");
+        codeWriter.writeLine("allOf:");
         codeWriter.indent();
+        codeWriter.writeLine("- $ref: '#/components/schemas/"+associationClass.associationSide.end2.reference.name +"Ids'");
+        codeWriter.writeLine("- $ref: '#/components/schemas/"+associationClass.classSide.name +"'");
+        codeWriter.writeLine("- type: object");
+        codeWriter.outdent();   
+        codeWriter.outdent();
 
-        classSideAtributes.forEach(attr => {
-                codeWriter.writeLine(attr.name+":");
-                codeWriter.indent();
-                codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
-                codeWriter.writeLine("type: "+  this.getType(attr.type) );
-                if(attr.type instanceof type.UMLEnumeration){
-                    codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
-                }   
-                codeWriter.outdent();
+       
+        // classSideAtributes.forEach(attr => {
+        //         codeWriter.writeLine(attr.name+":");
+        //         codeWriter.indent();
+        //         codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+        //         codeWriter.writeLine("type: "+  this.getType(attr.type) );
+        //         if(attr.type instanceof type.UMLEnumeration){
+        //             codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+        //         }   
+        //         codeWriter.outdent();
           
-        });
+        // });
 
-        end2Attributes.forEach(attr => {
-            if(attr.isID){
-                codeWriter.writeLine(attr.name+":");
-                codeWriter.indent();
-                codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
-                codeWriter.writeLine("type: "+  this.getType(attr.type) );
-                if(attr.type instanceof type.UMLEnumeration){
-                    codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
-                }   
-                codeWriter.outdent();
-            }
-        });
-        codeWriter.outdent();
-        codeWriter.outdent();
+        // end2Attributes.forEach(attr => {
+        //     if(attr.isID){
+        //         codeWriter.writeLine(attr.name+":");
+        //         codeWriter.indent();
+        //         codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+        //         codeWriter.writeLine("type: "+  this.getType(attr.type) );
+        //         if(attr.type instanceof type.UMLEnumeration){
+        //             codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+        //         }   
+        //         codeWriter.outdent();
+        //     }
+        // });
+        // codeWriter.outdent();
+        // codeWriter.outdent();
 
     }
 
