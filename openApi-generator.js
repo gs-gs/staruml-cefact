@@ -175,6 +175,12 @@ class OpenApiGenerator {
                         codeWriter.indent();
                         codeWriter.writeLine("items: {description: '"+ (attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+ this.getType(attr.type)+" }");   
                         codeWriter.writeLine("type: array");
+                        /**
+                        * Add MinItems of multiplicity is 1..*
+                        */
+                        if( attr.multiplicity==="1..*"){
+                            codeWriter.writeLine("minItems: 1");
+                        }
                         codeWriter.outdent();  
                     }else{
                         codeWriter.indent();
@@ -215,6 +221,14 @@ class OpenApiGenerator {
                                 codeWriter.indent();
                                 codeWriter.writeLine("items: {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");   
                                 codeWriter.writeLine("type: array");
+
+                                /**
+                                 * Add MinItems of multiplicity is 1..*
+                                 */
+                                if( assoc.end2.multiplicity.multiplicity==="1..*"){
+                                    codeWriter.writeLine("minItems: 1");
+                                }
+                                
                                 codeWriter.outdent();
                             }else{
                                 codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");                            
@@ -581,11 +595,28 @@ class OpenApiGenerator {
         
         assciation.end2.reference.attributes.forEach(attr => {
             if(attr.isID){
-                codeWriter.writeLine(attr.name+":");
-                codeWriter.indent();
-                codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
-                codeWriter.writeLine("type: "+  this.getType(attr.type) );
-                codeWriter.outdent();
+                codeWriter.writeLine(attr.name+":");              
+
+                if(attr.multiplicity==="1..*" || attr.multiplicity==="0..*"){
+                    codeWriter.indent();
+                    codeWriter.writeLine("items: {description: '"+ (attr.documentation?this.buildDescription(attr.documentation):"missing description")+"', type: "+ this.getType(attr.type)+" }");   
+                    codeWriter.writeLine("type: array");
+                    /**
+                     * Add MinItems of multiplicity is 1..*
+                     */
+                    if( attr.multiplicity==="1..*"){
+                        codeWriter.writeLine("minItems: 1");
+                    }
+                    codeWriter.outdent();  
+                }else{
+                    codeWriter.indent();
+                    codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
+                    codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                    if(attr.type instanceof type.UMLEnumeration){
+                        codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+                    }             
+                    codeWriter.outdent(); 
+                }         
             }
         });
         codeWriter.outdent();
