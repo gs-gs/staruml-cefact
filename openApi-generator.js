@@ -143,7 +143,7 @@ class OpenApiGenerator {
 
         let classLink = app.repository.select("@UMLAssociationClassLink");
         let basePath = path.join(fullPath, mainElem.name + '.json');
-       
+        
         let arrIdClasses = [];
         
         let codeWriter;
@@ -237,12 +237,25 @@ class OpenApiGenerator {
                             aggregationClasses.push(assoc.end2.reference);
                             codeWriter.writeLine(assoc.end2.reference.name+":");
                             codeWriter.indent();
-                            codeWriter.writeLine("allOf:");
-                            codeWriter.indent();
-                            codeWriter.writeLine("- $ref: '#/components/schemas/"+assoc.end2.reference.name +"Ids'");
-                            codeWriter.writeLine("- type: object");
-                            codeWriter.outdent();
-                            codeWriter.outdent();
+                            if(assoc.end2.multiplicity==="0..*" || assoc.end2.multiplicity==="1..*"){
+                                codeWriter.writeLine("items:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("allOf:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("- $ref: '#/components/schemas/"+assoc.end2.reference.name +"Ids'");
+                                codeWriter.writeLine("- type: object");
+                                codeWriter.outdent();
+                                codeWriter.outdent();
+                                codeWriter.writeLine("type: array");
+                                codeWriter.outdent();
+                            }else{
+                                codeWriter.writeLine("allOf:");
+                                codeWriter.indent();
+                                codeWriter.writeLine("- $ref: '#/components/schemas/"+assoc.end2.reference.name +"Ids'");
+                                codeWriter.writeLine("- type: object");
+                                codeWriter.outdent();
+                                codeWriter.outdent();
+                            }
                         }else{
                             if(assoc.end2.multiplicity==="0..*" || assoc.end2.multiplicity==="1..*"){
                                 codeWriter.writeLine(assoc.name+":");
@@ -289,19 +302,19 @@ class OpenApiGenerator {
                 codeWriter.outdent();                
             }
 
-            let filterAttributes =arrAttr.filter(item =>{
-                return item.isID;
-            });
+            // let filterAttributes =arrAttr.filter(item =>{
+            //     return item.isID;
+            // });
 
                 
 
-            if(filterAttributes.length>0 && assocSideClassLink.length>0){
-                codeWriter.writeLine("allOf:");
-                codeWriter.indent();
-                codeWriter.writeLine("- $ref: '#/components/schemas/"+objClass.name +"Ids'");
-                codeWriter.writeLine("- type: object");
-                codeWriter.outdent();       
-            }
+            // if(filterAttributes.length>0 && assocSideClassLink.length>0){
+            //     codeWriter.writeLine("allOf:");
+            //     codeWriter.indent();
+            //     codeWriter.writeLine("- $ref: '#/components/schemas/"+objClass.name +"Ids'");
+            //     codeWriter.writeLine("- type: object");
+            //     codeWriter.outdent();       
+            // }
            
             if(this.getRequiredAttributes(arrAttr).length>0){
                 codeWriter.writeLine("required: ["+ this.getRequiredAttributes(arrAttr)+"]" );
