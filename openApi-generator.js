@@ -268,7 +268,7 @@ class OpenApiGenerator {
                                 /**
                                  * Add MinItems of multiplicity is 1..*
                                  */
-                                if( assoc.end2.multiplicity.multiplicity==="1..*"){
+                                if( assoc.end2.multiplicity==="1..*"){
                                     codeWriter.writeLine("minItems: 1");
                                 }
                                 codeWriter.outdent();
