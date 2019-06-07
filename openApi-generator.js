@@ -467,7 +467,10 @@ class OpenApiGenerator {
                     });
 
                     if(checkOperationArr.length>0){
-                        objInterface.target.attributes.forEach( operationAttribute => {
+                        let operationAttributes = objInterface.target.attributes.filter(item =>{
+                            return item.name=="id" || item.name=="identifier";
+                        });
+                        operationAttributes.forEach( operationAttribute => {
                         codeWriter.writeLine("/"+objInterface.target.name+"/{"+operationAttribute.name+"}:");
                         codeWriter.indent();
                             
@@ -484,6 +487,12 @@ class OpenApiGenerator {
                                 codeWriter.writeLine("description: Get single " +objInterface.source.name+" by " + operationAttribute.name);
                                 codeWriter.writeLine("parameters:");
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
+
+                                objInterface.target.attributes.forEach(itemAttribute => {
+                                    if(itemAttribute.name!="id" && itemAttribute.name!="identifier"){
+                                        this.buildParameter(codeWriter,itemAttribute.name,"query",(itemAttribute.documentation?this.buildDescription(itemAttribute.documentation):"missing description"),false,"{type: string}")
+                                    }    
+                                });
 
                                 codeWriter.writeLine("responses:");
                                 codeWriter.indent();
@@ -515,7 +524,11 @@ class OpenApiGenerator {
                                 codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
                                 codeWriter.writeLine("parameters:");
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
-                            
+                                objInterface.target.attributes.forEach(itemAttribute => {
+                                    if(itemAttribute.name!="id" && itemAttribute.name!="identifier"){
+                                        this.buildParameter(codeWriter,itemAttribute.name,"query",(itemAttribute.documentation?this.buildDescription(itemAttribute.documentation):"missing description"),false,"{type: string}")
+                                    }    
+                                });
                                 codeWriter.writeLine("responses:");
                                 codeWriter.indent();
                                 codeWriter.writeLine("'204': {description: No Content}");
@@ -535,6 +548,11 @@ class OpenApiGenerator {
                                 codeWriter.writeLine("description: Update an existing " +objInterface.source.name);
                                 codeWriter.writeLine("parameters:");
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
+                                objInterface.target.attributes.forEach(itemAttribute => {
+                                    if(itemAttribute.name!="id" && itemAttribute.name!="identifier"){
+                                        this.buildParameter(codeWriter,itemAttribute.name,"query",(itemAttribute.documentation?this.buildDescription(itemAttribute.documentation):"missing description"),false,"{type: string}")
+                                    }    
+                                });
                                 this.buildRequestBody(codeWriter, objInterface);
                                 codeWriter.writeLine("responses:");
                                 codeWriter.indent();
@@ -564,7 +582,11 @@ class OpenApiGenerator {
                                 codeWriter.writeLine("description:  Update " +objInterface.source.name);
                                 codeWriter.writeLine("parameters:");
                                 this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
-                              
+                                objInterface.target.attributes.forEach(itemAttribute => {
+                                    if(itemAttribute.name!="id" && itemAttribute.name!="identifier"){
+                                        this.buildParameter(codeWriter,itemAttribute.name,"query",(itemAttribute.documentation?this.buildDescription(itemAttribute.documentation):"missing description"),false,"{type: string}")
+                                    }    
+                                });
                                 this.buildRequestBody(codeWriter, objInterface);
                         
                                 codeWriter.writeLine("responses:");
