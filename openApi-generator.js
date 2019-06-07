@@ -284,7 +284,15 @@ class OpenApiGenerator {
                 return item.associationSide.end1.reference._id==objClass._id;
             });
 
-           
+           /**
+            * Add asscociation class Properties
+            * eg.
+            *   TransportMeansParty
+                     allOf:
+                    - $ref: '#/components/schemas/TransportPartyIds'
+                    - $ref: '#/components/schemas/TransportMeansParty'
+                    - type: object
+            */
             if(assocClassLink.length>0)
             {
                 this.writeAssociationClassProperties(codeWriter,assocClassLink[0]);
@@ -292,6 +300,10 @@ class OpenApiGenerator {
 
             codeWriter.outdent();
 
+            /**
+             * Add Generalization class
+             * Inherite all properties of parent class
+             */
             if(arrGeneral.length>0){
                 codeWriter.writeLine("allOf:");
                 codeWriter.indent();
@@ -322,7 +334,7 @@ class OpenApiGenerator {
             codeWriter.outdent();
 
              /**
-             * Write sceparate schema for isID property
+             * Write sceparate schema for isID property of aggregation and relationship class
              **/  
             if(assocSideClassLink.length>0){
                 aggregationClasses.push(objClass);
@@ -732,13 +744,28 @@ class OpenApiGenerator {
         codeWriter.writeLine(associationClass.classSide.name+":");
         codeWriter.indent();
        
-        codeWriter.writeLine("allOf:");
-        codeWriter.indent();
-        codeWriter.writeLine("- $ref: '#/components/schemas/"+associationClass.associationSide.end2.reference.name +"Ids'");
-        codeWriter.writeLine("- $ref: '#/components/schemas/"+associationClass.classSide.name +"'");
-        codeWriter.writeLine("- type: object");
-        codeWriter.outdent();   
-        codeWriter.outdent();
+        if(associationClass.associationSide.end2.multiplicity=="0..*" || associationClass.associationSide.end2.multiplicity=="1..*"){
+       
+            codeWriter.writeLine("items:");   
+            codeWriter.indent();
+            codeWriter.writeLine("allOf:");
+            codeWriter.indent();
+            codeWriter.writeLine("- $ref: '#/components/schemas/"+associationClass.associationSide.end2.reference.name +"Ids'");
+            codeWriter.writeLine("- $ref: '#/components/schemas/"+associationClass.classSide.name +"'");
+            codeWriter.writeLine("- type: object");
+            codeWriter.outdent();   
+            codeWriter.outdent();
+            codeWriter.writeLine("type: array"); 
+            codeWriter.outdent();
+        }else{
+            codeWriter.writeLine("allOf:");
+            codeWriter.indent();
+            codeWriter.writeLine("- $ref: '#/components/schemas/"+associationClass.associationSide.end2.reference.name +"Ids'");
+            codeWriter.writeLine("- $ref: '#/components/schemas/"+associationClass.classSide.name +"'");
+            codeWriter.writeLine("- type: object");
+            codeWriter.outdent();   
+            codeWriter.outdent();
+        }
 
        
         // classSideAtributes.forEach(attr => {
