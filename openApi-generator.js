@@ -247,6 +247,9 @@ class OpenApiGenerator {
                                 codeWriter.outdent();
                                 codeWriter.outdent();
                                 codeWriter.writeLine("type: array");
+                                if( assoc.end2.multiplicity=="1..*"){
+                                    codeWriter.writeLine("minItems: 1");
+                                }
                                 codeWriter.outdent();
                             }else{
                                 codeWriter.writeLine("allOf:");
@@ -756,6 +759,9 @@ class OpenApiGenerator {
             codeWriter.outdent();   
             codeWriter.outdent();
             codeWriter.writeLine("type: array"); 
+            if( associationClass.associationSide.end2.multiplicity=="1..*"){
+                codeWriter.writeLine("minItems: 1");
+            }  
             codeWriter.outdent();
         }else{
             codeWriter.writeLine("allOf:");
