@@ -47,7 +47,7 @@ class OpenApiGenerator {
         } else return "string";
     }
 
-    generate(fullPath,elem,options){      
+    generate(fullPath,elem,options,fileType){      
                 
          let _this =this;   
          if (elem instanceof type.UMLPackage) {
@@ -100,7 +100,7 @@ class OpenApiGenerator {
                 });
 
                 if(!isDuplicate){
-                     _this.writeClass(uniqArr,fullPath, options,elem);
+                     _this.writeClass(uniqArr,fullPath, options,elem,fileType);
                      
                 }else{
                     app.dialogs.showErrorDialog("There "+ (duplicateClasses.length>1?"are":"is") +" duplicate "+ duplicateClasses.join() + (duplicateClasses.length>1?" classes":" class") + " for same name.");                           
@@ -139,10 +139,10 @@ class OpenApiGenerator {
      * @param {Object} options
      * @param {type.package} mainElem package element
      */
-    writeClass(classes,fullPath, options,mainElem){
+    writeClass(classes,fullPath, options,mainElem,fileType){
 
         let classLink = app.repository.select("@UMLAssociationClassLink");
-        let basePath = path.join(fullPath, mainElem.name + '.json');
+        // let basePath = path.join(fullPath, mainElem.name + '.json');
         
         let arrIdClasses = [];
         
@@ -365,21 +365,46 @@ class OpenApiGenerator {
        
         this.writeOperation(codeWriter,options,mainElem); 
         codeWriter.writeLine("servers: []");
-
-        /**
-         * Convert yml data to JSON
-         */
-        try {
-            var doc = yaml.safeLoad(codeWriter.getData());
-            console.log(doc);
-            fs.writeFileSync(basePath, JSON.stringify(doc,null,4));  
-        } catch (e) {
-            console.log(e);
-        }
+     
       
-        fs.writeFileSync(basePath, codeWriter.getData());  
+        this.fileGeneration(codeWriter, fullPath, mainElem, fileType);
+       
     }  
     
+
+    fileGeneration(codeWriter, fullPath, mainElem, fileType) {
+        let basePath;
+        if (fileType == 1) {
+            /**
+             * Convert yml data to JSON
+             */
+            basePath = path.join(fullPath, mainElem.name + '.json');
+
+            try {
+                var doc = yaml.safeLoad(codeWriter.getData());
+                console.log(doc);
+                fs.writeFileSync(basePath, JSON.stringify(doc, null, 4));
+            } catch (e) {
+                console.log(e);
+            }
+        } else if (fileType == 2) {
+            basePath = path.join(fullPath, mainElem.name + '.yml');
+            fs.writeFileSync(basePath, codeWriter.getData());
+        } else {
+            let basePathYML = path.join(fullPath, mainElem.name + '.yml');
+            fs.writeFileSync(basePathYML, codeWriter.getData());
+
+            basePath = path.join(fullPath, mainElem.name + '.json');
+
+            try {
+                var doc = yaml.safeLoad(codeWriter.getData());
+                console.log(doc);
+                fs.writeFileSync(basePath, JSON.stringify(doc, null, 4));
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    }
 
     /**
      * Write Operation (Path)

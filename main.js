@@ -11,18 +11,34 @@ function _handleGenerate(base, path, options) {
       .then(function({ buttonId, returnValue }) {
          if (buttonId === "ok") {
           if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
-            base = returnValue;
-            console.log(base,path,options);
-          //  openFolder(base, path, options);
-          const file = app.dialogs.showSaveDialog("Save File as...", null, "schema_" + base.name + ".yml");
-      
-          codeGenerator.generate(base,file,options);
+            base = returnValue;            
+            fileTypeSelection(base,options);
           } else {
             app.dialogs.showErrorDialog("Please select the project or a package");
           }
         }
       });
   } 
+}
+
+function fileTypeSelection(base,options){
+  let filters = [
+    // { name: "YML Files", extensions: [ "yml" ] }
+  ];
+
+  let fileOptions = [
+    { text: "JSON", value: 1 },
+    { text: "YML", value: 2 },
+    { text: "BOTH", value: 3 }
+  ];
+  app.dialogs.showSelectDropdownDialog("Select one of the following type.", fileOptions).then(function ({buttonId,returnValue}) {
+    if (buttonId === 'ok') {
+      const file = app.dialogs.showSaveDialog("Save File as...", null, filters);
+      codeGenerator.generate(base,file,options,returnValue);
+    } else {
+      console.log("User canceled")
+    }
+  });
 }
 
 const PREF_DEBUG_KEY = "openapi:debug.status";

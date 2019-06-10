@@ -37,12 +37,12 @@ class CodeGenerator {
         }
     }
 
-    generate(elem, basePath, options){
+    generate(elem, basePath, options,fileType){
         try{
             if (elem instanceof  type.UMLPackage) {
                 fs.mkdirSync(basePath)
                 let schemaWriter = new openApiGen.OpenApiGenerator(); 
-                schemaWriter.generate(basePath,elem,options,true);
+                schemaWriter.generate(basePath,elem,options,fileType);
             }
             else{
                 fs.mkdirSync(basePath);
@@ -52,7 +52,7 @@ class CodeGenerator {
                     let def = elem.ownedElements[i];
                     if (def instanceof  type.UMLPackage) {
                         let schemaWriter = new openApiGen.OpenApiGenerator(); 
-                        schemaWriter.generate(basePath,def,options,false);      
+                        schemaWriter.generate(basePath,def,options,fileType);      
                     }
                 }   
             }  
@@ -70,9 +70,9 @@ class CodeGenerator {
  * @param {string} basePath
  * @param {Object} options
  */
-function generate (baseModel, basePath, options) {
+function generate (baseModel, basePath, options,fileType) {
     var codeGenerator = new CodeGenerator(baseModel, basePath);
-    codeGenerator.generate(baseModel, basePath, options)
+    codeGenerator.generate(baseModel, basePath, options,fileType)
 }
   
 exports.generate = generate
