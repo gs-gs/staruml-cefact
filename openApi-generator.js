@@ -379,25 +379,36 @@ class OpenApiGenerator {
       
         fs.writeFileSync(basePath, codeWriter.getData());  
     }  
+    
 
     /**
      * Write Operation (Path)
      * @param {codeWriter} codeWriter
      */
-    writeOperation(codeWriter){
+    writeOperation(codeWriter) {
         let interReal = app.repository.select("@UMLInterfaceRealization");
         this.operations.forEach(objOperation => {
-                let filterInterface = interReal.filter(itemInterface =>{
-                    return itemInterface.target.name == objOperation.name;
+            let filterInterface = interReal.filter(itemInterface => {
+                return itemInterface.target.name == objOperation.name;
+            });
+
+            if (filterInterface.length > 0) {
+
+
+                let objInterface = filterInterface[0];
+
+                let interfaceAssociation = app.repository.select(objInterface.target.name + "::@UMLAssociation");
+                let filterInterfaceAssociation = interfaceAssociation.filter(item => {
+                    return item.end2.aggregation == "composite";
                 });
-                if(filterInterface.length>0){
-                    let objInterface = filterInterface[0];
-       
+
+                if (filterInterfaceAssociation.length == 0) {
+
                     codeWriter.indent();
-                    codeWriter.writeLine("/"+objInterface.target.name+":");
+                    codeWriter.writeLine("/" + objInterface.target.name + ":");
                     codeWriter.indent();
-                    objInterface.target.operations.forEach(objOperation =>{
-                        if(objOperation.name.toUpperCase()=="GET"){
+                    objInterface.target.operations.forEach(objOperation => {
+                        if (objOperation.name.toUpperCase() == "GET") {
                             codeWriter.writeLine("get:");
                             codeWriter.indent();
 
@@ -405,8 +416,8 @@ class OpenApiGenerator {
                             codeWriter.indent();
                             codeWriter.writeLine("- " + objInterface.target.name);
                             codeWriter.outdent();
-        
-                            codeWriter.writeLine("description: Get a list of " +objInterface.source.name);
+
+                            codeWriter.writeLine("description: Get a list of " + objInterface.source.name);
                             codeWriter.writeLine("parameters: []");
                             codeWriter.writeLine("responses:");
                             codeWriter.indent();
@@ -416,19 +427,19 @@ class OpenApiGenerator {
                             codeWriter.indent();
                             codeWriter.writeLine("application/json:");
                             codeWriter.indent();
-                            codeWriter.writeLine("schema:"); 
+                            codeWriter.writeLine("schema:");
                             codeWriter.indent();
-                            codeWriter.writeLine("items: {$ref: '#/components/schemas/"+objInterface.source.name+"'}");
-                            codeWriter.writeLine("type: array");   
+                            codeWriter.writeLine("items: {$ref: '#/components/schemas/" + objInterface.source.name + "'}");
+                            codeWriter.writeLine("type: array");
                             codeWriter.outdent();
                             codeWriter.outdent();
                             codeWriter.outdent();
                             codeWriter.writeLine("description: OK");
                             codeWriter.outdent();
                             codeWriter.outdent();
-                            codeWriter.outdent();                        
+                            codeWriter.outdent();
                         }
-                        else if(objOperation.name.toUpperCase()=="POST"){
+                        else if (objOperation.name.toUpperCase() == "POST") {
                             codeWriter.writeLine("post:");
                             codeWriter.indent();
 
@@ -437,10 +448,10 @@ class OpenApiGenerator {
                             codeWriter.writeLine("- " + objInterface.target.name);
                             codeWriter.outdent();
 
-                            codeWriter.writeLine("description:  Create a new " +objInterface.source.name);
+                            codeWriter.writeLine("description:  Create a new " + objInterface.source.name);
 
                             this.buildRequestBody(codeWriter, objInterface);
-                        
+
                             codeWriter.writeLine("responses:");
                             codeWriter.indent();
                             codeWriter.writeLine("'201':");
@@ -449,171 +460,174 @@ class OpenApiGenerator {
                             codeWriter.indent();
                             codeWriter.writeLine("application/json:");
                             codeWriter.indent();
-                            codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+objInterface.source.name+"'}"); 
+                            codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}");
                             codeWriter.outdent();
                             codeWriter.outdent();
                             codeWriter.writeLine("description: Created");
                             codeWriter.outdent();
                             codeWriter.outdent();
 
-                            codeWriter.outdent();                        
+                            codeWriter.outdent();
                         }
                     });
 
                     codeWriter.outdent();
-                
+
                     let checkOperationArr = objInterface.target.operations.filter(item => {
-                        return item.name=="GET" || item.name=="PUT" || item.name=="DELTE";
+                        return item.name == "GET" || item.name == "PUT" || item.name == "DELTE";
                     });
 
-                    if(checkOperationArr.length>0){
-                        let operationAttributes = objInterface.target.attributes.filter(item =>{
-                            return item.name=="id" || item.name=="identifier";
+                    if (checkOperationArr.length > 0) {
+                        let operationAttributes = objInterface.target.attributes.filter(item => {
+                            return item.name == "id" || item.name == "identifier";
                         });
-                        operationAttributes.forEach( operationAttribute => {
-                        codeWriter.writeLine("/"+objInterface.target.name+"/{"+operationAttribute.name+"}:");
-                        codeWriter.indent();
-                            
-                        objInterface.target.operations.forEach(objOperation => {
-                            if(objOperation.name.toUpperCase()=="GET"){
-                                codeWriter.writeLine("get:");
-                                codeWriter.indent();
+                        operationAttributes.forEach(operationAttribute => {
+                            codeWriter.writeLine("/" + objInterface.target.name + "/{" + operationAttribute.name + "}:");
+                            codeWriter.indent();
 
-                                codeWriter.writeLine("tags:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("- " + objInterface.target.name);
-                                codeWriter.outdent();
+                            objInterface.target.operations.forEach(objOperation => {
+                                if (objOperation.name.toUpperCase() == "GET") {
+                                    codeWriter.writeLine("get:");
+                                    codeWriter.indent();
 
-                                codeWriter.writeLine("description: Get single " +objInterface.source.name+" by " + operationAttribute.name);
-                                codeWriter.writeLine("parameters:");
-                                this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
+                                    codeWriter.writeLine("tags:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("- " + objInterface.target.name);
+                                    codeWriter.outdent();
 
-                                objInterface.target.attributes.forEach(itemAttribute => {
-                                    if(itemAttribute.name!="id" && itemAttribute.name!="identifier"){
-                                        this.buildParameter(codeWriter,itemAttribute.name,"query",(itemAttribute.documentation?this.buildDescription(itemAttribute.documentation):"missing description"),false,"{type: string}")
-                                    }    
-                                });
+                                    codeWriter.writeLine("description: Get single " + objInterface.source.name + " by " + operationAttribute.name);
+                                    codeWriter.writeLine("parameters:");
+                                    this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
 
-                                codeWriter.writeLine("responses:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("'200':");
-                                codeWriter.indent();
-                                codeWriter.writeLine("content:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("application/json:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+ objInterface.source.name +"'}"); 
-                            
-                                codeWriter.outdent();
-                                codeWriter.outdent();
-                                codeWriter.writeLine("description: OK");
-                                codeWriter.outdent();
-                                codeWriter.outdent();
-                                codeWriter.outdent();
-                            
-                            }
-                            else  if(objOperation.name.toUpperCase()=="DELETE"){
-                                codeWriter.writeLine("delete:");
-                                codeWriter.indent();
+                                    objInterface.target.attributes.forEach(itemAttribute => {
+                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
+                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, "{type: string}")
+                                        }
+                                    })
 
-                                codeWriter.writeLine("tags:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("- " + objInterface.target.name);
-                                codeWriter.outdent();
+                                    codeWriter.writeLine("responses:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("'200':");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("content:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("application/json:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}");
 
-                                codeWriter.writeLine("description: Delete an existing " +objInterface.source.name);
-                                codeWriter.writeLine("parameters:");
-                                this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
-                                objInterface.target.attributes.forEach(itemAttribute => {
-                                    if(itemAttribute.name!="id" && itemAttribute.name!="identifier"){
-                                        this.buildParameter(codeWriter,itemAttribute.name,"query",(itemAttribute.documentation?this.buildDescription(itemAttribute.documentation):"missing description"),false,"{type: string}")
-                                    }    
-                                });
-                                codeWriter.writeLine("responses:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("'204': {description: No Content}");
-                                codeWriter.outdent();
-                                codeWriter.outdent();                               
-                            
-                            }
-                            else  if(objOperation.name.toUpperCase()=="PUT"){
-                                codeWriter.writeLine("put:");
-                                codeWriter.indent();
+                                    codeWriter.outdent();
+                                    codeWriter.outdent();
+                                    codeWriter.writeLine("description: OK");
+                                    codeWriter.outdent();
+                                    codeWriter.outdent();
+                                    codeWriter.outdent();
 
-                                codeWriter.writeLine("tags:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("- " + objInterface.target.name);
-                                codeWriter.outdent();
+                                }
+                                else if (objOperation.name.toUpperCase() == "DELETE") {
+                                    codeWriter.writeLine("delete:");
+                                    codeWriter.indent();
 
-                                codeWriter.writeLine("description: Update an existing " +objInterface.source.name);
-                                codeWriter.writeLine("parameters:");
-                                this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
-                                objInterface.target.attributes.forEach(itemAttribute => {
-                                    if(itemAttribute.name!="id" && itemAttribute.name!="identifier"){
-                                        this.buildParameter(codeWriter,itemAttribute.name,"query",(itemAttribute.documentation?this.buildDescription(itemAttribute.documentation):"missing description"),false,"{type: string}")
-                                    }    
-                                });
-                                this.buildRequestBody(codeWriter, objInterface);
-                                codeWriter.writeLine("responses:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("'200':");
-                                codeWriter.indent();
-                                codeWriter.writeLine("content:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("application/json:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("schema: {$ref: '#/components/schemas/"+ objInterface.source.name +"'}");
-                                codeWriter.outdent();
-                                codeWriter.outdent();
-                                codeWriter.writeLine("description: OK");
-                            
-                                codeWriter.outdent();
-                                codeWriter.outdent();
-                                codeWriter.outdent();
-                            }else if(objOperation.name.toUpperCase()=="PATCH"){
-                                codeWriter.writeLine("patch:");
-                                codeWriter.indent();
-    
-                                codeWriter.writeLine("tags:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("- " + objInterface.target.name);
-                                codeWriter.outdent();
-    
-                                codeWriter.writeLine("description:  Update " +objInterface.source.name);
-                                codeWriter.writeLine("parameters:");
-                                this.buildParameter(codeWriter,operationAttribute.name,"path",(operationAttribute.documentation?this.buildDescription(operationAttribute.documentation):"missing description"),true,"{type: string}")
-                                objInterface.target.attributes.forEach(itemAttribute => {
-                                    if(itemAttribute.name!="id" && itemAttribute.name!="identifier"){
-                                        this.buildParameter(codeWriter,itemAttribute.name,"query",(itemAttribute.documentation?this.buildDescription(itemAttribute.documentation):"missing description"),false,"{type: string}")
-                                    }    
-                                });
-                                this.buildRequestBody(codeWriter, objInterface);
-                        
-                                codeWriter.writeLine("responses:");
-                                codeWriter.indent();
-                                codeWriter.writeLine("'204': {description: No Content}");
-                                codeWriter.outdent();
-                                codeWriter.outdent(); 
-                            }
+                                    codeWriter.writeLine("tags:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("- " + objInterface.target.name);
+                                    codeWriter.outdent();
+
+                                    codeWriter.writeLine("description: Delete an existing " + objInterface.source.name);
+                                    codeWriter.writeLine("parameters:");
+                                    this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
+
+                                    objInterface.target.attributes.forEach(itemAttribute => {
+                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
+                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, "{type: string}")
+                                        }
+                                    });
+
+                                    codeWriter.writeLine("responses:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("'204': {description: No Content}");
+                                    codeWriter.outdent();
+                                    codeWriter.outdent();
+
+                                }
+                                else if (objOperation.name.toUpperCase() == "PUT") {
+                                    codeWriter.writeLine("put:");
+                                    codeWriter.indent();
+
+                                    codeWriter.writeLine("tags:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("- " + objInterface.target.name);
+                                    codeWriter.outdent();
+
+                                    codeWriter.writeLine("description: Update an existing " + objInterface.source.name);
+                                    codeWriter.writeLine("parameters:");
+                                    this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
+                                    objInterface.target.attributes.forEach(itemAttribute => {
+                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
+                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, "{type: string}")
+                                        }
+                                    });
+                                    this.buildRequestBody(codeWriter, objInterface);
+                                    codeWriter.writeLine("responses:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("'200':");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("content:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("application/json:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}");
+                                    codeWriter.outdent();
+                                    codeWriter.outdent();
+                                    codeWriter.writeLine("description: OK");
+
+                                    codeWriter.outdent();
+                                    codeWriter.outdent();
+                                    codeWriter.outdent();
+                                } else if (objOperation.name.toUpperCase() == "PATCH") {
+                                    codeWriter.writeLine("patch:");
+                                    codeWriter.indent();
+
+                                    codeWriter.writeLine("tags:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("- " + objInterface.target.name);
+                                    codeWriter.outdent();
+
+                                    codeWriter.writeLine("description:  Update " + objInterface.source.name);
+                                    codeWriter.writeLine("parameters:");
+                                    this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
+                                    objInterface.target.attributes.forEach(itemAttribute => {
+                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
+                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, "{type: string}")
+                                        }
+                                    });
+                                    this.buildRequestBody(codeWriter, objInterface);
+
+                                    codeWriter.writeLine("responses:");
+                                    codeWriter.indent();
+                                    codeWriter.writeLine("'204': {description: No Content}");
+                                    codeWriter.outdent();
+                                    codeWriter.outdent();
+                                }
+                            });
+                            codeWriter.outdent();
                         });
-                        codeWriter.outdent();    
-                    });
-                    }
-
-                    if(objInterface.target.ownedElements.length>0){
+                        codeWriter.outdent();
+                    }                 
+                    
+                }else{
+                    if (objInterface.target.ownedElements.length > 0) {
                         let interfaceRelation = objInterface.target.ownedElements;
                         interfaceRelation.forEach(interAsso => {
-                            if(interAsso instanceof type.UMLAssociation){
-                                if(interAsso.end2.aggregation=="composite"){
-                                    this.writeInterfaceComposite(codeWriter,objInterface, interAsso);
+                            if (interAsso instanceof type.UMLAssociation) {
+                                if (interAsso.end2.aggregation == "composite") {
+                                    this.writeInterfaceComposite(codeWriter, objInterface, interAsso);
                                 }
                             }
                         });
                     }
-
-                codeWriter.outdent();
-                codeWriter.outdent();  
-            }     
+                }
+               
+            }
         });
     }
 
@@ -834,7 +848,7 @@ class OpenApiGenerator {
     writeInterfaceComposite(codeWriter,interfaceRealization, interfaceAssociation){
         let end1Interface = interfaceAssociation.end1;
         let end2Interface = interfaceAssociation.end2;
-        
+        codeWriter.indent();
        interfaceRealization.target.operations.forEach(objOperation =>{
             if(objOperation.name.toUpperCase()=="GET"){                
                 
@@ -966,7 +980,8 @@ class OpenApiGenerator {
                 codeWriter.outdent();                              
             
             }
-        });        
+        });  
+        codeWriter.outdent();         
     }
       
 }
