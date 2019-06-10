@@ -235,7 +235,7 @@ class OpenApiGenerator {
                         if(assoc.end1.aggregation=="shared"){
                             // this.writeAssociationProperties(codeWriter,assoc);
                             aggregationClasses.push(assoc.end2.reference);
-                            codeWriter.writeLine(assoc.end2.reference.name+":");
+                            codeWriter.writeLine(assoc.name+":"); // #7 resolve issue
                             codeWriter.indent();
                             if(assoc.end2.multiplicity==="0..*" || assoc.end2.multiplicity==="1..*"){
                                 codeWriter.writeLine("items:");
