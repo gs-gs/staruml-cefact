@@ -126,6 +126,8 @@ class OpenApiGenerator {
                     if(child.end1.reference.name!=child.end2.reference.name ){
                         setTimeout(function() {   _this.findClass(child.end2.reference,options); },5);
                     }                                               
+                }else if (child instanceof type.UMLClass) {
+                    setTimeout(function () { _this.findClass(child, options); }, 5);
                 }
             });                   
         }            
