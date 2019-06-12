@@ -222,12 +222,14 @@ class OpenApiGenerator {
             }
 
 
-            let arrGeneral = [];
+            let arrGeneral = this.findGeneralizationOfClass(objClass); // Git issue #12
 
             let arrAssoc = [];
             let aggregationClasses = [];
-            for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
-                let assoc = objClass.ownedElements[i];
+             // Git issue #12
+             classAssociations.forEach(assoc => {
+                // for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
+                //     let assoc = objClass.ownedElements[i];
                 if (assoc instanceof type.UMLAssociation) {
                     let filterAssoc = arrAssoc.filter(item=>{
                         return item.name==assoc.name;
@@ -283,7 +285,7 @@ class OpenApiGenerator {
                 }else if(assoc instanceof type.UMLGeneralization){
                     arrGeneral.push(assoc);
                 }
-            }
+            });
 
             let assocClassLink = classLink.filter(item => {
                 return item.associationSide.end1.reference._id==objClass._id;
@@ -298,9 +300,10 @@ class OpenApiGenerator {
                     - $ref: '#/components/schemas/TransportMeansParty'
                     - type: object
             */
-            if(assocClassLink.length>0)
-            {
-                this.writeAssociationClassProperties(codeWriter,assocClassLink[0]);
+            if (assocClassLink.length > 0) {
+                assocClassLink.forEach(item => {
+                    this.writeAssociationClassProperties(codeWriter, item);
+                })
             }
 
             codeWriter.outdent();
@@ -319,19 +322,19 @@ class OpenApiGenerator {
                 codeWriter.outdent();                
             }
 
-            // let filterAttributes =arrAttr.filter(item =>{
-            //     return item.isID;
-            // });
+            let filterAttributes =arrAttr.filter(item =>{
+                return item.isID;
+            });
 
                 
 
-            // if(filterAttributes.length>0 && assocSideClassLink.length>0){
-            //     codeWriter.writeLine("allOf:");
-            //     codeWriter.indent();
-            //     codeWriter.writeLine("- $ref: '#/components/schemas/"+objClass.name +"Ids'");
-            //     codeWriter.writeLine("- type: object");
-            //     codeWriter.outdent();       
-            // }
+            if(filterAttributes.length>0 && assocSideClassLink.length>0){
+                codeWriter.writeLine("allOf:");
+                codeWriter.indent();
+                codeWriter.writeLine("- $ref: '#/components/schemas/"+objClass.name +"Ids'");
+                codeWriter.writeLine("- type: object");
+                codeWriter.outdent();       
+            }
            
             if(this.getRequiredAttributes(arrAttr).length>0){
                 codeWriter.writeLine("required: ["+ this.getRequiredAttributes(arrAttr)+"]" );
@@ -747,8 +750,17 @@ class OpenApiGenerator {
             tempClass = assciation;           
         }
 
-        let filterAttributes = tempClass.attributes.filter(item =>{
+        let generalizeClasses = this.findGeneralizationOfClass(tempClass);
+
+        let filterAttributes = tempClass.attributes.filter(item => {
             return item.isID;
+        });
+
+        generalizeClasses.forEach(genClass => {
+            let genClassAttr = genClass.target.attributes.filter(item => {
+                return item.isID;
+            });
+            filterAttributes = filterAttributes.concat(genClassAttr);
         });
 
         if(filterAttributes.length>0){
@@ -1009,6 +1021,34 @@ class OpenApiGenerator {
             }
         });  
         codeWriter.outdent();         
+    }
+
+    /**
+     * @function findAssociationOfClass
+     * @description Find all association of UMLClass
+     * @param {UMLClass} objClass 
+     */
+    findAssociationOfClass(objClass) {
+        let associations = app.repository.select("@UMLAssociation");
+        let filterAssociation = associations.filter(item => {
+            return item.end1.reference._id == objClass._id
+        });
+        console.log(objClass.name, filterAssociation);
+        return filterAssociation;
+
+    }
+
+    /**
+     * @function findGeneralizationOfClass
+     * @description Find all generalization of UMLClass
+     * @param {UMLClass} objClass 
+     */
+    findGeneralizationOfClass(objClass) {
+        let generalizeClasses = app.repository.select("@UMLGeneralization");
+        let filterGeneral = generalizeClasses.filter(item => {
+            return item.source._id == objClass._id
+        });
+        return filterGeneral;
     }
       
 }
