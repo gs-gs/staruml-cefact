@@ -56,7 +56,7 @@ class CodeGenerator {
                     }
                 }   
             }  
-            app.toast.info("OpenAPI generation completed");
+            // app.toast.info("OpenAPI generation completed");
         } catch (e) {
           app.toast.error("Generation Failed!");
         }   

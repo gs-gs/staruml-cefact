@@ -147,7 +147,9 @@ class OpenApiGenerator {
         // let basePath = path.join(fullPath, mainElem.name + '.json');
         
         let arrIdClasses = [];
-        
+        let noNameRel = [];
+        let flagNoName = false;
+
         let codeWriter;
         codeWriter = new codegen.CodeWriter(this.getIndentString(options))
         codeWriter.writeLine('components:');
@@ -173,7 +175,7 @@ class OpenApiGenerator {
             let arrAttr = [];
 
             let i,len;
-            for (i = 0, len = objClass.attributes.length; i < len; i++) {
+            for (i = 0, len = objClass.attributes.length && !flagNoName ; i < len; i++) {
                 let attr = objClass.attributes[i];
                 let filterAttr = arrAttr.filter(item=>{
                     return item.name==attr.name;
@@ -234,7 +236,7 @@ class OpenApiGenerator {
                     let filterAssoc = arrAssoc.filter(item=>{
                         return item.name==assoc.name;
                     });
-                    if(filterAssoc.length==0 && assoc.name!=""){
+                    if(filterAssoc.length==0 && assoc.name!="" && !flagNoName){
 
                         if(assoc.end1.aggregation=="shared"){
                             // this.writeAssociationProperties(codeWriter,assoc);
@@ -281,7 +283,11 @@ class OpenApiGenerator {
                             } 
                         }      
                         arrAssoc.push(assoc); 
-                    }                    
+                    }else {
+                        flagNoName = true;
+                        let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
+                        noNameRel.push(str);
+                    }                   
                 }else if(assoc instanceof type.UMLGeneralization){
                     arrGeneral.push(assoc);
                 }
@@ -359,6 +365,10 @@ class OpenApiGenerator {
             });    
         });    
         
+        if (noNameRel.length > 0) {
+            app.dialogs.showErrorDialog("There is no-name relationship between " + noNameRel.join() + " classes.");
+            return 0;
+        }
 
         codeWriter.outdent();
         codeWriter.outdent();
@@ -409,6 +419,7 @@ class OpenApiGenerator {
                 console.log(e);
             }
         }
+        app.toast.info("OpenAPI generation completed");
     }
 
     /**
