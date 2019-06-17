@@ -332,7 +332,6 @@ class OpenApiGenerator {
                 return item.isID;
             });
 
-                
 
             if(filterAttributes.length>0 && assocSideClassLink.length>0){
                 codeWriter.writeLine("allOf:");
@@ -459,7 +458,13 @@ class OpenApiGenerator {
                             codeWriter.outdent();
 
                             codeWriter.writeLine("description: Get a list of " + objInterface.source.name);
-                            codeWriter.writeLine("parameters: []");
+                           
+                            codeWriter.writeLine("parameters: " + (objOperation.parameters.filter(itemParameters => itemParameters.name != "id" && itemParameters.name != "identifier").length > 0
+                                        ? ""
+                                        : "[]"));
+
+                            this.writeQueryParameters(codeWriter, objOperation);
+
                             codeWriter.writeLine("responses:");
                             codeWriter.indent();
                             codeWriter.writeLine("'200':");
@@ -1060,6 +1065,46 @@ class OpenApiGenerator {
             return item.source._id == objClass._id
         });
         return filterGeneral;
+    }
+
+    writeQueryParameters(codeWriter, objOperation) {
+        objOperation.parameters.forEach(itemParameters => {
+            if (itemParameters.name != "id" && itemParameters.name != "identifier") {
+                if (!(itemParameters.type instanceof type.UMLClass)) {
+                    this.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation
+                        ? this.buildDescription(itemParameters.documentation)
+                        : "missing description"), false, "{type: string}");
+                } else {
+
+                    let param = itemParameters.type.attributes.filter(item => {
+                        return itemParameters.name.toUpperCase() == item.name.toUpperCase();
+                    });
+
+                    if (param.length == 0) {
+                        let generalizeClasses = this.findGeneralizationOfClass(itemParameters.type);
+                        console.log(generalizeClasses);
+                        param = generalizeClasses[0].target.attributes.filter(item => {
+                            return itemParameters.name.toUpperCase() == item.name.toUpperCase();
+                        });
+                    }
+
+                    if (param[0].type == "DateTime") {
+                        this.buildParameter(codeWriter, "before_" + param[0].name, "query", (itemParameters.documentation
+                            ? this.buildDescription(itemParameters.documentation)
+                            : "missing description"), false, "{type: string}");
+                        this.buildParameter(codeWriter, "after_" + param[0].name, "query", (itemParameters.documentation
+                            ? this.buildDescription(itemParameters.documentation)
+                            : "missing description"), false, "{type: string}");
+
+                    } else {
+                        this.buildParameter(codeWriter, param[0].name, "query", (itemParameters.documentation
+                            ? this.buildDescription(itemParameters.documentation)
+                            : "missing description"), false, "{type: string}");
+                    }
+
+                }
+            }
+        });
     }
       
 }
