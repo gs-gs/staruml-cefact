@@ -228,6 +228,9 @@ class OpenApiGenerator {
 
             let arrAssoc = [];
             let aggregationClasses = [];
+
+            let classAssociations = this.findAssociationOfClass(objClass);
+
              // Git issue #12
              classAssociations.forEach(assoc => {
                 // for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
