@@ -11,14 +11,19 @@ class OpenApiGenerator {
     /** @member {Array.<string>} schemas */
     this.schemas = [];
     this.operations = [];
+    this.mFilePath=null;
+    this.mFileName='/error.txt';
+    this.errorContent=[];
   }
 
+     
    /**
      * Return Indent String based on options
      * @param {Object} options
      * @return {string}
      */
     getIndentString (options) {
+     try{
         if (options.useTab) {
         return '\t'
         } else {
@@ -30,6 +35,11 @@ class OpenApiGenerator {
         }
         return indent.join('')
         }
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
 
@@ -40,22 +50,41 @@ class OpenApiGenerator {
      * @param {string} starUMLType 
      */
     getType(starUMLType) {
+     try{
         if (starUMLType==="Numeric") {
             return "number";
         } else if (starUMLType==="Indicator") {
             return "boolean";
         } else return "string";
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
-    generate(fullPath,elem,options,fileType){      
-                
+    generate(fullPath,elem,options,fileType){    
+          console.log("generate",fullPath);  
+
+          try {
+          this.mFilePath=fullPath;
+             
+
          let _this =this;   
          if (elem instanceof type.UMLPackage) {
             
             if (Array.isArray(elem.ownedElements)) {
               elem.ownedElements.forEach(child => {                
                     if(child instanceof type.UMLClass){
-                         setTimeout(function() {  _this.findClass(child,  options); },10);
+                         setTimeout(function() {  
+                              try{
+                              _this.findClass(child,  options); 
+                              }
+                              catch(error) {
+                                   console.error("Found error",error.message);
+                                   _this.writeErrorToFile(error);
+                              }
+                         },10);
                         //  _this.schemas.push(child);
                     }else if(child instanceof type.UMLInterface){
                         
@@ -66,6 +95,7 @@ class OpenApiGenerator {
             }
 
             setTimeout(function() {
+               try{
                 let resArr = [];
                 _this.schemas.forEach(item => {
                     let filter = resArr.filter(subItem =>{
@@ -100,15 +130,27 @@ class OpenApiGenerator {
                 });
 
                 if(!isDuplicate){
-                     _this.writeClass(uniqArr,fullPath, options,elem,fileType);
+                    _this.writeClass(uniqArr,fullPath, options,elem,fileType);
                      
                 }else{
                     app.dialogs.showErrorDialog("There "+ (duplicateClasses.length>1?"are":"is") +" duplicate "+ duplicateClasses.join() + (duplicateClasses.length>1?" classes":" class") + " for same name.");                           
                 }
+               }
+               catch(error) {
+                    console.error("Found error",error.message);
+                    _this.writeErrorToFile(error);
+               }
              
             },500);
            
         } 
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+       // expected output: ReferenceError: nonExistentFunction is not defined
+       // Note - error messages will vary depending on browser
+       this.writeErrorToFile(error);
+     }
     }
   
 
@@ -118,19 +160,34 @@ class OpenApiGenerator {
      * @param {Object} options
      */
     findClass(elem, options) {
+     try{
         let _this =this;  
         _this.schemas.push(elem);
         if (elem.ownedElements.length>0) {
             elem.ownedElements.forEach(child => {                    
                 if(child instanceof type.UMLAssociation){
                     if(child.end1.reference.name!=child.end2.reference.name ){
-                        setTimeout(function() {   _this.findClass(child.end2.reference,options); },5);
+                        setTimeout(function() {   
+                         try{
+
+                             _this.findClass(child.end2.reference,options); 
+                         }
+                         catch(error) {
+                              console.error("Found error",error.message);
+                              _this.writeErrorToFile(error);
+                         }
+                         },5);
                     }                                               
                 }else if (child instanceof type.UMLClass) {
                     setTimeout(function () { _this.findClass(child, options); }, 5);
                 }
             });                   
-        }            
+        }   
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }      
     }
 
   
@@ -142,6 +199,7 @@ class OpenApiGenerator {
      * @param {type.package} mainElem package element
      */
     writeClass(classes,fullPath, options,mainElem,fileType){
+     try{
 
         let classLink = app.repository.select("@UMLAssociationClassLink");
         // let basePath = path.join(fullPath, mainElem.name + '.json');
@@ -367,10 +425,10 @@ class OpenApiGenerator {
             });    
         });    
         
-        if (noNameRel.length > 0) {
-            app.dialogs.showErrorDialog("There is no-name relationship between " + noNameRel.join() + " classes.");
-            return 0;
-        }
+     //    if (noNameRel.length > 0) {
+     //        app.dialogs.showErrorDialog("There is no-name relationship between " + noNameRel.join() + " classes.");
+     //        return 0;
+     //    }
 
         codeWriter.outdent();
         codeWriter.outdent();
@@ -385,11 +443,18 @@ class OpenApiGenerator {
      
       
         this.fileGeneration(codeWriter, fullPath, mainElem, fileType);
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
        
     }  
     
 
     fileGeneration(codeWriter, fullPath, mainElem, fileType) {
+     try{
+         console.log("fileGeneration",fullPath);
         let basePath;
         if (fileType == 1) {
             /**
@@ -403,6 +468,8 @@ class OpenApiGenerator {
                 fs.writeFileSync(basePath, JSON.stringify(doc, null, 4));
             } catch (e) {
                 console.log(e);
+                app.dialogs.showErrorDialog(e.message);
+                return 0;
             }
         } else if (fileType == 2) {
             basePath = path.join(fullPath, mainElem.name + '.yml');
@@ -419,9 +486,16 @@ class OpenApiGenerator {
                 fs.writeFileSync(basePath, JSON.stringify(doc, null, 4));
             } catch (e) {
                 console.log(e);
+                app.dialogs.showErrorDialog(e.message);
+                return 0;
             }
         }
         app.toast.info("OpenAPI generation completed");
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
     /**
@@ -429,6 +503,7 @@ class OpenApiGenerator {
      * @param {codeWriter} codeWriter
      */
     writeOperation(codeWriter) {
+     try{
         let interReal = app.repository.select("@UMLInterfaceRealization");
         this.operations.forEach(objOperation => {
             let filterInterface = interReal.filter(itemInterface => {
@@ -678,6 +753,11 @@ class OpenApiGenerator {
                
             }
         });
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
     /**
@@ -685,7 +765,13 @@ class OpenApiGenerator {
      * @param {string} desc
      */
     buildDescription(desc){
+     try{
         return desc.replace(/\'/g, "''")
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
     /**
@@ -698,6 +784,7 @@ class OpenApiGenerator {
      * @param {string} schema 
      */
     buildParameter(codeWriter, name,  type,  description,  required,  schema) {
+     try{
         // codeWriter.writeLine("parameters:");
         codeWriter.writeLine("- description: " + description);
         codeWriter.indent();
@@ -706,6 +793,11 @@ class OpenApiGenerator {
         codeWriter.writeLine("required: " + required);
         codeWriter.writeLine("schema: " + schema);
         codeWriter.outdent();
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
     /**
@@ -714,6 +806,7 @@ class OpenApiGenerator {
      * @param {interface} objInterface 
      */
      buildRequestBody(codeWriter, objInterface) {
+          try{
         codeWriter.writeLine('requestBody:');
         codeWriter.indent();
         codeWriter.writeLine("content:");
@@ -726,6 +819,11 @@ class OpenApiGenerator {
         codeWriter.writeLine("description: ''");
         codeWriter.writeLine("required: true");
         codeWriter.outdent();      
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
     /**
@@ -733,8 +831,14 @@ class OpenApiGenerator {
      * @param {UMLEnumaration} objEnum 
      */
     getEnumerationLiteral(objEnum){
+     try{
         let result = objEnum.literals.map(a => a.name);
         return (result);
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
     /**
@@ -742,6 +846,7 @@ class OpenApiGenerator {
      * @param {UMLAttributes[]} arrAttributes 
      */
     getRequiredAttributes(arrAttributes){
+     try{
 
         let requiredAttr = [];
          arrAttributes.forEach(item => {
@@ -751,6 +856,11 @@ class OpenApiGenerator {
             
         });
         return (requiredAttr);
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
     /**
@@ -759,7 +869,7 @@ class OpenApiGenerator {
      * @param {UMLAssociation} assciation 
      */
     writeAssociationProperties(codeWriter, assciation){
-
+     try{
        
         let tempClass;
         if(assciation instanceof type.UMLAssociation){
@@ -826,6 +936,11 @@ class OpenApiGenerator {
             
             codeWriter.outdent();
         }
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
 
@@ -835,7 +950,7 @@ class OpenApiGenerator {
      * @param {UMLAssociationClass} associationClass 
      */
     writeAssociationClassProperties(codeWriter, associationClass){
-
+     try{
         var end2Attributes = associationClass.associationSide.end2.reference.attributes;
         var classSideAtributes = associationClass.classSide.attributes;
         codeWriter.writeLine(associationClass.classSide.name+":");
@@ -895,6 +1010,11 @@ class OpenApiGenerator {
         // codeWriter.outdent();
         // codeWriter.outdent();
 
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
     }
 
     /**
@@ -904,6 +1024,7 @@ class OpenApiGenerator {
      * @param {UMLAssociation} interfaceAssociation 
      */
     writeInterfaceComposite(codeWriter,interfaceRealization, interfaceAssociation){
+     try{
         let end1Interface = interfaceAssociation.end1;
         let end2Interface = interfaceAssociation.end2;
         codeWriter.indent();
@@ -1039,7 +1160,12 @@ class OpenApiGenerator {
             
             }
         });  
-        codeWriter.outdent();         
+        codeWriter.outdent();  
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }       
     }
 
     /**
@@ -1048,12 +1174,18 @@ class OpenApiGenerator {
      * @param {UMLClass} objClass 
      */
     findAssociationOfClass(objClass) {
+     try{
         let associations = app.repository.select("@UMLAssociation");
         let filterAssociation = associations.filter(item => {
             return item.end1.reference._id == objClass._id
         });
         console.log(objClass.name, filterAssociation);
         return filterAssociation;
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
 
     }
 
@@ -1062,15 +1194,23 @@ class OpenApiGenerator {
      * @description Find all generalization of UMLClass
      * @param {UMLClass} objClass 
      */
-    findGeneralizationOfClass(objClass) {
-        let generalizeClasses = app.repository.select("@UMLGeneralization");
-        let filterGeneral = generalizeClasses.filter(item => {
-            return item.source._id == objClass._id
-        });
-        return filterGeneral;
-    }
 
+    findGeneralizationOfClass(objClass) {
+     try{
+          let generalizeClasses = app.repository.select("@UMLGeneralization");
+          let filterGeneral = generalizeClasses.filter(item => {
+               return item.source._id == objClass._id
+          });
+          return filterGeneral;
+         }
+         catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+         }
+    }
+//Test error writing 
     writeQueryParameters(codeWriter, objOperation) {
+     try{
         objOperation.parameters.forEach(itemParameters => {
             if (itemParameters.name != "id" && itemParameters.name != "identifier") {
                 if (!(itemParameters.type instanceof type.UMLClass)) {
@@ -1108,6 +1248,19 @@ class OpenApiGenerator {
                 }
             }
         });
+     }
+     catch(error) {
+          console.error("Found error",error.message);
+          this.writeErrorToFile(error);
+     }
+    }
+    writeErrorToFile(error){
+     this.errorContent.push(error.message);
+     fs.writeFile(this.mFilePath+this.mFileName, JSON.stringify(this.errorContent), function(err) {
+          if (err) {
+               console.error("Error writing file",err);
+          }
+     });
     }
       
 }
