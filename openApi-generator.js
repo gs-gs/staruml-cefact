@@ -281,10 +281,34 @@ class OpenApiGenerator {
                 }
             }
 
+            let arrAssoc = [];
+
+            let assocClassLink = classLink.filter(item => {
+                return item.associationSide.end1.reference._id==objClass._id;
+            });
+
+           /**
+            * Add asscociation class Properties
+            * eg.
+            *   TransportMeansParty
+                     allOf:
+                    - $ref: '#/components/schemas/TransportPartyIds'
+                    - $ref: '#/components/schemas/TransportMeansParty'
+                    - type: object
+            */
+            if (assocClassLink.length > 0) {
+                assocClassLink.forEach(item => {
+                    this.writeAssociationClassProperties(codeWriter, item);
+                   
+                })
+            }
+
 
             let arrGeneral = this.findGeneralizationOfClass(objClass); // Git issue #12
 
-            let arrAssoc = [];
+
+
+           
             let aggregationClasses = [];
 
             let classAssociations = this.findAssociationOfClass(objClass);
@@ -294,10 +318,16 @@ class OpenApiGenerator {
                 // for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
                 //     let assoc = objClass.ownedElements[i];
                 if (assoc instanceof type.UMLAssociation) {
+
                     let filterAssoc = arrAssoc.filter(item=>{
                         return item.name==assoc.name;
                     });
+                   
+                   
+
                     if(filterAssoc.length==0 && assoc.name!="" && !flagNoName){
+
+
 
                         if(assoc.end1.aggregation=="shared"){
                             // this.writeAssociationProperties(codeWriter,assoc);
@@ -354,24 +384,7 @@ class OpenApiGenerator {
                 }
             });
 
-            let assocClassLink = classLink.filter(item => {
-                return item.associationSide.end1.reference._id==objClass._id;
-            });
-
-           /**
-            * Add asscociation class Properties
-            * eg.
-            *   TransportMeansParty
-                     allOf:
-                    - $ref: '#/components/schemas/TransportPartyIds'
-                    - $ref: '#/components/schemas/TransportMeansParty'
-                    - type: object
-            */
-            if (assocClassLink.length > 0) {
-                assocClassLink.forEach(item => {
-                    this.writeAssociationClassProperties(codeWriter, item);
-                })
-            }
+            
 
             codeWriter.outdent();
 
@@ -1218,32 +1231,11 @@ class OpenApiGenerator {
                         ? this.buildDescription(itemParameters.documentation)
                         : "missing description"), false, "{type: string}");
                 } else {
-
-                    let param = itemParameters.type.attributes.filter(item => {
-                        return itemParameters.name.toUpperCase() == item.name.toUpperCase();
-                    });
-
-                    if (param.length == 0) {
-                        let generalizeClasses = this.findGeneralizationOfClass(itemParameters.type);
-                        console.log(generalizeClasses);
-                        param = generalizeClasses[0].target.attributes.filter(item => {
-                            return itemParameters.name.toUpperCase() == item.name.toUpperCase();
-                        });
-                    }
-
-                    if (param[0].type == "DateTime") {
-                        this.buildParameter(codeWriter, "before_" + param[0].name, "query", (itemParameters.documentation
+                   
+                        this.buildParameter(codeWriter, itemParameters.type.name+"."+itemParameters.name, "query", (itemParameters.documentation
                             ? this.buildDescription(itemParameters.documentation)
                             : "missing description"), false, "{type: string}");
-                        this.buildParameter(codeWriter, "after_" + param[0].name, "query", (itemParameters.documentation
-                            ? this.buildDescription(itemParameters.documentation)
-                            : "missing description"), false, "{type: string}");
-
-                    } else {
-                        this.buildParameter(codeWriter, param[0].name, "query", (itemParameters.documentation
-                            ? this.buildDescription(itemParameters.documentation)
-                            : "missing description"), false, "{type: string}");
-                    }
+                    
 
                 }
             }
