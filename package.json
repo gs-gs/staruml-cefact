@@ -2,7 +2,7 @@
     "name": "gs-gs.staruml-cefact",
     "title": "OpenAPI3.0 Generator",
     "description": "Implementation of UML to API generator in accordance with https://edi3.org/uml-profile/.",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "engines": {
         "staruml": ">=3.0.0"
     },
