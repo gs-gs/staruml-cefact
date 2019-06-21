@@ -233,7 +233,7 @@ class OpenApiGenerator {
             let arrAttr = [];
 
             let i,len;
-            for (i = 0, len = objClass.attributes.length && !flagNoName ; i < len; i++) {
+            for (i = 0, len = objClass.attributes.length; i < len; i++) {
                 let attr = objClass.attributes[i];
                 let filterAttr = arrAttr.filter(item=>{
                     return item.name==attr.name;
@@ -299,7 +299,7 @@ class OpenApiGenerator {
             if (assocClassLink.length > 0) {
                 assocClassLink.forEach(item => {
                     this.writeAssociationClassProperties(codeWriter, item);
-                   
+                    arrAssoc.push(item.classSide);
                 })
             }
 
@@ -322,12 +322,9 @@ class OpenApiGenerator {
                     let filterAssoc = arrAssoc.filter(item=>{
                         return item.name==assoc.name;
                     });
-                   
-                   
+                                    
 
                     if(filterAssoc.length==0 && assoc.name!="" && !flagNoName){
-
-
 
                         if(assoc.end1.aggregation=="shared"){
                             // this.writeAssociationProperties(codeWriter,assoc);
@@ -375,9 +372,11 @@ class OpenApiGenerator {
                         }      
                         arrAssoc.push(assoc); 
                     }else {
-                        flagNoName = true;
-                        let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
-                        noNameRel.push(str);
+                        if(assoc.name==""){
+                            flagNoName = true;
+                            let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
+                            noNameRel.push(str);
+                        }
                     }                   
                 }else if(assoc instanceof type.UMLGeneralization){
                     arrGeneral.push(assoc);
