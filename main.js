@@ -48,7 +48,7 @@ const PREF_INDENTSPC = "openapi.gen.indentSpaces";
 function getGenOptions() {
   return {
     idlDoc: app.preferences.get(PREF_GENDOC),
-    indentSpaces: app.preferences.get(PREF_INDENTSPC),
+    indentSpaces: [],
     debug: app.preferences.get(PREF_DEBUG_KEY)
   };
 }
