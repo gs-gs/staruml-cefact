@@ -1,16 +1,14 @@
 {
-  "menu": [
-    {
-      "id": "tools",
-      "submenu": [
-        {
-          "label": "OpenAPI",
-          "id": "tool.openapi",
-          "submenu": [
-            { "label": "Generate API", "id": "tools.openapi.generate", "command": "openapi:show-toast" }
-          ]
-        }
-      ]
-    }
-  ]
+     "menu": [{
+          "id": "tools",
+          "submenu": [{
+               "label": "OpenAPI",
+               "id": "tool.openapi",
+               "submenu": [{
+                    "label": "Generate API",
+                    "id": "tools.openapi.generate",
+                    "command": "openapi:show-toast"
+               }]
+          }]
+     }]
 }

@@ -54,8 +54,8 @@ class CodeWriter {
 
           if (line) {
                this.lines.push(this.indentations.join('') + line)
-          } 
-          
+          }
+
           for (i = 0; i < mOutdent; i++) {
                this.outdent();
           }
