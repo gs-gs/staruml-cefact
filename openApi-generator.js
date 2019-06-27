@@ -2,13 +2,18 @@ const fs = require('fs');
 const path = require('path');
 const codegen = require('./codegen-utils');
 const yaml = require('js-yaml');
+
+/**
+ *
+ *
+ * @class OpenApiGenerator
+ */
 class OpenApiGenerator {
 
      /**
-      * @constructor
+      * @constructor defines initialization of schemas, operations, filepath, error filename, errorcontent, options
       */
      constructor() {
-          /** @member {Array.<string>} schemas */
           this.schemas = [];
           this.operations = [];
           this.mFilePath = null;
@@ -18,19 +23,12 @@ class OpenApiGenerator {
      }
 
 
-
-     getIndentString() {
-          if (this.options) {
-               return this.options.useTab ?
-                    "\t" :
-                    this.options.indentSpaces.map(() => " ").join("");
-          }
-     }
+     
 
 
      /**
       * @function getType
-      * @description Get attribute type number,boolean,string 
+      * @description Returns type of attribute in string, Get attribute type number,boolean,string 
       * @returns string 
       * @param {string} starUMLType 
       */
@@ -42,7 +40,15 @@ class OpenApiGenerator {
           } else return "string";
      }
 
-     generate(fullPath, elem, options, fileType) {
+     /**
+      * @function generateOpenApi
+      * @description json,yml or both file on selected path
+      * @param {string} fullPath
+      * @param {UMLPackage} elem
+      * @param {Object} options
+      * @param {string} fileType
+      */
+     generateOpenApi(fullPath, elem, options, fileType) {
           console.log("generate", fullPath);
 
           try {
@@ -134,9 +140,10 @@ class OpenApiGenerator {
 
 
      /**
-      * Find Class
-      * @param {type.Model} elem
-      * @param {Object} options
+      * 
+      * @function findClass
+      * @description finds the element from the class
+      * @param {UMLPackage} elem
       */
      findClass(elem) {
           try {
@@ -171,280 +178,297 @@ class OpenApiGenerator {
 
 
      /**
-      * Write Class (Schema)
+      * @function writeClass
+      * @description Write Class (Schema)
       * @param {array} classes
       * @param {string} fullPath for generate yml
       * @param {Object} options
-      * @param {type.package} mainElem package element
+      * @param {UMLPackage} mainElem package element
       */
      writeClass(classes, fullPath, mainElem, fileType) {
-          try {
-               let classLink = app.repository.select("@UMLAssociationClassLink");
-               // let basePath = path.join(fullPath, mainElem.name + '.json');
-
-               let arrIdClasses = [];
-               let noNameRel = [];
-               let flagNoName = false;
-
-               let codeWriter;
-               codeWriter = new codegen.CodeWriter(this.getIndentString(this.options))
-               codeWriter.writeLine('components:',0,0);
-               // codeWriter.indent();
-               codeWriter.writeLine('schemas:' + (classes.length == 0 ? " {}" : ""),1,0);
-               codeWriter.writeLine(null,1,0);
-               // codeWriter.indent();
-               classes.forEach(objClass => {
-
-                    let accosElems = objClass.ownedElements.filter(item => {
-                         return item instanceof type.UMLAssociation;
-                    });
-
-                    let assocSideClassLink = classLink.filter(item => {
-                         return item.associationSide.end2.reference._id == objClass._id;
-                    });
-
-                    codeWriter.writeLine(objClass.name + ":",0,0);
-                    // codeWriter.indent();
-                    codeWriter.writeLine("type: object",1,0);
-                    codeWriter.writeLine("properties:" + ((objClass.attributes.length == 0 && accosElems.length == 0) ? " {}" : ""),0,0);
-                    // codeWriter.indent();
+          try{
+     
+             let classLink = app.repository.select("@UMLAssociationClassLink");
+             // let basePath = path.join(fullPath, mainElem.name + '.json');
+             
+             let arrIdClasses = [];
+             let noNameRel = [];
+             let flagNoName = false;
+     
+             let codeWriter;
+               codeWriter = new codegen.CodeWriter();
+               codeWriter.setIndentString(codeWriter.getIndentString(this.options));
+             codeWriter.writeLine('components:');
+          //    codeWriter.indent();
+             codeWriter.writeLine('schemas:' + (classes.length==0?" {}":""),1,0);
+             codeWriter.writeLine(null,1,0);
+          //    codeWriter.indent();
+             classes.forEach(objClass => {
+     
+                 let accosElems = objClass.ownedElements.filter(item=>{
+                     return item instanceof type.UMLAssociation;
+                 });
+               
+                 let assocSideClassLink = classLink.filter(item => {
+                     return item.associationSide.end2.reference._id==objClass._id;
+                 });
+     
+                 codeWriter.writeLine(objClass.name+":" );  
+               //   codeWriter.indent();
+                 codeWriter.writeLine("type: object",1,0); 
+                 codeWriter.writeLine("properties:" + ((objClass.attributes.length==0 && accosElems.length==0)?" {}":""));  
+                 codeWriter.writeLine(null,1,0);
+     
+                 let arrAttr = [];
+     
+                 let i,len;
+                 for (i = 0, len = objClass.attributes.length; i < len; i++) {
+                     let attr = objClass.attributes[i];
+                     let filterAttr = arrAttr.filter(item=>{
+                         return item.name==attr.name;
+                     });
+                     if(filterAttr.length==0 ){
+                         arrAttr.push(attr);
+                         if(assocSideClassLink.length>0 && attr.isID)
+                         {
+                             continue;
+                         }
+                         // if(!attr.isID ){
+                             codeWriter.writeLine(attr.name+":");
+                             if(attr.multiplicity==="1..*" || attr.multiplicity==="0..*"){
+                              //    codeWriter.indent();
+                                 codeWriter.writeLine("items:",1,0);   
+                              //    codeWriter.indent();
+                                 codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'",1,0);
+                                 codeWriter.writeLine("type: "+  this.getType(attr.type),0,1 );
+                              //    codeWriter.outdent();  
+                                 codeWriter.writeLine("type: array");
+                                 /**
+                                  * Add MinItems of multiplicity is 1..*
+                                  */
+                                 if( attr.multiplicity==="1..*"){
+                                     codeWriter.writeLine("minItems: 1");
+                                 }
+                                 codeWriter.writeLine(null,0,1);
+                              //    codeWriter.outdent();  
+                             }else{
+                              //    codeWriter.indent();
+                                 codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'",1,0);
+                                 codeWriter.writeLine("type: "+  this.getType(attr.type) );
+                                 if(attr.type instanceof type.UMLEnumeration){
+                                     codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
+                                 }             
+                                 codeWriter.writeLine(null,0,1);
+                              //    codeWriter.outdent(); 
+                             }
+                             if(attr.defaultValue!=""){
+                              //    codeWriter.indent();
+                                 codeWriter.writeLine("default: '" + attr.defaultValue + "'",1,1);
+                              //    codeWriter.outdent();
+                             }
+                         // }
+                         
+                     }
+                 }
+     
+                 let arrAssoc = [];
+     
+                 let assocClassLink = classLink.filter(item => {
+                     return item.associationSide.end1.reference._id==objClass._id;
+                 });
+     
+                /**
+                 * Add asscociation class Properties
+                 * eg.
+                 *   TransportMeansParty
+                          allOf:
+                         - $ref: '#/components/schemas/TransportPartyIds'
+                         - $ref: '#/components/schemas/TransportMeansParty'
+                         - type: object
+                 */
+                 if (assocClassLink.length > 0) {
+                     assocClassLink.forEach(item => {
+                         this.writeAssociationClassProperties(codeWriter, item);
+                         arrAssoc.push(item.classSide);
+                     })
+                 }
+     
+     
+                 let arrGeneral = this.findGeneralizationOfClass(objClass); // Git issue #12
+     
+     
+     
+                
+                 let aggregationClasses = [];
+     
+                 let classAssociations = this.findAssociationOfClass(objClass);
+     
+                  // Git issue #12
+                  classAssociations.forEach(assoc => {
+                     // for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
+                     //     let assoc = objClass.ownedElements[i];
+                     if (assoc instanceof type.UMLAssociation) {
+     
+                         let filterAssoc = arrAssoc.filter(item=>{
+                             return item.name==assoc.name;
+                         });
+                                         
+     
+                         if(filterAssoc.length==0 && assoc.name!="" && !flagNoName){
+     
+                             if(assoc.end1.aggregation=="shared"){
+                                 // this.writeAssociationProperties(codeWriter,assoc);
+                                 aggregationClasses.push(assoc.end2.reference);
+                                 codeWriter.writeLine(assoc.name+":"); // #7 resolve issue
+                              //    codeWriter.indent();
+                                 codeWriter.writeLine(null,1,0);
+                                 if(assoc.end2.multiplicity==="0..*" || assoc.end2.multiplicity==="1..*"){
+                                     codeWriter.writeLine("items:");
+                                   //   codeWriter.indent();
+                                     codeWriter.writeLine("allOf:",1,0);
+                                   //   codeWriter.indent();
+                                     codeWriter.writeLine("- $ref: '#/components/schemas/"+assoc.end2.reference.name +"Ids'",1,0);
+                                     codeWriter.writeLine("- type: object",0,2);
+                                   //   codeWriter.outdent();
+                                   //   codeWriter.outdent();
+                                     codeWriter.writeLine("type: array");
+                                     if( assoc.end2.multiplicity=="1..*"){
+                                         codeWriter.writeLine("minItems: 1");
+                                     }
+                                   //   codeWriter.outdent();
+                                     codeWriter.writeLine(null,0,1);
+                                 }else{
+                                     codeWriter.writeLine("allOf:");
+                                   //   codeWriter.indent();
+                                     codeWriter.writeLine("- $ref: '#/components/schemas/"+assoc.end2.reference.name +"Ids'",1,0);
+                                     codeWriter.writeLine("- type: object",0,2);
+                                   //   codeWriter.outdent();
+                                   //   codeWriter.outdent();
+                                 }
+                             }else{
+                                 if(assoc.end2.multiplicity==="0..*" || assoc.end2.multiplicity==="1..*"){
+                                     codeWriter.writeLine(assoc.name+":");
+                                   //   codeWriter.indent();
+                                     codeWriter.writeLine("items: {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}",1,0);   
+                                     codeWriter.writeLine("type: array");
+                                     /**
+                                      * Add MinItems of multiplicity is 1..*
+                                      */
+                                     if( assoc.end2.multiplicity==="1..*"){
+                                         codeWriter.writeLine("minItems: 1");
+                                     }
+                                   //   codeWriter.outdent();
+                                   codeWriter.writeLine(null,0,1);
+                                 }else{
+                                     codeWriter.writeLine(assoc.name+": {$ref: '#/components/schemas/"+assoc.end2.reference.name +"'}");                            
+                                 } 
+                             }      
+                             arrAssoc.push(assoc); 
+                         }else {
+                             if(assoc.name==""){
+                                 flagNoName = true;
+                                 let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
+                                 noNameRel.push(str);
+                             }
+                         }                   
+                     }else if(assoc instanceof type.UMLGeneralization){
+                         arrGeneral.push(assoc);
+                     }
+                 });
+     
+                 
+     
+               //   codeWriter.outdent();
+               codeWriter.writeLine(null,0,1);
+     
+                 /**
+                  * Add Generalization class
+                  * Inherite all properties of parent class
+                  */
+                 if(arrGeneral.length>0){
+                     codeWriter.writeLine("allOf:");
+                    //  codeWriter.indent();
                     codeWriter.writeLine(null,1,0);
-
-                    let arrAttr = [];
-
-                    let i, len;
-                    for (i = 0, len = objClass.attributes.length && !flagNoName; i < len; i++) {
-                         let attr = objClass.attributes[i];
-                         let filterAttr = arrAttr.filter(item => {
-                              return item.name == attr.name;
-                         });
-                         if (filterAttr.length == 0) {
-                              arrAttr.push(attr);
-                              if (assocSideClassLink.length > 0 && attr.isID) {
-                                   continue;
-                              }
-                              // if(!attr.isID ){
-                              codeWriter.writeLine(attr.name + ":",0,0);
-                              if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                                   // codeWriter.indent();
-                                   codeWriter.writeLine("items:",1,0);
-                                   // codeWriter.indent();
-                                   codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'",1,0);
-                                   codeWriter.writeLine("type: " + this.getType(attr.type),0,1);
-                                   // codeWriter.outdent();
-                                   codeWriter.writeLine("type: array",0,0);
-                                   /**
-                                    * Add MinItems of multiplicity is 1..*
-                                    */
-                                   if (attr.multiplicity === "1..*") {
-                                        codeWriter.writeLine("minItems: 1",0,0);
-                                   }
-                                   // codeWriter.outdent();
-                                   codeWriter.writeLine(null,0,1);
-                                   
-                                   // Do not comment this line
-                              } else {
-                                   // codeWriter.indent();
-                                   codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'",1,0);
-                                   codeWriter.writeLine("type: " + this.getType(attr.type),0,0);
-                                   if (attr.type instanceof type.UMLEnumeration) {
-                                        codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]",0,0);
-                                   }
-
-                                   // codeWriter.outdent();
-                                   codeWriter.writeLine(null,0,1);
-                                   // Do not comment this line
-                              }
-                              if (attr.defaultValue != "") {
-                                   // codeWriter.indent();
-                                   codeWriter.writeLine("default: '" + attr.defaultValue + "'",1,1);
-                                   // codeWriter.outdent();
-                              }
-                              // }
-
-                         }
-                    }
-
-
-                    let arrGeneral = this.findGeneralizationOfClass(objClass); // Git issue #12
-
-                    let arrAssoc = [];
-                    let aggregationClasses = [];
-
-                    let classAssociations = this.findAssociationOfClass(objClass);
-
-                    // Git issue #12
-                    classAssociations.forEach(assoc => {
-                         // for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
-                         //     let assoc = objClass.ownedElements[i];
-                         if (assoc instanceof type.UMLAssociation) {
-                              let filterAssoc = arrAssoc.filter(item => {
-                                   return item.name == assoc.name;
-                              });
-                              if (filterAssoc.length == 0 && assoc.name != "" && !flagNoName) {
-
-                                   if (assoc.end1.aggregation == "shared") {
-                                        // this.writeAssociationProperties(codeWriter,assoc);
-                                        aggregationClasses.push(assoc.end2.reference);
-                                        codeWriter.writeLine(assoc.name + ":",0,0); // #7 resolve issue
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine(null,1,0);
-                                        if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
-                                             codeWriter.writeLine("items:",0,0);
-                                             // codeWriter.indent();
-                                             codeWriter.writeLine("allOf:",1,0);
-                                             // codeWriter.indent();
-                                             codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'",1,0);
-                                             codeWriter.writeLine("- type: object",0,2);
-                                             // codeWriter.outdent();
-                                             // codeWriter.outdent();
-                                             codeWriter.writeLine("type: array",0,0);
-                                             if (assoc.end2.multiplicity == "1..*") {
-                                                  codeWriter.writeLine("minItems: 1",0,0);
-                                             }
-                                             codeWriter.writeLine(null,0,1);
-                                             // codeWriter.outdent();
-                                             // Do not remove this line
-                                        } else {
-                                             codeWriter.writeLine("allOf:",0,0);
-                                             // codeWriter.indent();
-                                             codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'",1,0);
-                                             codeWriter.writeLine("- type: object",0,2);
-                                             // codeWriter.outdent();
-                                             // codeWriter.outdent();
-                                        }
-                                   } else {
-                                        if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
-                                             codeWriter.writeLine(assoc.name + ":",0,0);
-                                             // codeWriter.indent();
-                                             codeWriter.writeLine("items: {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}",1,0);
-                                             codeWriter.writeLine("type: array",0,0);
-                                             /**
-                                              * Add MinItems of multiplicity is 1..*
-                                              */
-                                             if (assoc.end2.multiplicity === "1..*") {
-                                                  codeWriter.writeLine("minItems: 1",0,0);
-                                             }
-                                             // codeWriter.outdent();
-                                             codeWriter.writeLine(null,0,1);
-                                        } else {
-                                             codeWriter.writeLine(assoc.name + ": {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}",0,0);
-                                        }
-                                   }
-                                   arrAssoc.push(assoc);
-                              } else {
-                                   flagNoName = true;
-                                   let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
-                                   noNameRel.push(str);
-                              }
-                         } else if (assoc instanceof type.UMLGeneralization) {
-                              arrGeneral.push(assoc);
-                         }
-                    });
-
-                    let assocClassLink = classLink.filter(item => {
-                         return item.associationSide.end1.reference._id == objClass._id;
-                    });
-
-                    /**
-                     * Add asscociation class Properties
-                     * eg.
-                     *   TransportMeansParty
-                              allOf:
-                             - $ref: '#/components/schemas/TransportPartyIds'
-                             - $ref: '#/components/schemas/TransportMeansParty'
-                             - type: object
-                     */
-                    if (assocClassLink.length > 0) {
-                         assocClassLink.forEach(item => {
-                              this.writeAssociationClassProperties(codeWriter, item);
-                         })
-                    }
-
-                    codeWriter.outdent();
-
-                    /**
-                     * Add Generalization class
-                     * Inherite all properties of parent class
-                     */
-                    if (arrGeneral.length > 0) {
-                         codeWriter.writeLine("allOf:",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine(null,1,0);
-                         arrGeneral.forEach(generalizeClass => {
-                              codeWriter.writeLine("- $ref: '#/components/schemas/" + generalizeClass.target.name + "'",0,0);
-                              codeWriter.writeLine("- type: object",0,0);
-                         });
-                         // codeWriter.outdent();
-                         codeWriter.writeLine(null,0,1);
-                         // Do not comment this linke
-                    }
-
-                    let filterAttributes = arrAttr.filter(item => {
-                         return item.isID;
-                    });
-
-
-                    if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
-                         codeWriter.writeLine("allOf:",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("- $ref: '#/components/schemas/" + objClass.name + "Ids'",1,0);
-                         codeWriter.writeLine("- type: object",0,1);
-                         // codeWriter.outdent();
-                    }
-
-                    if (this.getRequiredAttributes(arrAttr).length > 0) {
-                         codeWriter.writeLine("required: [" + this.getRequiredAttributes(arrAttr) + "]",0,0);
-                    }
-                    // codeWriter.outdent();
-                    codeWriter.writeLine(null,0,1);
-                    // Do not comment this line
-
-                    /**
-                     * Write sceparate schema for isID property of aggregation and relationship class
-                     **/
-                    if (assocSideClassLink.length > 0) {
-                         aggregationClasses.push(objClass);
-                         // this.writeAssociationProperties(codeWriter,objClass);
-                    }
-                    aggregationClasses.forEach(itemClass => {
-                         let filter = arrIdClasses.filter(subItem => {
-                              return itemClass.name == subItem.name;
-                         });
-                         if (filter.length == 0) {
-                              this.writeAssociationProperties(codeWriter, itemClass);
-                              arrIdClasses.push(itemClass)
-                         }
-                    });
-               });
-
-               //    if (noNameRel.length > 0) {
-               //        app.dialogs.showErrorDialog("There is no-name relationship between " + noNameRel.join() + " classes.");
-               //        return 0;
-               //    }
-
-               codeWriter.writeLine(null,0,2);
-               //codeWriter.outdent();
-               //codeWriter.outdent();
-
-               codeWriter.writeLine("info: {description: " + mainElem.name + " API - 1.0.0, title: " + mainElem.name + " API, version: '1.0.0'}",0,0)
-               codeWriter.writeLine("openapi: 3.0.0",0,0);
-               codeWriter.writeLine("paths:" + (this.operations.length == 0 ? " {}" : ""),0,0);
-
-
-               this.writeOperation(codeWriter, this.options, mainElem);
-               codeWriter.writeLine("servers: []",0,0);
-
-
-               this.fileGeneration(codeWriter, fullPath, mainElem, fileType);
-          } catch (error) {
-               console.error("Found error", error.message);
+                     arrGeneral.forEach(generalizeClass => {                   
+                         codeWriter.writeLine("- $ref: '#/components/schemas/"+generalizeClass.target.name +"'");
+                         codeWriter.writeLine("- type: object");
+                     });
+                    //  codeWriter.outdent();    
+                     codeWriter.writeLine(null,0,1);            
+                 }
+     
+                 let filterAttributes =arrAttr.filter(item =>{
+                     return item.isID;
+                 });
+     
+     
+                 if(filterAttributes.length>0 && assocSideClassLink.length>0){
+                     codeWriter.writeLine("allOf:");
+                    //  codeWriter.indent();
+                     codeWriter.writeLine("- $ref: '#/components/schemas/"+objClass.name +"Ids'",1,0);
+                     codeWriter.writeLine("- type: object");
+                    //  codeWriter.outdent();  
+                     codeWriter.writeLine(null,0,1);     
+                 }
+                
+                 if(this.getRequiredAttributes(arrAttr).length>0){
+                     codeWriter.writeLine("required: ["+ this.getRequiredAttributes(arrAttr)+"]" );
+                 }
+               //   codeWriter.outdent();
+                 codeWriter.writeLine(null,0,1);
+     
+                  /**
+                  * Write sceparate schema for isID property of aggregation and relationship class
+                  **/  
+                 if(assocSideClassLink.length>0){
+                     aggregationClasses.push(objClass);
+                     // this.writeAssociationProperties(codeWriter,objClass);
+                 }
+                 aggregationClasses.forEach(itemClass => {
+                     let filter = arrIdClasses.filter(subItem =>{
+                         return itemClass.name==subItem.name;
+                     });
+                     if(filter.length==0){
+                         this.writeAssociationProperties(codeWriter,itemClass);
+                         arrIdClasses.push(itemClass)
+                     }
+                 });    
+             });    
+             
+          //    if (noNameRel.length > 0) {
+          //        app.dialogs.showErrorDialog("There is no-name relationship between " + noNameRel.join() + " classes.");
+          //        return 0;
+          //    }
+          codeWriter.writeLine(null,0,2);
+          //    codeWriter.outdent();
+          //    codeWriter.outdent();
+     
+             codeWriter.writeLine("info: {description: "+mainElem.name+" API - 1.0.0, title: "+ mainElem.name+" API, version: '1.0.0'}")
+             codeWriter.writeLine("openapi: 3.0.0");
+             codeWriter.writeLine("paths:" + (this.operations.length==0?" {}":""));
+     
+            
+             this.writeOperation(codeWriter,this.options,mainElem); 
+             codeWriter.writeLine("servers: []");
+          
+           
+             this.fileGeneration(codeWriter, fullPath, mainElem, fileType);
+          }
+          catch(error) {
+               console.error("Found error",error.message);
                this.writeErrorToFile(error);
           }
+            
+         }
 
-     }
-
-
+     /**
+      * @function fileGeneration
+      * @description convert output file to json
+      * @param {CodeWriter} codeWriter class instance
+      * @param {string} fullPath
+      * @param {UMLPackage} mainElem
+      * @param {string} fileType
+      */
      fileGeneration(codeWriter, fullPath, mainElem, fileType) {
           try {
                console.log("fileGeneration", fullPath);
@@ -487,8 +511,9 @@ class OpenApiGenerator {
      }
 
      /**
-      * Write Operation (Path)
-      * @param {codeWriter} codeWriter
+      * @function writeOperation
+      * @description Write Operation (Path)
+      * @param {CodeWriter} codeWriter class instance
       */
      writeOperation(codeWriter) {
           try {
@@ -510,82 +535,82 @@ class OpenApiGenerator {
 
                          if (filterInterfaceAssociation.length == 0) {
 
-                              // codeWriter.indent();
-                              codeWriter.writeLine("/" + objInterface.target.name + ":",1,0);
-                              // codeWriter.indent();
-                              codeWriter.writeLine(null,1,0);
-                              
+
+                              codeWriter.writeLine("/" + objInterface.target.name + ":", 1, 0);
+
+                              codeWriter.writeLine(null, 1, 0);
+
                               objInterface.target.operations.forEach(objOperation => {
                                    if (objOperation.name.toUpperCase() == "GET") {
-                                        codeWriter.writeLine("get:",0,0);
-                                        // codeWriter.indent();
+                                        codeWriter.writeLine("get:", 0, 0);
 
-                                        codeWriter.writeLine("tags:",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("- " + objInterface.target.name,1,1);
-                                        // codeWriter.outdent();
 
-                                        codeWriter.writeLine("description: Get a list of " + objInterface.source.name,0,0);
+                                        codeWriter.writeLine("tags:", 1, 0);
+
+                                        codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+
+
+                                        codeWriter.writeLine("description: Get a list of " + objInterface.source.name, 0, 0);
 
                                         codeWriter.writeLine("parameters: " + (objOperation.parameters.filter(itemParameters => itemParameters.name != "id" && itemParameters.name != "identifier").length > 0 ?
                                              "" :
-                                             "[]"),0,0);
+                                             "[]"), 0, 0);
 
                                         this.writeQueryParameters(codeWriter, objOperation);
 
-                                        codeWriter.writeLine("responses:",0,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("'200':",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("content:",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("application/json:",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("schema:",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("items: {$ref: '#/components/schemas/" + objInterface.source.name + "'}",1,0);
-                                        codeWriter.writeLine("type: array",0,3);
-                                        // codeWriter.outdent();
-                                        // codeWriter.outdent();
-                                        // codeWriter.outdent();
-                                        codeWriter.writeLine("description: OK",0,3);
-                                        // codeWriter.outdent();
-                                        // codeWriter.outdent();
-                                        // codeWriter.outdent();
+                                        codeWriter.writeLine("responses:", 0, 0);
+
+                                        codeWriter.writeLine("'200':", 1, 0);
+
+                                        codeWriter.writeLine("content:", 1, 0);
+
+                                        codeWriter.writeLine("application/json:", 1, 0);
+
+                                        codeWriter.writeLine("schema:", 1, 0);
+
+                                        codeWriter.writeLine("items: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 0);
+                                        codeWriter.writeLine("type: array", 0, 3);
+
+
+
+                                        codeWriter.writeLine("description: OK", 0, 3);
+
+
+
                                    } else if (objOperation.name.toUpperCase() == "POST") {
-                                        codeWriter.writeLine("post:",0,0);
-                                        // codeWriter.indent();
+                                        codeWriter.writeLine("post:", 0, 0);
 
-                                        codeWriter.writeLine("tags:",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("- " + objInterface.target.name,1,1);
-                                        // codeWriter.outdent();
 
-                                        codeWriter.writeLine("description:  Create a new " + objInterface.source.name,0,0);
+                                        codeWriter.writeLine("tags:", 1, 0);
+
+                                        codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+
+
+                                        codeWriter.writeLine("description:  Create a new " + objInterface.source.name, 0, 0);
 
                                         this.buildRequestBody(codeWriter, objInterface);
 
-                                        codeWriter.writeLine("responses:",0,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("'201':",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("content:",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("application/json:",1,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}",1,2);
-                                        // codeWriter.outdent();
-                                        // codeWriter.outdent();
-                                        codeWriter.writeLine("description: Created",0,3);
-                                        // codeWriter.outdent();
-                                        // codeWriter.outdent();
+                                        codeWriter.writeLine("responses:", 0, 0);
 
-                                        // codeWriter.outdent();
+                                        codeWriter.writeLine("'201':", 1, 0);
+
+                                        codeWriter.writeLine("content:", 1, 0);
+
+                                        codeWriter.writeLine("application/json:", 1, 0);
+
+                                        codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 2);
+
+
+                                        codeWriter.writeLine("description: Created", 0, 3);
+
+
+
+
                                    }
                               });
 
-                              // codeWriter.outdent();
-                              codeWriter.writeLine(null,0,1);
+
+                              codeWriter.writeLine(null, 0, 1);
 
                               let checkOperationArr = objInterface.target.operations.filter(item => {
                                    return item.name == "GET" || item.name == "PUT" || item.name == "DELTE";
@@ -596,22 +621,22 @@ class OpenApiGenerator {
                                         return item.name == "id" || item.name == "identifier";
                                    });
                                    operationAttributes.forEach(operationAttribute => {
-                                        codeWriter.writeLine("/" + objInterface.target.name + "/{" + operationAttribute.name + "}:",0,0);
-                                        // codeWriter.indent();
-                                        codeWriter.writeLine(null,1,0);
+                                        codeWriter.writeLine("/" + objInterface.target.name + "/{" + operationAttribute.name + "}:", 0, 0);
+
+                                        codeWriter.writeLine(null, 1, 0);
 
                                         objInterface.target.operations.forEach(objOperation => {
                                              if (objOperation.name.toUpperCase() == "GET") {
-                                                  codeWriter.writeLine("get:",0,0);
-                                                  // codeWriter.indent();
+                                                  codeWriter.writeLine("get:", 0, 0);
 
-                                                  codeWriter.writeLine("tags:",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("- " + objInterface.target.name,1,1);
-                                                  // codeWriter.outdent();
 
-                                                  codeWriter.writeLine("description: Get single " + objInterface.source.name + " by " + operationAttribute.name,0,0);
-                                                  codeWriter.writeLine("parameters:",0,0);
+                                                  codeWriter.writeLine("tags:", 1, 0);
+
+                                                  codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+
+
+                                                  codeWriter.writeLine("description: Get single " + objInterface.source.name + " by " + operationAttribute.name, 0, 0);
+                                                  codeWriter.writeLine("parameters:", 0, 0);
                                                   this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
 
                                                   objInterface.target.attributes.forEach(itemAttribute => {
@@ -620,34 +645,34 @@ class OpenApiGenerator {
                                                        }
                                                   })
 
-                                                  codeWriter.writeLine("responses:",0,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("'200':",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("content:",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("application/json:",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}",1,2);
+                                                  codeWriter.writeLine("responses:", 0, 0);
 
-                                                  // codeWriter.outdent();
-                                                  // codeWriter.outdent();
-                                                  codeWriter.writeLine("description: OK",0,3);
-                                                  // codeWriter.outdent();
-                                                  // codeWriter.outdent();
-                                                  // codeWriter.outdent();
+                                                  codeWriter.writeLine("'200':", 1, 0);
+
+                                                  codeWriter.writeLine("content:", 1, 0);
+
+                                                  codeWriter.writeLine("application/json:", 1, 0);
+
+                                                  codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 2);
+
+
+
+                                                  codeWriter.writeLine("description: OK", 0, 3);
+
+
+
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
-                                                  codeWriter.writeLine("delete:",0,0);
-                                                  // codeWriter.indent();
+                                                  codeWriter.writeLine("delete:", 0, 0);
 
-                                                  codeWriter.writeLine("tags:",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("- " + objInterface.target.name,1,1);
-                                                  // codeWriter.outdent();
 
-                                                  codeWriter.writeLine("description: Delete an existing " + objInterface.source.name,0,0);
-                                                  codeWriter.writeLine("parameters:",0,0);
+                                                  codeWriter.writeLine("tags:", 1, 0);
+
+                                                  codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+
+
+                                                  codeWriter.writeLine("description: Delete an existing " + objInterface.source.name, 0, 0);
+                                                  codeWriter.writeLine("parameters:", 0, 0);
                                                   this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
 
                                                   objInterface.target.attributes.forEach(itemAttribute => {
@@ -656,23 +681,23 @@ class OpenApiGenerator {
                                                        }
                                                   });
 
-                                                  codeWriter.writeLine("responses:",0,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("'204': {description: No Content}",1,2);
-                                                  // codeWriter.outdent();
-                                                  // codeWriter.outdent();
+                                                  codeWriter.writeLine("responses:", 0, 0);
+
+                                                  codeWriter.writeLine("'204': {description: No Content}", 1, 2);
+
+
 
                                              } else if (objOperation.name.toUpperCase() == "PUT") {
-                                                  codeWriter.writeLine("put:",0,0);
-                                                  // codeWriter.indent();
+                                                  codeWriter.writeLine("put:", 0, 0);
 
-                                                  codeWriter.writeLine("tags:",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("- " + objInterface.target.name,1,1);
-                                                  // codeWriter.outdent();
 
-                                                  codeWriter.writeLine("description: Update an existing " + objInterface.source.name,0,0);
-                                                  codeWriter.writeLine("parameters:",0,0);
+                                                  codeWriter.writeLine("tags:", 1, 0);
+
+                                                  codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+
+
+                                                  codeWriter.writeLine("description: Update an existing " + objInterface.source.name, 0, 0);
+                                                  codeWriter.writeLine("parameters:", 0, 0);
                                                   this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
                                                   objInterface.target.attributes.forEach(itemAttribute => {
                                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
@@ -680,33 +705,33 @@ class OpenApiGenerator {
                                                        }
                                                   });
                                                   this.buildRequestBody(codeWriter, objInterface);
-                                                  codeWriter.writeLine("responses:",0,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("'200':",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("content:",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("application/json:",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}",1,2);
-                                                  // codeWriter.outdent();
-                                                  // codeWriter.outdent();
-                                                  codeWriter.writeLine("description: OK",0,3);
+                                                  codeWriter.writeLine("responses:", 0, 0);
 
-                                                  // codeWriter.outdent();
-                                                  // codeWriter.outdent();
-                                                  // codeWriter.outdent();
+                                                  codeWriter.writeLine("'200':", 1, 0);
+
+                                                  codeWriter.writeLine("content:", 1, 0);
+
+                                                  codeWriter.writeLine("application/json:", 1, 0);
+
+                                                  codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 2);
+
+
+                                                  codeWriter.writeLine("description: OK", 0, 3);
+
+
+
+
                                              } else if (objOperation.name.toUpperCase() == "PATCH") {
-                                                  codeWriter.writeLine("patch:",0,0);
-                                                  // codeWriter.indent();
+                                                  codeWriter.writeLine("patch:", 0, 0);
 
-                                                  codeWriter.writeLine("tags:",1,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("- " + objInterface.target.name,1,1);
-                                                  // codeWriter.outdent();
 
-                                                  codeWriter.writeLine("description:  Update " + objInterface.source.name,0,0);
-                                                  codeWriter.writeLine("parameters:",0,0);
+                                                  codeWriter.writeLine("tags:", 1, 0);
+
+                                                  codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+
+
+                                                  codeWriter.writeLine("description:  Update " + objInterface.source.name, 0, 0);
+                                                  codeWriter.writeLine("parameters:", 0, 0);
                                                   this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
                                                   objInterface.target.attributes.forEach(itemAttribute => {
                                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
@@ -715,18 +740,18 @@ class OpenApiGenerator {
                                                   });
                                                   this.buildRequestBody(codeWriter, objInterface);
 
-                                                  codeWriter.writeLine("responses:",0,0);
-                                                  // codeWriter.indent();
-                                                  codeWriter.writeLine("'204': {description: No Content}",1,2);
-                                                  // codeWriter.outdent();
-                                                  // codeWriter.outdent();
+                                                  codeWriter.writeLine("responses:", 0, 0);
+
+                                                  codeWriter.writeLine("'204': {description: No Content}", 1, 2);
+
+
                                              }
                                         });
-                                        // codeWriter.outdent();
-                                        codeWriter.writeLine(null,0,1);
+
+                                        codeWriter.writeLine(null, 0, 1);
                                    });
-                                   // codeWriter.outdent();
-                                   codeWriter.writeLine(null,0,1);
+
+                                   codeWriter.writeLine(null, 0, 1);
                               }
 
                          } else {
@@ -751,19 +776,21 @@ class OpenApiGenerator {
      }
 
      /**
-      * Description replace (') with ('')
+      * @function buildDescription
+      * @description Description replace (') with ('')
       * @param {string} desc
       */
      buildDescription(desc) {
-          if(desc)
+          if (desc)
                return desc.replace(/\'/g, "''")
-          
+
           return null;
      }
 
      /**
       * @function buildParameter
-      * @param {codeWriter} codeWriter
+      * @description Adds parameters to the file
+      * @param {CodeWriter} codeWriter class instance
       * @param {string} name
       * @param {string} type
       * @param {string} description
@@ -772,37 +799,39 @@ class OpenApiGenerator {
       */
      buildParameter(codeWriter, name, type, description, required, schema) {
           // codeWriter.writeLine("parameters:");
-          codeWriter.writeLine("- description: " + description,0,0);
-          // codeWriter.indent();
-          codeWriter.writeLine("in: " + type,1,0);
-          codeWriter.writeLine("name: " + name,0,0);
-          codeWriter.writeLine("required: " + required,0,0);
-          codeWriter.writeLine("schema: " + schema,0,1);
-          // codeWriter.outdent();
+          codeWriter.writeLine("- description: " + description, 0, 0);
+
+          codeWriter.writeLine("in: " + type, 1, 0);
+          codeWriter.writeLine("name: " + name, 0, 0);
+          codeWriter.writeLine("required: " + required, 0, 0);
+          codeWriter.writeLine("schema: " + schema, 0, 1);
+
      }
 
      /**
       * @function buildRequestBody
-      * @param {codewrite} codeWriter 
-      * @param {interface} objInterface 
+      * @description Build request body for api
+      * @param {CodeWriter} codeWriter class instance 
+      * @param {UMLInterfaceRealization} objInterface 
       */
      buildRequestBody(codeWriter, objInterface) {
-          codeWriter.writeLine('requestBody:',0,0);
-          // codeWriter.indent();
-          codeWriter.writeLine("content:",1,0);
-          // codeWriter.indent();
-          codeWriter.writeLine("application/json:",1,0);
-          // codeWriter.indent();
-          codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}",1,2);
-          // codeWriter.outdent();
-          // codeWriter.outdent();
-          codeWriter.writeLine("description: ''",0,0);
-          codeWriter.writeLine("required: true",0,1);
-          // codeWriter.outdent();
+          codeWriter.writeLine('requestBody:', 0, 0);
+
+          codeWriter.writeLine("content:", 1, 0);
+
+          codeWriter.writeLine("application/json:", 1, 0);
+
+          codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 2);
+
+
+          codeWriter.writeLine("description: ''", 0, 0);
+          codeWriter.writeLine("required: true", 0, 1);
+
      }
 
      /**
       * @function getEnumerationLiteral
+      * @description 
       * @param {UMLEnumaration} objEnum 
       */
      getEnumerationLiteral(objEnum) {
@@ -814,8 +843,10 @@ class OpenApiGenerator {
 
      /**
       * @function getRequiredAttributes
+      * @description 
       * @param {UMLAttributes[]} arrAttributes 
-      */
+      * @returns {Array} array of string
+      */ 
      getRequiredAttributes(arrAttributes) {
           if (arrAttributes) {
                let requiredAttr = [];
@@ -831,8 +862,9 @@ class OpenApiGenerator {
 
      /**
       * @function writeAssociationProperties
-      * @param {codeWriter} codeWriter 
-      * @param {UMLAssociation} assciation 
+      * @description 
+      * @param {CodeWriter} codeWriter class instance 
+      * @param {UMLClass} assciation 
       */
      writeAssociationProperties(codeWriter, assciation) {
           try {
@@ -859,53 +891,53 @@ class OpenApiGenerator {
 
                if (filterAttributes.length > 0) {
 
-                    codeWriter.writeLine((assciation instanceof type.UMLAssociation) ? (assciation.name + ":") : (tempClass.name + "Ids:"),0,0);
-                    // codeWriter.indent();
-                    codeWriter.writeLine("type: object",1,0);
-                    codeWriter.writeLine("properties:",0,0);
-                    // codeWriter.indent();
-                    codeWriter.writeLine(null,1,0);
+                    codeWriter.writeLine((assciation instanceof type.UMLAssociation) ? (assciation.name + ":") : (tempClass.name + "Ids:"), 0, 0);
+
+                    codeWriter.writeLine("type: object", 1, 0);
+                    codeWriter.writeLine("properties:", 0, 0);
+
+                    codeWriter.writeLine(null, 1, 0);
 
                     filterAttributes.forEach(attr => {
 
-                         codeWriter.writeLine(attr.name + ":",0,0);
+                         codeWriter.writeLine(attr.name + ":", 0, 0);
                          if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                              // codeWriter.indent();
-                              codeWriter.writeLine("items:",1,0);
-                              // codeWriter.indent();
-                              codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'",1,0);
-                              codeWriter.writeLine("type: " + this.getType(attr.type),0,1);
-                              // codeWriter.outdent();
-                              codeWriter.writeLine("type: array",0,0);
+
+                              codeWriter.writeLine("items:", 1, 0);
+
+                              codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                              codeWriter.writeLine("type: " + this.getType(attr.type), 0, 1);
+
+                              codeWriter.writeLine("type: array", 0, 0);
                               /**
                                * Add MinItems of multiplicity is 1..*
                                */
                               if (attr.multiplicity === "1..*") {
-                                   codeWriter.writeLine("minItems: 1",0,0);
+                                   codeWriter.writeLine("minItems: 1", 0, 0);
                               }
-                              // codeWriter.outdent();
-                              codeWriter.writeLine(null,0,1);
+
+                              codeWriter.writeLine(null, 0, 1);
                          } else {
-                              // codeWriter.indent();
-                              codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'",1,0);
-                              codeWriter.writeLine("type: " + this.getType(attr.type),0,0);
+
+                              codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                              codeWriter.writeLine("type: " + this.getType(attr.type), 0, 0);
                               if (attr.type instanceof type.UMLEnumeration) {
-                                   codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]",0,0);
+                                   codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]", 0, 0);
                               }
-                              // codeWriter.outdent();
-                              codeWriter.writeLine(null,0,1);
+
+                              codeWriter.writeLine(null, 0, 1);
                          }
                     });
 
-                    // codeWriter.outdent();
-                    codeWriter.writeLine(null,0,1);
 
-                    if (this.getRequiredAttributes(filterAttributes).length > 0){
-                         codeWriter.writeLine("required: [" + this.getRequiredAttributes(filterAttributes) + "]",0,0);
+                    codeWriter.writeLine(null, 0, 1);
+
+                    if (this.getRequiredAttributes(filterAttributes).length > 0) {
+                         codeWriter.writeLine("required: [" + this.getRequiredAttributes(filterAttributes) + "]", 0, 0);
                     }
 
-                    // codeWriter.outdent();
-                    codeWriter.writeLine(null,0,1);
+
+                    codeWriter.writeLine(null, 0, 1);
                }
           } catch (error) {
                console.error("Found error", error.message);
@@ -916,42 +948,42 @@ class OpenApiGenerator {
 
      /**
       * @function writeAssociationClassProperties
-      * @param {codeWriter} codeWriter 
-      * @param {UMLAssociationClass} associationClass 
+      * @description adds property for association class
+      * @param {CodeWriter} codeWriter class instance
+      * @param {UMLAssociationClassLink} associationClass 
       */
      writeAssociationClassProperties(codeWriter, associationClass) {
           try {
                var end2Attributes = associationClass.associationSide.end2.reference.attributes;
                var classSideAtributes = associationClass.classSide.attributes;
-               codeWriter.writeLine(associationClass.classSide.name + ":",0,0);
-               // codeWriter.indent();
+               codeWriter.writeLine(associationClass.classSide.name + ":", 0, 0);
+
 
                if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
 
-                    codeWriter.writeLine("items:",0,0);
-                    // codeWriter.indent();
-                    codeWriter.writeLine("allOf:",1,0);
-                    // codeWriter.indent();
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'",1,0);
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'",0,0);
-                    codeWriter.writeLine("- type: object",0,2);
-                    // codeWriter.outdent();
-                    // codeWriter.outdent();
-                    codeWriter.writeLine("type: array",0,0);
+                    codeWriter.writeLine("items:", 1, 0);
+
+                    codeWriter.writeLine("allOf:", 1, 0);
+
+                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
+                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'", 0, 0);
+                    codeWriter.writeLine("- type: object", 0, 2);
+
+
+                    codeWriter.writeLine("type: array", 0, 0);
                     if (associationClass.associationSide.end2.multiplicity == "1..*") {
-                         codeWriter.writeLine("minItems: 1",0,0);
+                         codeWriter.writeLine("minItems: 1", 0, 0);
                     }
-                    // codeWriter.outdent();
-                    codeWriter.writeLine(null,0,1);
-                    //---- This is kept due to if condition
+
+                    codeWriter.writeLine(null, 0, 1);
                } else {
-                    codeWriter.writeLine("allOf:",0,0);
-                    // codeWriter.indent();
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'",1,0);
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'",0,0);
-                    codeWriter.writeLine("- type: object",0,2);
-                    // codeWriter.outdent();
-                    // codeWriter.outdent();
+                    codeWriter.writeLine("allOf:", 0, 0);
+
+                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
+                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'", 0, 0);
+                    codeWriter.writeLine("- type: object", 0, 2);
+
+
                }
 
 
@@ -979,8 +1011,8 @@ class OpenApiGenerator {
                //         codeWriter.outdent();
                //     }
                // });
-               // codeWriter.outdent();
-               // codeWriter.outdent();
+
+
 
           } catch (error) {
                console.error("Found error", error.message);
@@ -990,7 +1022,8 @@ class OpenApiGenerator {
 
      /**
       * @function writeInterfaceComposite
-      * @param {codeWriter} codeWriter 
+      * @description Adds interface composision
+      * @param {CodeWriter} codeWriter class instance
       * @param {UMLInterfaceRealization} interfaceRealization 
       * @param {UMLAssociation} interfaceAssociation 
       */
@@ -998,139 +1031,139 @@ class OpenApiGenerator {
           try {
                let end1Interface = interfaceAssociation.end1;
                let end2Interface = interfaceAssociation.end2;
-               codeWriter.indent();
+               codeWriter.writeLine(null, 1, 0);
                interfaceRealization.target.operations.forEach(objOperation => {
                     if (objOperation.name.toUpperCase() == "GET") {
 
                          /* Get all list */
-                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + ":",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("get:",1,0);
-                         // codeWriter.indent();
+                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + ":", 0, 0);
 
-                         codeWriter.writeLine("tags:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("- " + interfaceRealization.target.name,1,1);
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("get:", 1, 0);
 
-                         codeWriter.writeLine("description: Get a list of " + interfaceRealization.source.name,0,0);
-                         codeWriter.writeLine("parameters:",0,0);
+
+                         codeWriter.writeLine("tags:", 1, 0);
+
+                         codeWriter.writeLine("- " + interfaceRealization.target.name, 1, 1);
+
+
+                         codeWriter.writeLine("description: Get a list of " + interfaceRealization.source.name, 0, 0);
+                         codeWriter.writeLine("parameters:", 0, 0);
                          this.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
 
-                         codeWriter.writeLine("responses:",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("'200':",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("content:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("application/json:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("schema:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("items: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}",1,0);
-                         codeWriter.writeLine("type: array",0,3);
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         codeWriter.writeLine("description: OK",0,4);
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("responses:", 0, 0);
+
+                         codeWriter.writeLine("'200':", 1, 0);
+
+                         codeWriter.writeLine("content:", 1, 0);
+
+                         codeWriter.writeLine("application/json:", 1, 0);
+
+                         codeWriter.writeLine("schema:", 1, 0);
+
+                         codeWriter.writeLine("items: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}", 1, 0);
+                         codeWriter.writeLine("type: array", 0, 3);
+
+
+
+                         codeWriter.writeLine("description: OK", 0, 4);
+
+
+
+
 
                          /* Get single element record */
-                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}:",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("get:",1,0);
-                         // codeWriter.indent();
+                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}:", 0, 0);
 
-                         codeWriter.writeLine("tags:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("- " + interfaceRealization.target.name,1,1);
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("get:", 1, 0);
 
-                         codeWriter.writeLine("description: Get a list of " + interfaceRealization.source.name,0,0);
-                         codeWriter.writeLine("parameters:",0,0);
+
+                         codeWriter.writeLine("tags:", 1, 0);
+
+                         codeWriter.writeLine("- " + interfaceRealization.target.name, 1, 1);
+
+
+                         codeWriter.writeLine("description: Get a list of " + interfaceRealization.source.name, 0, 0);
+                         codeWriter.writeLine("parameters:", 0, 0);
                          this.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
                          this.buildParameter(codeWriter, end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
 
-                         codeWriter.writeLine("responses:",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("'200':",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("content:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("application/json:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}",1,2);
+                         codeWriter.writeLine("responses:", 0, 0);
 
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         codeWriter.writeLine("description: OK",0,4);
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("'200':", 1, 0);
+
+                         codeWriter.writeLine("content:", 1, 0);
+
+                         codeWriter.writeLine("application/json:", 1, 0);
+
+                         codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}", 1, 2);
+
+
+
+                         codeWriter.writeLine("description: OK", 0, 4);
+
+
+
+
                     } else if (objOperation.name.toUpperCase() == "POST") {
-                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + ":",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("post:",1,0);
-                         // codeWriter.indent();
+                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + ":", 0, 0);
 
-                         codeWriter.writeLine("tags:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("- " + interfaceRealization.target.name,1,1);
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("post:", 1, 0);
 
-                         codeWriter.writeLine("description:  Create a new " + interfaceRealization.source.name,0,0);
-                         codeWriter.writeLine("parameters:",0,0);
+
+                         codeWriter.writeLine("tags:", 1, 0);
+
+                         codeWriter.writeLine("- " + interfaceRealization.target.name, 1, 1);
+
+
+                         codeWriter.writeLine("description:  Create a new " + interfaceRealization.source.name, 0, 0);
+                         codeWriter.writeLine("parameters:", 0, 0);
                          this.buildParameter(codeWriter, end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
 
                          this.buildRequestBody(codeWriter, interfaceRealization);
 
-                         codeWriter.writeLine("responses:",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("'201':",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("content:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("application/json:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}",1,2);
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         codeWriter.writeLine("description: Created",0,4);
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("responses:", 0, 0);
 
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("'201':", 1, 0);
+
+                         codeWriter.writeLine("content:", 1, 0);
+
+                         codeWriter.writeLine("application/json:", 1, 0);
+
+                         codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}", 1, 2);
+
+
+                         codeWriter.writeLine("description: Created", 0, 4);
+
+
+
+
+
                     } else if (objOperation.name.toUpperCase() == "DELETE") {
-                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}:",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("delete:",1,0);
-                         // codeWriter.indent();
+                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}:", 0, 0);
 
-                         codeWriter.writeLine("tags:",1,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("- " + objInterface.target.name,1,1);
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("delete:", 1, 0);
 
-                         codeWriter.writeLine("description: Delete an existing " + objInterface.source.name,0,0);
-                         codeWriter.writeLine("parameters:",0,0);
+
+                         codeWriter.writeLine("tags:", 1, 0);
+
+                         codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+
+
+                         codeWriter.writeLine("description: Delete an existing " + objInterface.source.name, 0, 0);
+                         codeWriter.writeLine("parameters:", 0, 0);
                          this.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
                          this.buildParameter(codeWriter, end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
 
-                         codeWriter.writeLine("responses:",0,0);
-                         // codeWriter.indent();
-                         codeWriter.writeLine("'204': {description: No Content}",1,3);
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
-                         // codeWriter.outdent();
+                         codeWriter.writeLine("responses:", 0, 0);
+
+                         codeWriter.writeLine("'204': {description: No Content}", 1, 3);
+
+
+
 
                     }
                });
-               codeWriter.outdent();
+               codeWriter.writeLine(null, 0, 1);
           } catch (error) {
                console.error("Found error", error.message);
                this.writeErrorToFile(error);
@@ -1162,7 +1195,6 @@ class OpenApiGenerator {
       * @description Find all generalization of UMLClass
       * @param {UMLClass} objClass 
       */
-
      findGeneralizationOfClass(objClass) {
           try {
                let generalizeClasses = app.repository.select("@UMLGeneralization");
@@ -1175,7 +1207,12 @@ class OpenApiGenerator {
                this.writeErrorToFile(error);
           }
      }
-     //Test error writing 
+     /**
+      * @function writeQueryParameters
+      * @description Ads query paramater 
+      * @param {CodeWriter} codeWriter class instance
+      * @param {UMLOperation} objOperation
+      */
      writeQueryParameters(codeWriter, objOperation) {
           try {
                objOperation.parameters.forEach(itemParameters => {
@@ -1220,6 +1257,12 @@ class OpenApiGenerator {
                this.writeErrorToFile(error);
           }
      }
+     /**
+      * @function writeErrorToFile
+      * @description Catch the error and write it to file
+      * @param {*} error
+      * @memberof OpenApiGenerator
+      */
      writeErrorToFile(error) {
           this.errorContent.push(error.message);
           fs.writeFile(this.mFilePath + this.mFileName, JSON.stringify(this.errorContent), function(err) {
