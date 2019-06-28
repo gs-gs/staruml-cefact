@@ -50,8 +50,6 @@ class OpenApiGenerator {
       */
      generateOpenApi(fullPath, elem, options, fileType) {
           console.log("generate", fullPath);
-          console.log("generate----new", fullPath);
-          console.log("generate----new----", fullPath);
 
           try {
                this.mFilePath = fullPath;
