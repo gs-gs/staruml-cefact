@@ -50,6 +50,8 @@ class OpenApiGenerator {
       */
      generateOpenApi(fullPath, elem, options, fileType) {
           console.log("generate", fullPath);
+          console.log("generate----new", fullPath);
+          console.log("generate----new----", fullPath);
 
           try {
                this.mFilePath = fullPath;
@@ -901,7 +903,7 @@ class OpenApiGenerator {
                     filterAttributes = filterAttributes.concat(genClassAttr);
                });
 
-               // if (filterAttributes.length > 0) {
+               if (filterAttributes.length > 0) {
 
                codeWriter.writeLine((assciation instanceof type.UMLAssociation) ? (assciation.name + ":") : (tempClass.name + "Ids:"), 0, 0);
 
@@ -951,7 +953,7 @@ class OpenApiGenerator {
 
 
                codeWriter.writeLine(null, 0, 1);
-               // }
+               }
           } catch (error) {
                console.error("Found error", error.message);
                this.writeErrorToFile(error);
@@ -978,7 +980,14 @@ class OpenApiGenerator {
 
                     codeWriter.writeLine("allOf:", 1, 0);
 
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
+                    // codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
+                    codeWriter.writeLine(null,1,0);
+                    if (associationClass.associationSide.end1.aggregation == "shared")
+                         codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'");
+                    else
+                         codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name+"'");
+
+
                     codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'", 0, 0);
                     codeWriter.writeLine("- type: object", 0, 2);
 
@@ -992,7 +1001,14 @@ class OpenApiGenerator {
                } else {
                     codeWriter.writeLine("allOf:", 0, 0);
 
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
+                    // codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
+                    codeWriter.writeLine(null,1,0);
+                    if (associationClass.associationSide.end1.aggregation == "shared")
+                         codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'");
+                    else
+                         codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name+"'");
+
+
                     codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'", 0, 0);
                     codeWriter.writeLine("- type: object", 0, 2);
 
