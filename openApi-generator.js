@@ -20,6 +20,12 @@ class OpenApiGenerator {
           this.mFileName = '/error.txt';
           this.errorContent = [];
           this.options = null;
+          this.mainOpenApiObj={};
+          this.mainComponentObj={};
+          this.mainSchemaObj={};
+          this.mainServer=[];
+          this.mainInfo={};
+          this.mainPath={};
      }
 
 
@@ -196,10 +202,8 @@ class OpenApiGenerator {
                codeWriter = new codegen.CodeWriter();
                codeWriter.setIndentString(codeWriter.getIndentString(this.options));
                codeWriter.writeLine('components:');
-               //    codeWriter.indent();
                codeWriter.writeLine('schemas:' + (classes.length == 0 ? " {}" : ""), 1, 0);
                codeWriter.writeLine(null, 1, 0);
-               //    codeWriter.indent();
                classes.forEach(objClass => {
 
                     let accosElems = objClass.ownedElements.filter(item => {
@@ -215,7 +219,6 @@ class OpenApiGenerator {
                     });
 
                     codeWriter.writeLine(objClass.name + ":");
-                    //   codeWriter.indent();
                     codeWriter.writeLine("type: object", 1, 0);
                     codeWriter.writeLine("properties:" + ((objClass.attributes.length == 0 && accosElems.length == 0 && assocClassLink.length == 0) ? " {}" : ""));
                     codeWriter.writeLine(null, 1, 0);
@@ -236,12 +239,9 @@ class OpenApiGenerator {
                               // if(!attr.isID ){
                               codeWriter.writeLine(attr.name + ":");
                               if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                                   //    codeWriter.indent();
                                    codeWriter.writeLine("items:", 1, 0);
-                                   //    codeWriter.indent();
                                    codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
                                    codeWriter.writeLine("type: " + this.getType(attr.type), 0, 1);
-                                   //    codeWriter.outdent();  
                                    codeWriter.writeLine("type: array");
                                    /**
                                     * Add MinItems of multiplicity is 1..*
@@ -250,21 +250,16 @@ class OpenApiGenerator {
                                         codeWriter.writeLine("minItems: 1");
                                    }
                                    codeWriter.writeLine(null, 0, 1);
-                                   //    codeWriter.outdent();  
                               } else {
-                                   //    codeWriter.indent();
                                    codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
                                    codeWriter.writeLine("type: " + this.getType(attr.type));
                                    if (attr.type instanceof type.UMLEnumeration) {
                                         codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]");
                                    }
                                    codeWriter.writeLine(null, 0, 1);
-                                   //    codeWriter.outdent(); 
                               }
                               if (attr.defaultValue != "") {
-                                   //    codeWriter.indent();
                                    codeWriter.writeLine("default: '" + attr.defaultValue + "'", 1, 1);
-                                   //    codeWriter.outdent();
                               }
                               // }
 
@@ -318,35 +313,25 @@ class OpenApiGenerator {
                                         // this.writeAssociationProperties(codeWriter,assoc);
                                         aggregationClasses.push(assoc.end2.reference);
                                         codeWriter.writeLine(assoc.name + ":"); // #7 resolve issue
-                                        //    codeWriter.indent();
                                         codeWriter.writeLine(null, 1, 0);
                                         if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                                              codeWriter.writeLine("items:");
-                                             //   codeWriter.indent();
                                              codeWriter.writeLine("allOf:", 1, 0);
-                                             //   codeWriter.indent();
                                              codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'", 1, 0);
                                              codeWriter.writeLine("- type: object", 0, 2);
-                                             //   codeWriter.outdent();
-                                             //   codeWriter.outdent();
                                              codeWriter.writeLine("type: array");
                                              if (assoc.end2.multiplicity == "1..*") {
                                                   codeWriter.writeLine("minItems: 1");
                                              }
-                                             //   codeWriter.outdent();
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
                                              codeWriter.writeLine("allOf:");
-                                             //   codeWriter.indent();
                                              codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'", 1, 0);
                                              codeWriter.writeLine("- type: object", 0, 2);
-                                             //   codeWriter.outdent();
-                                             //   codeWriter.outdent();
                                         }
                                    } else {
                                         if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                                              codeWriter.writeLine(assoc.name + ":");
-                                             //   codeWriter.indent();
                                              codeWriter.writeLine("items: {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}", 1, 0);
                                              codeWriter.writeLine("type: array");
                                              /**
@@ -355,7 +340,6 @@ class OpenApiGenerator {
                                              if (assoc.end2.multiplicity === "1..*") {
                                                   codeWriter.writeLine("minItems: 1");
                                              }
-                                             //   codeWriter.outdent();
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
                                              codeWriter.writeLine(assoc.name + ": {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}");
@@ -376,7 +360,6 @@ class OpenApiGenerator {
 
 
 
-                    //   codeWriter.outdent();
                     codeWriter.writeLine(null, 0, 1);
 
                     /**
@@ -385,13 +368,11 @@ class OpenApiGenerator {
                      */
                     if (arrGeneral.length > 0) {
                          codeWriter.writeLine("allOf:");
-                         //  codeWriter.indent();
                          codeWriter.writeLine(null, 1, 0);
                          arrGeneral.forEach(generalizeClass => {
                               codeWriter.writeLine("- $ref: '#/components/schemas/" + generalizeClass.target.name + "'");
                               codeWriter.writeLine("- type: object");
                          });
-                         //  codeWriter.outdent();    
                          codeWriter.writeLine(null, 0, 1);
                     }
 
@@ -402,17 +383,14 @@ class OpenApiGenerator {
 
                     if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
                          codeWriter.writeLine("allOf:");
-                         //  codeWriter.indent();
                          codeWriter.writeLine("- $ref: '#/components/schemas/" + objClass.name + "Ids'", 1, 0);
                          codeWriter.writeLine("- type: object");
-                         //  codeWriter.outdent();  
                          codeWriter.writeLine(null, 0, 1);
                     }
 
                     if (this.getRequiredAttributes(arrAttr).length > 0) {
                          codeWriter.writeLine("required: [" + this.getRequiredAttributes(arrAttr) + "]");
                     }
-                    //   codeWriter.outdent();
                     codeWriter.writeLine(null, 0, 1);
 
                     /**
@@ -438,8 +416,6 @@ class OpenApiGenerator {
                //        return 0;
                //    }
                codeWriter.writeLine(null, 0, 2);
-               //    codeWriter.outdent();
-               //    codeWriter.outdent();
 
                codeWriter.writeLine("info: {description: " + mainElem.name + " API - 1.0.0, title: " + mainElem.name + " API, version: '1.0.0'}")
                codeWriter.writeLine("openapi: 3.0.0");
