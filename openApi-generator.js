@@ -140,7 +140,7 @@ class OpenApiGenerator {
       * 
       * @function findClass
       * @description finds the element from the class
-      * @param {UMLPackage} elem
+      * @param {UMLClass} elem
       */
      findClass(elem) {
           try {

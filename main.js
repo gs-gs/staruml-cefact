@@ -2,15 +2,15 @@ const codeGenerator = require('./code-generator')
 /**
  * @function _handleGenerate
  * @description OpenAPI generation when OpenAPI Initialization  
- * @param {string} base
+ * @param {UMLPackage} baseModel
  * @param {string} path
  * @param {Object} options
  */
-function _handleGenerate(base, path, options) {
+function _handleGenerate(baseModel, path, options) {
      // If options is not passed, get from preference
      options = options || getGenOptions();
-     // If base is not assigned, popup ElementPicker
-     if (!base) {
+     // If baseModel is not assigned, popup ElementPicker
+     if (!baseModel) {
           app.elementPickerDialog
                .showDialog("Select the package or project to generate from", null, null) //type.UMLPackage
                .then(function({
@@ -19,8 +19,8 @@ function _handleGenerate(base, path, options) {
                }) {
                     if (buttonId === "ok") {
                          if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
-                              base = returnValue;
-                              fileTypeSelection(base, options);
+                              baseModel = returnValue;
+                              fileTypeSelection(baseModel, options);
                          } else {
                               app.dialogs.showErrorDialog("Please select the project or a package");
                          }
@@ -32,10 +32,10 @@ function _handleGenerate(base, path, options) {
 /**
  * @function fileTypeSelection
  * @description Selects file type from the dropdown
- * @param {Object} base
+ * @param {UMLPackage} baseModel
  * @param {Object} options
  */
-function fileTypeSelection(base, options) {
+function fileTypeSelection(baseModel, options) {
      let filters = [
           // { name: "YML Files", extensions: [ "yml" ] }
      ];
@@ -59,7 +59,7 @@ function fileTypeSelection(base, options) {
      }) {
           if (buttonId === 'ok') {
                const file = app.dialogs.showSaveDialog("Save File as...", null, filters);
-               codeGenerator.generate(base, file, options, returnValue);
+               codeGenerator.generate(baseModel, file, options, returnValue);
           } else {
                console.log("User canceled")
           }
