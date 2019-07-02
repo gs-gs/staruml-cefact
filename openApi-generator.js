@@ -450,13 +450,25 @@ class OpenApiGenerator {
                      * Inherite all properties of parent class
                      */
                     if (arrGeneral.length > 0) {
+                         console.log("---WG-1")
+                         let allOfArray=[];
+                         mainClassesObj.allOf=allOfArray;
                          codeWriter.writeLine("allOf:");
                          codeWriter.writeLine(null, 1, 0);
                          arrGeneral.forEach(generalizeClass => {
+                              let allOfObj={};
                               codeWriter.writeLine("- $ref: '#/components/schemas/" + generalizeClass.target.name + "'");
+                              allOfObj['$ref']='#/components/schemas/'+ generalizeClass.target.name;
+                              allOfArray.push(allOfObj);
+
+
+                              allOfObj={};
                               codeWriter.writeLine("- type: object");
+                              allOfObj['type']='object';
+                              allOfArray.push(allOfObj);
                          });
                          codeWriter.writeLine(null, 0, 1);
+                         
                     }
 
                     let filterAttributes = arrAttr.filter(item => {
@@ -465,10 +477,21 @@ class OpenApiGenerator {
 
 
                     if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
+                         let allOfArray=[];
+                         mainClassesObj.allOf=allOfArray;
+                         console.log("---FA-1")
                          codeWriter.writeLine("allOf:");
+                         let allOfObj={};
                          codeWriter.writeLine("- $ref: '#/components/schemas/" + objClass.name + "Ids'", 1, 0);
+                         allOfObj['$ref']='#/components/schemas/' + objClass.name + 'Ids';
+                         allOfArray.push(allOfObj);
+
+                         allOfObj={};
                          codeWriter.writeLine("- type: object");
+                         allOfObj['type']='object';
+                         allOfArray.push(allOfObj);
                          codeWriter.writeLine(null, 0, 1);
+                         
                     }
 
                     if (this.getRequiredAttributes(arrAttr).length > 0) {
@@ -1104,6 +1127,7 @@ class OpenApiGenerator {
 
                     codeWriter.writeLine(null, 0, 1);
                } else {
+                    //AskQue
                     console.log("----WA-2",associationClass.classSide.name);
                     let allOfArray=[];
                     let objAllOfArry={};
