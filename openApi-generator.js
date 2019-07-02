@@ -1014,6 +1014,8 @@ class OpenApiGenerator {
                if (filterAttributes.length > 0) {
 
                codeWriter.writeLine((assciation instanceof type.UMLAssociation) ? (assciation.name + ":") : (tempClass.name + "Ids:"), 0, 0);
+               
+               mainClassesObj[(assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids'];
 
                let mainPropertiesObj={}
                let propertiesObj={};
@@ -1075,6 +1077,7 @@ class OpenApiGenerator {
 
                if (this.getRequiredAttributes(filterAttributes).length > 0) {
                     codeWriter.writeLine("required: [" + this.getRequiredAttributes(filterAttributes) + "]", 0, 0);
+                    mainClassesObj.required=this.getListRequiredAttributes(filterAttributes);
                }
 
 
