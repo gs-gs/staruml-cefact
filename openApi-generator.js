@@ -254,7 +254,9 @@ class OpenApiGenerator {
                               codeWriter.writeLine(attr.name + ":");
                               mainPropertiesObj[attr.name]=propertiesObj;
                               if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
+                                   console.log("----Attr-1",attr.name);
                                    let itemsObj={};
+                                   propertiesObj.items=itemsObj;
                                    codeWriter.writeLine("items:", 1, 0);
                                    codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
                                    itemsObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
@@ -262,7 +264,7 @@ class OpenApiGenerator {
                                    codeWriter.writeLine("type: " + this.getType(attr.type), 0, 1);
                                    itemsObj.type=this.getType(attr.type);
 
-                                   propertiesObj.items=itemsObj;
+                                   
 
                                    codeWriter.writeLine("type: array");
                                    propertiesObj.type='array';
@@ -275,6 +277,7 @@ class OpenApiGenerator {
                                    }
                                    codeWriter.writeLine(null, 0, 1);
                               } else {
+                                   console.log("----Attr-2",attr.name);
                                    codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
                                    propertiesObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
 
@@ -283,12 +286,12 @@ class OpenApiGenerator {
 
                                    if (attr.type instanceof type.UMLEnumeration) {
                                         codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]");
-                                        let enumArr=[];
-                                        propertiesObj.enum=enumArr.push(this.getEnumerationLiteral(attr.type));
+                                        propertiesObj.enum=this.getEnumerationLiteral(attr.type);
                                    }
                                    codeWriter.writeLine(null, 0, 1);
                               }
                               if (attr.defaultValue != "") {
+                                   console.log("----Attr-3",attr.name);
                                    codeWriter.writeLine("default: '" + attr.defaultValue + "'", 1, 1);
 
                                    propertiesObj.default=attr.defaultValue;
@@ -353,7 +356,7 @@ class OpenApiGenerator {
                                         codeWriter.writeLine(null, 1, 0);
                                         if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
-                                             console.log("----1",assoc.name);
+                                             console.log("----CA-1",assoc.name);
                                              let itemsObj={};
                                              propertiesObj.items=itemsObj;
                                              let allOfArray=[];
@@ -382,7 +385,7 @@ class OpenApiGenerator {
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
                                              //AskQue
-                                             console.log("----2",assoc.name);
+                                             console.log("----CA-2",assoc.name);
                                              let allOfArray=[];
                                              propertiesObj.allOf=allOfArray;
 
@@ -402,7 +405,7 @@ class OpenApiGenerator {
                                    } else {
                                         mainPropertiesObj[assoc.name]=propertiesObj;
                                         if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
-                                             console.log("----3",assoc.name);
+                                             console.log("----CA-3",assoc.name);
                                              codeWriter.writeLine(assoc.name + ":");
                                              let itemsObj={};
                                              propertiesObj.items=itemsObj;
@@ -419,7 +422,7 @@ class OpenApiGenerator {
                                              }
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
-                                             console.log("----4",assoc.name);
+                                             console.log("----CA-4",assoc.name);
                                              propertiesObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
                                              codeWriter.writeLine(assoc.name + ": {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}");
                                         }
@@ -1057,7 +1060,7 @@ class OpenApiGenerator {
                mainPropertiesObj[associationClass.classSide.name]=propertiesObj;
 
                if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
-
+                    console.log("----WA-1",associationClass.classSide.name);
                     let itemsObj={};
                     codeWriter.writeLine("items:", 1, 0);
                     propertiesObj.items=itemsObj;
@@ -1101,6 +1104,7 @@ class OpenApiGenerator {
 
                     codeWriter.writeLine(null, 0, 1);
                } else {
+                    console.log("----WA-2",associationClass.classSide.name);
                     let allOfArray=[];
                     let objAllOfArry={};
                     propertiesObj.allOf=allOfArray;
