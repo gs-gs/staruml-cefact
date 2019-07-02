@@ -402,14 +402,14 @@ class OpenApiGenerator {
                                              propertiesObj.items=itemsObj;
                                              codeWriter.writeLine("items: {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}", 1, 0);
                                              itemsObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
-                                             itemsObj.type='array';
+                                             propertiesObj.type='array';
                                              codeWriter.writeLine("type: array");
                                              /**
                                               * Add MinItems of multiplicity is 1..*
                                               */
                                              if (assoc.end2.multiplicity === "1..*") {
                                                   codeWriter.writeLine("minItems: 1");
-                                                  itemsObj.minItems=1;
+                                                  propertiesObj.minItems=1;
                                              }
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
