@@ -158,7 +158,6 @@ class OpenApiGenerator {
                               if (child.end1.reference.name != child.end2.reference.name) {
                                    setTimeout(function() {
                                         try {
-
                                              _this.findClass(child.end2.reference, _this.options);
                                         } catch (error) {
                                              console.error("Found error", error.message);
@@ -354,6 +353,7 @@ class OpenApiGenerator {
                                         codeWriter.writeLine(null, 1, 0);
                                         if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
+                                             console.log("----1",assoc.name);
                                              let itemsObj={};
                                              propertiesObj.items=itemsObj;
                                              let allOfArray=[];
@@ -382,21 +382,27 @@ class OpenApiGenerator {
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
                                              //AskQue
-                                             let allOfObj={};
-                                             propertiesObj.allOf=allOfObj;
+                                             console.log("----2",assoc.name);
+                                             let allOfArray=[];
+                                             propertiesObj.allOf=allOfArray;
 
                                              codeWriter.writeLine("allOf:");
 
-                                             
+                                             let allOfObj={};
                                              codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'", 1, 0);
                                              allOfObj['$ref']='#/components/schemas/' + assoc.end2.reference.name + 'Ids';
+                                             allOfArray.push(allOfObj);
 
+                                             allOfObj={};
                                              codeWriter.writeLine("- type: object", 0, 2);
                                              allOfObj['type']='object';
+                                             allOfArray.push(allOfObj);
+
                                         }
                                    } else {
                                         mainPropertiesObj[assoc.name]=propertiesObj;
                                         if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
+                                             console.log("----3",assoc.name);
                                              codeWriter.writeLine(assoc.name + ":");
                                              let itemsObj={};
                                              propertiesObj.items=itemsObj;
@@ -413,6 +419,7 @@ class OpenApiGenerator {
                                              }
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
+                                             console.log("----4",assoc.name);
                                              propertiesObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
                                              codeWriter.writeLine(assoc.name + ": {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}");
                                         }
