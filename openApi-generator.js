@@ -202,9 +202,14 @@ class OpenApiGenerator {
                codeWriter = new codegen.CodeWriter();
                codeWriter.setIndentString(codeWriter.getIndentString(this.options));
                codeWriter.writeLine('components:');
+               this.mainOpenApiObj.components=this.mainComponentObj;
+
                codeWriter.writeLine('schemas:' + (classes.length == 0 ? " {}" : ""), 1, 0);
+               this.mainComponentObj.schemas=this.mainSchemaObj;
                codeWriter.writeLine(null, 1, 0);
                classes.forEach(objClass => {
+                    let mainClassesObj={};
+                    let mainPropertiesObj={}
 
                     let accosElems = objClass.ownedElements.filter(item => {
                          return item instanceof type.UMLAssociation;
@@ -219,14 +224,24 @@ class OpenApiGenerator {
                     });
 
                     codeWriter.writeLine(objClass.name + ":");
+                    this.mainSchemaObj[objClass.name]=mainClassesObj
+
                     codeWriter.writeLine("type: object", 1, 0);
+                    mainClassesObj.type='object';
+
                     codeWriter.writeLine("properties:" + ((objClass.attributes.length == 0 && accosElems.length == 0 && assocClassLink.length == 0) ? " {}" : ""));
                     codeWriter.writeLine(null, 1, 0);
 
+                    mainClassesObj.properties=mainPropertiesObj;
+                    
+
+                    
                     let arrAttr = [];
 
                     let i, len;
+                    let propertiesObj={};
                     for (i = 0, len = objClass.attributes.length; i < len; i++) {
+                         propertiesObj={};
                          let attr = objClass.attributes[i];
                          let filterAttr = arrAttr.filter(item => {
                               return item.name == attr.name;
@@ -238,28 +253,46 @@ class OpenApiGenerator {
                               }
                               // if(!attr.isID ){
                               codeWriter.writeLine(attr.name + ":");
+                              mainPropertiesObj[attr.name]=propertiesObj;
                               if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
+                                   let itemsObj={};
                                    codeWriter.writeLine("items:", 1, 0);
                                    codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                                   itemsObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
+
                                    codeWriter.writeLine("type: " + this.getType(attr.type), 0, 1);
+                                   itemsObj.type=this.getType(attr.type);
+
+                                   propertiesObj.items=itemsObj;
+
                                    codeWriter.writeLine("type: array");
+                                   propertiesObj.type='array';
                                    /**
                                     * Add MinItems of multiplicity is 1..*
                                     */
                                    if (attr.multiplicity === "1..*") {
                                         codeWriter.writeLine("minItems: 1");
+                                        propertiesObj.minItems=1;
                                    }
                                    codeWriter.writeLine(null, 0, 1);
                               } else {
                                    codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                                   propertiesObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
+
                                    codeWriter.writeLine("type: " + this.getType(attr.type));
+                                   propertiesObj.type=this.getType(attr.type);
+
                                    if (attr.type instanceof type.UMLEnumeration) {
                                         codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]");
+                                        let enumArr=[];
+                                        propertiesObj.enum=enumArr.push(this.getEnumerationLiteral(attr.type));
                                    }
                                    codeWriter.writeLine(null, 0, 1);
                               }
                               if (attr.defaultValue != "") {
                                    codeWriter.writeLine("default: '" + attr.defaultValue + "'", 1, 1);
+
+                                   propertiesObj.default=attr.defaultValue;
                               }
                               // }
 
@@ -281,7 +314,7 @@ class OpenApiGenerator {
                      */
                     if (assocClassLink.length > 0) {
                          assocClassLink.forEach(item => {
-                              this.writeAssociationClassProperties(codeWriter, item);
+                              this.writeAssociationClassProperties(mainPropertiesObj,codeWriter, item);
                               arrAssoc.push(item.classSide);
                          })
                     }
@@ -297,6 +330,7 @@ class OpenApiGenerator {
                     let classAssociations = this.findAssociationOfClass(objClass);
 
                     // Git issue #12
+                    let classAssociationObj={};
                     classAssociations.forEach(assoc => {
                          // for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
                          //     let assoc = objClass.ownedElements[i];
@@ -306,6 +340,8 @@ class OpenApiGenerator {
                                    return item.name == assoc.name;
                               });
 
+                              let propertiesObj={};
+                              
 
                               if (filterAssoc.length == 0 && assoc.name != "") {
 
@@ -313,38 +349,75 @@ class OpenApiGenerator {
                                         // this.writeAssociationProperties(codeWriter,assoc);
                                         aggregationClasses.push(assoc.end2.reference);
                                         codeWriter.writeLine(assoc.name + ":"); // #7 resolve issue
+                                        mainPropertiesObj[assoc.name]=propertiesObj;
+                                        
                                         codeWriter.writeLine(null, 1, 0);
                                         if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
+
+                                             let itemsObj={};
+                                             propertiesObj.items=itemsObj;
+                                             let allOfArray=[];
+                                             itemsObj.allOf=allOfArray;
+                                             
+
+
                                              codeWriter.writeLine("items:");
                                              codeWriter.writeLine("allOf:", 1, 0);
                                              codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'", 1, 0);
+                                             let objAllOfArry={};
+                                             objAllOfArry['$ref']='#/components/schemas/' + assoc.end2.reference.name + 'Ids';
+                                             allOfArray.push(objAllOfArry);
+
+                                             objAllOfArry={};
                                              codeWriter.writeLine("- type: object", 0, 2);
+                                             objAllOfArry['type']='object';
+                                             allOfArray.push(objAllOfArry);
+
                                              codeWriter.writeLine("type: array");
+                                             propertiesObj.type='array';
                                              if (assoc.end2.multiplicity == "1..*") {
                                                   codeWriter.writeLine("minItems: 1");
+                                                  propertiesObj.minItems=1;
                                              }
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
+                                             //AskQue
+                                             let allOfObj={};
+                                             propertiesObj.allOf=allOfObj;
+
                                              codeWriter.writeLine("allOf:");
+
+                                             
                                              codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'", 1, 0);
+                                             allOfObj['$ref']='#/components/schemas/' + assoc.end2.reference.name + 'Ids';
+
                                              codeWriter.writeLine("- type: object", 0, 2);
+                                             allOfObj['type']='object';
                                         }
                                    } else {
+                                        mainPropertiesObj[assoc.name]=propertiesObj;
                                         if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                                              codeWriter.writeLine(assoc.name + ":");
+                                             let itemsObj={};
+                                             propertiesObj.items=itemsObj;
                                              codeWriter.writeLine("items: {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}", 1, 0);
+                                             itemsObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
+                                             itemsObj.type='array';
                                              codeWriter.writeLine("type: array");
                                              /**
                                               * Add MinItems of multiplicity is 1..*
                                               */
                                              if (assoc.end2.multiplicity === "1..*") {
                                                   codeWriter.writeLine("minItems: 1");
+                                                  itemsObj.minItems=1;
                                              }
                                              codeWriter.writeLine(null, 0, 1);
                                         } else {
+                                             propertiesObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
                                              codeWriter.writeLine(assoc.name + ": {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}");
                                         }
                                    }
+                                   // df----------------------
                                    arrAssoc.push(assoc);
                               } else {
                                    if (assoc.name == "") {
@@ -390,6 +463,8 @@ class OpenApiGenerator {
 
                     if (this.getRequiredAttributes(arrAttr).length > 0) {
                          codeWriter.writeLine("required: [" + this.getRequiredAttributes(arrAttr) + "]");
+
+                         mainClassesObj.required=this.getListRequiredAttributes(arrAttr);
                     }
                     codeWriter.writeLine(null, 0, 1);
 
@@ -418,15 +493,27 @@ class OpenApiGenerator {
                codeWriter.writeLine(null, 0, 2);
 
                codeWriter.writeLine("info: {description: " + mainElem.name + " API - 1.0.0, title: " + mainElem.name + " API, version: '1.0.0'}")
+
+               let mainInfoObj={};
+               mainInfoObj.description=mainElem.name+ ' API - 1.0.0';
+               mainInfoObj.title=mainElem.name+' API';
+               mainInfoObj.version='1.0.0';
+
+               this.mainOpenApiObj.info=mainInfoObj;
+
                codeWriter.writeLine("openapi: 3.0.0");
+               this.mainOpenApiObj.openapi='3.0.0';
+
                codeWriter.writeLine("paths:" + (this.operations.length == 0 ? " {}" : ""));
 
 
                this.writeOperation(codeWriter, this.options, mainElem);
                codeWriter.writeLine(null, 0, 1);
                codeWriter.writeLine("servers: []");
+               let mainServerArr=[];
+               this.mainOpenApiObj.servers=mainServerArr;
 
-
+               console.log("Result JSON obj",this.mainOpenApiObj);
                this.fileGeneration(codeWriter, fullPath, mainElem, fileType);
           } catch (error) {
                console.error("Found error", error.message);
@@ -847,6 +934,19 @@ class OpenApiGenerator {
                return (requiredAttr);
           }
      }
+     getListRequiredAttributes(arrAttributes) {
+          let requiredAttr = [];
+          if (arrAttributes) {
+               
+               arrAttributes.forEach(item => {
+                    if (item.multiplicity == "1" || item.multiplicity == "1..*") {
+                         requiredAttr.push(item.name);
+                    }
+
+               });
+               return (requiredAttr);
+          }
+     }
 
      /**
       * @function writeAssociationProperties
@@ -941,51 +1041,85 @@ class OpenApiGenerator {
       * @param {CodeWriter} codeWriter class instance
       * @param {UMLAssociationClassLink} associationClass 
       */
-     writeAssociationClassProperties(codeWriter, associationClass) {
+     writeAssociationClassProperties(mainPropertiesObj,codeWriter, associationClass) {
           try {
+               let propertiesObj={};
                var end2Attributes = associationClass.associationSide.end2.reference.attributes;
                var classSideAtributes = associationClass.classSide.attributes;
                codeWriter.writeLine(associationClass.classSide.name + ":", 0, 0);
-
+               mainPropertiesObj[associationClass.classSide.name]=propertiesObj;
 
                if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
 
+                    let itemsObj={};
                     codeWriter.writeLine("items:", 1, 0);
-
+                    propertiesObj.items=itemsObj;
                     codeWriter.writeLine("allOf:", 1, 0);
+                    let allOfArray=[];
+                    itemsObj.allOf=allOfArray;
 
                     // codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
                     codeWriter.writeLine(null,1,0);
-                    if (associationClass.associationSide.end1.aggregation == "shared")
+                    let objAllOfArry={};
+                    if (associationClass.associationSide.end1.aggregation == "shared"){
                          codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'");
-                    else
+                         objAllOfArry['$ref']='#/components/schemas/' + associationClass.associationSide.end2.reference.name + 'Ids';
+                    }
+                    else{
                          codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name+"'");
+                         objAllOfArry['$ref']='#/components/schemas/' + associationClass.associationSide.end2.reference.name;
+                    }
+
+                    allOfArray.push(objAllOfArry);
 
 
+                    objAllOfArry={};
                     codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'", 0, 0);
+                    objAllOfArry['$ref']='#/components/schemas/' + associationClass.classSide.name;
+                    allOfArray.push(objAllOfArry);
+
+                    objAllOfArry={};
                     codeWriter.writeLine("- type: object", 0, 2);
+                    objAllOfArry['type']='object';
+                    allOfArray.push(objAllOfArry);
+
 
 
                     codeWriter.writeLine("type: array", 0, 0);
+                    itemsObj.type='array';
                     if (associationClass.associationSide.end2.multiplicity == "1..*") {
                          codeWriter.writeLine("minItems: 1", 0, 0);
+                         itemsObj.minItems=1;
                     }
 
                     codeWriter.writeLine(null, 0, 1);
                } else {
+                    let allOfArray=[];
+                    let objAllOfArry={};
+                    propertiesObj.allOf=allOfArray;
                     codeWriter.writeLine("allOf:", 0, 0);
 
                     // codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
                     codeWriter.writeLine(null,1,0);
-                    if (associationClass.associationSide.end1.aggregation == "shared")
+                    if (associationClass.associationSide.end1.aggregation == "shared"){
                          codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'");
-                    else
+                         objAllOfArry['$ref']='#/components/schemas/'+ associationClass.associationSide.end2.reference.name + 'Ids';
+                    }
+                    else{
                          codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name+"'");
+                         objAllOfArry['$ref']='#/components/schemas/'+ associationClass.associationSide.end2.reference.name;
+                    }
+                    allOfArray.push(objAllOfArry);
 
-
+                    objAllOfArry={};
                     codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'", 0, 0);
-                    codeWriter.writeLine("- type: object", 0, 2);
+                    objAllOfArry['$ref']='#/components/schemas/'+ associationClass.classSide.name;
+                    allOfArray.push(objAllOfArry);
 
+                    objAllOfArry={};
+                    codeWriter.writeLine("- type: object", 0, 2);
+                    objAllOfArry['type']='object';
+                    allOfArray.push(objAllOfArry);
 
                }
 
