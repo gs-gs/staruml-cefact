@@ -513,7 +513,7 @@ class OpenApiGenerator {
                               return itemClass.name == subItem.name;
                          });
                          if (filter.length == 0) {
-                              this.writeAssociationProperties(codeWriter, itemClass);
+                              this.writeAssociationProperties(mainClassesObj,codeWriter, itemClass);
                               arrIdClasses.push(itemClass)
                          }
                     });
@@ -987,8 +987,9 @@ class OpenApiGenerator {
       * @param {CodeWriter} codeWriter class instance 
       * @param {UMLClass} assciation 
       */
-     writeAssociationProperties(codeWriter, assciation) {
+     writeAssociationProperties(mainClassesObj,codeWriter, assciation) {
           try {
+
                let tempClass;
                if (assciation instanceof type.UMLAssociation) {
                     tempClass = assciation.end2.reference;
@@ -1014,37 +1015,55 @@ class OpenApiGenerator {
 
                codeWriter.writeLine((assciation instanceof type.UMLAssociation) ? (assciation.name + ":") : (tempClass.name + "Ids:"), 0, 0);
 
+               let mainPropertiesObj={}
+               let propertiesObj={};
+
                codeWriter.writeLine("type: object", 1, 0);
+               mainClassesObj.type='object';
+
+               
                // codeWriter.writeLine("properties:", 0, 0);
                codeWriter.writeLine("properties:" + ((filterAttributes.length == 0) ? " {}" : ""));
+               mainClassesObj.properties=mainPropertiesObj;
 
                codeWriter.writeLine(null, 1, 0);
 
                filterAttributes.forEach(attr => {
-
+                    mainPropertiesObj[attr.name]=propertiesObj;
                     codeWriter.writeLine(attr.name + ":", 0, 0);
                     if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-
+                         console.log('---WAC--1',attr.name);
+                         let itemsObj={};
                          codeWriter.writeLine("items:", 1, 0);
+                         propertiesObj.items=itemsObj;
+
 
                          codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                         itemsObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
                          codeWriter.writeLine("type: " + this.getType(attr.type), 0, 1);
+                         itemsObj.type=this.getType(attr.type);
 
                          codeWriter.writeLine("type: array", 0, 0);
+                         propertiesObj.type='array';
                          /**
                           * Add MinItems of multiplicity is 1..*
                           */
                          if (attr.multiplicity === "1..*") {
                               codeWriter.writeLine("minItems: 1", 0, 0);
+                              propertiesObj.minItems=1;
                          }
 
                          codeWriter.writeLine(null, 0, 1);
                     } else {
-
+                         console.log('---WAC--2',attr.name);
                          codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                         propertiesObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
+
                          codeWriter.writeLine("type: " + this.getType(attr.type), 0, 0);
+                         propertiesObj.type=this.getType(attr.type);
                          if (attr.type instanceof type.UMLEnumeration) {
                               codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]", 0, 0);
+                              propertiesObj.enum=this.getEnumerationLiteral(attr.type);
                          }
 
                          codeWriter.writeLine(null, 0, 1);
