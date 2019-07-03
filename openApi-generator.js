@@ -799,7 +799,7 @@ class OpenApiGenerator {
                                                   let parametersArray=[];
                                                   codeWriter.writeLine("parameters:", 0, 0);
                                                   wOperationObject.parameters=parametersArray;
-                                                  
+                                                  let paramsObject={};
                                                   parametersArray.push(paramsObject);
 
                                                   let objSchema={};
@@ -861,7 +861,7 @@ class OpenApiGenerator {
                                                   let parametersArray=[];
                                                   codeWriter.writeLine("parameters:", 0, 0);
                                                   wOperationObject.parameters=parametersArray;
-                                                  
+                                                  let paramsObject={};
                                                   parametersArray.push(paramsObject);
 
                                                   let objSchema={};
@@ -905,7 +905,7 @@ class OpenApiGenerator {
                                                   let parametersArray=[];
                                                   codeWriter.writeLine("parameters:", 0, 0);
                                                   wOperationObject.parameters=parametersArray;
-                                                  
+                                                  let paramsObject={};
                                                   parametersArray.push(paramsObject);
 
                                                   let objSchema={};
@@ -968,7 +968,7 @@ class OpenApiGenerator {
                                                   let parametersArray=[];
                                                   codeWriter.writeLine("parameters:", 0, 0);
                                                   wOperationObject.parameters=parametersArray;
-
+                                                  let paramsObject={};
                                                   parametersArray.push(paramsObject);
 
                                                   let objSchema={};
@@ -983,7 +983,7 @@ class OpenApiGenerator {
 
                                                   let requestBodyObj={}
                                                   wOperationObject.requestBody=requestBodyObj;
-                                                  this.buildRequestBody(codeWriter, objInterface);
+                                                  this.buildRequestBody(codeWriter, objInterface,requestBodyObj);
 
                                                   let resObj={};
                                                   codeWriter.writeLine("responses:", 0, 0);
@@ -1580,7 +1580,7 @@ class OpenApiGenerator {
                          if (!(itemParameters.type instanceof type.UMLClass)) {
                               // codeWriter, name, type, description, required, schema
                               
-                              this.buildParameter(ocodeWriter, itemParameters.name, "query", (itemParameters.documentation ?
+                              this.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
                                    this.buildDescription(itemParameters.documentation) :
                                    "missing description"), false, objSchema,paramsObject);
 
