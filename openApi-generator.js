@@ -570,12 +570,18 @@ class OpenApiGenerator {
                     /**
                      * Convert yml data to JSON file
                      */
-                    basePath = path.join(fullPath, mainElem.name + '.json');
+                    
 
                     try {
+                         basePath = path.join(fullPath, mainElem.name + '.json');
                          var doc = yaml.safeLoad(codeWriter.getData());
                          fs.writeFileSync(basePath, JSON.stringify(doc, null, 4));
                          console.log(doc);
+
+
+                         //Direct json from JsonOject
+                         basePath = path.join(fullPath, mainElem.name+"-test" + '.json');
+                         fs.writeFileSync(basePath, JSON.stringify(this.mainOpenApiObj));
 
                     } catch (error) {
                          console.error("Error generating JSON file", error);
@@ -1684,8 +1690,9 @@ class OpenApiGenerator {
           try {
                objOperation.parameters.forEach(itemParameters => {
                     let paramsObject={};
-                    parametersArray.push(paramsObject);
+                    
                     if (itemParameters.name != "id" && itemParameters.name != "identifier") {
+                         parametersArray.push(paramsObject);
                          let objSchema={};
                          objSchema.type='string';
                          if (!(itemParameters.type instanceof type.UMLClass)) {
