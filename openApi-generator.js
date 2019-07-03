@@ -1389,6 +1389,7 @@ class OpenApiGenerator {
       * @param {CodeWriter} codeWriter class instance
       * @param {UMLInterfaceRealization} interfaceRealization 
       * @param {UMLAssociation} interfaceAssociation 
+      * @param {Object} mainPathsObject
       */
      
      writeInterfaceComposite(codeWriter, interfaceRealization, interfaceAssociation,mainPathsObject) {
@@ -1557,13 +1558,18 @@ class OpenApiGenerator {
                          codeWriter.writeLine("content:", 1, 0);
                          ok201Obj.content=contentObj;
 
+                         let appJsonObj={};
                          codeWriter.writeLine("application/json:", 1, 0);
+                         contentObj['application/json']=appJsonObj;
 
+                         let schemaObj={};
                          codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}", 1, 2);
+                         appJsonObj.schema=schemaObj;
+                         schemaObj['$ref']='#/components/schemas/' + interfaceRealization.source.name;
 
 
                          codeWriter.writeLine("description: Created", 0, 4);
-
+                         ok201Obj.description='Created';
 
 
 
@@ -1580,24 +1586,46 @@ class OpenApiGenerator {
                          codeWriter.writeLine(mICPath+":", 0, 0);
 
                          codeWriter.writeLine("delete:", 1, 0);
+                         pathsObject.delete=wOperationObject;
 
-
+                         let tagsArray=[];
                          codeWriter.writeLine("tags:", 1, 0);
+                         wOperationObject.tags=tagsArray;
 
-                         codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+                         //AskQue
+                         // codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+                         codeWriter.writeLine("- " + interfaceRealization.target.name, 1, 1);
+                         tagsArray.push(interfaceRealization.target.name);
+                         
 
 
-                         codeWriter.writeLine("description: Delete an existing " + objInterface.source.name, 0, 0);
+                         //AskQue
+                         // codeWriter.writeLine("description: Delete an existing " + objInterface.source.name, 0, 0);
+                         codeWriter.writeLine("description: Delete an existing " + interfaceRealization.source.name, 0, 0);
+                         wOperationObject.description='Delete an existing ' + interfaceRealization.source.name;
+
+
+                         let parametersArray=[];
                          codeWriter.writeLine("parameters:", 0, 0);
-                         this.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
-                         this.buildParameter(codeWriter, end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
+                         wOperationObject.parameters=parametersArray;
+                         let paramsObject={};
+                         parametersArray.push(paramsObject);
 
+                         let objSchema={};
+                         objSchema.type='string';
+
+                         this.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject);
+                         //AskQue
+                         this.buildParameter(codeWriter, end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject);
+
+                         let resObj={};
                          codeWriter.writeLine("responses:", 0, 0);
+                         wOperationObject.responses=resObj;
 
+                         let noContent204Obj={};
                          codeWriter.writeLine("'204': {description: No Content}", 1, 3);
-
-
-
+                         resObj['204']=noContent204Obj;
+                         noContent204Obj.description='No Content';
 
                     }
                });
