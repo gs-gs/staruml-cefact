@@ -626,13 +626,13 @@ class OpenApiGenerator {
           try {
                let interReal = app.repository.select("@UMLInterfaceRealization");
                this.operations.forEach(objOperation => {
-                    let pathsObject={};
+                    
                     let filterInterface = interReal.filter(itemInterface => {
                          return itemInterface.target.name == objOperation.name;
                     });
 
                     if (filterInterface.length > 0) {
-
+                         
 
                          let objInterface = filterInterface[0];
 
@@ -642,7 +642,7 @@ class OpenApiGenerator {
                          });
 
                          if (filterInterfaceAssociation.length == 0) {
-
+                              let pathsObject={};
                               mainPathsObject["/" + objInterface.target.name]=pathsObject;
                               codeWriter.writeLine("/" + objInterface.target.name + ":", 1, 0);
 
@@ -652,6 +652,7 @@ class OpenApiGenerator {
                                    let wOperationObject={};
                                    
                                    if (objOperation.name.toUpperCase() == "GET") {
+                                        console.log("---WO-1-get","/" + objInterface.target.name);
                                         pathsObject.get=wOperationObject;
                                         codeWriter.writeLine("get:", 0, 0);
 
@@ -707,11 +708,12 @@ class OpenApiGenerator {
 
 
                                         codeWriter.writeLine("description: OK", 0, 3);
-                                        contentObject.description='OK';
+                                        ok200Object.description='OK';
 
 
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
+                                        console.log("---WO-2-post","/" + objInterface.target.name);
                                         pathsObject.post=wOperationObject;
                                         codeWriter.writeLine("post:", 0, 0);
 
@@ -769,6 +771,7 @@ class OpenApiGenerator {
                               });
 
                               if (checkOperationArr.length > 0) {
+                                   let pathsObject={};
                                    let operationAttributes = objInterface.target.attributes.filter(item => {
                                         return item.name == "id" || item.name == "identifier";
                                    });
@@ -781,6 +784,7 @@ class OpenApiGenerator {
                                         objInterface.target.operations.forEach(objOperation => {
                                              let wOperationObject={};
                                              if (objOperation.name.toUpperCase() == "GET") {
+                                                  console.log("---WO-3-get","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   pathsObject.get=wOperationObject;
                                                   codeWriter.writeLine("get:", 0, 0);
 
@@ -793,7 +797,7 @@ class OpenApiGenerator {
                                                   tagsArray.push(objInterface.target.name);
 
 
-                                                  wOperationObject.description=' Get single ' + objInterface.source.name + ' by ' + operationAttribute.name;
+                                                  wOperationObject.description='Get single ' + objInterface.source.name + ' by ' + operationAttribute.name;
                                                   codeWriter.writeLine("description: Get single " + objInterface.source.name + " by " + operationAttribute.name, 0, 0);
 
                                                   let parametersArray=[];
@@ -844,6 +848,7 @@ class OpenApiGenerator {
 
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
+                                                  console.log("---WO-4-delete","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   codeWriter.writeLine("delete:", 0, 0);
                                                   pathsObject.delete=wOperationObject;
 
@@ -888,6 +893,7 @@ class OpenApiGenerator {
 
 
                                              } else if (objOperation.name.toUpperCase() == "PUT") {
+                                                  console.log("---WO-5-put","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   codeWriter.writeLine("put:", 0, 0);
                                                   pathsObject.put=wOperationObject;
 
@@ -951,6 +957,7 @@ class OpenApiGenerator {
 
 
                                              } else if (objOperation.name.toUpperCase() == "PATCH") {
+                                                  console.log("---WO-6-patch","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   codeWriter.writeLine("patch:", 0, 0);
                                                   pathsObject.patch=wOperationObject;
 
@@ -1026,6 +1033,7 @@ class OpenApiGenerator {
           }
      }
 
+
      /**
       * @function buildDescription
       * @description Description replace (') with ('')
@@ -1058,7 +1066,7 @@ class OpenApiGenerator {
           codeWriter.writeLine("schema: " + schema, 0, 1);
 
           paramsObject.description=description;
-          paramsObject.type=type;
+          paramsObject.in=type;
           paramsObject.name=name;
           paramsObject.required=required;
           paramsObject.schema=schema;
@@ -1584,6 +1592,7 @@ class OpenApiGenerator {
                                    this.buildDescription(itemParameters.documentation) :
                                    "missing description"), false, objSchema,paramsObject);
 
+                                   //AskQue
                                    // this.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
                                    //      this.buildDescription(itemParameters.documentation) :
                                    //      "missing description"), false, "{type: string}");
