@@ -939,7 +939,7 @@ class OpenApiGenerator {
 
                                                   let contentObj={};
                                                   codeWriter.writeLine("content:", 1, 0);
-                                                  ok200Obj=contentObj;
+                                                  ok200Obj.content=contentObj;
 
                                                   let appJsonObj={};
                                                   codeWriter.writeLine("application/json:", 1, 0);
@@ -1018,7 +1018,7 @@ class OpenApiGenerator {
                                    interfaceRelation.forEach(interAsso => {
                                         if (interAsso instanceof type.UMLAssociation) {
                                              if (interAsso.end2.aggregation == "composite") {
-                                                  this.writeInterfaceComposite(codeWriter, objInterface, interAsso);
+                                                  this.writeInterfaceComposite(codeWriter, objInterface, interAsso,mainPathsObject);
                                              }
                                         }
                                    });
@@ -1390,45 +1390,83 @@ class OpenApiGenerator {
       * @param {UMLInterfaceRealization} interfaceRealization 
       * @param {UMLAssociation} interfaceAssociation 
       */
-     writeInterfaceComposite(codeWriter, interfaceRealization, interfaceAssociation) {
+     
+     writeInterfaceComposite(codeWriter, interfaceRealization, interfaceAssociation,mainPathsObject) {
           try {
+               
                let end1Interface = interfaceAssociation.end1;
                let end2Interface = interfaceAssociation.end2;
                codeWriter.writeLine(null, 1, 0);
+               let pathsObject={};
                interfaceRealization.target.operations.forEach(objOperation => {
+                    
+                    let wOperationObject={};
                     if (objOperation.name.toUpperCase() == "GET") {
+                         let mICPath="/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
+                         console.log('---WIC-1-get',mICPath);
 
+                         mainPathsObject[mICPath]=pathsObject;
                          /* Get all list */
-                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + ":", 0, 0);
+                         codeWriter.writeLine(mICPath + ":", 0, 0);
 
+                         pathsObject.get=wOperationObject;
                          codeWriter.writeLine("get:", 1, 0);
 
-
+                         let tagsArray=[];
                          codeWriter.writeLine("tags:", 1, 0);
+                         wOperationObject.tags=tagsArray;
 
                          codeWriter.writeLine("- " + interfaceRealization.target.name, 1, 1);
+                         tagsArray.push(interfaceRealization.target.name);
 
 
+                         wOperationObject.description='Get a list of ' +interfaceRealization.source.name;
                          codeWriter.writeLine("description: Get a list of " + interfaceRealization.source.name, 0, 0);
+
+                         let parametersArray=[];
                          codeWriter.writeLine("parameters:", 0, 0);
-                         this.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
+                         wOperationObject.parameters=parametersArray;
+                         let paramsObject={};
+                         parametersArray.push(paramsObject);
 
+                         let objSchema={};
+                         objSchema.type='string';
+
+                         this.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject);
+
+                         let responsesObj={};
                          codeWriter.writeLine("responses:", 0, 0);
+                         wOperationObject.responses=responsesObj;
 
+                         let ok200ResOjb={};
                          codeWriter.writeLine("'200':", 1, 0);
+                         responsesObj['200']=ok200ResOjb;
 
+                         let contentObj={};
                          codeWriter.writeLine("content:", 1, 0);
+                         ok200ResOjb.content=contentObj;
 
+                         let appJsonObj={};
                          codeWriter.writeLine("application/json:", 1, 0);
+                         contentObj['application/json']=appJsonObj;
 
+                         let schemaObj={};
                          codeWriter.writeLine("schema:", 1, 0);
+                         appJsonObj.schema=schemaObj;
+                         
 
+                         let itemsArray=[];
+                         schemaObj.items=itemsArray;
+                         let itemsObj={};
+                         itemsArray.push(itemsObj);
+                         itemsObj['$ref']='#/components/schemas/' + interfaceRealization.source.name;
                          codeWriter.writeLine("items: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}", 1, 0);
+                         schemaObj.type='array';
                          codeWriter.writeLine("type: array", 0, 3);
 
 
-
                          codeWriter.writeLine("description: OK", 0, 4);
+                         ok200ResOjb.description='OK';
 
 
 
@@ -1468,27 +1506,56 @@ class OpenApiGenerator {
 
 
                     } else if (objOperation.name.toUpperCase() == "POST") {
-                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + ":", 0, 0);
+
+                         let mICPath="/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
+                         console.log('---WIC-2-post',mICPath);
+
+                         mainPathsObject[mICPath]=pathsObject;
+
+
+                         codeWriter.writeLine(mICPath + ":", 0, 0);
 
                          codeWriter.writeLine("post:", 1, 0);
+                         pathsObject.post=wOperationObject;
 
+                         let tagsArray=[];
 
                          codeWriter.writeLine("tags:", 1, 0);
+                         wOperationObject.tags=tagsArray;
 
                          codeWriter.writeLine("- " + interfaceRealization.target.name, 1, 1);
-
+                         tagsArray.push(interfaceRealization.target.name);
 
                          codeWriter.writeLine("description:  Create a new " + interfaceRealization.source.name, 0, 0);
+                         wOperationObject.description='Create a new ' + interfaceRealization.source.name;
+
+                         let parametersArray=[];
                          codeWriter.writeLine("parameters:", 0, 0);
-                         this.buildParameter(codeWriter, end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
+                         wOperationObject.parameters=parametersArray;
+                         let paramsObject={};
+                         parametersArray.push(paramsObject);
 
-                         this.buildRequestBody(codeWriter, interfaceRealization);
+                         let objSchema={};
+                         objSchema.type='string';
 
+                         this.buildParameter(codeWriter, end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject);
+
+                         let requestBodyObj={}
+                         wOperationObject.requestBody=requestBodyObj;
+
+                         this.buildRequestBody(codeWriter, interfaceRealization,requestBodyObj);
+
+                         let resObj={};
                          codeWriter.writeLine("responses:", 0, 0);
+                         wOperationObject.responses=resObj;
 
+                         let ok201Obj={};
                          codeWriter.writeLine("'201':", 1, 0);
+                         resObj['201']=ok201Obj;
 
+                         let contentObj={};
                          codeWriter.writeLine("content:", 1, 0);
+                         ok201Obj.content=contentObj;
 
                          codeWriter.writeLine("application/json:", 1, 0);
 
@@ -1502,7 +1569,15 @@ class OpenApiGenerator {
 
 
                     } else if (objOperation.name.toUpperCase() == "DELETE") {
-                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}:", 0, 0);
+
+                         let mICPath="/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
+                         console.log('---WIC-3-delete',mICPath);
+
+                         mainPathsObject[mICPath]=pathsObject;
+
+                         console.log('---WIC-3-delete',);
+
+                         codeWriter.writeLine(mICPath+":", 0, 0);
 
                          codeWriter.writeLine("delete:", 1, 0);
 
