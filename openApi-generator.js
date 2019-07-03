@@ -22,10 +22,7 @@ class OpenApiGenerator {
           this.options = null;
           this.mainOpenApiObj={};
           this.mainComponentObj={};
-          this.mainSchemaObj={};
-          this.mainServer=[];
-          this.mainInfo={};
-          this.mainPath={};
+          this.mainSchemaObj={};          
      }
 
 
@@ -538,9 +535,11 @@ class OpenApiGenerator {
                this.mainOpenApiObj.openapi='3.0.0';
 
                codeWriter.writeLine("paths:" + (this.operations.length == 0 ? " {}" : ""));
+               let mainPathsObject={};
+               this.mainOpenApiObj.paths=mainPathsObject;
 
 
-               this.writeOperation(codeWriter, this.options, mainElem);
+               this.writeOperation(mainPathsObject,codeWriter, this.options, mainElem);
                codeWriter.writeLine(null, 0, 1);
                codeWriter.writeLine("servers: []");
                let mainServerArr=[];
@@ -623,10 +622,11 @@ class OpenApiGenerator {
       * @description Write Operation (Path)
       * @param {CodeWriter} codeWriter class instance
       */
-     writeOperation(codeWriter) {
+     writeOperation(mainPathsObject,codeWriter) {
           try {
                let interReal = app.repository.select("@UMLInterfaceRealization");
                this.operations.forEach(objOperation => {
+                    let pathsObject={};
                     let filterInterface = interReal.filter(itemInterface => {
                          return itemInterface.target.name == objOperation.name;
                     });
@@ -643,28 +643,38 @@ class OpenApiGenerator {
 
                          if (filterInterfaceAssociation.length == 0) {
 
-
+                              mainPathsObject["/" + objInterface.target.name]=pathsObject;
                               codeWriter.writeLine("/" + objInterface.target.name + ":", 1, 0);
 
                               codeWriter.writeLine(null, 1, 0);
 
                               objInterface.target.operations.forEach(objOperation => {
+                                   let wOperationObject={};
+                                   
                                    if (objOperation.name.toUpperCase() == "GET") {
+                                        pathsObject.get=wOperationObject;
                                         codeWriter.writeLine("get:", 0, 0);
 
+                                        let tagsArray=[];
+                                        
 
                                         codeWriter.writeLine("tags:", 1, 0);
+                                        wOperationObject.tags=tagsArray;
 
                                         codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+                                        tagsArray.push(objInterface.target.name);
 
-
+                                        
                                         codeWriter.writeLine("description: Get a list of " + objInterface.source.name, 0, 0);
+                                        wOperationObject.description=objInterface.source.name;
 
+                                        let parametersArray=[];
+                                        wOperationObject.parameters=parametersArray;
                                         codeWriter.writeLine("parameters: " + (objOperation.parameters.filter(itemParameters => itemParameters.name != "id" && itemParameters.name != "identifier").length > 0 ?
                                              "" :
                                              "[]"), 0, 0);
 
-                                        this.writeQueryParameters(codeWriter, objOperation);
+                                        this.writeQueryParameters(parametersArray,codeWriter, objOperation);
 
                                         codeWriter.writeLine("responses:", 0, 0);
 
@@ -1015,9 +1025,11 @@ class OpenApiGenerator {
 
                codeWriter.writeLine((assciation instanceof type.UMLAssociation) ? (assciation.name + ":") : (tempClass.name + "Ids:"), 0, 0);
                
-               mainClassesObj[(assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids'];
-
+               let cName=(assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids';
+               
+               mainClassesObj={};
                let mainPropertiesObj={}
+               this.mainSchemaObj[cName]=mainClassesObj
                let propertiesObj={};
 
                codeWriter.writeLine("type: object", 1, 0);
@@ -1034,7 +1046,7 @@ class OpenApiGenerator {
                     mainPropertiesObj[attr.name]=propertiesObj;
                     codeWriter.writeLine(attr.name + ":", 0, 0);
                     if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                         console.log('---WAC--1',attr.name);
+                         console.log('---WAP--1',attr.name);
                          let itemsObj={};
                          codeWriter.writeLine("items:", 1, 0);
                          propertiesObj.items=itemsObj;
@@ -1057,7 +1069,7 @@ class OpenApiGenerator {
 
                          codeWriter.writeLine(null, 0, 1);
                     } else {
-                         console.log('---WAC--2',attr.name);
+                         console.log('---WAP--2',attr.name);
                          codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
                          propertiesObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
 
@@ -1105,7 +1117,7 @@ class OpenApiGenerator {
                mainPropertiesObj[associationClass.classSide.name]=propertiesObj;
 
                if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
-                    console.log("----WA-1",associationClass.classSide.name);
+                    console.log("----WAC-1",associationClass.classSide.name);
                     let itemsObj={};
                     codeWriter.writeLine("items:", 1, 0);
                     propertiesObj.items=itemsObj;
@@ -1141,16 +1153,16 @@ class OpenApiGenerator {
 
 
                     codeWriter.writeLine("type: array", 0, 0);
-                    itemsObj.type='array';
+                    propertiesObj.type='array';
                     if (associationClass.associationSide.end2.multiplicity == "1..*") {
                          codeWriter.writeLine("minItems: 1", 0, 0);
-                         itemsObj.minItems=1;
+                         propertiesObj.minItems=1;
                     }
 
                     codeWriter.writeLine(null, 0, 1);
                } else {
                     //AskQue
-                    console.log("----WA-2",associationClass.classSide.name);
+                    console.log("----WAC-2",associationClass.classSide.name);
                     let allOfArray=[];
                     let objAllOfArry={};
                     propertiesObj.allOf=allOfArray;
@@ -1407,11 +1419,17 @@ class OpenApiGenerator {
       * @param {CodeWriter} codeWriter class instance
       * @param {UMLOperation} objOperation
       */
-     writeQueryParameters(codeWriter, objOperation) {
+     writeQueryParameters(parametersArray,codeWriter, objOperation) {
+          ////Here to start
           try {
                objOperation.parameters.forEach(itemParameters => {
+                    let paramsObject={};
+                    parametersArray.push(paramsObject);
                     if (itemParameters.name != "id" && itemParameters.name != "identifier") {
                          if (!(itemParameters.type instanceof type.UMLClass)) {
+                              // codeWriter, name, type, description, required, schema
+                              let objSchema={};
+                              objSchema.type='string';
                               this.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
                                    this.buildDescription(itemParameters.documentation) :
                                    "missing description"), false, "{type: string}");
