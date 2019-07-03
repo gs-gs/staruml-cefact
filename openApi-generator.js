@@ -666,7 +666,7 @@ class OpenApiGenerator {
 
                                         
                                         codeWriter.writeLine("description: Get a list of " + objInterface.source.name, 0, 0);
-                                        wOperationObject.description=objInterface.source.name;
+                                        wOperationObject.description='Get a list of  '+objInterface.source.name;
 
                                         let parametersArray=[];
                                         wOperationObject.parameters=parametersArray;
@@ -676,53 +676,87 @@ class OpenApiGenerator {
 
                                         this.writeQueryParameters(parametersArray,codeWriter, objOperation);
 
+                                        let responsesObject={};
                                         codeWriter.writeLine("responses:", 0, 0);
+                                        wOperationObject.responses=responsesObject;
 
+                                        let ok200Object={}
                                         codeWriter.writeLine("'200':", 1, 0);
+                                        responsesObject['200']=ok200Object;
 
+                                        let contentObject={};
                                         codeWriter.writeLine("content:", 1, 0);
+                                        ok200Object.content=contentObject;
 
+                                        let appJsonObject={};
                                         codeWriter.writeLine("application/json:", 1, 0);
+                                        contentObject['application/json']=appJsonObject;
 
+                                        let schemaObject={};
                                         codeWriter.writeLine("schema:", 1, 0);
+                                        appJsonObject.schema=schemaObject;
 
+                                        let itemsObject={};
                                         codeWriter.writeLine("items: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 0);
+                                        schemaObject.items=itemsObject;
+                                        itemsObject['$ref']='#/components/schemas/' + objInterface.source.name;
+
                                         codeWriter.writeLine("type: array", 0, 3);
+                                        schemaObject.type='array';
 
 
 
                                         codeWriter.writeLine("description: OK", 0, 3);
+                                        contentObject.description='OK';
 
 
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
+                                        pathsObject.post=wOperationObject;
                                         codeWriter.writeLine("post:", 0, 0);
 
 
+                                        let tagsArray=[];
+
                                         codeWriter.writeLine("tags:", 1, 0);
+                                        wOperationObject.tags=tagsArray;
 
                                         codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+                                        tagsArray.push(objInterface.target.name);
 
 
                                         codeWriter.writeLine("description:  Create a new " + objInterface.source.name, 0, 0);
+                                        wOperationObject.description='Create a new ' + objInterface.source.name;
 
-                                        this.buildRequestBody(codeWriter, objInterface);
+                                        let requestBodyObj={}
+                                        wOperationObject.requestBody=requestBodyObj;
+                                        this.buildRequestBody(codeWriter, objInterface,requestBodyObj);
 
+                                        
+                                        let responsesObject={};
                                         codeWriter.writeLine("responses:", 0, 0);
+                                        wOperationObject.responses=responsesObject;
 
+                                        let created201Object={};
                                         codeWriter.writeLine("'201':", 1, 0);
+                                        responsesObject['201']=created201Object;
 
+                                        let contentObj={};
                                         codeWriter.writeLine("content:", 1, 0);
+                                        created201Object.content=contentObj;
 
+                                        let appJsonObj={};
                                         codeWriter.writeLine("application/json:", 1, 0);
+                                        contentObj['application/json']=appJsonObj;
 
+                                        let schemaObj={};
                                         codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 2);
+                                        appJsonObj.schema=schemaObj;
+                                        schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
 
 
                                         codeWriter.writeLine("description: Created", 0, 3);
-
-
-
+                                        created201Object.description='Created';
 
                                    }
                               });
@@ -740,42 +774,71 @@ class OpenApiGenerator {
                                    });
                                    operationAttributes.forEach(operationAttribute => {
                                         codeWriter.writeLine("/" + objInterface.target.name + "/{" + operationAttribute.name + "}:", 0, 0);
+                                        mainPathsObject["/" + objInterface.target.name+'/{' + operationAttribute.name + '}']=pathsObject
 
                                         codeWriter.writeLine(null, 1, 0);
 
                                         objInterface.target.operations.forEach(objOperation => {
+                                             let wOperationObject={};
                                              if (objOperation.name.toUpperCase() == "GET") {
+                                                  pathsObject.get=wOperationObject;
                                                   codeWriter.writeLine("get:", 0, 0);
 
 
+                                                  let tagsArray=[];
                                                   codeWriter.writeLine("tags:", 1, 0);
+                                                  wOperationObject.tags=tagsArray;
 
                                                   codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+                                                  tagsArray.push(objInterface.target.name);
 
 
+                                                  wOperationObject.description=' Get single ' + objInterface.source.name + ' by ' + operationAttribute.name;
                                                   codeWriter.writeLine("description: Get single " + objInterface.source.name + " by " + operationAttribute.name, 0, 0);
+
+                                                  let parametersArray=[];
                                                   codeWriter.writeLine("parameters:", 0, 0);
-                                                  this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
+                                                  wOperationObject.parameters=parametersArray;
+                                                  
+                                                  parametersArray.push(paramsObject);
+
+                                                  let objSchema={};
+                                                  objSchema.type='string';
+
+                                                  this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema,paramsObject);
 
                                                   objInterface.target.attributes.forEach(itemAttribute => {
                                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, "{type: string}")
+                                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema,paramsObject);
                                                        }
                                                   })
 
+                                                  let responsesObj={};
                                                   codeWriter.writeLine("responses:", 0, 0);
+                                                  wOperationObject.responses=responsesObj;
 
+                                                  let ok200ResOjb={};
                                                   codeWriter.writeLine("'200':", 1, 0);
+                                                  responsesObj['200']=ok200ResOjb;
 
+                                                  let contentObj={};
                                                   codeWriter.writeLine("content:", 1, 0);
+                                                  ok200ResOjb.content=contentObj;
 
+
+                                                  let appJsonObj={};
                                                   codeWriter.writeLine("application/json:", 1, 0);
+                                                  contentObj['application/json']=appJsonObj;
 
+                                                  let schemaObj={};
                                                   codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 2);
+                                                  appJsonObj.schema=schemaObj;
+                                                  schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
 
 
 
                                                   codeWriter.writeLine("description: OK", 0, 3);
+                                                  ok200ResOjb.description='OK';
 
 
 
@@ -915,7 +978,7 @@ class OpenApiGenerator {
       * @param {boolean} required
       * @param {string} schema 
       */
-     buildParameter(codeWriter, name, type, description, required, schema) {
+     buildParameter(codeWriter, name, type, description, required, schema,paramsObject) {
           // codeWriter.writeLine("parameters:");
           codeWriter.writeLine("- description: " + description, 0, 0);
 
@@ -923,6 +986,12 @@ class OpenApiGenerator {
           codeWriter.writeLine("name: " + name, 0, 0);
           codeWriter.writeLine("required: " + required, 0, 0);
           codeWriter.writeLine("schema: " + schema, 0, 1);
+
+          paramsObject.description=description;
+          paramsObject.type=type;
+          paramsObject.name=name;
+          paramsObject.required=required;
+          paramsObject.schema=schema;
 
      }
 
@@ -932,18 +1001,28 @@ class OpenApiGenerator {
       * @param {CodeWriter} codeWriter class instance 
       * @param {UMLInterfaceRealization} objInterface 
       */
-     buildRequestBody(codeWriter, objInterface) {
+     buildRequestBody(codeWriter, objInterface,requestBodyObj) {
           codeWriter.writeLine('requestBody:', 0, 0);
 
+          let contentObj={};
           codeWriter.writeLine("content:", 1, 0);
+          requestBodyObj.content=contentObj;
 
+          let appJsonObject={};
           codeWriter.writeLine("application/json:", 1, 0);
+          contentObj['application/json']=appJsonObject;
 
+          let schemaObj={};
           codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 2);
+          appJsonObject.schema=schemaObj;
+
+          schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
 
 
           codeWriter.writeLine("description: ''", 0, 0);
+          requestBodyObj.description='';
           codeWriter.writeLine("required: true", 0, 1);
+          requestBodyObj.required=true;
 
      }
 
@@ -1426,13 +1505,18 @@ class OpenApiGenerator {
                     let paramsObject={};
                     parametersArray.push(paramsObject);
                     if (itemParameters.name != "id" && itemParameters.name != "identifier") {
+                         let objSchema={};
+                         objSchema.type='string';
                          if (!(itemParameters.type instanceof type.UMLClass)) {
                               // codeWriter, name, type, description, required, schema
-                              let objSchema={};
-                              objSchema.type='string';
-                              this.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
+                              
+                              this.buildParameter(ocodeWriter, itemParameters.name, "query", (itemParameters.documentation ?
                                    this.buildDescription(itemParameters.documentation) :
-                                   "missing description"), false, "{type: string}");
+                                   "missing description"), false, objSchema,paramsObject);
+
+                                   // this.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
+                                   //      this.buildDescription(itemParameters.documentation) :
+                                   //      "missing description"), false, "{type: string}");
                          } else {
 
                               let param = itemParameters.type.attributes.filter(item => {
@@ -1450,15 +1534,15 @@ class OpenApiGenerator {
                               if (param[0].type == "DateTime") {
                                    this.buildParameter(codeWriter, "before_" + param[0].name, "query", (itemParameters.documentation ?
                                         this.buildDescription(itemParameters.documentation) :
-                                        "missing description"), false, "{type: string}");
+                                        "missing description"), false, objSchema,paramsObject);
                                    this.buildParameter(codeWriter, "after_" + param[0].name, "query", (itemParameters.documentation ?
                                         this.buildDescription(itemParameters.documentation) :
-                                        "missing description"), false, "{type: string}");
+                                        "missing description"), false, objSchema,paramsObject);
 
                               } else {
                                    this.buildParameter(codeWriter, param[0].name, "query", (itemParameters.documentation ?
                                         this.buildDescription(itemParameters.documentation) :
-                                        "missing description"), false, "{type: string}");
+                                        "missing description"), false, objSchema,paramsObject);
                               }
 
                          }
