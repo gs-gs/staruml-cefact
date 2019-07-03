@@ -845,85 +845,155 @@ class OpenApiGenerator {
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
                                                   codeWriter.writeLine("delete:", 0, 0);
+                                                  pathsObject.delete=wOperationObject;
 
-
+                                                  let tagsArray=[];
                                                   codeWriter.writeLine("tags:", 1, 0);
+                                                  wOperationObject.tags=tagsArray;
 
                                                   codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+                                                  tagsArray.push(objInterface.target.name);
 
 
                                                   codeWriter.writeLine("description: Delete an existing " + objInterface.source.name, 0, 0);
+                                                  wOperationObject.description='Delete an existing ' + objInterface.source.name;
+
+                                                  let parametersArray=[];
                                                   codeWriter.writeLine("parameters:", 0, 0);
-                                                  this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
+                                                  wOperationObject.parameters=parametersArray;
+                                                  
+                                                  parametersArray.push(paramsObject);
+
+                                                  let objSchema={};
+                                                  objSchema.type='string';
+
+                                                  this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema,paramsObject);
 
                                                   objInterface.target.attributes.forEach(itemAttribute => {
                                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, "{type: string}")
+                                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema,paramsObject);
                                                        }
                                                   });
 
+                                                  let resObj={};
                                                   codeWriter.writeLine("responses:", 0, 0);
+                                                  wOperationObject.responses=resObj;
 
+                                                  let noContent204Obj={};
                                                   codeWriter.writeLine("'204': {description: No Content}", 1, 2);
+                                                  resObj['204']=noContent204Obj;
+                                                  noContent204Obj.description='No Content';
+
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PUT") {
                                                   codeWriter.writeLine("put:", 0, 0);
+                                                  pathsObject.put=wOperationObject;
 
-
+                                                  let tagsArray=[];
                                                   codeWriter.writeLine("tags:", 1, 0);
+                                                  wOperationObject.tags=tagsArray;
 
                                                   codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+                                                  tagsArray.push(objInterface.target.name);
 
 
                                                   codeWriter.writeLine("description: Update an existing " + objInterface.source.name, 0, 0);
+                                                  wOperationObject.description='Update an existing ' + objInterface.source.name;
+
+                                                  let parametersArray=[];
                                                   codeWriter.writeLine("parameters:", 0, 0);
-                                                  this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
+                                                  wOperationObject.parameters=parametersArray;
+                                                  
+                                                  parametersArray.push(paramsObject);
+
+                                                  let objSchema={};
+                                                  objSchema.type='string';
+
+                                                  this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema,paramsObject);
                                                   objInterface.target.attributes.forEach(itemAttribute => {
                                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, "{type: string}")
+                                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema,paramsObject);
                                                        }
                                                   });
-                                                  this.buildRequestBody(codeWriter, objInterface);
+
+                                                  let requestBodyObj={}
+                                                  wOperationObject.requestBody=requestBodyObj;
+
+                                                  this.buildRequestBody(codeWriter, objInterface,requestBodyObj);
+                                                  
+                                                  let resObj={};
                                                   codeWriter.writeLine("responses:", 0, 0);
+                                                  wOperationObject.responses=resObj;
 
+                                                  let ok200Obj={};
                                                   codeWriter.writeLine("'200':", 1, 0);
+                                                  resObj['200']=ok200Obj;
 
+                                                  let contentObj={};
                                                   codeWriter.writeLine("content:", 1, 0);
+                                                  ok200Obj=contentObj;
 
+                                                  let appJsonObj={};
                                                   codeWriter.writeLine("application/json:", 1, 0);
+                                                  contentObj['application/json']=appJsonObj;
 
+                                                  let schemaObj={};
                                                   codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + objInterface.source.name + "'}", 1, 2);
+                                                  appJsonObj.schema=schemaObj;
+                                                  schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
 
 
                                                   codeWriter.writeLine("description: OK", 0, 3);
-
+                                                  ok200Obj.description='OK';
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PATCH") {
                                                   codeWriter.writeLine("patch:", 0, 0);
+                                                  pathsObject.patch=wOperationObject;
 
-
+                                                  let tagsArray=[];
                                                   codeWriter.writeLine("tags:", 1, 0);
+                                                  wOperationObject.tags=tagsArray;
 
                                                   codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
+                                                  tagsArray.push(objInterface.target.name);
 
 
                                                   codeWriter.writeLine("description:  Update " + objInterface.source.name, 0, 0);
+                                                  wOperationObject.description='Update ' + objInterface.source.name;
+
+                                                  let parametersArray=[];
                                                   codeWriter.writeLine("parameters:", 0, 0);
-                                                  this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, "{type: string}")
+                                                  wOperationObject.parameters=parametersArray;
+
+                                                  parametersArray.push(paramsObject);
+
+                                                  let objSchema={};
+                                                  objSchema.type='string';
+
+                                                  this.buildParameter(codeWriter, operationAttribute.name, "path", (operationAttribute.documentation ? this.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema,paramsObject);
                                                   objInterface.target.attributes.forEach(itemAttribute => {
                                                        if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, "{type: string}")
+                                                            this.buildParameter(codeWriter, itemAttribute.name, "query", (itemAttribute.documentation ? this.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema,paramsObject);
                                                        }
                                                   });
+
+                                                  let requestBodyObj={}
+                                                  wOperationObject.requestBody=requestBodyObj;
                                                   this.buildRequestBody(codeWriter, objInterface);
 
+                                                  let resObj={};
                                                   codeWriter.writeLine("responses:", 0, 0);
+                                                  wOperationObject.responses=resObj;
 
+
+                                                  let noContentObj={};
                                                   codeWriter.writeLine("'204': {description: No Content}", 1, 2);
+                                                  resObj['204']=noContentObj;
+                                                  noContentObj.description='No Content';
 
 
                                              }
