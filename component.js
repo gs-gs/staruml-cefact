@@ -1,3 +1,4 @@
+const common=require('./common-utils');
 /**
  *
  *
@@ -9,9 +10,11 @@ class Component {
       * 
       * @constructor Component
       */
-     constructor() {
+     constructor(fullPath) {
           this.mainComponentObj={};
           this.mainSchemaObj={};
+          this.utils=new common.Utils();     
+          this.fullPath=fullPath;
      }
 
      
@@ -78,11 +81,11 @@ class Component {
                               let itemsObj={};
                               propertiesObj.items=itemsObj;
                               codeWriter.writeLine("items:", 1, 0);
-                              codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
-                              itemsObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
+                              codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                              itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
 
-                              codeWriter.writeLine("type: " + this.getType(attr.type), 0, 1);
-                              itemsObj.type=this.getType(attr.type);
+                              codeWriter.writeLine("type: " + this.utils.getType(attr.type), 0, 1);
+                              itemsObj.type=this.utils.getType(attr.type);
 
                               
 
@@ -98,11 +101,11 @@ class Component {
                               codeWriter.writeLine(null, 0, 1);
                          } else {
                               console.log("----Attr-2",attr.name);
-                              codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
-                              propertiesObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
+                              codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                              propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
 
-                              codeWriter.writeLine("type: " + this.getType(attr.type));
-                              propertiesObj.type=this.getType(attr.type);
+                              codeWriter.writeLine("type: " + this.utils.getType(attr.type));
+                              propertiesObj.type=this.utils.getType(attr.type);
 
                               if (attr.type instanceof type.UMLEnumeration) {
                                    codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]");
@@ -142,7 +145,7 @@ class Component {
                }
 
 
-               let arrGeneral = this.findGeneralizationOfClass(objClass); // Git issue #12
+               let arrGeneral = this.utils.findGeneralizationOfClass(objClass,this.fullPath); // Git issue #12
 
 
 
@@ -344,58 +347,9 @@ class Component {
 
           return this.mainComponentObj;
      }
-     /**
-      * @function buildDescription
-      * @description Description replace (') with ('')
-      * @param {string} desc
-      */
-     buildDescription(desc) {
-          if (desc)
-               return desc.replace(/\'/g, "''")
+     
 
-          return null;
-     }
-
-     /**
-      * @function buildParameter
-      * @description Adds parameters to the file
-      * @param {CodeWriter} codeWriter class instance
-      * @param {string} name
-      * @param {string} type
-      * @param {string} description
-      * @param {boolean} required
-      * @param {string} schema 
-      */
-     buildParameter(codeWriter, name, type, description, required, schema,paramsObject) {
-          // codeWriter.writeLine("parameters:");
-          codeWriter.writeLine("- description: " + description, 0, 0);
-
-          codeWriter.writeLine("in: " + type, 1, 0);
-          codeWriter.writeLine("name: " + name, 0, 0);
-          codeWriter.writeLine("required: " + required, 0, 0);
-          codeWriter.writeLine("schema: " + schema, 0, 1);
-
-          paramsObject.description=description;
-          paramsObject.in=type;
-          paramsObject.name=name;
-          paramsObject.required=required;
-          paramsObject.schema=schema;
-
-     }
-
-     /**
-      * @function getType
-      * @description Returns type of attribute in string, Get attribute type number,boolean,string 
-      * @returns string 
-      * @param {string} starUMLType 
-      */
-     getType(starUMLType) {
-          if (starUMLType === "Numeric") {
-               return "number";
-          } else if (starUMLType === "Indicator") {
-               return "boolean";
-          } else return "string";
-     }
+     
      /**
       * @function getEnumerationLiteral
       * @description 
@@ -502,8 +456,8 @@ class Component {
                // classSideAtributes.forEach(attr => {
                //         codeWriter.writeLine(attr.name+":");
                //         codeWriter.indent();
-               //         codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
-               //         codeWriter.writeLine("type: "+  this.getType(attr.type) );
+               //         codeWriter.writeLine("description: '"+(attr.documentation?this.utils.buildDescription(attr.documentation):"missing description")+"'");
+               //         codeWriter.writeLine("type: "+  this.utils.getType(attr.type) );
                //         if(attr.type instanceof type.UMLEnumeration){
                //             codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
                //         }   
@@ -515,8 +469,8 @@ class Component {
                //     if(attr.isID){
                //         codeWriter.writeLine(attr.name+":");
                //         codeWriter.indent();
-               //         codeWriter.writeLine("description: '"+(attr.documentation?this.buildDescription(attr.documentation):"missing description")+"'");
-               //         codeWriter.writeLine("type: "+  this.getType(attr.type) );
+               //         codeWriter.writeLine("description: '"+(attr.documentation?this.utils.buildDescription(attr.documentation):"missing description")+"'");
+               //         codeWriter.writeLine("type: "+  this.utils.getType(attr.type) );
                //         if(attr.type instanceof type.UMLEnumeration){
                //             codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
                //         }   
@@ -528,24 +482,7 @@ class Component {
 
           } catch (error) {
                console.error("Found error", error.message);
-               this.writeErrorToFile(error);
-          }
-     }
-     /**
-      * @function findGeneralizationOfClass
-      * @description Find all generalization of UMLClass
-      * @param {UMLClass} objClass 
-      */
-     findGeneralizationOfClass(objClass) {
-          try {
-               let generalizeClasses = app.repository.select("@UMLGeneralization");
-               let filterGeneral = generalizeClasses.filter(item => {
-                    return item.source._id == objClass._id
-               });
-               return filterGeneral;
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.writeErrorToFile(error);
+               this.utils.writeErrorToFile(error,this.fullPath);
           }
      }
 
@@ -564,7 +501,7 @@ class Component {
                return filterAssociation;
           } catch (error) {
                console.error("Found error", error.message);
-               this.writeErrorToFile(error);
+               this.utils.writeErrorToFile(error,this.fullPath);
           }
 
      }
@@ -617,7 +554,7 @@ class Component {
                     tempClass = assciation;
                }
 
-               let generalizeClasses = this.findGeneralizationOfClass(tempClass);
+               let generalizeClasses = this.utils.findGeneralizationOfClass(tempClass,this.fullPath);
 
                let filterAttributes = tempClass.attributes.filter(item => {
                     return item.isID;
@@ -661,10 +598,10 @@ class Component {
                          propertiesObj.items=itemsObj;
 
 
-                         codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
-                         itemsObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
-                         codeWriter.writeLine("type: " + this.getType(attr.type), 0, 1);
-                         itemsObj.type=this.getType(attr.type);
+                         codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                         itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+                         codeWriter.writeLine("type: " + this.utils.getType(attr.type), 0, 1);
+                         itemsObj.type=this.utils.getType(attr.type);
 
                          codeWriter.writeLine("type: array", 0, 0);
                          propertiesObj.type='array';
@@ -679,11 +616,11 @@ class Component {
                          codeWriter.writeLine(null, 0, 1);
                     } else {
                          console.log('---WAP--2',attr.name);
-                         codeWriter.writeLine("description: '" + (attr.documentation ? this.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
-                         propertiesObj.description=(attr.documentation ? this.buildDescription(attr.documentation) : "missing description");
+                         codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                         propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
 
-                         codeWriter.writeLine("type: " + this.getType(attr.type), 0, 0);
-                         propertiesObj.type=this.getType(attr.type);
+                         codeWriter.writeLine("type: " + this.utils.getType(attr.type), 0, 0);
+                         propertiesObj.type=this.utils.getType(attr.type);
                          if (attr.type instanceof type.UMLEnumeration) {
                               codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]", 0, 0);
                               propertiesObj.enum=this.getEnumerationLiteral(attr.type);
@@ -706,7 +643,7 @@ class Component {
                }
           } catch (error) {
                console.error("Found error", error.message);
-               this.writeErrorToFile(error);
+               this.utils.writeErrorToFile(error,this.fullPath);
           }
      }
 }
