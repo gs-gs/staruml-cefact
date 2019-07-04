@@ -7,7 +7,6 @@ class Responses {
      /**
       * Creates an instance of Responses.
       * 
-      * @param {string} indentString
       * @constructor Responses
       */
      constructor() {
