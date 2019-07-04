@@ -11,9 +11,6 @@ class Responses {
       * @constructor Responses
       */
      constructor() {
-          this.lines = []
-          this.indentString = '  ' // default 2 spaces
-          this.indentations = []
      }
 
      /**
