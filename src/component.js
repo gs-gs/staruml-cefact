@@ -16,6 +16,7 @@ class Component {
           this.utils=new common.Utils();     
           this.fullPath=fullPath;
           this.arrAttr = [];
+          this.arrAssoc = [];
      }
 
      
@@ -55,32 +56,15 @@ class Component {
                codeWriter.writeLine("properties:" + ((objClass.attributes.length == 0 && accosElems.length == 0 && assocClassLink.length == 0) ? " {}" : ""));
                codeWriter.writeLine(null, 1, 0);
 
+               // Adding Properties to schema
                mainPropertiesObj=this.getProperties(objClass,assocSideClassLink,codeWriter);
                mainClassesObj.properties=mainPropertiesObj;
                
 
-               
-               
+               this.arrAssoc = [];
 
-               let arrAssoc = [];
-
-
-
-               /**
-                * Add asscociation class Properties
-                * eg.
-                *   TransportMeansParty
-                         allOf:
-                        - $ref: '#/components/schemas/TransportPartyIds'
-                        - $ref: '#/components/schemas/TransportMeansParty'
-                        - type: object
-                */
-               if (assocClassLink.length > 0) {
-                    assocClassLink.forEach(item => {
-                         this.writeAssociationClassProperties(mainPropertiesObj,codeWriter, item);
-                         arrAssoc.push(item.classSide);
-                    })
-               }
+               // Adding Association
+               mainPropertiesObj=this.getAssociations(assocClassLink,mainPropertiesObj,codeWriter);
 
 
                let arrGeneral = this.utils.findGeneralizationOfClass(objClass,this.fullPath); // Git issue #12
@@ -99,7 +83,7 @@ class Component {
                     //     let assoc = objClass.ownedElements[i];
                     if (assoc instanceof type.UMLAssociation) {
 
-                         let filterAssoc = arrAssoc.filter(item => {
+                         let filterAssoc = this.arrAssoc.filter(item => {
                               return item.name == assoc.name;
                          });
 
@@ -189,7 +173,7 @@ class Component {
                                    }
                               }
                               // df----------------------
-                              arrAssoc.push(assoc);
+                              this.arrAssoc.push(assoc);
                          } else {
                               if (assoc.name == "") {
                                    flagNoName = true;
@@ -285,7 +269,25 @@ class Component {
 
           return this.mainComponentObj;
      }
-     
+     getAssociations(assocClassLink,mainPropertiesObj,codeWriter){
+          /**
+                * Add asscociation class Properties
+                * eg.
+                *   TransportMeansParty
+                         allOf:
+                        - $ref: '#/components/schemas/TransportPartyIds'
+                        - $ref: '#/components/schemas/TransportMeansParty'
+                        - type: object
+                */
+               if (assocClassLink.length > 0) {
+                    assocClassLink.forEach(item => {
+                         this.writeAssociationClassProperties(mainPropertiesObj,codeWriter, item);
+                         this.arrAssoc.push(item.classSide);
+                    })
+               }
+          return mainPropertiesObj;
+     }
+
      getProperties(objClass,assocSideClassLink,codeWriter){
           let mainPropertiesObj={};
           this.arrAttr = [];
