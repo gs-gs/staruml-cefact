@@ -7,6 +7,10 @@ const j2yaml = require('json2yaml');
  *
  *
  * @class FileGenerator
+/**
+ * FileGenerator class generate JSON, YAML file based of selection
+ *
+ * @class FileGenerator
  */
 class FileGenerator {
      /**
@@ -20,10 +24,13 @@ class FileGenerator {
 
      
      /**
-      * Return FileGenerator object 
-      * 
-      * @function getData
-      * @return {string}
+      *
+      * @param {CodeWriter} codeWriter
+      * @param {string} fullPath
+      * @param {UMLPackage} mainElem
+      * @param {string} fileType
+      * @param {Object} mainOpenApiObj
+      * @memberof FileGenerator
       */
      generate(codeWriter, fullPath, mainElem, fileType,mainOpenApiObj) {
           try {

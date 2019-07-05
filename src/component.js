@@ -1,14 +1,14 @@
 const common=require('./common-utils');
 /**
- *
+ * Component class adds all classes from the class diagram
  *
  * @class Component
  */
 class Component {
      /**
-      * Creates an instance of Component.
-      * 
-      * @constructor Component
+      *Creates an instance of Component.
+      * @param {string} fullPath
+      * @memberof Component
       */
      constructor(fullPath) {
           this.mainComponentObj={};
@@ -19,12 +19,14 @@ class Component {
           this.arrAssoc = [];
      }
 
-     
      /**
-      * Return Info object 
-      * 
-      * @function getData
-      * @return {string}
+      *
+      *
+      * @param {UMLClass} classes
+      * @param {UMLAssociationClassLink} classLink
+      * @param {CodeWriter} codeWriter
+      * @returns
+      * @memberof Component
       */
      getComponent(classes,classLink,codeWriter) {
           let arrIdClasses = [];
@@ -171,6 +173,16 @@ class Component {
 
           return this.mainComponentObj;
      }
+     /**
+      *
+      *
+      * @param {Object} mainPropertiesObj
+      * @param {Array} aggregationClasses
+      * @param {UMLAssociation} assoc
+      * @param {CodeWriter} codeWriter
+      * @returns mainPropertiesObj
+      * @memberof Component
+      */
      getAggregation(mainPropertiesObj,aggregationClasses,assoc,codeWriter) {
           let propertiesObj={};
           aggregationClasses.push(assoc.end2.reference);
@@ -229,6 +241,15 @@ class Component {
           }
           return mainPropertiesObj;
      }
+     /**
+      *
+      *
+      * @param {Object} mainPropertiesObj
+      * @param {UMLAssociation} assoc
+      * @param {CodeWriter} codeWriter
+      * @returns mainPropertiesObj
+      * @memberof Component
+      */
      getComposition(mainPropertiesObj,assoc,codeWriter){
           let propertiesObj={};
           mainPropertiesObj[assoc.name]=propertiesObj;
@@ -258,6 +279,14 @@ class Component {
           }
           return mainPropertiesObj;
      }
+     /**
+      *
+      * @param {Array} arrGeneral
+      * @param {Object} mainClassesObj
+      * @param {CodeWriter} codeWriter
+      * @returns
+      * @memberof Component
+      */
      getGeneralization(arrGeneral,mainClassesObj,codeWriter){
           /**
            * Add Generalization class
@@ -286,6 +315,14 @@ class Component {
           }
           return mainClassesObj;
      }
+     /**
+      *
+      * @param {UMLAssociationClassLink} assocClassLink
+      * @param {Object} mainPropertiesObj
+      * @param {CodeWriter} codeWriter
+      * @returns mainPropertiesObj
+      * @memberof Component
+      */
      getAssociations(assocClassLink,mainPropertiesObj,codeWriter){
           /**
                 * Add asscociation class Properties
@@ -305,6 +342,14 @@ class Component {
           return mainPropertiesObj;
      }
 
+     /**
+      *
+      * @param {UMLClass} objClass
+      * @param {UMLAssociationClassLink} assocSideClassLink
+      * @param {CodeWriter} codeWriter
+      * @returns mainPropertiesObj
+      * @memberof Component
+      */
      getProperties(objClass,assocSideClassLink,codeWriter){
           let mainPropertiesObj={};
           this.arrAttr = [];
@@ -375,7 +420,6 @@ class Component {
           return mainPropertiesObj;
      }
 
-     
      /**
       * @function getEnumerationLiteral
       * @description 
@@ -550,6 +594,13 @@ class Component {
                return (requiredAttr);
           }
      }
+     /**
+      *
+      *
+      * @param {Array} arrAttributes
+      * @returns
+      * @memberof Component
+      */
      getListRequiredAttributes(arrAttributes) {
           let requiredAttr = [];
           if (arrAttributes) {

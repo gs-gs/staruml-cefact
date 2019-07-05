@@ -2,6 +2,10 @@
  *
  *
  * @class Info
+/**
+ * Info class returns the API Info 
+ *
+ * @class Info
  */
 class Info {
      /**
