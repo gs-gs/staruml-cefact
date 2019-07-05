@@ -87,6 +87,8 @@ class Operations {
                                         codeWriter.writeLine("'200':", 1, 0);
                                         responsesObject['200']=ok200Object;
 
+                                        ok200Object.description='OK';
+
                                         let contentObject={};
                                         codeWriter.writeLine("content:", 1, 0);
                                         ok200Object.content=contentObject;
@@ -110,7 +112,7 @@ class Operations {
 
 
                                         codeWriter.writeLine("description: OK", 0, 3);
-                                        ok200Object.description='OK';
+                                        
 
 
 
@@ -229,6 +231,8 @@ class Operations {
                                                   codeWriter.writeLine("'200':", 1, 0);
                                                   responsesObj['200']=ok200ResOjb;
 
+                                                  ok200ResOjb.description='OK';
+
                                                   let contentObj={};
                                                   codeWriter.writeLine("content:", 1, 0);
                                                   ok200ResOjb.content=contentObj;
@@ -246,7 +250,7 @@ class Operations {
 
 
                                                   codeWriter.writeLine("description: OK", 0, 3);
-                                                  ok200ResOjb.description='OK';
+                                                  
 
 
 
@@ -345,6 +349,8 @@ class Operations {
                                                   codeWriter.writeLine("'200':", 1, 0);
                                                   resObj['200']=ok200Obj;
 
+                                                  ok200Obj.description='OK';
+
                                                   let contentObj={};
                                                   codeWriter.writeLine("content:", 1, 0);
                                                   ok200Obj.content=contentObj;
@@ -360,7 +366,7 @@ class Operations {
 
 
                                                   codeWriter.writeLine("description: OK", 0, 3);
-                                                  ok200Obj.description='OK';
+                                                  
 
 
 
@@ -539,6 +545,8 @@ class Operations {
                          codeWriter.writeLine("'200':", 1, 0);
                          responsesObj['200']=ok200ResOjb;
 
+                         ok200ResOjb.description='OK';
+
                          let contentObj={};
                          codeWriter.writeLine("content:", 1, 0);
                          ok200ResOjb.content=contentObj;
@@ -563,7 +571,7 @@ class Operations {
 
 
                          codeWriter.writeLine("description: OK", 0, 4);
-                         ok200ResOjb.description='OK';
+                         
 
 
 

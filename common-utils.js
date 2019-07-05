@@ -76,9 +76,9 @@ class Utils {
           codeWriter.writeLine("required: " + required, 0, 0);
           codeWriter.writeLine("schema: " + schema, 0, 1);
 
-          paramsObject.description=description;
-          paramsObject.in=type;
           paramsObject.name=name;
+          paramsObject.in=type;
+          paramsObject.description=description;
           paramsObject.required=required;
           paramsObject.schema=schema;
 
