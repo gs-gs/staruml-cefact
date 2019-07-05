@@ -782,63 +782,90 @@ class Operations {
       * @param {CodeWriter} codeWriter class instance
       * @param {UMLOperation} objOperation
       */
-     writeQueryParameters(parametersArray,codeWriter, objOperation) {
-          ////Here to start
+     writeQueryParameters(parametersArray, codeWriter, objOperation) {
           try {
                objOperation.parameters.forEach(itemParameters => {
-                    let paramsObject={};
-                    
+                    let paramsObject = {};
                     if (itemParameters.name != "id" && itemParameters.name != "identifier") {
                          parametersArray.push(paramsObject);
-                         let objSchema={};
-                         objSchema.type='string';
+                         let objSchema = {};
+                         objSchema.type = 'string';
                          if (!(itemParameters.type instanceof type.UMLClass)) {
-                              // codeWriter, name, type, description, required, schema
-                              
                               this.utils.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
                                    this.utils.buildDescription(itemParameters.documentation) :
                                    "missing description"), false, objSchema,paramsObject);
-
-                                   //AskQue
-                                   // this.utils.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
-                                   //      this.utils.buildDescription(itemParameters.documentation) :
-                                   //      "missing description"), false, "{type: string}");
                          } else {
 
-                              let param = itemParameters.type.attributes.filter(item => {
-                                   return itemParameters.name.toUpperCase() == item.name.toUpperCase();
-                              });
+                              this.utils.buildParameter(codeWriter, itemParameters.type.name + "." + itemParameters.name, "query", (itemParameters.documentation ?
+                                   this.utils.buildDescription(itemParameters.documentation) :
+                                   "missing description"), false, objSchema,paramsObject);
 
-                              if (param.length == 0) {
-                                   let generalizeClasses = this.utils.findGeneralizationOfClass(itemParameters.type,this.mFilePath);
-                                   console.log(generalizeClasses);
-                                   param = generalizeClasses[0].target.attributes.filter(item => {
-                                        return itemParameters.name.toUpperCase() == item.name.toUpperCase();
-                                   });
-                              }
-
-                              if (param[0].type == "DateTime") {
-                                   this.utils.buildParameter(codeWriter, "before_" + param[0].name, "query", (itemParameters.documentation ?
-                                        this.utils.buildDescription(itemParameters.documentation) :
-                                        "missing description"), false, objSchema,paramsObject);
-                                   this.utils.buildParameter(codeWriter, "after_" + param[0].name, "query", (itemParameters.documentation ?
-                                        this.utils.buildDescription(itemParameters.documentation) :
-                                        "missing description"), false, objSchema,paramsObject);
-
-                              } else {
-                                   this.utils.buildParameter(codeWriter, param[0].name, "query", (itemParameters.documentation ?
-                                        this.utils.buildDescription(itemParameters.documentation) :
-                                        "missing description"), false, objSchema,paramsObject);
-                              }
 
                          }
                     }
                });
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.mFilePath);
+               this.utils.writeErrorToFile(error);
           }
      }
+     // writeQueryParameters(parametersArray,codeWriter, objOperation) {
+     //      ////Here to start
+     //      try {
+     //           objOperation.parameters.forEach(itemParameters => {
+     //                let paramsObject={};
+                    
+     //                if (itemParameters.name != "id" && itemParameters.name != "identifier") {
+     //                     parametersArray.push(paramsObject);
+     //                     let objSchema={};
+     //                     objSchema.type='string';
+     //                     if (!(itemParameters.type instanceof type.UMLClass)) {
+     //                          // codeWriter, name, type, description, required, schema
+                              
+     //                          this.utils.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
+     //                               this.utils.buildDescription(itemParameters.documentation) :
+     //                               "missing description"), false, objSchema,paramsObject);
+
+     //                               //AskQue
+     //                               // this.utils.buildParameter(codeWriter, itemParameters.name, "query", (itemParameters.documentation ?
+     //                               //      this.utils.buildDescription(itemParameters.documentation) :
+     //                               //      "missing description"), false, "{type: string}");
+     //                     } else {
+
+     //                          let param = itemParameters.type.attributes.filter(item => {
+     //                               return itemParameters.name.toUpperCase() == item.name.toUpperCase();
+     //                          });
+
+     //                          if (param.length == 0) {
+     //                               let generalizeClasses = this.utils.findGeneralizationOfClass(itemParameters.type,this.mFilePath);
+     //                               console.log(generalizeClasses);
+     //                               param = generalizeClasses[0].target.attributes.filter(item => {
+     //                                    return itemParameters.name.toUpperCase() == item.name.toUpperCase();
+     //                               });
+     //                          }
+
+     //                          if (param[0].type == "DateTime") {
+     //                               this.utils.buildParameter(codeWriter, "before_" + param[0].name, "query", (itemParameters.documentation ?
+     //                                    this.utils.buildDescription(itemParameters.documentation) :
+     //                                    "missing description"), false, objSchema,paramsObject);
+     //                               this.utils.buildParameter(codeWriter, "after_" + param[0].name, "query", (itemParameters.documentation ?
+     //                                    this.utils.buildDescription(itemParameters.documentation) :
+     //                                    "missing description"), false, objSchema,paramsObject);
+
+     //                          } else {
+     //                               this.utils.buildParameter(codeWriter, param[0].name, "query", (itemParameters.documentation ?
+     //                                    this.utils.buildDescription(itemParameters.documentation) :
+     //                                    "missing description"), false, objSchema,paramsObject);
+     //                          }
+
+     //                     }
+     //                }
+     //           });
+     //      } catch (error) {
+     //           console.error("Found error", error.message);
+     //           this.utils.writeErrorToFile(error,this.mFilePath);
+     //      }
+     // }
      
 }
 

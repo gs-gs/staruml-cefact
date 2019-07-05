@@ -15,6 +15,7 @@ class Component {
           this.mainSchemaObj={};
           this.utils=new common.Utils();     
           this.fullPath=fullPath;
+          this.arrAttr = [];
      }
 
      
@@ -54,75 +55,12 @@ class Component {
                codeWriter.writeLine("properties:" + ((objClass.attributes.length == 0 && accosElems.length == 0 && assocClassLink.length == 0) ? " {}" : ""));
                codeWriter.writeLine(null, 1, 0);
 
+               mainPropertiesObj=this.getProperties(objClass,assocSideClassLink,codeWriter);
                mainClassesObj.properties=mainPropertiesObj;
                
 
                
-               let arrAttr = [];
-
-               let i, len;
-               let propertiesObj={};
-               for (i = 0, len = objClass.attributes.length; i < len; i++) {
-                    propertiesObj={};
-                    let attr = objClass.attributes[i];
-                    let filterAttr = arrAttr.filter(item => {
-                         return item.name == attr.name;
-                    });
-                    if (filterAttr.length == 0) {
-                         arrAttr.push(attr);
-                         if (assocSideClassLink.length > 0 && attr.isID) {
-                              continue;
-                         }
-                         // if(!attr.isID ){
-                         codeWriter.writeLine(attr.name + ":");
-                         mainPropertiesObj[attr.name]=propertiesObj;
-                         if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                              console.log("----Attr-1",attr.name);
-                              let itemsObj={};
-                              propertiesObj.items=itemsObj;
-                              codeWriter.writeLine("items:", 1, 0);
-                              codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
-                              itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-
-                              codeWriter.writeLine("type: " + this.utils.getType(attr.type), 0, 1);
-                              itemsObj.type=this.utils.getType(attr.type);
-
-                              
-
-                              codeWriter.writeLine("type: array");
-                              propertiesObj.type='array';
-                              /**
-                               * Add MinItems of multiplicity is 1..*
-                               */
-                              if (attr.multiplicity === "1..*") {
-                                   codeWriter.writeLine("minItems: 1");
-                                   propertiesObj.minItems=1;
-                              }
-                              codeWriter.writeLine(null, 0, 1);
-                         } else {
-                              console.log("----Attr-2",attr.name);
-                              codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
-                              propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-
-                              codeWriter.writeLine("type: " + this.utils.getType(attr.type));
-                              propertiesObj.type=this.utils.getType(attr.type);
-
-                              if (attr.type instanceof type.UMLEnumeration) {
-                                   codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]");
-                                   propertiesObj.enum=this.getEnumerationLiteral(attr.type);
-                              }
-                              codeWriter.writeLine(null, 0, 1);
-                         }
-                         if (attr.defaultValue != "") {
-                              console.log("----Attr-3",attr.name);
-                              codeWriter.writeLine("default: '" + attr.defaultValue + "'", 1, 1);
-
-                              propertiesObj.default=attr.defaultValue;
-                         }
-                         // }
-
-                    }
-               }
+               
 
                let arrAssoc = [];
 
@@ -294,7 +232,7 @@ class Component {
                     
                }
 
-               let filterAttributes = arrAttr.filter(item => {
+               let filterAttributes = this.arrAttr.filter(item => {
                     return item.isID;
                });
 
@@ -317,10 +255,10 @@ class Component {
                     
                }
 
-               if (this.getRequiredAttributes(arrAttr).length > 0) {
-                    codeWriter.writeLine("required: [" + this.getRequiredAttributes(arrAttr) + "]");
+               if (this.getRequiredAttributes(this.arrAttr).length > 0) {
+                    codeWriter.writeLine("required: [" + this.getRequiredAttributes(this.arrAttr) + "]");
 
-                    mainClassesObj.required=this.getListRequiredAttributes(arrAttr);
+                    mainClassesObj.required=this.getListRequiredAttributes(this.arrAttr);
                }
                codeWriter.writeLine(null, 0, 1);
 
@@ -348,6 +286,75 @@ class Component {
           return this.mainComponentObj;
      }
      
+     getProperties(objClass,assocSideClassLink,codeWriter){
+          let mainPropertiesObj={};
+          this.arrAttr = [];
+
+               let i, len;
+               let propertiesObj={};
+               for (i = 0, len = objClass.attributes.length; i < len; i++) {
+                    propertiesObj={};
+                    let attr = objClass.attributes[i];
+                    let filterAttr = this.arrAttr.filter(item => {
+                         return item.name == attr.name;
+                    });
+                    if (filterAttr.length == 0) {
+                         this.arrAttr.push(attr);
+                         if (assocSideClassLink.length > 0 && attr.isID) {
+                              continue;
+                         }
+                         // if(!attr.isID ){
+                         codeWriter.writeLine(attr.name + ":");
+                         mainPropertiesObj[attr.name]=propertiesObj;
+                         if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
+                              console.log("----Attr-1",attr.name);
+                              let itemsObj={};
+                              propertiesObj.items=itemsObj;
+                              codeWriter.writeLine("items:", 1, 0);
+                              codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                              itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+
+                              codeWriter.writeLine("type: " + this.utils.getType(attr.type), 0, 1);
+                              itemsObj.type=this.utils.getType(attr.type);
+
+                              
+
+                              codeWriter.writeLine("type: array");
+                              propertiesObj.type='array';
+                              /**
+                               * Add MinItems of multiplicity is 1..*
+                               */
+                              if (attr.multiplicity === "1..*") {
+                                   codeWriter.writeLine("minItems: 1");
+                                   propertiesObj.minItems=1;
+                              }
+                              codeWriter.writeLine(null, 0, 1);
+                         } else {
+                              console.log("----Attr-2",attr.name);
+                              codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
+                              propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+
+                              codeWriter.writeLine("type: " + this.utils.getType(attr.type));
+                              propertiesObj.type=this.utils.getType(attr.type);
+
+                              if (attr.type instanceof type.UMLEnumeration) {
+                                   codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]");
+                                   propertiesObj.enum=this.getEnumerationLiteral(attr.type);
+                              }
+                              codeWriter.writeLine(null, 0, 1);
+                         }
+                         if (attr.defaultValue != "") {
+                              console.log("----Attr-3",attr.name);
+                              codeWriter.writeLine("default: '" + attr.defaultValue + "'", 1, 1);
+
+                              propertiesObj.default=attr.defaultValue;
+                         }
+                         // }
+
+                    }
+               }
+          return mainPropertiesObj;
+     }
 
      
      /**
