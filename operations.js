@@ -578,29 +578,62 @@ class Operations {
 
 
                          /* Get single element record */
-                         codeWriter.writeLine("/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}:", 0, 0);
 
+                         let mICPath1="/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
+
+                         codeWriter.writeLine(mICPath1+":", 0, 0);
+                         console.log('---WIC-2-get',mICPath1);
+                         let pathsSingleObject={};
+                         mainPathsObject[mICPath1]=pathsSingleObject;
+
+                         let wOperationSingleObject={};
+                         pathsSingleObject.get=wOperationSingleObject;
                          codeWriter.writeLine("get:", 1, 0);
 
-
+                         let tagsSingleArray=[];
                          codeWriter.writeLine("tags:", 1, 0);
+                         wOperationSingleObject.tags=tagsSingleArray;
 
                          codeWriter.writeLine("- " + interfaceRealization.target.name, 1, 1);
+                         tagsSingleArray.push(interfaceRealization.target.name);
 
 
+                         wOperationSingleObject.description='Get a list of ' +interfaceRealization.source.name;
                          codeWriter.writeLine("description: Get a list of " + interfaceRealization.source.name, 0, 0);
-                         codeWriter.writeLine("parameters:", 0, 0);
-                         this.utils.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
-                         this.utils.buildParameter(codeWriter, end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
 
+                         let parametersSingleArray=[];
+                         codeWriter.writeLine("parameters:", 0, 0);
+                         wOperationSingleObject.parameters=parametersSingleArray;
+                         let paramsSingleObject={};
+                         parametersSingleArray.push(paramsSingleObject);
+
+                         let objSingleSchema={};
+                         objSingleSchema.type='string';
+
+                         this.utils.buildParameter(codeWriter, end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
+                         this.utils.buildParameter(codeWriter, end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true,objSingleSchema,paramsSingleObject)
+
+                         wOperationSingleObject.responses=responsesSingleObj;
                          codeWriter.writeLine("responses:", 0, 0);
 
+                         responsesSingleObj['200']=ok200SingleResOjb;
                          codeWriter.writeLine("'200':", 1, 0);
 
+                         ok200SingleResOjb.description='OK';
+
+                         let contentSingleObj={};
                          codeWriter.writeLine("content:", 1, 0);
+                         ok200SingleResOjb.content=contentSingleObj;
 
+                         let appJsonSingleObj={};
                          codeWriter.writeLine("application/json:", 1, 0);
+                         contentSingleObj['application/json']=appJsonSingleObj;
 
+                         let schemaSingleObj={};
+                         codeWriter.writeLine("schema:", 1, 0);
+                         appJsonSingleObj.schema=schemaSingleObj;
+
+                         schemaSingleObj['$ref']='#/components/schemas/' + interfaceRealization.source.name;
                          codeWriter.writeLine("schema: {$ref: '#/components/schemas/" + interfaceRealization.source.name + "'}", 1, 2);
 
 

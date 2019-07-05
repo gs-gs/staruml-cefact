@@ -2,6 +2,7 @@ const common=require('./common-utils');
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const j2yaml = require('json2yaml');
 /**
  *
  *
@@ -54,8 +55,15 @@ class FileGenerator {
                      * Convert data to YML file
                      */
 
-                    basePath = path.join(fullPath, mainElem.name + '.yml');
-                    fs.writeFileSync(basePath, codeWriter.getData());
+
+
+                         basePath = path.join(fullPath, mainElem.name + '.yml');
+                         fs.writeFileSync(basePath, codeWriter.getData());
+
+                         // Direct YML from JsonObject
+                         let ymlText = j2yaml.stringify(mainOpenApiObj);
+                         basePath = path.join(fullPath, mainElem.name+"-test" + '.yml');
+                         fs.writeFileSync(basePath, ymlText);
                } else {
 
                     /**
@@ -77,6 +85,18 @@ class FileGenerator {
                          console.error(error);
                          this.utils.writeErrorToFile(error,fullPath);
                     }
+
+
+                    //Direct conversion from JsonObject to JSON/YAML
+                    
+                              //Direct json from JsonOject
+                              basePath = path.join(fullPath, mainElem.name+"-test" + '.json');
+                              fs.writeFileSync(basePath, JSON.stringify(mainOpenApiObj));
+
+                              // Direct YML from JsonObject
+                              let ymlText = j2yaml.stringify(mainOpenApiObj);
+                              basePath = path.join(fullPath, mainElem.name+"-test" + '.yml');
+                              fs.writeFileSync(basePath, ymlText);
                }
                app.toast.info("OpenAPI generation completed");
           } catch (error) {
