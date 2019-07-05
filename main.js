@@ -1,4 +1,4 @@
-const codeGenerator = require('./code-generator')
+const codeGenerator = require('./src/code-generator')
 /**
  * @function _handleGenerate
  * @description OpenAPI generation when OpenAPI Initialization  

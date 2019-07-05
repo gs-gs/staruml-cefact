@@ -207,7 +207,7 @@ class OpenApiGenerator {
                let mainServerArr=[];
                this.mainOpenApiObj.servers=mainServerArr;
 
-               console.log("Result JSON obj",this.mainOpenApiObj);
+               console.log("Result generated JSON Object : ",this.mainOpenApiObj);
                let generator=new fileGen.FileGenerator();
                generator.generate(codeWriter, fullPath, mainElem, fileType,this.mainOpenApiObj);
           } catch (error) {
