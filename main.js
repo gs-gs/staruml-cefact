@@ -1,16 +1,16 @@
-const codeGenerator = require('./src/code-generator')
+const OpenApi = require('./src/openapi')
 /**
  * @function _handleGenerate
  * @description OpenAPI generation when OpenAPI Initialization  
- * @param {UMLPackage} baseModel
+ * @param {UMLPackage} umlPackage
  * @param {string} path
  * @param {Object} options
  */
-function _handleGenerate(baseModel, path, options) {
+function _handleGenerate(umlPackage, path, options) {
      // If options is not passed, get from preference
      options = options || getGenOptions();
-     // If baseModel is not assigned, popup ElementPicker
-     if (!baseModel) {
+     // If umlPackage is not assigned, popup ElementPicker
+     if (!umlPackage) {
           app.elementPickerDialog
                .showDialog("Select the package or project to generate from", null, null) //type.UMLPackage
                .then(function({
@@ -19,8 +19,8 @@ function _handleGenerate(baseModel, path, options) {
                }) {
                     if (buttonId === "ok") {
                          if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
-                              baseModel = returnValue;
-                              fileTypeSelection(baseModel, options);
+                              umlPackage = returnValue;
+                              fileTypeSelection(umlPackage, options);
                          } else {
                               app.dialogs.showErrorDialog("Please select the project or a package");
                          }
@@ -32,10 +32,10 @@ function _handleGenerate(baseModel, path, options) {
 /**
  * @function fileTypeSelection
  * @description Selects file type from the dropdown
- * @param {UMLPackage} baseModel
+ * @param {UMLPackage} umlPackage
  * @param {Object} options
  */
-function fileTypeSelection(baseModel, options) {
+function fileTypeSelection(umlPackage, options) {
      let filters = [
           // { name: "YML Files", extensions: [ "yml" ] }
      ];
@@ -55,11 +55,12 @@ function fileTypeSelection(baseModel, options) {
      ];
      app.dialogs.showSelectDropdownDialog("Select one of the following type.", fileOptions).then(function({
           buttonId,
-          returnValue
+          fileType
      }) {
           if (buttonId === 'ok') {
-               const file = app.dialogs.showSaveDialog("Save File as...", null, filters);
-               codeGenerator.generate(baseModel, file, options, returnValue);
+               const basePath = app.dialogs.showSaveDialog("Save File as...", null, filters);
+               const mOpenApi = new OpenApi(umlPackage, basePath, options,fileType);
+               mOpenApi.initUMLPackage();
           } else {
                console.log("User canceled")
           }
