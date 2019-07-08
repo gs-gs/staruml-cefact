@@ -1,4 +1,7 @@
-const common=require('./common-utils');
+const Utils=require('./utils');
+var OpenApi =require('./openapi');
+const Properties =require('./properties');
+
 /**
  * Component class adds all classes from the class diagram
  *
@@ -10,13 +13,14 @@ class Component {
       * @param {string} fullPath
       * @memberof Component
       */
-     constructor(fullPath) {
+     constructor(uniqueClassesArr,filePath) {
           this.mainComponentObj={};
           this.mainSchemaObj={};
-          this.utils=new common.Utils();     
-          this.fullPath=fullPath;
+          this.utils=new Utils();     
           this.arrAttr = [];
           this.arrAssoc = [];
+          this.uniqueClassesArr=uniqueClassesArr;
+          this.filePath=filePath;
      }
 
      /**
@@ -24,11 +28,15 @@ class Component {
       *
       * @param {UMLClass} classes
       * @param {UMLAssociationClassLink} classLink
-      * @param {CodeWriter} codeWriter
       * @returns
       * @memberof Component
       */
-     getComponent(classes,classLink,codeWriter) {
+     getComponent() {
+          // let classes=OpenApi.getUniqueClasses();
+          // console.log("--------------thi-1",OpenApi.getMyName())
+          // console.log("--------------thi-2",OpenApi.getName());
+          let classes=this.uniqueClassesArr;
+          let classLink = app.repository.select("@UMLAssociationClassLink");
           let arrIdClasses = [];
           let flagNoName = false;
           let noNameRel = [];
@@ -49,27 +57,26 @@ class Component {
                     return item.associationSide.end1.reference._id == objClass._id;
                });
 
-               codeWriter.writeLine(objClass.name + ":");
                this.mainSchemaObj[objClass.name]=mainClassesObj
 
-               codeWriter.writeLine("type: object", 1, 0);
                mainClassesObj.type='object';
 
-               codeWriter.writeLine("properties:" + ((objClass.attributes.length == 0 && accosElems.length == 0 && assocClassLink.length == 0) ? " {}" : ""));
-               codeWriter.writeLine(null, 1, 0);
 
                // Adding Properties
-               mainPropertiesObj=this.getProperties(objClass,assocSideClassLink,codeWriter);
+               let properties=new Properties(objClass,assocSideClassLink);
+               mainPropertiesObj=properties.getProperties();
                mainClassesObj.properties=mainPropertiesObj;
                
+               
 
+               this.arrAttr = properties.getAttributes();
                this.arrAssoc = [];
 
                // Adding Association
-               mainPropertiesObj=this.getAssociations(assocClassLink,mainPropertiesObj,codeWriter);
+               mainPropertiesObj=this.getAssociations(assocClassLink,mainPropertiesObj);
 
 
-               let arrGeneral = this.utils.findGeneralizationOfClass(objClass,this.fullPath); // Git issue #12
+               let arrGeneral = this.utils.findGeneralizationOfClass(objClass,this.filePath); // Git issue #12
 
 
 
@@ -93,10 +100,10 @@ class Component {
 
                               if (assoc.end1.aggregation == "shared") {
                                    // Adding Aggregation
-                                   mainPropertiesObj=this.getAggregation(mainPropertiesObj,aggregationClasses,assoc,codeWriter);
+                                   mainPropertiesObj=this.getAggregation(mainPropertiesObj,aggregationClasses,assoc);
                               } else {
                                    // Adding composition
-                                   mainPropertiesObj=this.getComposition(mainPropertiesObj,assoc,codeWriter);
+                                   mainPropertiesObj=this.getComposition(mainPropertiesObj,assoc);
                               }
                               this.arrAssoc.push(assoc);
                          } else {
@@ -113,10 +120,9 @@ class Component {
 
 
 
-               codeWriter.writeLine(null, 0, 1);
 
                // Adding Generalization
-               mainClassesObj=this.getGeneralization(arrGeneral,mainClassesObj,codeWriter);
+               mainClassesObj=this.getGeneralization(arrGeneral,mainClassesObj);
 
 
                let filterAttributes = this.arrAttr.filter(item => {
@@ -128,41 +134,35 @@ class Component {
                     let allOfArray=[];
                     mainClassesObj.allOf=allOfArray;
                     console.log("---FA-1")
-                    codeWriter.writeLine("allOf:");
                     let allOfObj={};
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + objClass.name + "Ids'", 1, 0);
                     allOfObj['$ref']='#/components/schemas/' + objClass.name + 'Ids';
                     allOfArray.push(allOfObj);
 
                     allOfObj={};
-                    codeWriter.writeLine("- type: object");
                     allOfObj['type']='object';
                     allOfArray.push(allOfObj);
-                    codeWriter.writeLine(null, 0, 1);
                     
                }
 
                // Adding Required 
                if (this.getRequiredAttributes(this.arrAttr).length > 0) {
-                    codeWriter.writeLine("required: [" + this.getRequiredAttributes(this.arrAttr) + "]");
 
                     mainClassesObj.required=this.getListRequiredAttributes(this.arrAttr);
                }
-               codeWriter.writeLine(null, 0, 1);
 
                /**
                 * Write sceparate schema for isID property of aggregation and relationship class
                 **/
                if (assocSideClassLink.length > 0) {
                     aggregationClasses.push(objClass);
-                    // this.writeAssociationProperties(codeWriter,objClass);
+                    // this.writeAssociationProperties(objClass);
                }
                aggregationClasses.forEach(itemClass => {
                     let filter = arrIdClasses.filter(subItem => {
                          return itemClass.name == subItem.name;
                     });
                     if (filter.length == 0) {
-                         this.writeAssociationProperties(mainClassesObj,codeWriter, itemClass);
+                         this.writeAssociationProperties(mainClassesObj, itemClass);
                          arrIdClasses.push(itemClass)
                     }
                });
@@ -179,17 +179,14 @@ class Component {
       * @param {Object} mainPropertiesObj
       * @param {Array} aggregationClasses
       * @param {UMLAssociation} assoc
-      * @param {CodeWriter} codeWriter
       * @returns mainPropertiesObj
       * @memberof Component
       */
-     getAggregation(mainPropertiesObj,aggregationClasses,assoc,codeWriter) {
+     getAggregation(mainPropertiesObj,aggregationClasses,assoc) {
           let propertiesObj={};
           aggregationClasses.push(assoc.end2.reference);
-          codeWriter.writeLine(assoc.name + ":"); // #7 resolve issue
           mainPropertiesObj[assoc.name] = propertiesObj;
 
-          codeWriter.writeLine(null, 1, 0);
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
                console.log("----CA-1", assoc.name);
@@ -200,41 +197,31 @@ class Component {
 
 
 
-               codeWriter.writeLine("items:");
-               codeWriter.writeLine("allOf:", 1, 0);
-               codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'", 1, 0);
                let objAllOfArry = {};
                objAllOfArry['$ref'] = '#/components/schemas/' + assoc.end2.reference.name + 'Ids';
                allOfArray.push(objAllOfArry);
 
                objAllOfArry = {};
-               codeWriter.writeLine("- type: object", 0, 2);
                objAllOfArry['type'] = 'object';
                allOfArray.push(objAllOfArry);
 
-               codeWriter.writeLine("type: array");
                propertiesObj.type = 'array';
                if (assoc.end2.multiplicity == "1..*") {
-                    codeWriter.writeLine("minItems: 1");
                     propertiesObj.minItems = 1;
                }
                console.log(propertiesObj);
-               codeWriter.writeLine(null, 0, 1);
           } else {
                //AskQue
                console.log("----CA-2", assoc.name);
                let allOfArray = [];
                propertiesObj.allOf = allOfArray;
 
-               codeWriter.writeLine("allOf:");
 
                let allOfObj = {};
-               codeWriter.writeLine("- $ref: '#/components/schemas/" + assoc.end2.reference.name + "Ids'", 1, 0);
                allOfObj['$ref'] = '#/components/schemas/' + assoc.end2.reference.name + 'Ids';
                allOfArray.push(allOfObj);
 
                allOfObj = {};
-               codeWriter.writeLine("- type: object", 0, 2);
                allOfObj['type'] = 'object';
                allOfArray.push(allOfObj);
                console.log(propertiesObj);
@@ -246,35 +233,28 @@ class Component {
       *
       * @param {Object} mainPropertiesObj
       * @param {UMLAssociation} assoc
-      * @param {CodeWriter} codeWriter
       * @returns mainPropertiesObj
       * @memberof Component
       */
-     getComposition(mainPropertiesObj,assoc,codeWriter){
+     getComposition(mainPropertiesObj,assoc){
           let propertiesObj={};
           mainPropertiesObj[assoc.name]=propertiesObj;
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                console.log("----CA-3",assoc.name);
-               codeWriter.writeLine(assoc.name + ":");
                let itemsObj={};
                propertiesObj.items=itemsObj;
-               codeWriter.writeLine("items: {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}", 1, 0);
                itemsObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
                propertiesObj.type='array';
-               codeWriter.writeLine("type: array");
                /**
                 * Add MinItems of multiplicity is 1..*
                 */
                if (assoc.end2.multiplicity === "1..*") {
-                    codeWriter.writeLine("minItems: 1");
                     propertiesObj.minItems=1;
                }
-               codeWriter.writeLine(null, 0, 1);
                console.log(propertiesObj);
           } else {
                console.log("----CA-4",assoc.name);
                propertiesObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
-               codeWriter.writeLine(assoc.name + ": {$ref: '#/components/schemas/" + assoc.end2.reference.name + "'}");
                console.log(propertiesObj);
           }
           return mainPropertiesObj;
@@ -283,11 +263,10 @@ class Component {
       *
       * @param {Array} arrGeneral
       * @param {Object} mainClassesObj
-      * @param {CodeWriter} codeWriter
       * @returns
       * @memberof Component
       */
-     getGeneralization(arrGeneral,mainClassesObj,codeWriter){
+     getGeneralization(arrGeneral,mainClassesObj){
           /**
            * Add Generalization class
            * Inherite all properties of parent class
@@ -296,21 +275,16 @@ class Component {
                console.log("---WG-1")
                let allOfArray=[];
                mainClassesObj.allOf=allOfArray;
-               codeWriter.writeLine("allOf:");
-               codeWriter.writeLine(null, 1, 0);
                arrGeneral.forEach(generalizeClass => {
                     let allOfObj={};
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + generalizeClass.target.name + "'");
                     allOfObj['$ref']='#/components/schemas/'+ generalizeClass.target.name;
                     allOfArray.push(allOfObj);
 
 
                     allOfObj={};
-                    codeWriter.writeLine("- type: object");
                     allOfObj['type']='object';
                     allOfArray.push(allOfObj);
                });
-               codeWriter.writeLine(null, 0, 1);
                
           }
           return mainClassesObj;
@@ -319,11 +293,10 @@ class Component {
       *
       * @param {UMLAssociationClassLink} assocClassLink
       * @param {Object} mainPropertiesObj
-      * @param {CodeWriter} codeWriter
       * @returns mainPropertiesObj
       * @memberof Component
       */
-     getAssociations(assocClassLink,mainPropertiesObj,codeWriter){
+     getAssociations(assocClassLink,mainPropertiesObj){
           /**
                 * Add asscociation class Properties
                 * eg.
@@ -335,135 +308,40 @@ class Component {
                 */
                if (assocClassLink.length > 0) {
                     assocClassLink.forEach(item => {
-                         this.writeAssociationClassProperties(mainPropertiesObj,codeWriter, item);
+                         this.writeAssociationClassProperties(mainPropertiesObj, item);
                          this.arrAssoc.push(item.classSide);
                     })
                }
           return mainPropertiesObj;
      }
 
-     /**
-      *
-      * @param {UMLClass} objClass
-      * @param {UMLAssociationClassLink} assocSideClassLink
-      * @param {CodeWriter} codeWriter
-      * @returns mainPropertiesObj
-      * @memberof Component
-      */
-     getProperties(objClass,assocSideClassLink,codeWriter){
-          let mainPropertiesObj={};
-          this.arrAttr = [];
-
-               let i, len;
-               let propertiesObj={};
-               for (i = 0, len = objClass.attributes.length; i < len; i++) {
-                    propertiesObj={};
-                    let attr = objClass.attributes[i];
-                    let filterAttr = this.arrAttr.filter(item => {
-                         return item.name == attr.name;
-                    });
-                    if (filterAttr.length == 0) {
-                         this.arrAttr.push(attr);
-                         if (assocSideClassLink.length > 0 && attr.isID) {
-                              continue;
-                         }
-                         // if(!attr.isID ){
-                         codeWriter.writeLine(attr.name + ":");
-                         mainPropertiesObj[attr.name]=propertiesObj;
-                         if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                              console.log("----Attr-1",attr.name);
-                              let itemsObj={};
-                              propertiesObj.items=itemsObj;
-                              codeWriter.writeLine("items:", 1, 0);
-                              codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
-                              itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-
-                              codeWriter.writeLine("type: " + this.utils.getType(attr.type), 0, 1);
-                              itemsObj.type=this.utils.getType(attr.type);
-
-                              
-
-                              codeWriter.writeLine("type: array");
-                              propertiesObj.type='array';
-                              /**
-                               * Add MinItems of multiplicity is 1..*
-                               */
-                              if (attr.multiplicity === "1..*") {
-                                   codeWriter.writeLine("minItems: 1");
-                                   propertiesObj.minItems=1;
-                              }
-                              codeWriter.writeLine(null, 0, 1);
-                         } else {
-                              console.log("----Attr-2",attr.name);
-                              codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
-                              propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-
-                              codeWriter.writeLine("type: " + this.utils.getType(attr.type));
-                              propertiesObj.type=this.utils.getType(attr.type);
-
-                              if (attr.type instanceof type.UMLEnumeration) {
-                                   codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]");
-                                   propertiesObj.enum=this.getEnumerationLiteral(attr.type);
-                              }
-                              codeWriter.writeLine(null, 0, 1);
-                         }
-                         if (attr.defaultValue != "") {
-                              console.log("----Attr-3",attr.name);
-                              codeWriter.writeLine("default: '" + attr.defaultValue + "'", 1, 1);
-
-                              propertiesObj.default=attr.defaultValue;
-                         }
-                         // }
-
-                    }
-               }
-          return mainPropertiesObj;
-     }
-
-     /**
-      * @function getEnumerationLiteral
-      * @description 
-      * @param {UMLEnumaration} objEnum 
-      */
-     getEnumerationLiteral(objEnum) {
-          if (objEnum) {
-               let result = objEnum.literals.map(a => a.name);
-               return (result);
-          }
-     }
+     
 
      /**
       * @function writeAssociationClassProperties
       * @description adds property for association class
-      * @param {CodeWriter} codeWriter class instance
+      * @param {Object} main openapi json object
       * @param {UMLAssociationClassLink} associationClass 
       */
-     writeAssociationClassProperties(mainPropertiesObj,codeWriter, associationClass) {
+     writeAssociationClassProperties(mainPropertiesObj, associationClass) {
           try {
                let propertiesObj={};
                var end2Attributes = associationClass.associationSide.end2.reference.attributes;
                var classSideAtributes = associationClass.classSide.attributes;
-               codeWriter.writeLine(associationClass.classSide.name + ":", 0, 0);
                mainPropertiesObj[associationClass.classSide.name]=propertiesObj;
 
                if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
                     console.log("----WAC-1",associationClass.classSide.name);
                     let itemsObj={};
-                    codeWriter.writeLine("items:", 1, 0);
                     propertiesObj.items=itemsObj;
-                    codeWriter.writeLine("allOf:", 1, 0);
                     let allOfArray=[];
                     itemsObj.allOf=allOfArray;
 
-                    // codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
-                    codeWriter.writeLine(null,1,0);
                     let objAllOfArry={};
                     if (associationClass.associationSide.end1.aggregation == "shared"){
-                         codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'");
                          objAllOfArry['$ref']='#/components/schemas/' + associationClass.associationSide.end2.reference.name + 'Ids';
                     }
                     else{
-                         codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name+"'");
                          objAllOfArry['$ref']='#/components/schemas/' + associationClass.associationSide.end2.reference.name;
                     }
 
@@ -471,88 +349,48 @@ class Component {
 
 
                     objAllOfArry={};
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'", 0, 0);
                     objAllOfArry['$ref']='#/components/schemas/' + associationClass.classSide.name;
                     allOfArray.push(objAllOfArry);
 
                     objAllOfArry={};
-                    codeWriter.writeLine("- type: object", 0, 2);
                     objAllOfArry['type']='object';
                     allOfArray.push(objAllOfArry);
 
 
 
-                    codeWriter.writeLine("type: array", 0, 0);
                     propertiesObj.type='array';
                     if (associationClass.associationSide.end2.multiplicity == "1..*") {
-                         codeWriter.writeLine("minItems: 1", 0, 0);
                          propertiesObj.minItems=1;
                     }
 
-                    codeWriter.writeLine(null, 0, 1);
                } else {
                     //AskQue
                     console.log("----WAC-2",associationClass.classSide.name);
                     let allOfArray=[];
                     let objAllOfArry={};
                     propertiesObj.allOf=allOfArray;
-                    codeWriter.writeLine("allOf:", 0, 0);
 
-                    // codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'", 1, 0);
-                    codeWriter.writeLine(null,1,0);
                     if (associationClass.associationSide.end1.aggregation == "shared"){
-                         codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name + "Ids'");
                          objAllOfArry['$ref']='#/components/schemas/'+ associationClass.associationSide.end2.reference.name + 'Ids';
                     }
                     else{
-                         codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.associationSide.end2.reference.name+"'");
                          objAllOfArry['$ref']='#/components/schemas/'+ associationClass.associationSide.end2.reference.name;
                     }
                     allOfArray.push(objAllOfArry);
 
                     objAllOfArry={};
-                    codeWriter.writeLine("- $ref: '#/components/schemas/" + associationClass.classSide.name + "'", 0, 0);
                     objAllOfArry['$ref']='#/components/schemas/'+ associationClass.classSide.name;
                     allOfArray.push(objAllOfArry);
 
                     objAllOfArry={};
-                    codeWriter.writeLine("- type: object", 0, 2);
                     objAllOfArry['type']='object';
                     allOfArray.push(objAllOfArry);
 
                }
 
-
-               // classSideAtributes.forEach(attr => {
-               //         codeWriter.writeLine(attr.name+":");
-               //         codeWriter.indent();
-               //         codeWriter.writeLine("description: '"+(attr.documentation?this.utils.buildDescription(attr.documentation):"missing description")+"'");
-               //         codeWriter.writeLine("type: "+  this.utils.getType(attr.type) );
-               //         if(attr.type instanceof type.UMLEnumeration){
-               //             codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
-               //         }   
-               //         codeWriter.outdent();
-
-               // });
-
-               // end2Attributes.forEach(attr => {
-               //     if(attr.isID){
-               //         codeWriter.writeLine(attr.name+":");
-               //         codeWriter.indent();
-               //         codeWriter.writeLine("description: '"+(attr.documentation?this.utils.buildDescription(attr.documentation):"missing description")+"'");
-               //         codeWriter.writeLine("type: "+  this.utils.getType(attr.type) );
-               //         if(attr.type instanceof type.UMLEnumeration){
-               //             codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) +"]");                            
-               //         }   
-               //         codeWriter.outdent();
-               //     }
-               // });
-
-
-
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.fullPath);
+               this.utils.writeErrorToFile(error,this.filePath);
           }
      }
 
@@ -571,7 +409,7 @@ class Component {
                return filterAssociation;
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.fullPath);
+               this.utils.writeErrorToFile(error,this.filePath);
           }
 
      }
@@ -617,10 +455,10 @@ class Component {
      /**
       * @function writeAssociationProperties
       * @description 
-      * @param {CodeWriter} codeWriter class instance 
+      * @param {Object} Main open api json object 
       * @param {UMLClass} assciation 
       */
-     writeAssociationProperties(mainClassesObj,codeWriter, assciation) {
+     writeAssociationProperties(mainClassesObj, assciation) {
           try {
 
                let tempClass;
@@ -631,7 +469,7 @@ class Component {
                     tempClass = assciation;
                }
 
-               let generalizeClasses = this.utils.findGeneralizationOfClass(tempClass,this.fullPath);
+               let generalizeClasses = this.utils.findGeneralizationOfClass(tempClass,this.filePath);
 
                let filterAttributes = tempClass.attributes.filter(item => {
                     return item.isID;
@@ -646,7 +484,6 @@ class Component {
 
                if (filterAttributes.length > 0) {
 
-               codeWriter.writeLine((assciation instanceof type.UMLAssociation) ? (assciation.name + ":") : (tempClass.name + "Ids:"), 0, 0);
                
                let cName=(assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids';
                
@@ -655,74 +492,56 @@ class Component {
                this.mainSchemaObj[cName]=mainClassesObj
                let propertiesObj={};
 
-               codeWriter.writeLine("type: object", 1, 0);
                mainClassesObj.type='object';
 
                
-               // codeWriter.writeLine("properties:", 0, 0);
-               codeWriter.writeLine("properties:" + ((filterAttributes.length == 0) ? " {}" : ""));
                mainClassesObj.properties=mainPropertiesObj;
 
-               codeWriter.writeLine(null, 1, 0);
 
                filterAttributes.forEach(attr => {
                     mainPropertiesObj[attr.name]=propertiesObj;
-                    codeWriter.writeLine(attr.name + ":", 0, 0);
                     if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
                          console.log('---WAP--1',attr.name);
                          let itemsObj={};
-                         codeWriter.writeLine("items:", 1, 0);
                          propertiesObj.items=itemsObj;
 
 
-                         codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
                          itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-                         codeWriter.writeLine("type: " + this.utils.getType(attr.type), 0, 1);
                          itemsObj.type=this.utils.getType(attr.type);
 
-                         codeWriter.writeLine("type: array", 0, 0);
                          propertiesObj.type='array';
                          /**
                           * Add MinItems of multiplicity is 1..*
                           */
                          if (attr.multiplicity === "1..*") {
-                              codeWriter.writeLine("minItems: 1", 0, 0);
                               propertiesObj.minItems=1;
                          }
 
-                         codeWriter.writeLine(null, 0, 1);
                     } else {
                          console.log('---WAP--2',attr.name);
-                         codeWriter.writeLine("description: '" + (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description") + "'", 1, 0);
                          propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
 
-                         codeWriter.writeLine("type: " + this.utils.getType(attr.type), 0, 0);
                          propertiesObj.type=this.utils.getType(attr.type);
                          if (attr.type instanceof type.UMLEnumeration) {
-                              codeWriter.writeLine("enum: [" + this.getEnumerationLiteral(attr.type) + "]", 0, 0);
                               propertiesObj.enum=this.getEnumerationLiteral(attr.type);
                          }
 
-                         codeWriter.writeLine(null, 0, 1);
                     }
                });
 
 
-               codeWriter.writeLine(null, 0, 1);
 
                if (this.getRequiredAttributes(filterAttributes).length > 0) {
-                    codeWriter.writeLine("required: [" + this.getRequiredAttributes(filterAttributes) + "]", 0, 0);
                     mainClassesObj.required=this.getListRequiredAttributes(filterAttributes);
                }
 
 
-               codeWriter.writeLine(null, 0, 1);
                }
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.fullPath);
+               this.utils.writeErrorToFile(error,this.filePath);
           }
      }
 }
 
-exports.Component = Component;
+module.exports = Component;
