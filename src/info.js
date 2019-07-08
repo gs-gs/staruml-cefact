@@ -32,4 +32,4 @@ class Info {
      }
 }
 
-exports.Info = Info;
+module.exports = Info;
