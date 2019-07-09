@@ -1,5 +1,8 @@
 const Utils=require('./utils');
 const Properties =require('./properties');
+const Association =require('./association');
+const Aggregation =require('./aggregation');
+const Composition =require('./composition');
 const openAPI = require('./openapi');
 
 /**
@@ -63,16 +66,20 @@ class Component {
 
                // Adding Properties
                let properties=new Properties(objClass,assocSideClassLink);
-               mainPropertiesObj=properties.getProperties();
+               mainPropertiesObj=properties.addProperties();
                mainClassesObj.properties=mainPropertiesObj;
                
                
 
                this.arrAttr = properties.getAttributes();
-               this.arrAssoc = [];
+               
 
                // Adding Association
-               mainPropertiesObj=this.getAssociations(assocClassLink,mainPropertiesObj);
+               // mainPropertiesObj=this.getAssociations(assocClassLink,mainPropertiesObj);
+               let association=new Association();
+               mainPropertiesObj=association.addAssociationProperties(assocClassLink,mainPropertiesObj);
+
+               this.arrAssoc = association.getAssociations();;
 
 
                let arrGeneral = this.utils.findGeneralizationOfClass(objClass); // Git issue #12
@@ -99,10 +106,13 @@ class Component {
 
                               if (assoc.end1.aggregation == "shared") {
                                    // Adding Aggregation
-                                   mainPropertiesObj=this.getAggregation(mainPropertiesObj,aggregationClasses,assoc);
+
+                                   let aggregation=new Aggregation();
+                                   mainPropertiesObj=aggregation.addAggregationProperties(mainPropertiesObj,aggregationClasses,assoc);
                               } else {
                                    // Adding composition
-                                   mainPropertiesObj=this.getComposition(mainPropertiesObj,assoc);
+                                   let composition=new Composition();
+                                   mainPropertiesObj=composition.addComposition(mainPropertiesObj,assoc);
                               }
                               this.arrAssoc.push(assoc);
                          } else {
@@ -172,92 +182,8 @@ class Component {
 
           return this.mainComponentObj;
      }
-     /**
-      *
-      *
-      * @param {Object} mainPropertiesObj
-      * @param {Array} aggregationClasses
-      * @param {UMLAssociation} assoc
-      * @returns mainPropertiesObj
-      * @memberof Component
-      */
-     getAggregation(mainPropertiesObj,aggregationClasses,assoc) {
-          let propertiesObj={};
-          aggregationClasses.push(assoc.end2.reference);
-          mainPropertiesObj[assoc.name] = propertiesObj;
-
-          if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
-
-               console.log("----CA-1", assoc.name);
-               let itemsObj = {};
-               propertiesObj.items = itemsObj;
-               let allOfArray = [];
-               itemsObj.allOf = allOfArray;
-
-
-
-               let objAllOfArry = {};
-               objAllOfArry['$ref'] = '#/components/schemas/' + assoc.end2.reference.name + 'Ids';
-               allOfArray.push(objAllOfArry);
-
-               objAllOfArry = {};
-               objAllOfArry['type'] = 'object';
-               allOfArray.push(objAllOfArry);
-
-               propertiesObj.type = 'array';
-               if (assoc.end2.multiplicity == "1..*") {
-                    propertiesObj.minItems = 1;
-               }
-               console.log(propertiesObj);
-          } else {
-               //AskQue
-               console.log("----CA-2", assoc.name);
-               let allOfArray = [];
-               propertiesObj.allOf = allOfArray;
-
-
-               let allOfObj = {};
-               allOfObj['$ref'] = '#/components/schemas/' + assoc.end2.reference.name + 'Ids';
-               allOfArray.push(allOfObj);
-
-               allOfObj = {};
-               allOfObj['type'] = 'object';
-               allOfArray.push(allOfObj);
-               console.log(propertiesObj);
-          }
-          return mainPropertiesObj;
-     }
-     /**
-      *
-      *
-      * @param {Object} mainPropertiesObj
-      * @param {UMLAssociation} assoc
-      * @returns mainPropertiesObj
-      * @memberof Component
-      */
-     getComposition(mainPropertiesObj,assoc){
-          let propertiesObj={};
-          mainPropertiesObj[assoc.name]=propertiesObj;
-          if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
-               console.log("----CA-3",assoc.name);
-               let itemsObj={};
-               propertiesObj.items=itemsObj;
-               itemsObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
-               propertiesObj.type='array';
-               /**
-                * Add MinItems of multiplicity is 1..*
-                */
-               if (assoc.end2.multiplicity === "1..*") {
-                    propertiesObj.minItems=1;
-               }
-               console.log(propertiesObj);
-          } else {
-               console.log("----CA-4",assoc.name);
-               propertiesObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
-               console.log(propertiesObj);
-          }
-          return mainPropertiesObj;
-     }
+     
+     
      /**
       *
       * @param {Array} arrGeneral
@@ -287,110 +213,6 @@ class Component {
                
           }
           return mainClassesObj;
-     }
-     /**
-      *
-      * @param {UMLAssociationClassLink} assocClassLink
-      * @param {Object} mainPropertiesObj
-      * @returns mainPropertiesObj
-      * @memberof Component
-      */
-     getAssociations(assocClassLink,mainPropertiesObj){
-          /**
-                * Add asscociation class Properties
-                * eg.
-                *   TransportMeansParty
-                         allOf:
-                        - $ref: '#/components/schemas/TransportPartyIds'
-                        - $ref: '#/components/schemas/TransportMeansParty'
-                        - type: object
-                */
-               if (assocClassLink.length > 0) {
-                    assocClassLink.forEach(item => {
-                         this.writeAssociationClassProperties(mainPropertiesObj, item);
-                         this.arrAssoc.push(item.classSide);
-                    })
-               }
-          return mainPropertiesObj;
-     }
-
-     
-
-     /**
-      * @function writeAssociationClassProperties
-      * @description adds property for association class
-      * @param {Object} main openapi json object
-      * @param {UMLAssociationClassLink} associationClass 
-      */
-     writeAssociationClassProperties(mainPropertiesObj, associationClass) {
-          try {
-               let propertiesObj={};
-               var end2Attributes = associationClass.associationSide.end2.reference.attributes;
-               var classSideAtributes = associationClass.classSide.attributes;
-               mainPropertiesObj[associationClass.classSide.name]=propertiesObj;
-
-               if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
-                    console.log("----WAC-1",associationClass.classSide.name);
-                    let itemsObj={};
-                    propertiesObj.items=itemsObj;
-                    let allOfArray=[];
-                    itemsObj.allOf=allOfArray;
-
-                    let objAllOfArry={};
-                    if (associationClass.associationSide.end1.aggregation == "shared"){
-                         objAllOfArry['$ref']='#/components/schemas/' + associationClass.associationSide.end2.reference.name + 'Ids';
-                    }
-                    else{
-                         objAllOfArry['$ref']='#/components/schemas/' + associationClass.associationSide.end2.reference.name;
-                    }
-
-                    allOfArray.push(objAllOfArry);
-
-
-                    objAllOfArry={};
-                    objAllOfArry['$ref']='#/components/schemas/' + associationClass.classSide.name;
-                    allOfArray.push(objAllOfArry);
-
-                    objAllOfArry={};
-                    objAllOfArry['type']='object';
-                    allOfArray.push(objAllOfArry);
-
-
-
-                    propertiesObj.type='array';
-                    if (associationClass.associationSide.end2.multiplicity == "1..*") {
-                         propertiesObj.minItems=1;
-                    }
-
-               } else {
-                    //AskQue
-                    console.log("----WAC-2",associationClass.classSide.name);
-                    let allOfArray=[];
-                    let objAllOfArry={};
-                    propertiesObj.allOf=allOfArray;
-
-                    if (associationClass.associationSide.end1.aggregation == "shared"){
-                         objAllOfArry['$ref']='#/components/schemas/'+ associationClass.associationSide.end2.reference.name + 'Ids';
-                    }
-                    else{
-                         objAllOfArry['$ref']='#/components/schemas/'+ associationClass.associationSide.end2.reference.name;
-                    }
-                    allOfArray.push(objAllOfArry);
-
-                    objAllOfArry={};
-                    objAllOfArry['$ref']='#/components/schemas/'+ associationClass.classSide.name;
-                    allOfArray.push(objAllOfArry);
-
-                    objAllOfArry={};
-                    objAllOfArry['type']='object';
-                    allOfArray.push(objAllOfArry);
-
-               }
-
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
-          }
      }
 
      /**
