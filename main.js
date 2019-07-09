@@ -1,4 +1,4 @@
-const OpenApi = require('./src/openapi')
+const openAPI =require('./src/openapi');
 /**
  * @function _handleGenerate
  * @description OpenAPI generation when OpenAPI Initialization  
@@ -8,6 +8,7 @@ const OpenApi = require('./src/openapi')
  */
 function _handleGenerate(umlPackage, path, options) {
      // If options is not passed, get from preference
+     
      options = options || getGenOptions();
      // If umlPackage is not assigned, popup ElementPicker
      if (!umlPackage) {
@@ -59,8 +60,12 @@ function fileTypeSelection(umlPackage, options) {
      }) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog("Save File as...", null, filters);
-               const mOpenApi = new OpenApi(umlPackage, basePath, options,fileType);
+               console.log("UMLPackage",umlPackage);
+               console.log("Path",basePath);
+               console.log("Options",options);
+               const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options,fileType);
                mOpenApi.initUMLPackage();
+               console.log("mTest",openAPI.getFilePath());
           } else {
                console.log("User canceled")
           }
