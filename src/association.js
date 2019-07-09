@@ -23,7 +23,7 @@ class Association {
           return this.arrAssoc;
      }
      
-     getAssociationProperties(assocClassLink,mainPropertiesObj){
+     addAssociationProperties(assocClassLink,mainPropertiesObj){
           /**
            * Add asscociation class Properties
            * eg.

@@ -12,7 +12,6 @@ class Paths {
       * @constructor Paths
       */
      constructor() {
-          this.operations=operations;
           this.utils=new Utils();    
      }
 

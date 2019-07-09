@@ -37,7 +37,7 @@ class Properties {
      * @returns
      * @memberof Properties
      */
-    getProperties(){
+    addProperties(){
           let mainPropertiesObj={};
           this.arrAttr = [];
 
