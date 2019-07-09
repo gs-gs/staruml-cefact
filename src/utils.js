@@ -1,3 +1,4 @@
+const openAPI = require('./openapi');
 const fs = require('fs');
 /**
  *
@@ -20,9 +21,9 @@ class Utils {
       * @param {*} error
       * @memberof Utils
       */
-     writeErrorToFile(error,mFilePath) {
+     writeErrorToFile(error) {
           this.errorContent.push(error.message);
-          fs.writeFile(mFilePath + this.mFileName, JSON.stringify(this.errorContent), function(err) {
+          fs.writeFile(openAPI.getFilePath() + this.mFileName, JSON.stringify(this.errorContent), function(err) {
                if (err) {
                     console.error("Error writing file", err);
                }
@@ -33,7 +34,7 @@ class Utils {
       * @description Find all generalization of UMLClass
       * @param {UMLClass} objClass 
       */
-     findGeneralizationOfClass(objClass,fullPath) {
+     findGeneralizationOfClass(objClass) {
           try {
                let generalizeClasses = app.repository.select("@UMLGeneralization");
                let filterGeneral = generalizeClasses.filter(item => {
@@ -42,7 +43,7 @@ class Utils {
                return filterGeneral;
           } catch (error) {
                console.error("Found error", error.message);
-               this.writeErrorToFile(error,fullPath);
+               this.writeErrorToFile(error);
           }
      }
      /**

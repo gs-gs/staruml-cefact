@@ -1,10 +1,11 @@
-const fs = require('fs')
+const fs = require('fs');
 const Info=require('./info');
 const Component=require('./component');
 const Utils=require('./utils');
 const FileGenerator=require('./filegenerator');
 const Paths=require('./paths');
 const Servers=require('./servers');
+
 /**
  *
  *
@@ -21,15 +22,15 @@ class OpenApi {
       * @param {Object} options
       */
      constructor(umlPackage, basePath, options,fileType) {
-          this.umlPackage = umlPackage;
-          this.filePath = basePath;
+          OpenApi.umlPackage = umlPackage;
+          OpenApi.filePath=basePath;
           this.options = options;
           this.schemas = [];
-          this.operations = [];
+          OpenApi.operations = [];
           this.mainOpenApiObj={};
           this.utils=new Utils();   
-          this.fileType=fileType;
-          this.uniqueClassesArr=[];
+          OpenApi.fileType=fileType;
+          OpenApi.uniqueClassesArr=[];
      }
 
      
@@ -41,11 +42,11 @@ class OpenApi {
       */
      initUMLPackage() {
           try {
-               fs.mkdirSync(this.filePath);
-               if (this.umlPackage instanceof type.UMLPackage) {
+               fs.mkdirSync(OpenApi.filePath);
+               if (OpenApi.umlPackage instanceof type.UMLPackage) {
                     this.getUMLModels();
                } else {
-                    this.umlPackage.ownedElements.forEach(element => {
+                    OpenApi.umlPackage.ownedElements.forEach(element => {
                          if (element instanceof type.UMLPackage) {
                               this.getUMLModels();
                          }
@@ -68,23 +69,23 @@ class OpenApi {
           
           try {
                let _this = this;
-               if (_this.umlPackage instanceof type.UMLPackage) {
+               if (OpenApi.umlPackage instanceof type.UMLPackage) {
 
-                    if (Array.isArray(_this.umlPackage.ownedElements)) {
-                         _this.umlPackage.ownedElements.forEach(child => {
+                    if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
+                         OpenApi.umlPackage.ownedElements.forEach(child => {
                               if (child instanceof type.UMLClass) {
                                    setTimeout(function() {
                                         try {
                                              _this.findClass(child, _this.options);
                                         } catch (error) {
                                              console.error("Found error", error.message);
-                                             _this.utils.writeErrorToFile(error,_this.filePath);
+                                             _this.utils.writeErrorToFile(error);
                                         }
                                    }, 10);
                                    //  _this.schemas.push(child);
                               } else if (child instanceof type.UMLInterface) {
 
-                                   _this.operations.push(child);
+                                   OpenApi.operations.push(child);
                               }
 
                          });
@@ -124,7 +125,7 @@ class OpenApi {
                                         uniqueArr[firstElem].ownedElements = uniqueArr[firstElem].ownedElements.concat(item.ownedElements);
                                    }
                               });
-                              _this.uniqueClassesArr = uniqueArr;
+                              OpenApi.uniqueClassesArr = uniqueArr;
 
 
                               if (!isDuplicate) {
@@ -134,7 +135,7 @@ class OpenApi {
                               }
                          } catch (error) {
                               console.error("Found error", error.message);
-                              _this.utils.writeErrorToFile(error,this.filePath);
+                              _this.utils.writeErrorToFile(error);
                          }
 
                     }, 500);
@@ -144,7 +145,7 @@ class OpenApi {
                console.error("Found error", error.message);
                // expected output: ReferenceError: nonExistentFunction is not defined
                // Note - error messages will vary depending on browser
-               this.utils.writeErrorToFile(error,this.filePath);
+               this.utils.writeErrorToFile(error);
           }
      }
 
@@ -155,46 +156,54 @@ class OpenApi {
       * @description finds the element from the class
       * @param {UMLClass} elem
       */
-     findClass(elem) {
+     findClass(umlClass) {
           try {
                let _this = this;
-               _this.schemas.push(elem);
-               if (elem.ownedElements.length > 0) {
-                    elem.ownedElements.forEach(child => {
+               _this.schemas.push(umlClass);
+               if (umlClass.ownedElements.length > 0) {
+                    umlClass.ownedElements.forEach(child => {
                          if (child instanceof type.UMLAssociation) {
                               if (child.end1.reference.name != child.end2.reference.name) {
                                    setTimeout(function() {
                                         try {
-                                             _this.findClass(child.end2.reference, _this.options);
+                                             _this.findClass(child.end2.reference);
                                         } catch (error) {
                                              console.error("Found error", error.message);
-                                             _this.utils.writeErrorToFile(error,this.filePath);
+                                             _this.utils.writeErrorToFile(error);
                                         }
                                    }, 5);
                               }
                          } else if (child instanceof type.UMLClass) {
                               setTimeout(function() {
-                                   _this.findClass(child, _this.options);
+                                   _this.findClass(child);
                               }, 5);
                          }
                     });
                }
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.filePath);
+               this.utils.writeErrorToFile(error);
           }
      }
 
      static getUniqueClasses(){
-          return this.uniqueClassesArr;
+          return OpenApi.uniqueClassesArr;
      }
 
-     static getFilePath(){
-          return this.filePath;
+     static getPath(){
+          return OpenApi.filePath;
      }
 
-     static getName(){
-          return "this is name";
+     static getPackage(){
+          return OpenApi.umlPackage;
+     }
+
+     static getOperations(){
+          return OpenApi.operations;
+     }
+
+     static getType(){
+          return OpenApi.fileType;
      }
      /**
       * @function generateOpenAPI
@@ -204,19 +213,21 @@ class OpenApi {
      generateOpenAPI() {
           try {
                // Adding openapi component
-               let component=new Component(this.uniqueClassesArr,this.filePath);
+               let component=new Component();
                this.addComponent(component);
 
 
                // Adding openapi information
-               let mInfo=new Info(this.umlPackage);
+               let mInfo=new Info();
                this.addInfo(mInfo);
+
 
                // Adding openapi version
                this.mainOpenApiObj.openapi='3.0.0';
 
+
                //Adding openapi paths
-               let paths=new Paths(this.operations,this.filePath);
+               let paths=new Paths();
                this.addPaths(paths);
 
 
@@ -226,10 +237,10 @@ class OpenApi {
 
                console.log("Result generated JSON Object : ",this.mainOpenApiObj);
                let generator=new FileGenerator();
-               generator.generate(this.filePath, this.umlPackage, this.fileType,this.mainOpenApiObj);
+               generator.generate(this.mainOpenApiObj);
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.filePath);
+               this.utils.writeErrorToFile(error);
           }
 
      }
@@ -252,4 +263,10 @@ class OpenApi {
      }
 
 }
-module.exports=OpenApi;
+
+module.exports.getFilePath=OpenApi.getPath;
+module.exports.OpenApi=OpenApi;
+module.exports.getClasses=OpenApi.getUniqueClasses;
+module.exports.getUMLPackage=OpenApi.getPackage;
+module.exports.getPaths=OpenApi.getOperations;
+module.exports.getFileType=OpenApi.getType;

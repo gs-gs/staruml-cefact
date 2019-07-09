@@ -1,3 +1,4 @@
+const openAPI =require('./openapi');
 /**
  *
  *
@@ -13,10 +14,10 @@ class Info {
       * 
       * @constructor Info
       */
-     constructor(mainElem) {
+     constructor() {
           this.mainInfoObj={};
-          this.mainInfoObj.description=mainElem.name+ ' API - 1.0.0';
-          this.mainInfoObj.title=mainElem.name+' API';
+          this.mainInfoObj.description=openAPI.getUMLPackage().name+ ' API - 1.0.0';
+          this.mainInfoObj.title=openAPI.getUMLPackage().name+' API';
           this.mainInfoObj.version='1.0.0';
      }
 

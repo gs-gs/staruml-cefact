@@ -1,4 +1,5 @@
 const Utils=require('./utils');
+const openAPI=require('./openapi');
 /**
  *
  *
@@ -10,9 +11,8 @@ class Paths {
       * 
       * @constructor Paths
       */
-     constructor(operations,mFilePath) {
+     constructor() {
           this.operations=operations;
-          this.mFilePath=mFilePath;
           this.utils=new Utils();    
      }
 
@@ -27,7 +27,7 @@ class Paths {
           
           try {
                let interReal = app.repository.select("@UMLInterfaceRealization");
-               this.operations.forEach(objOperation => {
+               openAPI.getPaths().forEach(objOperation => {
                     
                     let filterInterface = interReal.filter(itemInterface => {
                          return itemInterface.target.name == objOperation.name;
@@ -367,7 +367,7 @@ class Paths {
                });
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.mFilePath);
+               this.utils.writeErrorToFile(error);
           }
 
           return mainPathsObject;
@@ -632,7 +632,7 @@ class Paths {
                });
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.mFilePath);
+               this.utils.writeErrorToFile(error);
           }
      }
 
@@ -699,7 +699,7 @@ class Paths {
      //                          });
 
      //                          if (param.length == 0) {
-     //                               let generalizeClasses = this.utils.findGeneralizationOfClass(itemParameters.type,this.mFilePath);
+     //                               let generalizeClasses = this.utils.findGeneralizationOfClass(itemParameters.type,getFilePath());
      //                               console.log(generalizeClasses);
      //                               param = generalizeClasses[0].target.attributes.filter(item => {
      //                                    return itemParameters.name.toUpperCase() == item.name.toUpperCase();
@@ -725,7 +725,7 @@ class Paths {
      //           });
      //      } catch (error) {
      //           console.error("Found error", error.message);
-     //           this.utils.writeErrorToFile(error,this.mFilePath);
+     //           this.utils.writeErrorToFile(error,getFilePath());
      //      }
      // }
      

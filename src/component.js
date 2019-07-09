@@ -1,6 +1,6 @@
 const Utils=require('./utils');
-var OpenApi =require('./openapi');
 const Properties =require('./properties');
+const openAPI = require('./openapi');
 
 /**
  * Component class adds all classes from the class diagram
@@ -13,14 +13,13 @@ class Component {
       * @param {string} fullPath
       * @memberof Component
       */
-     constructor(uniqueClassesArr,filePath) {
+     constructor() {
           this.mainComponentObj={};
           this.mainSchemaObj={};
           this.utils=new Utils();     
           this.arrAttr = [];
           this.arrAssoc = [];
-          this.uniqueClassesArr=uniqueClassesArr;
-          this.filePath=filePath;
+          
      }
 
      /**
@@ -33,9 +32,9 @@ class Component {
       */
      getComponent() {
           // let classes=OpenApi.getUniqueClasses();
-          // console.log("--------------thi-1",OpenApi.getMyName())
+          // console.log("--------------thi-1",mOpenApi.getName())
           // console.log("--------------thi-2",OpenApi.getName());
-          let classes=this.uniqueClassesArr;
+          let classes=openAPI.getClasses();
           let classLink = app.repository.select("@UMLAssociationClassLink");
           let arrIdClasses = [];
           let flagNoName = false;
@@ -76,7 +75,7 @@ class Component {
                mainPropertiesObj=this.getAssociations(assocClassLink,mainPropertiesObj);
 
 
-               let arrGeneral = this.utils.findGeneralizationOfClass(objClass,this.filePath); // Git issue #12
+               let arrGeneral = this.utils.findGeneralizationOfClass(objClass); // Git issue #12
 
 
 
@@ -390,7 +389,7 @@ class Component {
 
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.filePath);
+               this.utils.writeErrorToFile(error);
           }
      }
 
@@ -409,7 +408,7 @@ class Component {
                return filterAssociation;
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.filePath);
+               this.utils.writeErrorToFile(error);
           }
 
      }
@@ -469,7 +468,7 @@ class Component {
                     tempClass = assciation;
                }
 
-               let generalizeClasses = this.utils.findGeneralizationOfClass(tempClass,this.filePath);
+               let generalizeClasses = this.utils.findGeneralizationOfClass(tempClass);
 
                let filterAttributes = tempClass.attributes.filter(item => {
                     return item.isID;
@@ -539,7 +538,7 @@ class Component {
                }
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error,this.filePath);
+               this.utils.writeErrorToFile(error);
           }
      }
 }
