@@ -4,6 +4,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const j2yaml = require('json2yaml');
 const openAPI = require('./openapi');
+const MainJSON=require('./mainjson');
 
 /**
  *
@@ -28,10 +29,10 @@ class FileGenerator {
      /**
       *
       * 
-      * @param {Object} mainOpenApiObj
+      * 
       * @memberof FileGenerator
       */
-     generate(mainOpenApiObj) {
+     generate() {
           try {
                console.log("fileGeneration", openAPI.getFilePath());
                let basePath;
@@ -44,7 +45,7 @@ class FileGenerator {
                     try {
                          //Direct json from JsonOject
                          basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + "-test" + '.json');
-                         fs.writeFileSync(basePath, JSON.stringify(mainOpenApiObj));
+                         fs.writeFileSync(basePath, JSON.stringify(MainJSON.getJSON()));
 
                     } catch (error) {
                          console.error("Error generating JSON file", error);
@@ -53,7 +54,7 @@ class FileGenerator {
                } else if (openAPI.getFileType() == 2) {
 
                     // Direct YML from JsonObject
-                    let ymlText = j2yaml.stringify(mainOpenApiObj);
+                    let ymlText = j2yaml.stringify(MainJSON.getJSON());
                     basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + "-test" + '.yml');
                     fs.writeFileSync(basePath, ymlText);
                } else {
@@ -64,10 +65,10 @@ class FileGenerator {
 
                     //Direct json from JsonOject
                     basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + "-test" + '.json');
-                    fs.writeFileSync(basePath, JSON.stringify(mainOpenApiObj));
+                    fs.writeFileSync(basePath, JSON.stringify(MainJSON.getJSON()));
 
                     // Direct YML from JsonObject
-                    let ymlText = j2yaml.stringify(mainOpenApiObj);
+                    let ymlText = j2yaml.stringify(MainJSON.getJSON());
                     basePath = path.join(openAPI.getFilePath(),openAPI.getUMLPackage().name + "-test" + '.yml');
                     fs.writeFileSync(basePath, ymlText);
                }

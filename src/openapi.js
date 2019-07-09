@@ -5,6 +5,7 @@ const Utils=require('./utils');
 const FileGenerator=require('./filegenerator');
 const Paths=require('./paths');
 const Servers=require('./servers');
+const MainJSON=require('./mainjson');
 
 /**
  *
@@ -27,7 +28,6 @@ class OpenApi {
           this.options = options;
           this.schemas = [];
           OpenApi.operations = [];
-          this.mainOpenApiObj={};
           this.utils=new Utils();   
           OpenApi.fileType=fileType;
           OpenApi.uniqueClassesArr=[];
@@ -214,30 +214,30 @@ class OpenApi {
           try {
                // Adding openapi component
                let component=new Component();
-               this.addComponent(component);
+               MainJSON.addComponent(component);
 
 
                // Adding openapi information
                let mInfo=new Info();
-               this.addInfo(mInfo);
+               MainJSON.addInfo(mInfo);
 
 
                // Adding openapi version
-               this.mainOpenApiObj.openapi='3.0.0';
+               MainJSON.addApiVersion('3.0.0')
 
 
                //Adding openapi paths
                let paths=new Paths();
-               this.addPaths(paths);
+               MainJSON.addPaths(paths);
 
 
                //Adding openapi servers
                let server=new Servers();
-               this.addServers(server);
+               MainJSON.addServers(server);
 
-               console.log("Result generated JSON Object : ",this.mainOpenApiObj);
+               console.log("Result generated JSON Object : ",MainJSON.getJSON());
                let generator=new FileGenerator();
-               generator.generate(this.mainOpenApiObj);
+               generator.generate();
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
@@ -245,22 +245,9 @@ class OpenApi {
 
      }
 
-     addComponent(component)
-     {
-          this.mainOpenApiObj.components=component.getComponent();
-     }
+     
 
-     addInfo(mInfo){
-          this.mainOpenApiObj.info=mInfo.getInfo();
-     }
-
-     addPaths(mPaths){
-          this.mainOpenApiObj.paths=mPaths.getOperations();
-     }
-
-     addServers(servers){
-          this.mainOpenApiObj.servers=servers.getServers();
-     }
+     
 
 }
 

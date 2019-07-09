@@ -1,4 +1,6 @@
 const Utils=require('./utils');
+const Generalization=require('./generalization');
+const Required=require('./required');
 /**
  *
  *
@@ -17,6 +19,7 @@ class Association {
      constructor() {
           this.utils=new Utils();   
           this.arrAssoc=[];  
+          this.required=new Required();
      }
 
      getAssociations(){
@@ -112,6 +115,117 @@ class Association {
 
                }
 
+          } catch (error) {
+               console.error("Found error", error.message);
+               this.utils.writeErrorToFile(error);
+          }
+     }
+     /**
+      * @function getAssociationOfClass
+      * @description Find all association of UMLClass
+      * @param {UMLClass} objClass 
+      */
+     getAssociationOfClass(objClass) {
+          try {
+               let associations = app.repository.select("@UMLAssociation");
+               let filterAssociation = associations.filter(item => {
+                    return item.end1.reference._id == objClass._id
+               });
+               console.log(objClass.name, filterAssociation);
+               return filterAssociation;
+          } catch (error) {
+               console.error("Found error", error.message);
+               this.utils.writeErrorToFile(error);
+          }
+
+     }
+
+     /**
+      * @function writeAssociationProperties
+      * @description 
+      * @param {Object} Main open api json object 
+      * @param {UMLClass} assciation 
+      */
+     writeAssociationProperties(mainClassesObj, assciation,mainSchemaObj) {
+          try {
+
+               let tempClass;
+               if (assciation instanceof type.UMLAssociation) {
+                    tempClass = assciation.end2.reference;
+
+               } else {
+                    tempClass = assciation;
+               }
+
+               let generalization=new Generalization();
+               let generalizeClasses = generalization.findGeneralizationOfClass(tempClass);
+
+               let filterAttributes = tempClass.attributes.filter(item => {
+                    return item.isID;
+               });
+
+               generalizeClasses.forEach(genClass => {
+                    let genClassAttr = genClass.target.attributes.filter(item => {
+                         return item.isID;
+                    });
+                    filterAttributes = filterAttributes.concat(genClassAttr);
+               });
+
+               if (filterAttributes.length > 0) {
+
+               
+               let cName=(assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids';
+               
+               mainClassesObj={};
+               let mainPropertiesObj={}
+               mainSchemaObj[cName]=mainClassesObj
+               let propertiesObj={};
+
+               mainClassesObj.type='object';
+
+               
+               mainClassesObj.properties=mainPropertiesObj;
+
+
+               filterAttributes.forEach(attr => {
+                    mainPropertiesObj[attr.name]=propertiesObj;
+                    if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
+                         console.log('---WAP--1',attr.name);
+                         let itemsObj={};
+                         propertiesObj.items=itemsObj;
+
+
+                         itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+                         itemsObj.type=this.utils.getType(attr.type);
+
+                         propertiesObj.type='array';
+                         /**
+                          * Add MinItems of multiplicity is 1..*
+                          */
+                         if (attr.multiplicity === "1..*") {
+                              propertiesObj.minItems=1;
+                         }
+
+                    } else {
+                         console.log('---WAP--2',attr.name);
+                         propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+
+                         propertiesObj.type=this.utils.getType(attr.type);
+                         if (attr.type instanceof type.UMLEnumeration) {
+                              propertiesObj.enum=this.getEnumerationLiteral(attr.type);
+                         }
+
+                    }
+               });
+
+
+
+               if (this.required.getRequiredAttributes(filterAttributes).length > 0) {
+                    mainClassesObj.required=this.required.addRequiredAttributes(filterAttributes);
+               }
+
+
+               }
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);

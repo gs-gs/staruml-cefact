@@ -1,5 +1,6 @@
 const Utils=require('./utils');
 const openAPI=require('./openapi');
+const Generalization =require('./generalization');
 /**
  *
  *
@@ -12,7 +13,8 @@ class Paths {
       * @constructor Paths
       */
      constructor() {
-          this.utils=new Utils();    
+          this.utils=new Utils();  
+          this.generalization=new Generalization();  
      }
 
      /**
@@ -698,7 +700,7 @@ class Paths {
      //                          });
 
      //                          if (param.length == 0) {
-     //                               let generalizeClasses = this.utils.findGeneralizationOfClass(itemParameters.type,getFilePath());
+     //                               let generalizeClasses = this.generalization.findGeneralizationOfClass(itemParameters.type,getFilePath());
      //                               console.log(generalizeClasses);
      //                               param = generalizeClasses[0].target.attributes.filter(item => {
      //                                    return itemParameters.name.toUpperCase() == item.name.toUpperCase();

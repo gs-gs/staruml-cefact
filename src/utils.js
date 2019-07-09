@@ -29,23 +29,7 @@ class Utils {
                }
           });
      }
-     /**
-      * @function findGeneralizationOfClass
-      * @description Find all generalization of UMLClass
-      * @param {UMLClass} objClass 
-      */
-     findGeneralizationOfClass(objClass) {
-          try {
-               let generalizeClasses = app.repository.select("@UMLGeneralization");
-               let filterGeneral = generalizeClasses.filter(item => {
-                    return item.source._id == objClass._id
-               });
-               return filterGeneral;
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.writeErrorToFile(error);
-          }
-     }
+     
      /**
       * @function buildDescription
       * @description Description replace (') with ('')

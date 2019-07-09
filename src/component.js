@@ -3,6 +3,8 @@ const Properties =require('./properties');
 const Association =require('./association');
 const Aggregation =require('./aggregation');
 const Composition =require('./composition');
+const Generalization =require('./generalization');
+const Required =require('./required');
 const openAPI = require('./openapi');
 
 /**
@@ -22,6 +24,9 @@ class Component {
           this.utils=new Utils();     
           this.arrAttr = [];
           this.arrAssoc = [];
+          this.required= new Required();
+          this.generalization=new Generalization();
+          this.association=new Association();
           
      }
 
@@ -76,20 +81,19 @@ class Component {
 
                // Adding Association
                // mainPropertiesObj=this.getAssociations(assocClassLink,mainPropertiesObj);
-               let association=new Association();
-               mainPropertiesObj=association.addAssociationProperties(assocClassLink,mainPropertiesObj);
+               mainPropertiesObj=this.association.addAssociationProperties(assocClassLink,mainPropertiesObj);
 
-               this.arrAssoc = association.getAssociations();;
+               this.arrAssoc = this.association.getAssociations();
 
 
-               let arrGeneral = this.utils.findGeneralizationOfClass(objClass); // Git issue #12
+               let arrGeneral = this.generalization.findGeneralizationOfClass(objClass); // Git issue #12
 
 
 
 
                let aggregationClasses = [];
 
-               let classAssociations = this.findAssociationOfClass(objClass);
+               let classAssociations = this.association.getAssociationOfClass(objClass);
 
                // Git issue #12
                let classAssociationObj={};
@@ -105,14 +109,17 @@ class Component {
                          if (filterAssoc.length == 0 && assoc.name != "") {
 
                               if (assoc.end1.aggregation == "shared") {
-                                   // Adding Aggregation
 
+                                   // Adding Aggregation
                                    let aggregation=new Aggregation();
                                    mainPropertiesObj=aggregation.addAggregationProperties(mainPropertiesObj,aggregationClasses,assoc);
+
                               } else {
+
                                    // Adding composition
                                    let composition=new Composition();
                                    mainPropertiesObj=composition.addComposition(mainPropertiesObj,assoc);
+
                               }
                               this.arrAssoc.push(assoc);
                          } else {
@@ -131,7 +138,7 @@ class Component {
 
 
                // Adding Generalization
-               mainClassesObj=this.getGeneralization(arrGeneral,mainClassesObj);
+               mainClassesObj=this.generalization.addGeneralization(arrGeneral,mainClassesObj);
 
 
                let filterAttributes = this.arrAttr.filter(item => {
@@ -153,10 +160,9 @@ class Component {
                     
                }
 
-               // Adding Required 
-               if (this.getRequiredAttributes(this.arrAttr).length > 0) {
-
-                    mainClassesObj.required=this.getListRequiredAttributes(this.arrAttr);
+               // Adding Required
+               if (this.required.getRequiredAttributes(this.arrAttr).length > 0) {
+                    mainClassesObj.required=this.required.addRequiredAttributes(this.arrAttr);
                }
 
                /**
@@ -171,7 +177,7 @@ class Component {
                          return itemClass.name == subItem.name;
                     });
                     if (filter.length == 0) {
-                         this.writeAssociationProperties(mainClassesObj, itemClass);
+                         this.association.writeAssociationProperties(mainClassesObj, itemClass,this.mainSchemaObj);
                          arrIdClasses.push(itemClass)
                     }
                });
@@ -184,185 +190,10 @@ class Component {
      }
      
      
-     /**
-      *
-      * @param {Array} arrGeneral
-      * @param {Object} mainClassesObj
-      * @returns
-      * @memberof Component
-      */
-     getGeneralization(arrGeneral,mainClassesObj){
-          /**
-           * Add Generalization class
-           * Inherite all properties of parent class
-           */
-          if (arrGeneral.length > 0) {
-               console.log("---WG-1")
-               let allOfArray=[];
-               mainClassesObj.allOf=allOfArray;
-               arrGeneral.forEach(generalizeClass => {
-                    let allOfObj={};
-                    allOfObj['$ref']='#/components/schemas/'+ generalizeClass.target.name;
-                    allOfArray.push(allOfObj);
+     
 
-
-                    allOfObj={};
-                    allOfObj['type']='object';
-                    allOfArray.push(allOfObj);
-               });
-               
-          }
-          return mainClassesObj;
-     }
-
-     /**
-      * @function findAssociationOfClass
-      * @description Find all association of UMLClass
-      * @param {UMLClass} objClass 
-      */
-     findAssociationOfClass(objClass) {
-          try {
-               let associations = app.repository.select("@UMLAssociation");
-               let filterAssociation = associations.filter(item => {
-                    return item.end1.reference._id == objClass._id
-               });
-               console.log(objClass.name, filterAssociation);
-               return filterAssociation;
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
-          }
-
-     }
-
-     /**
-      * @function getRequiredAttributes
-      * @description 
-      * @param {UMLAttributes[]} arrAttributes 
-      * @returns {Array} array of string
-      */
-     getRequiredAttributes(arrAttributes) {
-          if (arrAttributes) {
-               let requiredAttr = [];
-               arrAttributes.forEach(item => {
-                    if (item.multiplicity == "1" || item.multiplicity == "1..*") {
-                         requiredAttr.push(item.name);
-                    }
-
-               });
-               return (requiredAttr);
-          }
-     }
-     /**
-      *
-      *
-      * @param {Array} arrAttributes
-      * @returns
-      * @memberof Component
-      */
-     getListRequiredAttributes(arrAttributes) {
-          let requiredAttr = [];
-          if (arrAttributes) {
-               
-               arrAttributes.forEach(item => {
-                    if (item.multiplicity == "1" || item.multiplicity == "1..*") {
-                         requiredAttr.push(item.name);
-                    }
-
-               });
-               return (requiredAttr);
-          }
-     }
-     /**
-      * @function writeAssociationProperties
-      * @description 
-      * @param {Object} Main open api json object 
-      * @param {UMLClass} assciation 
-      */
-     writeAssociationProperties(mainClassesObj, assciation) {
-          try {
-
-               let tempClass;
-               if (assciation instanceof type.UMLAssociation) {
-                    tempClass = assciation.end2.reference;
-
-               } else {
-                    tempClass = assciation;
-               }
-
-               let generalizeClasses = this.utils.findGeneralizationOfClass(tempClass);
-
-               let filterAttributes = tempClass.attributes.filter(item => {
-                    return item.isID;
-               });
-
-               generalizeClasses.forEach(genClass => {
-                    let genClassAttr = genClass.target.attributes.filter(item => {
-                         return item.isID;
-                    });
-                    filterAttributes = filterAttributes.concat(genClassAttr);
-               });
-
-               if (filterAttributes.length > 0) {
-
-               
-               let cName=(assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids';
-               
-               mainClassesObj={};
-               let mainPropertiesObj={}
-               this.mainSchemaObj[cName]=mainClassesObj
-               let propertiesObj={};
-
-               mainClassesObj.type='object';
-
-               
-               mainClassesObj.properties=mainPropertiesObj;
-
-
-               filterAttributes.forEach(attr => {
-                    mainPropertiesObj[attr.name]=propertiesObj;
-                    if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                         console.log('---WAP--1',attr.name);
-                         let itemsObj={};
-                         propertiesObj.items=itemsObj;
-
-
-                         itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-                         itemsObj.type=this.utils.getType(attr.type);
-
-                         propertiesObj.type='array';
-                         /**
-                          * Add MinItems of multiplicity is 1..*
-                          */
-                         if (attr.multiplicity === "1..*") {
-                              propertiesObj.minItems=1;
-                         }
-
-                    } else {
-                         console.log('---WAP--2',attr.name);
-                         propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-
-                         propertiesObj.type=this.utils.getType(attr.type);
-                         if (attr.type instanceof type.UMLEnumeration) {
-                              propertiesObj.enum=this.getEnumerationLiteral(attr.type);
-                         }
-
-                    }
-               });
-
-
-
-               if (this.getRequiredAttributes(filterAttributes).length > 0) {
-                    mainClassesObj.required=this.getListRequiredAttributes(filterAttributes);
-               }
-
-
-               }
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
-          }
-     }
+     
+     
 }
 
 module.exports = Component;
