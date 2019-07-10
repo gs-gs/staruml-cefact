@@ -1,6 +1,7 @@
 const Utils=require('./utils');
 const Generalization=require('./generalization');
 const Required=require('./required');
+const constant =require('./constant');
 /**
  *
  *
@@ -66,17 +67,17 @@ class Association {
 
                     let objAllOfArry={};
                     if (associationClass.associationSide.end1.aggregation == "shared"){
-                         objAllOfArry['$ref']='#/components/schemas/' + associationClass.associationSide.end2.reference.name + 'Ids';
+                         objAllOfArry['$ref']=constant.getReference() + associationClass.associationSide.end2.reference.name + 'Ids';
                     }
                     else{
-                         objAllOfArry['$ref']='#/components/schemas/' + associationClass.associationSide.end2.reference.name;
+                         objAllOfArry['$ref']=constant.getReference() + associationClass.associationSide.end2.reference.name;
                     }
 
                     allOfArray.push(objAllOfArry);
 
 
                     objAllOfArry={};
-                    objAllOfArry['$ref']='#/components/schemas/' + associationClass.classSide.name;
+                    objAllOfArry['$ref']=constant.getReference() + associationClass.classSide.name;
                     allOfArray.push(objAllOfArry);
 
                     objAllOfArry={};
@@ -98,15 +99,15 @@ class Association {
                     propertiesObj.allOf=allOfArray;
 
                     if (associationClass.associationSide.end1.aggregation == "shared"){
-                         objAllOfArry['$ref']='#/components/schemas/'+ associationClass.associationSide.end2.reference.name + 'Ids';
+                         objAllOfArry['$ref']=constant.getReference()+ associationClass.associationSide.end2.reference.name + 'Ids';
                     }
                     else{
-                         objAllOfArry['$ref']='#/components/schemas/'+ associationClass.associationSide.end2.reference.name;
+                         objAllOfArry['$ref']=constant.getReference()+ associationClass.associationSide.end2.reference.name;
                     }
                     allOfArray.push(objAllOfArry);
 
                     objAllOfArry={};
-                    objAllOfArry['$ref']='#/components/schemas/'+ associationClass.classSide.name;
+                    objAllOfArry['$ref']=constant.getReference()+ associationClass.classSide.name;
                     allOfArray.push(objAllOfArry);
 
                     objAllOfArry={};

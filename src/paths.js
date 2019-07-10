@@ -1,6 +1,7 @@
 const Utils=require('./utils');
 const openAPI=require('./openapi');
 const Generalization =require('./generalization');
+const constant =require('./constant');
 /**
  *
  *
@@ -93,7 +94,7 @@ class Paths {
 
                                         let itemsObject={};
                                         schemaObject.items=itemsObject;
-                                        itemsObject['$ref']='#/components/schemas/' + objInterface.source.name;
+                                        itemsObject['$ref']=constant.getReference() + objInterface.source.name;
 
                                         schemaObject.type='array';
 
@@ -131,7 +132,7 @@ class Paths {
 
                                         let schemaObj={};
                                         appJsonObj.schema=schemaObj;
-                                        schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
+                                        schemaObj['$ref']=constant.getReference() + objInterface.source.name;
 
 
                                         created201Object.description='Created';
@@ -204,7 +205,7 @@ class Paths {
 
                                                   let schemaObj={};
                                                   appJsonObj.schema=schemaObj;
-                                                  schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
+                                                  schemaObj['$ref']=constant.getReference() + objInterface.source.name;
 
 
 
@@ -299,7 +300,7 @@ class Paths {
 
                                                   let schemaObj={};
                                                   appJsonObj.schema=schemaObj;
-                                                  schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
+                                                  schemaObj['$ref']=constant.getReference() + objInterface.source.name;
 
 
 
@@ -395,7 +396,7 @@ class Paths {
           let schemaObj={};
           appJsonObject.schema=schemaObj;
 
-          schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
+          schemaObj['$ref']=constant.getReference() + objInterface.source.name;
 
 
           requestBodyObj.description='';
@@ -469,7 +470,7 @@ class Paths {
                          schemaObj.items=itemsArray;
                          let itemsObj={};
                          itemsArray.push(itemsObj);
-                         itemsObj['$ref']='#/components/schemas/' + interfaceRealization.source.name;
+                         itemsObj['$ref']=constant.getReference() + interfaceRealization.source.name;
                          schemaObj.type='array';
 
 
@@ -519,7 +520,7 @@ class Paths {
                          let schemaSingleObj={};
                          appJsonSingleObj.schema=schemaSingleObj;
 
-                         schemaSingleObj['$ref']='#/components/schemas/' + interfaceRealization.source.name;
+                         schemaSingleObj['$ref']=constant.getReference() + interfaceRealization.source.name;
 
 
 
@@ -572,7 +573,7 @@ class Paths {
 
                          let schemaObj={};
                          appJsonObj.schema=schemaObj;
-                         schemaObj['$ref']='#/components/schemas/' + interfaceRealization.source.name;
+                         schemaObj['$ref']=constant.getReference() + interfaceRealization.source.name;
 
 
                          ok201Obj.description='Created';

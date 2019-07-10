@@ -1,4 +1,5 @@
 const openAPI =require('./src/openapi');
+const constant =require('./src/constant');
 /**
  * @function _handleGenerate
  * @description OpenAPI generation when OpenAPI Initialization  
@@ -63,8 +64,11 @@ function fileTypeSelection(umlPackage, options) {
                console.log("UMLPackage",umlPackage);
                console.log("Path",basePath);
                console.log("Options",options);
+               console.log("component path",constant.getReference());
                const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options,fileType);
                mOpenApi.initUMLPackage();
+               // mOpenApi.generateOpenAPI();
+
                console.log("mTest",openAPI.getFilePath());
           } else {
                console.log("User canceled")

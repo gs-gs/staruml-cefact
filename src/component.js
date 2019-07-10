@@ -6,6 +6,7 @@ const Composition =require('./composition');
 const Generalization =require('./generalization');
 const Required =require('./required');
 const openAPI = require('./openapi');
+const constant =require('./constant');
 
 /**
  * Component class adds all classes from the class diagram
@@ -80,7 +81,6 @@ class Component {
                
 
                // Adding Association
-               // mainPropertiesObj=this.getAssociations(assocClassLink,mainPropertiesObj);
                mainPropertiesObj=this.association.addAssociationProperties(assocClassLink,mainPropertiesObj);
 
                this.arrAssoc = this.association.getAssociations();
@@ -151,7 +151,7 @@ class Component {
                     mainClassesObj.allOf=allOfArray;
                     console.log("---FA-1")
                     let allOfObj={};
-                    allOfObj['$ref']='#/components/schemas/' + objClass.name + 'Ids';
+                    allOfObj['$ref']=constant.getReference() + objClass.name + 'Ids';
                     allOfArray.push(allOfObj);
 
                     allOfObj={};

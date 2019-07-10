@@ -31,6 +31,8 @@ class OpenApi {
           this.utils=new Utils();   
           OpenApi.fileType=fileType;
           OpenApi.uniqueClassesArr=[];
+          // OpenApi.isDuplicate=false;
+          // OpenApi.duplicateClasses = [];
      }
 
      
@@ -212,32 +214,37 @@ class OpenApi {
       */
      generateOpenAPI() {
           try {
-               // Adding openapi component
-               let component=new Component();
-               MainJSON.addComponent(component);
+               // if (OpenApi.isDuplicate) {
+                    // Add openapi component
+                    let component = new Component();
+                    MainJSON.addComponent(component);
 
 
-               // Adding openapi information
-               let mInfo=new Info();
-               MainJSON.addInfo(mInfo);
+                    // Add openapi information
+                    let mInfo = new Info();
+                    MainJSON.addInfo(mInfo);
 
 
-               // Adding openapi version
-               MainJSON.addApiVersion('3.0.0')
+                    // Add openapi version
+                    MainJSON.addApiVersion('3.0.0')
 
 
-               //Adding openapi paths
-               let paths=new Paths();
-               MainJSON.addPaths(paths);
+                    //Add openapi paths
+                    let paths = new Paths();
+                    MainJSON.addPaths(paths);
 
 
-               //Adding openapi servers
-               let server=new Servers();
-               MainJSON.addServers(server);
+                    //Add openapi servers
+                    let server = new Servers();
+                    MainJSON.addServers(server);
 
-               console.log("Result generated JSON Object : ",MainJSON.getJSON());
-               let generator=new FileGenerator();
-               generator.generate();
+                    console.log("Result generated JSON Object : ", MainJSON.getJSON());
+                    let generator = new FileGenerator();
+                    generator.generate();
+               // } else {
+               //      app.dialogs.showErrorDialog("There " + (OpenApi.duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + OpenApi.duplicateClasses.join() + (OpenApi.duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
+               // }
+
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);

@@ -1,4 +1,5 @@
 const openAPI =require('./openapi');
+const constant =require('./constant');
 /**
  *
  *
@@ -37,7 +38,7 @@ class Generalization {
                mainClassesObj.allOf=allOfArray;
                arrGeneral.forEach(generalizeClass => {
                     let allOfObj={};
-                    allOfObj['$ref']='#/components/schemas/'+ generalizeClass.target.name;
+                    allOfObj['$ref']=constant.getReference()+ generalizeClass.target.name;
                     allOfArray.push(allOfObj);
 
 

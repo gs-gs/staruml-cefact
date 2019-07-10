@@ -1,4 +1,5 @@
 const openAPI =require('./openapi');
+const constant =require('./constant');
 /**
  *
  *
@@ -34,7 +35,7 @@ class Composition {
                console.log("----CA-3",assoc.name);
                let itemsObj={};
                propertiesObj.items=itemsObj;
-               itemsObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
+               itemsObj['$ref']=constant.getReference() + assoc.end2.reference.name;
                propertiesObj.type='array';
                /**
                 * Add MinItems of multiplicity is 1..*
@@ -45,7 +46,7 @@ class Composition {
                console.log(propertiesObj);
           } else {
                console.log("----CA-4",assoc.name);
-               propertiesObj['$ref']='#/components/schemas/' + assoc.end2.reference.name;
+               propertiesObj['$ref']=constant.getReference() + assoc.end2.reference.name;
                console.log(propertiesObj);
           }
           return mainPropertiesObj;

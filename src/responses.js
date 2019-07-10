@@ -1,3 +1,4 @@
+const constant =require('./constant');
 /**
  *
  *
@@ -38,7 +39,7 @@ class Responses {
 
           let itemsObject={};
           schemaObject.items=itemsObject;
-          itemsObject['$ref']='#/components/schemas/' + objInterface.source.name;
+          itemsObject['$ref']=constant.getReference() + objInterface.source.name;
 
           schemaObject.type='array';
 
@@ -70,7 +71,7 @@ class Responses {
 
           let schemaObj={};
           appJsonObj.schema=schemaObj;
-          schemaObj['$ref']='#/components/schemas/' + objInterface.source.name;
+          schemaObj['$ref']=constant.getReference() + objInterface.source.name;
 
 
           created201Object.description='Created';

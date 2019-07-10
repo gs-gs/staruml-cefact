@@ -1,4 +1,5 @@
 const openAPI =require('./openapi');
+const constant =require('./constant');
 /**
  *
  *
@@ -44,7 +45,7 @@ class Aggregation {
 
 
                let objAllOfArry = {};
-               objAllOfArry['$ref'] = '#/components/schemas/' + assoc.end2.reference.name + 'Ids';
+               objAllOfArry['$ref'] = constant.getReference() + assoc.end2.reference.name + 'Ids';
                allOfArray.push(objAllOfArry);
 
                objAllOfArry = {};
@@ -64,7 +65,7 @@ class Aggregation {
 
 
                let allOfObj = {};
-               allOfObj['$ref'] = '#/components/schemas/' + assoc.end2.reference.name + 'Ids';
+               allOfObj['$ref'] = constant.getReference() + assoc.end2.reference.name + 'Ids';
                allOfArray.push(allOfObj);
 
                allOfObj = {};
