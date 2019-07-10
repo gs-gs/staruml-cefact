@@ -55,16 +55,18 @@ function fileTypeSelection(umlPackage, options) {
                value: 3
           }
      ];
-     app.dialogs.showSelectDropdownDialog("Select one of the following type.", fileOptions).then(function({
+     app.dialogs.showSelectDropdownDialog(constant.msg_file_select, fileOptions).then(function({
           buttonId,
           fileType
      }) {
           if (buttonId === 'ok') {
-               const basePath = app.dialogs.showSaveDialog("Save File as...", null, filters);
+               const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, filters);
                console.log("UMLPackage",umlPackage);
                console.log("Path",basePath);
                console.log("Options",options);
                console.log("component path",constant.getReference());
+               console.log("component shared : ",constant.shared);
+               
                const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options,fileType);
                mOpenApi.initUMLPackage();
                // mOpenApi.generateOpenAPI();
@@ -76,10 +78,6 @@ function fileTypeSelection(umlPackage, options) {
      });
 }
 
-const PREF_DEBUG_KEY = "openapi:debug.status";
-const PREF_GENDOC = "openapi.gen.idlDoc";
-const PREF_INDENTSPC = "openapi.gen.indentSpaces";
-
 /**
  * @function getGenOptions
  * @description Get options from the preferences
@@ -87,9 +85,9 @@ const PREF_INDENTSPC = "openapi.gen.indentSpaces";
  */
 function getGenOptions() {
      return {
-          idlDoc: app.preferences.get(PREF_GENDOC),
+          idlDoc: app.preferences.get(constant.PREF_GENDOC),
           indentSpaces: [],
-          debug: app.preferences.get(PREF_DEBUG_KEY)
+          debug: app.preferences.get(constant.PREF_DEBUG_KEY)
      };
 }
 /**

@@ -108,7 +108,7 @@ class Component {
 
                          if (filterAssoc.length == 0 && assoc.name != "") {
 
-                              if (assoc.end1.aggregation == "shared") {
+                              if (assoc.end1.aggregation == constant.shared) {
 
                                    // Adding Aggregation
                                    let aggregation=new Aggregation();

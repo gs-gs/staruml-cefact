@@ -66,7 +66,7 @@ class Association {
                     itemsObj.allOf=allOfArray;
 
                     let objAllOfArry={};
-                    if (associationClass.associationSide.end1.aggregation == "shared"){
+                    if (associationClass.associationSide.end1.aggregation == constant.shared){
                          objAllOfArry['$ref']=constant.getReference() + associationClass.associationSide.end2.reference.name + 'Ids';
                     }
                     else{
@@ -98,7 +98,7 @@ class Association {
                     let objAllOfArry={};
                     propertiesObj.allOf=allOfArray;
 
-                    if (associationClass.associationSide.end1.aggregation == "shared"){
+                    if (associationClass.associationSide.end1.aggregation == constant.shared){
                          objAllOfArry['$ref']=constant.getReference()+ associationClass.associationSide.end2.reference.name + 'Ids';
                     }
                     else{

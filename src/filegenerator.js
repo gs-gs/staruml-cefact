@@ -5,6 +5,7 @@ const yaml = require('js-yaml');
 const j2yaml = require('json2yaml');
 const openAPI = require('./openapi');
 const MainJSON=require('./mainjson');
+const constant=require('./constant');
 
 /**
  *
@@ -72,7 +73,7 @@ class FileGenerator {
                     basePath = path.join(openAPI.getFilePath(),openAPI.getUMLPackage().name + "-test" + '.yml');
                     fs.writeFileSync(basePath, ymlText);
                }
-               app.toast.info("OpenAPI generation completed");
+               app.toast.info(constant.msgsuccess);
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);

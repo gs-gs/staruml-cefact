@@ -2,6 +2,7 @@ const Utils=require('./utils');
 const openAPI=require('./openapi');
 const Generalization =require('./generalization');
 const constant =require('./constant');
+const Operations =require('./operations');
 /**
  *
  *
@@ -16,6 +17,7 @@ class Paths {
      constructor() {
           this.utils=new Utils();  
           this.generalization=new Generalization();  
+          this.operations=new Operations();
      }
 
      /**
@@ -55,87 +57,12 @@ class Paths {
                                    
                                    if (objOperation.name.toUpperCase() == "GET") {
                                         console.log("---WO-1-get","/" + objInterface.target.name);
-                                        pathsObject.get=wOperationObject;
-
-                                        let tagsArray=[];
-                                        
-
-                                        wOperationObject.tags=tagsArray;
-
-                                        tagsArray.push(objInterface.target.name);
-
-                                        
-                                        wOperationObject.description='Get a list of '+objInterface.source.name;
-
-                                        let parametersArray=[];
-                                        wOperationObject.parameters=parametersArray;
-                                        // codeWriter.writeLine("parameters: " + (objOperation.parameters.filter(itemParameters => itemParameters.name != "id" && itemParameters.name != "identifier").length > 0 ?
-                                        //      "" :
-                                        //      "[]"), 0, 0);
-
-                                        this.writeQueryParameters(parametersArray,objOperation);
-
-                                        let responsesObject={};
-                                        wOperationObject.responses=responsesObject;
-
-                                        let ok200Object={}
-                                        responsesObject['200']=ok200Object;
-
-                                        ok200Object.description='OK';
-
-                                        let contentObject={};
-                                        ok200Object.content=contentObject;
-
-                                        let appJsonObject={};
-                                        contentObject['application/json']=appJsonObject;
-
-                                        let schemaObject={};
-                                        appJsonObject.schema=schemaObject;
-
-                                        let itemsObject={};
-                                        schemaObject.items=itemsObject;
-                                        itemsObject['$ref']=constant.getReference() + objInterface.source.name;
-
-                                        schemaObject.type='array';
+                                        pathsObject.get=this.operations.get(objInterface,objOperation);
 
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
                                         console.log("---WO-2-post","/" + objInterface.target.name);
-                                        pathsObject.post=wOperationObject;
-
-
-                                        let tagsArray=[];
-
-                                        wOperationObject.tags=tagsArray;
-
-                                        tagsArray.push(objInterface.target.name);
-
-
-                                        wOperationObject.description='Create a new ' + objInterface.source.name;
-
-                                        let requestBodyObj={}
-                                        wOperationObject.requestBody=requestBodyObj;
-                                        this.buildRequestBody(objInterface,requestBodyObj);
-
-                                        
-                                        let responsesObject={};
-                                        wOperationObject.responses=responsesObject;
-
-                                        let created201Object={};
-                                        responsesObject['201']=created201Object;
-
-                                        let contentObj={};
-                                        created201Object.content=contentObj;
-
-                                        let appJsonObj={};
-                                        contentObj['application/json']=appJsonObj;
-
-                                        let schemaObj={};
-                                        appJsonObj.schema=schemaObj;
-                                        schemaObj['$ref']=constant.getReference() + objInterface.source.name;
-
-
-                                        created201Object.description='Created';
+                                        pathsObject.post=this.operations.post(objInterface);
 
                                    }
                               });
@@ -212,138 +139,20 @@ class Paths {
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
                                                   console.log("---WO-4-delete","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
-                                                  pathsObject.delete=wOperationObject;
-
-                                                  let tagsArray=[];
-                                                  wOperationObject.tags=tagsArray;
-
-                                                  tagsArray.push(objInterface.target.name);
-
-
-                                                  wOperationObject.description='Delete an existing ' + objInterface.source.name;
-
-                                                  let parametersArray=[];
-                                                  wOperationObject.parameters=parametersArray;
-                                                  let paramsObject={};
-                                                  parametersArray.push(paramsObject);
-
-                                                  let objSchema={};
-                                                  objSchema.type='string';
-
-                                                  this.utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? this.utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema,paramsObject);
-
-                                                  objInterface.target.attributes.forEach(itemAttribute => {
-                                                       let paramsObject={};
-                                                       if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                                                            this.utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? this.utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema,paramsObject);
-                                                            parametersArray.push(paramsObject);
-                                                       }
-                                                  });
-
-                                                  let resObj={};
-                                                  wOperationObject.responses=resObj;
-
-                                                  let noContent204Obj={};
-                                                  resObj['204']=noContent204Obj;
-                                                  noContent204Obj.description='No Content';
+                                                  pathsObject.delete=this.operations.delete(objInterface,operationAttribute);
 
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PUT") {
                                                   console.log("---WO-5-put","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
-                                                  pathsObject.put=wOperationObject;
-
-                                                  let tagsArray=[];
-                                                  wOperationObject.tags=tagsArray;
-
-                                                  tagsArray.push(objInterface.target.name);
-
-
-                                                  wOperationObject.description='Update an existing ' + objInterface.source.name;
-
-                                                  let parametersArray=[];
-                                                  wOperationObject.parameters=parametersArray;
-                                                  let paramsObject={};
-                                                  parametersArray.push(paramsObject);
-
-                                                  let objSchema={};
-                                                  objSchema.type='string';
-
-                                                  this.utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? this.utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema,paramsObject);
-                                                  objInterface.target.attributes.forEach(itemAttribute => {
-                                                       let paramsObject={};
-                                                       if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                                                            this.utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? this.utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema,paramsObject);
-                                                            parametersArray.push(paramsObject);
-                                                       }
-                                                  });
-
-                                                  let requestBodyObj={}
-                                                  wOperationObject.requestBody=requestBodyObj;
-
-                                                  this.buildRequestBody(objInterface,requestBodyObj);
-                                                  
-                                                  let resObj={};
-                                                  wOperationObject.responses=resObj;
-
-                                                  let ok200Obj={};
-                                                  resObj['200']=ok200Obj;
-
-                                                  ok200Obj.description='OK';
-
-                                                  let contentObj={};
-                                                  ok200Obj.content=contentObj;
-
-                                                  let appJsonObj={};
-                                                  contentObj['application/json']=appJsonObj;
-
-                                                  let schemaObj={};
-                                                  appJsonObj.schema=schemaObj;
-                                                  schemaObj['$ref']=constant.getReference() + objInterface.source.name;
+                                                  pathsObject.put=this.operations.put(objInterface,operationAttribute);
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PATCH") {
                                                   console.log("---WO-6-patch","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
-                                                  pathsObject.patch=wOperationObject;
-
-                                                  let tagsArray=[];
-                                                  wOperationObject.tags=tagsArray;
-
-                                                  tagsArray.push(objInterface.target.name);
-
-
-                                                  wOperationObject.description='Update ' + objInterface.source.name;
-
-                                                  let parametersArray=[];
-                                                  wOperationObject.parameters=parametersArray;
-                                                  let paramsObject={};
-                                                  parametersArray.push(paramsObject);
-
-                                                  let objSchema={};
-                                                  objSchema.type='string';
-
-                                                  this.utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? this.utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema,paramsObject);
-                                                  objInterface.target.attributes.forEach(itemAttribute => {
-                                                       let paramsObject={};
-                                                       if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                                                            this.utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? this.utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema,paramsObject);
-                                                            parametersArray.push(paramsObject);
-                                                       }
-                                                  });
-
-                                                  let requestBodyObj={}
-                                                  wOperationObject.requestBody=requestBodyObj;
-                                                  this.buildRequestBody( objInterface,requestBodyObj);
-
-                                                  let resObj={};
-                                                  wOperationObject.responses=resObj;
-
-
-                                                  let noContentObj={};
-                                                  resObj['204']=noContentObj;
-                                                  noContentObj.description='No Content';
+                                                  pathsObject.patch=this.operations.patch(objInterface,operationAttribute);
 
 
                                              }
@@ -378,31 +187,7 @@ class Paths {
 
      
 
-     /**
-      *
-      *
-      * @param {UMLInterfaceRealization} objInterface
-      * @param {Object} requestBodyObj
-      * @memberof Operations
-      */
-     buildRequestBody(objInterface,requestBodyObj) {
-
-          let contentObj={};
-          requestBodyObj.content=contentObj;
-
-          let appJsonObject={};
-          contentObj['application/json']=appJsonObject;
-
-          let schemaObj={};
-          appJsonObject.schema=schemaObj;
-
-          schemaObj['$ref']=constant.getReference() + objInterface.source.name;
-
-
-          requestBodyObj.description='';
-          requestBodyObj.required=true;
-
-     }
+     
 
      /**
       * @function writeInterfaceComposite
@@ -557,7 +342,7 @@ class Paths {
                          let requestBodyObj={}
                          wOperationObject.requestBody=requestBodyObj;
 
-                         this.buildRequestBody(interfaceRealization,requestBodyObj);
+                         this.utils.buildRequestBody(interfaceRealization,requestBodyObj);
 
                          let resObj={};
                          wOperationObject.responses=resObj;
@@ -639,97 +424,8 @@ class Paths {
      }
 
      
-     /**
-      *
-      *
-      * @param {Array} parametersArray
-      * @param {Object} objOperation
-      * @memberof Operations
-      */
-     writeQueryParameters(parametersArray, objOperation) {
-          try {
-               objOperation.parameters.forEach(itemParameters => {
-                    let paramsObject = {};
-                    if (itemParameters.name != "id" && itemParameters.name != "identifier") {
-                         parametersArray.push(paramsObject);
-                         let objSchema = {};
-                         objSchema.type = 'string';
-                         if (!(itemParameters.type instanceof type.UMLClass)) {
-                              this.utils.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
-                                   this.utils.buildDescription(itemParameters.documentation) :
-                                   "missing description"), false, objSchema,paramsObject);
-                         } else {
-
-                              this.utils.buildParameter(itemParameters.type.name + "." + itemParameters.name, "query", (itemParameters.documentation ?
-                                   this.utils.buildDescription(itemParameters.documentation) :
-                                   "missing description"), false, objSchema,paramsObject);
-
-
-                         }
-                    }
-               });
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
-          }
-     }
-     // writeQueryParameters(parametersArray, objOperation) {
-     //      ////Here to start
-     //      try {
-     //           objOperation.parameters.forEach(itemParameters => {
-     //                let paramsObject={};
-                    
-     //                if (itemParameters.name != "id" && itemParameters.name != "identifier") {
-     //                     parametersArray.push(paramsObject);
-     //                     let objSchema={};
-     //                     objSchema.type='string';
-     //                     if (!(itemParameters.type instanceof type.UMLClass)) {
-     //                          //  name, type, description, required, schema
-                              
-     //                          this.utils.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
-     //                               this.utils.buildDescription(itemParameters.documentation) :
-     //                               "missing description"), false, objSchema,paramsObject);
-
-     //                               //AskQue
-     //                               // this.utils.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
-     //                               //      this.utils.buildDescription(itemParameters.documentation) :
-     //                               //      "missing description"), false, "{type: string}");
-     //                     } else {
-
-     //                          let param = itemParameters.type.attributes.filter(item => {
-     //                               return itemParameters.name.toUpperCase() == item.name.toUpperCase();
-     //                          });
-
-     //                          if (param.length == 0) {
-     //                               let generalizeClasses = this.generalization.findGeneralizationOfClass(itemParameters.type,getFilePath());
-     //                               console.log(generalizeClasses);
-     //                               param = generalizeClasses[0].target.attributes.filter(item => {
-     //                                    return itemParameters.name.toUpperCase() == item.name.toUpperCase();
-     //                               });
-     //                          }
-
-     //                          if (param[0].type == "DateTime") {
-     //                               this.utils.buildParameter("before_" + param[0].name, "query", (itemParameters.documentation ?
-     //                                    this.utils.buildDescription(itemParameters.documentation) :
-     //                                    "missing description"), false, objSchema,paramsObject);
-     //                               this.utils.buildParameter("after_" + param[0].name, "query", (itemParameters.documentation ?
-     //                                    this.utils.buildDescription(itemParameters.documentation) :
-     //                                    "missing description"), false, objSchema,paramsObject);
-
-     //                          } else {
-     //                               this.utils.buildParameter(param[0].name, "query", (itemParameters.documentation ?
-     //                                    this.utils.buildDescription(itemParameters.documentation) :
-     //                                    "missing description"), false, objSchema,paramsObject);
-     //                          }
-
-     //                     }
-     //                }
-     //           });
-     //      } catch (error) {
-     //           console.error("Found error", error.message);
-     //           this.utils.writeErrorToFile(error,getFilePath());
-     //      }
-     // }
+     
+     
      
 }
 

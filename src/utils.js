@@ -1,5 +1,6 @@
 const openAPI = require('./openapi');
 const fs = require('fs');
+const constant=require('./constant');
 /**
  *
  *
@@ -73,6 +74,124 @@ class Utils {
                return "boolean";
           } else return "string";
      }
+
+     /**
+      *
+      *
+      * @param {UMLInterfaceRealization} objInterface
+      * @param {Object} requestBodyObj
+      * @memberof Operations
+      */
+     buildRequestBody(objInterface,requestBodyObj) {
+
+          let contentObj={};
+          requestBodyObj.content=contentObj;
+
+          let appJsonObject={};
+          contentObj['application/json']=appJsonObject;
+
+          let schemaObj={};
+          appJsonObject.schema=schemaObj;
+
+          schemaObj['$ref']=constant.getReference() + objInterface.source.name;
+
+
+          requestBodyObj.description='';
+          requestBodyObj.required=true;
+
+     }
+
+     /**
+      *
+      *
+      * @param {Array} parametersArray
+      * @param {Object} objOperation
+      * @memberof Operations
+      */
+     writeQueryParameters(parametersArray, objOperation) {
+          try {
+               objOperation.parameters.forEach(itemParameters => {
+                    let paramsObject = {};
+                    if (itemParameters.name != "id" && itemParameters.name != "identifier") {
+                         parametersArray.push(paramsObject);
+                         let objSchema = {};
+                         objSchema.type = 'string';
+                         if (!(itemParameters.type instanceof type.UMLClass)) {
+                              this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
+                                   this.utils.buildDescription(itemParameters.documentation) :
+                                   "missing description"), false, objSchema,paramsObject);
+                         } else {
+
+                              this.buildParameter(itemParameters.type.name + "." + itemParameters.name, "query", (itemParameters.documentation ?
+                                   this.utils.buildDescription(itemParameters.documentation) :
+                                   "missing description"), false, objSchema,paramsObject);
+
+
+                         }
+                    }
+               });
+          } catch (error) {
+               console.error("Found error", error.message);
+               this.writeErrorToFile(error);
+          }
+     }
+     // writeQueryParameters(parametersArray, objOperation) {
+     //      ////Here to start
+     //      try {
+     //           objOperation.parameters.forEach(itemParameters => {
+     //                let paramsObject={};
+                    
+     //                if (itemParameters.name != "id" && itemParameters.name != "identifier") {
+     //                     parametersArray.push(paramsObject);
+     //                     let objSchema={};
+     //                     objSchema.type='string';
+     //                     if (!(itemParameters.type instanceof type.UMLClass)) {
+     //                          //  name, type, description, required, schema
+                              
+     //                          this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
+     //                               this.utils.buildDescription(itemParameters.documentation) :
+     //                               "missing description"), false, objSchema,paramsObject);
+
+     //                               //AskQue
+     //                               // this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
+     //                               //      this.utils.buildDescription(itemParameters.documentation) :
+     //                               //      "missing description"), false, "{type: string}");
+     //                     } else {
+
+     //                          let param = itemParameters.type.attributes.filter(item => {
+     //                               return itemParameters.name.toUpperCase() == item.name.toUpperCase();
+     //                          });
+
+     //                          if (param.length == 0) {
+     //                               let generalizeClasses = this.generalization.findGeneralizationOfClass(itemParameters.type,getFilePath());
+     //                               console.log(generalizeClasses);
+     //                               param = generalizeClasses[0].target.attributes.filter(item => {
+     //                                    return itemParameters.name.toUpperCase() == item.name.toUpperCase();
+     //                               });
+     //                          }
+
+     //                          if (param[0].type == "DateTime") {
+     //                               this.buildParameter("before_" + param[0].name, "query", (itemParameters.documentation ?
+     //                                    this.utils.buildDescription(itemParameters.documentation) :
+     //                                    "missing description"), false, objSchema,paramsObject);
+     //                               this.buildParameter("after_" + param[0].name, "query", (itemParameters.documentation ?
+     //                                    this.utils.buildDescription(itemParameters.documentation) :
+     //                                    "missing description"), false, objSchema,paramsObject);
+
+     //                          } else {
+     //                               this.buildParameter(param[0].name, "query", (itemParameters.documentation ?
+     //                                    this.utils.buildDescription(itemParameters.documentation) :
+     //                                    "missing description"), false, objSchema,paramsObject);
+     //                          }
+
+     //                     }
+     //                }
+     //           });
+     //      } catch (error) {
+     //           console.error("Found error", error.message);
+     //           this.writeErrorToFile(error,getFilePath());
+     //      }
+     // }
      
 }
 
