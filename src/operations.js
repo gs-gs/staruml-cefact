@@ -64,7 +64,7 @@ class Operations {
           return wOperationObject;
      }
 
-     post(objInterface) {
+     post(objInterface,end2Interface) {
 
           let wOperationObject={};
 
@@ -76,7 +76,19 @@ class Operations {
 
 
           wOperationObject.description='Create a new ' + objInterface.source.name;
-
+///
+          if(end2Interface!=null){
+               let parametersArray=[];
+               wOperationObject.parameters=parametersArray;
+               let paramsObject={};
+               parametersArray.push(paramsObject);
+     
+               let objSchema={};
+               objSchema.type='string';
+     
+               this.utils.buildParameter(end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject);
+          }
+///
           let requestBodyObj={}
           wOperationObject.requestBody=requestBodyObj;
           this.utils.buildRequestBody(objInterface,requestBodyObj);
@@ -97,7 +109,6 @@ class Operations {
           let schemaObj={};
           appJsonObj.schema=schemaObj;
           schemaObj['$ref']=constant.getReference() + objInterface.source.name;
-
 
           created201Object.description='Created';
 

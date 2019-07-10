@@ -62,7 +62,7 @@ class Paths {
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
                                         console.log("---WO-2-post","/" + objInterface.target.name);
-                                        pathsObject.post=this.operations.post(objInterface);
+                                        pathsObject.post=this.operations.post(objInterface,null);
 
                                    }
                               });
@@ -318,53 +318,7 @@ class Paths {
 
                          mainPathsObject[mICPath]=pathsObject;
 
-
-
-                         pathsObject.post=wOperationObject;
-
-                         let tagsArray=[];
-
-                         wOperationObject.tags=tagsArray;
-
-                         tagsArray.push(interfaceRealization.target.name);
-
-                         wOperationObject.description='Create a new ' + interfaceRealization.source.name;
-
-                         let parametersArray=[];
-                         wOperationObject.parameters=parametersArray;
-                         let paramsObject={};
-                         parametersArray.push(paramsObject);
-
-                         let objSchema={};
-                         objSchema.type='string';
-
-                         this.utils.buildParameter(end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject);
-
-                         let requestBodyObj={}
-                         wOperationObject.requestBody=requestBodyObj;
-
-                         this.utils.buildRequestBody(interfaceRealization,requestBodyObj);
-
-                         let resObj={};
-                         wOperationObject.responses=resObj;
-
-                         let ok201Obj={};
-                         resObj['201']=ok201Obj;
-
-                         let contentObj={};
-                         ok201Obj.content=contentObj;
-
-                         let appJsonObj={};
-                         contentObj['application/json']=appJsonObj;
-
-                         let schemaObj={};
-                         appJsonObj.schema=schemaObj;
-                         schemaObj['$ref']=constant.getReference() + interfaceRealization.source.name;
-
-
-                         ok201Obj.description='Created';
-
-
+                         pathsObject.post=this.operations.post(interfaceRealization,end2Interface);
 
 
                     } else if (objOperation.name.toUpperCase() == "DELETE") {
