@@ -47,7 +47,8 @@ class Composition {
           } else {
                console.log("----CA-4",assoc.name);
                propertiesObj['$ref']=constant.getReference() + assoc.end2.reference.name;
-               console.log(propertiesObj);
+               console.log("-----p1",propertiesObj);
+               console.log("-----p2",mainPropertiesObj);
           }
           return mainPropertiesObj;
      }

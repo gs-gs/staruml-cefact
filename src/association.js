@@ -180,7 +180,7 @@ class Association {
                mainClassesObj={};
                let mainPropertiesObj={}
                mainSchemaObj[cName]=mainClassesObj
-               let propertiesObj={};
+               
 
                mainClassesObj.type='object';
 
@@ -189,6 +189,7 @@ class Association {
 
 
                filterAttributes.forEach(attr => {
+                    let propertiesObj={};
                     mainPropertiesObj[attr.name]=propertiesObj;
                     if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
                          console.log('---WAP--1',attr.name);
