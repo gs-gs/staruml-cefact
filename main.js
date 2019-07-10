@@ -57,7 +57,7 @@ function fileTypeSelection(umlPackage, options) {
      ];
      app.dialogs.showSelectDropdownDialog(constant.msg_file_select, fileOptions).then(function({
           buttonId,
-          fileType
+          returnValue
      }) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, filters);
@@ -67,7 +67,7 @@ function fileTypeSelection(umlPackage, options) {
                console.log("component path",constant.getReference());
                console.log("component shared : ",constant.shared);
                
-               const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options,fileType);
+               const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options,returnValue);
                mOpenApi.initUMLPackage();
                // mOpenApi.generateOpenAPI();
 
