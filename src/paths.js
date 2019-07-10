@@ -99,6 +99,7 @@ class Paths {
 
                                                   let parametersArray=[];
                                                   wOperationObject.parameters=parametersArray;
+                                                  ///---
                                                   let paramsObject={};
                                                   parametersArray.push(paramsObject);
 
@@ -114,7 +115,7 @@ class Paths {
                                                             parametersArray.push(paramsObject);
                                                        }
                                                   })
-
+                                                  ///---
                                                   let responsesObj={};
                                                   wOperationObject.responses=responsesObj;
 
@@ -139,7 +140,7 @@ class Paths {
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
                                                   console.log("---WO-4-delete","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
-                                                  pathsObject.delete=this.operations.delete(objInterface,operationAttribute);
+                                                  pathsObject.delete=this.operations.delete(objInterface,operationAttribute,null,null);
 
 
 
@@ -376,44 +377,7 @@ class Paths {
                          console.log('---WIC-3-delete',);
 
 
-                         pathsObject.delete=wOperationObject;
-
-                         let tagsArray=[];
-                         wOperationObject.tags=tagsArray;
-
-                         //AskQue
-                         // codeWriter.writeLine("- " + objInterface.target.name, 1, 1);
-                         // codeWriter.writeLine("- " + interfaceRealization.target.name, 1, 1);
-                         tagsArray.push(interfaceRealization.target.name);
-                         
-
-
-                         //AskQue
-                         // codeWriter.writeLine("description: Delete an existing " + objInterface.source.name, 0, 0);
-                         // codeWriter.writeLine("description: Delete an existing " + interfaceRealization.source.name, 0, 0);
-                         wOperationObject.description='Delete an existing ' + interfaceRealization.source.name;
-
-
-                         let parametersArray=[];
-                         wOperationObject.parameters=parametersArray;
-                         let paramsObject={};
-                         parametersArray.push(paramsObject);
-
-                         let objSchema={};
-                         objSchema.type='string';
-
-                         this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject);
-
-                         //AskQue
-                         let paramsObject1={};
-                         this.utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject1);
-                         parametersArray.push(paramsObject1);
-                         let resObj={};
-                         wOperationObject.responses=resObj;
-
-                         let noContent204Obj={};
-                         resObj['204']=noContent204Obj;
-                         noContent204Obj.description='No Content';
+                         pathsObject.delete=this.operations.delete(interfaceRealization,null,end1Interface,end2Interface);
 
                     }
                });
