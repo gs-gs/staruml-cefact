@@ -59,7 +59,6 @@ class Association {
                mainPropertiesObj[associationClass.classSide.name]=propertiesObj;
 
                if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
-                    console.log("----WAC-1",associationClass.classSide.name);
                     let itemsObj={};
                     propertiesObj.items=itemsObj;
                     let allOfArray=[];
@@ -93,7 +92,6 @@ class Association {
 
                } else {
                     //AskQue
-                    console.log("----WAC-2",associationClass.classSide.name);
                     let allOfArray=[];
                     let objAllOfArry={};
                     propertiesObj.allOf=allOfArray;
@@ -132,7 +130,6 @@ class Association {
                let filterAssociation = associations.filter(item => {
                     return item.end1.reference._id == objClass._id
                });
-               console.log(objClass.name, filterAssociation);
                return filterAssociation;
           } catch (error) {
                console.error("Found error", error.message);
@@ -192,7 +189,6 @@ class Association {
                     let propertiesObj={};
                     mainPropertiesObj[attr.name]=propertiesObj;
                     if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                         console.log('---WAP--1',attr.name);
                          let itemsObj={};
                          propertiesObj.items=itemsObj;
 
@@ -209,7 +205,6 @@ class Association {
                          }
 
                     } else {
-                         console.log('---WAP--2',attr.name);
                          propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
 
                          propertiesObj.type=this.utils.getType(attr.type);

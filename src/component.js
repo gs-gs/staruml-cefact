@@ -38,9 +38,7 @@ class Component {
       * @memberof Component
       */
      getComponent() {
-          // let classes=OpenApi.getUniqueClasses();
-          // console.log("--------------thi-1",mOpenApi.getName())
-          // console.log("--------------thi-2",OpenApi.getName());
+
           let classes=openAPI.getClasses();
           let classLink = app.repository.select("@UMLAssociationClassLink");
           let arrIdClasses = [];
@@ -153,7 +151,6 @@ class Component {
                if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
                     let allOfArray=[];
                     mainClassesObj.allOf=allOfArray;
-                    console.log("---FA-1")
                     let allOfObj={};
                     allOfObj['$ref']=constant.getReference() + objClass.name + 'Ids';
                     allOfArray.push(allOfObj);

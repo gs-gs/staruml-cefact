@@ -31,7 +31,6 @@ class FileGenerator {
       */
      generate() {
           try {
-               console.log("fileGeneration", openAPI.getFilePath());
                let basePath;
                if (openAPI.getFileType() == 1) {
                     /**

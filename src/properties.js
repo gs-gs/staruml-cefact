@@ -57,7 +57,6 @@ class Properties {
                          // if(!attr.isID ){
                          mainPropertiesObj[attr.name]=propertiesObj;
                          if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                              console.log("----Attr-1",attr.name);
                               let itemsObj={};
                               propertiesObj.items=itemsObj;
                               itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
@@ -74,7 +73,6 @@ class Properties {
                                    propertiesObj.minItems=1;
                               }
                          } else {
-                              console.log("----Attr-2",attr.name);
                               propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
 
                               propertiesObj.type=this.utils.getType(attr.type);
@@ -84,8 +82,6 @@ class Properties {
                               }
                          }
                          if (attr.defaultValue != "") {
-                              console.log("----Attr-3",attr.name);
-
                               propertiesObj.default=attr.defaultValue;
                          }
                          // }

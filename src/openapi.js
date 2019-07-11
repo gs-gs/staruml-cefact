@@ -271,7 +271,7 @@ class OpenApi {
                     let server = new Servers();
                     MainJSON.addServers(server);
 
-                    console.log("Result generated JSON Object : ", MainJSON.getJSON());
+                    // console.log("Result generated JSON Object : ", MainJSON.getJSON());
                     let generator = new FileGenerator();
                     generator.generate();
                // } else {

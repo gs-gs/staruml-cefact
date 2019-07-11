@@ -32,7 +32,6 @@ class Composition {
           let propertiesObj={};
           mainPropertiesObj[assoc.name]=propertiesObj;
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
-               console.log("----CA-3",assoc.name);
                let itemsObj={};
                propertiesObj.items=itemsObj;
                itemsObj['$ref']=constant.getReference() + assoc.end2.reference.name;
@@ -43,12 +42,8 @@ class Composition {
                if (assoc.end2.multiplicity === "1..*") {
                     propertiesObj.minItems=1;
                }
-               console.log(propertiesObj);
           } else {
-               console.log("----CA-4",assoc.name);
                propertiesObj['$ref']=constant.getReference() + assoc.end2.reference.name;
-               console.log("-----p1",propertiesObj);
-               console.log("-----p2",mainPropertiesObj);
           }
           return mainPropertiesObj;
      }

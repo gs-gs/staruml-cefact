@@ -56,12 +56,10 @@ class Paths {
                                    let wOperationObject={};
                                    
                                    if (objOperation.name.toUpperCase() == "GET") {
-                                        console.log("---WO-1-get","/" + objInterface.target.name);
                                         pathsObject.get=this.operations.get(objInterface,objOperation);
 
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
-                                        console.log("---WO-2-post","/" + objInterface.target.name);
                                         pathsObject.post=this.operations.post(objInterface,null);
 
                                    }
@@ -85,26 +83,22 @@ class Paths {
                                         objInterface.target.operations.forEach(objOperation => {
                                              let wOperationObject={};
                                              if (objOperation.name.toUpperCase() == "GET") {
-                                                  console.log("---WO-3-get","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   pathsObject.get=wOperationObject;
                                                   pathsObject.get=this.operations.getOperationAttribute(objInterface,operationAttribute)
 
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
-                                                  console.log("---WO-4-delete","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   pathsObject.delete=this.operations.delete(objInterface,operationAttribute,null,null);
 
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PUT") {
-                                                  console.log("---WO-5-put","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   pathsObject.put=this.operations.put(objInterface,operationAttribute);
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PATCH") {
-                                                  console.log("---WO-6-patch","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   pathsObject.patch=this.operations.patch(objInterface,operationAttribute);
 
 
@@ -161,7 +155,6 @@ class Paths {
                     let wOperationObject={};
                     if (objOperation.name.toUpperCase() == "GET") {
                          let mICPath="/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
-                         console.log('---WIC-1-get',mICPath);
 
                          mainPathsObject[mICPath]=pathsObject;
                          /* Get all list */
@@ -217,7 +210,6 @@ class Paths {
 
                          let mICPath1="/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
 
-                         console.log('---WIC-2-get',mICPath1);
                          let pathsSingleObject={};
                          mainPathsObject[mICPath1]=pathsSingleObject;
 
@@ -266,7 +258,6 @@ class Paths {
                     } else if (objOperation.name.toUpperCase() == "POST") {
 
                          let mICPath="/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
-                         console.log('---WIC-2-post',mICPath);
 
                          mainPathsObject[mICPath]=pathsObject;
 
@@ -276,12 +267,8 @@ class Paths {
                     } else if (objOperation.name.toUpperCase() == "DELETE") {
 
                          let mICPath="/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
-                         console.log('---WIC-3-delete',mICPath);
 
                          mainPathsObject[mICPath]=pathsObject;
-
-                         console.log('---WIC-3-delete',);
-
 
                          pathsObject.delete=this.operations.delete(interfaceRealization,null,end1Interface,end2Interface);
 

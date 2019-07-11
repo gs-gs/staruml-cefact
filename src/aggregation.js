@@ -36,7 +36,6 @@ class Aggregation {
 
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
-               console.log("----CA-1", assoc.name);
                let itemsObj = {};
                propertiesObj.items = itemsObj;
                let allOfArray = [];
@@ -56,10 +55,8 @@ class Aggregation {
                if (assoc.end2.multiplicity == "1..*") {
                     propertiesObj.minItems = 1;
                }
-               console.log(propertiesObj);
           } else {
                //AskQue
-               console.log("----CA-2", assoc.name);
                let allOfArray = [];
                propertiesObj.allOf = allOfArray;
 
@@ -71,7 +68,6 @@ class Aggregation {
                allOfObj = {};
                allOfObj['type'] = 'object';
                allOfArray.push(allOfObj);
-               console.log(propertiesObj);
           }
           return mainPropertiesObj;
      }
