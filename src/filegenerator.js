@@ -41,7 +41,7 @@ class FileGenerator {
 
                     try {
                          //Direct json from JsonOject
-                         basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + "-test" + '.json');
+                         basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                          fs.writeFileSync(basePath, JSON.stringify(MainJSON.getJSON()));
 
                     } catch (error) {
@@ -52,7 +52,7 @@ class FileGenerator {
 
                     // Direct YML from JsonObject
                     let ymlText = j2yaml.stringify(MainJSON.getJSON());
-                    basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + "-test" + '.yml');
+                    basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
                     fs.writeFileSync(basePath, ymlText);
                } else {
 
@@ -61,12 +61,12 @@ class FileGenerator {
                     //Direct conversion from JsonObject to JSON/YAML
 
                     //Direct json from JsonOject
-                    basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + "-test" + '.json');
+                    basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                     fs.writeFileSync(basePath, JSON.stringify(MainJSON.getJSON()));
 
                     // Direct YML from JsonObject
                     let ymlText = j2yaml.stringify(MainJSON.getJSON());
-                    basePath = path.join(openAPI.getFilePath(),openAPI.getUMLPackage().name + "-test" + '.yml');
+                    basePath = path.join(openAPI.getFilePath(),openAPI.getUMLPackage().name + '.yml');
                     fs.writeFileSync(basePath, ymlText);
                }
                app.toast.info(constant.msgsuccess);
