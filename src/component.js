@@ -34,9 +34,7 @@ class Component {
      /**
       *
       *
-      * @param {UMLClass} classes
-      * @param {UMLAssociationClassLink} classLink
-      * @returns
+      * @returns mainComponentObj
       * @memberof Component
       */
      getComponent() {
@@ -128,6 +126,12 @@ class Component {
                                    let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
                                    noNameRel.push(str);
                               }
+                              /* Remove if not requred*/
+                              // else{
+                              //      let propertiesObj={};
+                              //      mainPropertiesObj[assoc.name]=propertiesObj;
+                              //      propertiesObj['$ref']=constant.getReference() + assoc.end2.reference.name;
+                              // }
                          }
                     } else if (assoc instanceof type.UMLGeneralization) {
                          arrGeneral.push(assoc);

@@ -21,6 +21,7 @@ class OpenApi {
       * @param {UMLPackage} umlPackage
       * @param {string} basePath
       * @param {Object} options
+      * @param {integer} fileType
       */
      constructor(umlPackage, basePath, options,fileType) {
           OpenApi.umlPackage = umlPackage;
@@ -61,11 +62,8 @@ class OpenApi {
      }
 
      /**
-      * @function generateOpenApi
-      * @description json,yml or both file on selected path
-      * @param {UMLPackage} elem
-      * @param {Object} options
-      * @param {string} fileType
+      * @function getUMLModels
+      * @description get all models from UMLPacakage
       */
      getUMLModels() {
           
@@ -188,29 +186,64 @@ class OpenApi {
           }
      }
 
+     /**
+      * @function getUniqueClasses
+      * @description save and returns the array of unique classes
+      * @static
+      * @returns returns array of unique classes
+      * @memberof OpenApi
+      */
      static getUniqueClasses(){
           return OpenApi.uniqueClassesArr;
      }
 
+     /**
+      * @function getPath
+      * @description returns filePath
+      * @static
+      * @returns returns filePath
+      * @memberof OpenApi
+      */
      static getPath(){
           return OpenApi.filePath;
      }
 
+     /**
+      * @function getPackage
+      * @description returns UMLPackage
+      * @static
+      * @returns returns UMLPackage
+      * @memberof OpenApi
+      */
      static getPackage(){
           return OpenApi.umlPackage;
      }
 
+     /**
+      * @function getOperations
+      * @description returns path operations
+      * @static
+      * @returns operations
+      * @memberof OpenApi
+      */
      static getOperations(){
           return OpenApi.operations;
      }
 
+     /**
+      * @function getType
+      * @description returns fileType
+      * @static
+      * @returns fileType
+      * @memberof OpenApi
+      */
      static getType(){
           return OpenApi.fileType;
      }
+     
      /**
       * @function generateOpenAPI
-      * @description Write Class (Schema)
-      * @param {array} classes
+      * @description generate open api json
       */
      generateOpenAPI() {
           try {

@@ -135,6 +135,17 @@ class Utils {
                this.writeErrorToFile(error);
           }
      }
+     /**
+      * @function getEnumerationLiteral
+      * @description 
+      * @param {UMLEnumaration} objEnum 
+      */
+     getEnumerationLiteral(objEnum) {
+          if (objEnum) {
+               let result = objEnum.literals.map(a => a.name);
+               return (result);
+          }
+     }
      // writeQueryParameters(parametersArray, objOperation) {
      //      ////Here to start
      //      try {

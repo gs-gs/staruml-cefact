@@ -80,7 +80,7 @@ class Properties {
                               propertiesObj.type=this.utils.getType(attr.type);
 
                               if (attr.type instanceof type.UMLEnumeration) {
-                                   propertiesObj.enum=this.getEnumerationLiteral(attr.type);
+                                   propertiesObj.enum=this.utils.getEnumerationLiteral(attr.type);
                               }
                          }
                          if (attr.defaultValue != "") {
@@ -95,17 +95,7 @@ class Properties {
           return mainPropertiesObj;
      }
 
-     /**
-      * @function getEnumerationLiteral
-      * @description 
-      * @param {UMLEnumaration} objEnum 
-      */
-     getEnumerationLiteral(objEnum) {
-          if (objEnum) {
-               let result = objEnum.literals.map(a => a.name);
-               return (result);
-          }
-     }
+     
 }
 
 module.exports = Properties;

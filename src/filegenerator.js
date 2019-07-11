@@ -8,10 +8,6 @@ const MainJSON=require('./mainjson');
 const constant=require('./constant');
 
 /**
- *
- *
- * @class FileGenerator
-/**
  * FileGenerator class generate JSON, YAML file based of selection
  *
  * @class FileGenerator
