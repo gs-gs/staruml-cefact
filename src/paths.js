@@ -23,8 +23,8 @@ class Paths {
      /**
       * Return Operations object 
       * 
-      * @function getData
-      * @return {string}
+      * @function getOperations
+      * @return {object} mainPathsObject
       */
      getOperations() {
           let mainPathsObject={};
@@ -87,55 +87,7 @@ class Paths {
                                              if (objOperation.name.toUpperCase() == "GET") {
                                                   console.log("---WO-3-get","/" + objInterface.target.name+'/{' + operationAttribute.name + '}');
                                                   pathsObject.get=wOperationObject;
-
-
-                                                  let tagsArray=[];
-                                                  wOperationObject.tags=tagsArray;
-
-                                                  tagsArray.push(objInterface.target.name);
-
-
-                                                  wOperationObject.description='Get single ' + objInterface.source.name + ' by ' + operationAttribute.name;
-
-                                                  let parametersArray=[];
-                                                  wOperationObject.parameters=parametersArray;
-                                                  ///---
-                                                  let paramsObject={};
-                                                  parametersArray.push(paramsObject);
-
-                                                  let objSchema={};
-                                                  objSchema.type='string';
-
-                                                  this.utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? this.utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema,paramsObject);
-
-                                                  objInterface.target.attributes.forEach(itemAttribute => {
-                                                       if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                                                            let paramsObject={};
-                                                            this.utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? this.utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema,paramsObject);
-                                                            parametersArray.push(paramsObject);
-                                                       }
-                                                  })
-                                                  ///---
-                                                  let responsesObj={};
-                                                  wOperationObject.responses=responsesObj;
-
-                                                  let ok200ResOjb={};
-                                                  responsesObj['200']=ok200ResOjb;
-
-                                                  ok200ResOjb.description='OK';
-
-                                                  let contentObj={};
-                                                  ok200ResOjb.content=contentObj;
-
-
-                                                  let appJsonObj={};
-                                                  contentObj['application/json']=appJsonObj;
-
-                                                  let schemaObj={};
-                                                  appJsonObj.schema=schemaObj;
-                                                  schemaObj['$ref']=constant.getReference() + objInterface.source.name;
-
-
+                                                  pathsObject.get=this.operations.getOperationAttribute(objInterface,operationAttribute)
 
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
