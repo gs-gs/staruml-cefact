@@ -214,7 +214,7 @@ class Association {
 
                          propertiesObj.type=this.utils.getType(attr.type);
                          if (attr.type instanceof type.UMLEnumeration) {
-                              propertiesObj.enum=this.getEnumerationLiteral(attr.type);
+                              propertiesObj.enum=this.utils.getEnumerationLiteral(attr.type);
                          }
 
                     }
