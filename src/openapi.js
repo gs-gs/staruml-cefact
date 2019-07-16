@@ -1,11 +1,11 @@
 const fs = require('fs');
-const Info=require('./info');
-const Component=require('./component');
-const Utils=require('./utils');
-const FileGenerator=require('./filegenerator');
-const Paths=require('./paths');
-const Servers=require('./servers');
-const MainJSON=require('./mainjson');
+const Info = require('./info');
+const Component = require('./component');
+const Utils = require('./utils');
+const FileGenerator = require('./filegenerator');
+const Paths = require('./paths');
+const Servers = require('./servers');
+const MainJSON = require('./mainjson');
 
 /**
  *
@@ -34,12 +34,9 @@ class OpenApi {
           OpenApi.uniqueClassesArr=[];
      }
 
-     
-
      /**
-      * Generates file as user have selected fileType (JSON, YML, BOTH)
-      *
-      * @function generate
+      * @function initUMLPackage
+      * @description initializes UML Package
       */
      initUMLPackage() {
           try {
@@ -79,7 +76,6 @@ class OpenApi {
                                         }
                                    }, 10);
                               } else if (child instanceof type.UMLInterface) {
-
                                    OpenApi.operations.push(child);
                               }
                          });
@@ -183,7 +179,7 @@ class OpenApi {
       * @returns returns array of unique classes
       * @memberof OpenApi
       */
-     static getUniqueClasses(){
+     static getUniqueClasses() {
           return OpenApi.uniqueClassesArr;
      }
 
@@ -194,7 +190,7 @@ class OpenApi {
       * @returns returns filePath
       * @memberof OpenApi
       */
-     static getPath(){
+     static getPath() {
           return OpenApi.filePath;
      }
 
@@ -205,7 +201,7 @@ class OpenApi {
       * @returns returns UMLPackage
       * @memberof OpenApi
       */
-     static getPackage(){
+     static getPackage() {
           return OpenApi.umlPackage;
      }
 
@@ -216,7 +212,7 @@ class OpenApi {
       * @returns operations
       * @memberof OpenApi
       */
-     static getOperations(){
+     static getOperations() {
           return OpenApi.operations;
      }
 
@@ -227,7 +223,7 @@ class OpenApi {
       * @returns fileType
       * @memberof OpenApi
       */
-     static getType(){
+     static getType() {
           return OpenApi.fileType;
      }
      
@@ -266,9 +262,9 @@ class OpenApi {
      }
 }
 
-module.exports.getFilePath=OpenApi.getPath;
-module.exports.OpenApi=OpenApi;
-module.exports.getClasses=OpenApi.getUniqueClasses;
-module.exports.getUMLPackage=OpenApi.getPackage;
-module.exports.getPaths=OpenApi.getOperations;
-module.exports.getFileType=OpenApi.getType;
+module.exports.getFilePath = OpenApi.getPath;
+module.exports.OpenApi = OpenApi;
+module.exports.getClasses = OpenApi.getUniqueClasses;
+module.exports.getUMLPackage = OpenApi.getPackage;
+module.exports.getPaths = OpenApi.getOperations;
+module.exports.getFileType = OpenApi.getType;
