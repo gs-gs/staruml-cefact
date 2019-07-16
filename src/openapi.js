@@ -32,8 +32,6 @@ class OpenApi {
           this.utils=new Utils();   
           OpenApi.fileType=fileType;
           OpenApi.uniqueClassesArr=[];
-          // OpenApi.isDuplicate=false;
-          // OpenApi.duplicateClasses = [];
      }
 
      
@@ -66,11 +64,9 @@ class OpenApi {
       * @description get all models from UMLPacakage
       */
      getUMLModels() {
-          
           try {
                let _this = this;
                if (OpenApi.umlPackage instanceof type.UMLPackage) {
-
                     if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
                          OpenApi.umlPackage.ownedElements.forEach(child => {
                               if (child instanceof type.UMLClass) {
@@ -82,12 +78,10 @@ class OpenApi {
                                              _this.utils.writeErrorToFile(error);
                                         }
                                    }, 10);
-                                   //  _this.schemas.push(child);
                               } else if (child instanceof type.UMLInterface) {
 
                                    OpenApi.operations.push(child);
                               }
-
                          });
                     }
 
@@ -109,7 +103,6 @@ class OpenApi {
 
                               let uniqueArr = [];
                               let duplicateClasses = [];
-
                               let isDuplicate = false;
                               resArr.forEach(item => {
                                    let filter = uniqueArr.filter(subItem => {
@@ -127,7 +120,6 @@ class OpenApi {
                               });
                               OpenApi.uniqueClassesArr = uniqueArr;
 
-
                               if (!isDuplicate) {
                                    _this.generateOpenAPI();
                               } else {
@@ -137,9 +129,7 @@ class OpenApi {
                               console.error("Found error", error.message);
                               _this.utils.writeErrorToFile(error);
                          }
-
                     }, 500);
-
                }
           } catch (error) {
                console.error("Found error", error.message);
@@ -247,48 +237,33 @@ class OpenApi {
       */
      generateOpenAPI() {
           try {
-               // if (OpenApi.isDuplicate) {
-                    // Add openapi component
-                    let component = new Component();
-                    MainJSON.addComponent(component);
+               // Add openapi component
+               let component = new Component();
+               MainJSON.addComponent(component);
 
+               // Add openapi information
+               let mInfo = new Info();
+               MainJSON.addInfo(mInfo);
 
-                    // Add openapi information
-                    let mInfo = new Info();
-                    MainJSON.addInfo(mInfo);
+               // Add openapi version
+               MainJSON.addApiVersion('3.0.0')
 
+               //Add openapi paths
+               let paths = new Paths();
+               MainJSON.addPaths(paths);
 
-                    // Add openapi version
-                    MainJSON.addApiVersion('3.0.0')
+               //Add openapi servers
+               let server = new Servers();
+               MainJSON.addServers(server);
 
-
-                    //Add openapi paths
-                    let paths = new Paths();
-                    MainJSON.addPaths(paths);
-
-
-                    //Add openapi servers
-                    let server = new Servers();
-                    MainJSON.addServers(server);
-
-                    // console.log("Result generated JSON Object : ", MainJSON.getJSON());
-                    let generator = new FileGenerator();
-                    generator.generate();
-               // } else {
-               //      app.dialogs.showErrorDialog("There " + (OpenApi.duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + OpenApi.duplicateClasses.join() + (OpenApi.duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
-               // }
+               let generator = new FileGenerator();
+               generator.generate();
 
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
-
      }
-
-     
-
-     
-
 }
 
 module.exports.getFilePath=OpenApi.getPath;
