@@ -18,7 +18,6 @@ class Composition {
      constructor() {
          
      }
-
      
      /**
       *
@@ -29,21 +28,21 @@ class Composition {
       * @memberof Component
       */
      addComposition(mainPropertiesObj,assoc){
-          let propertiesObj={};
-          mainPropertiesObj[assoc.name]=propertiesObj;
+          let propertiesObj = {};
+          mainPropertiesObj[assoc.name] = propertiesObj;
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
-               let itemsObj={};
-               propertiesObj.items=itemsObj;
-               itemsObj['$ref']=constant.getReference() + assoc.end2.reference.name;
-               propertiesObj.type='array';
+               let itemsObj = {};
+               propertiesObj.items = itemsObj;
+               itemsObj['$ref'] = constant.getReference() + assoc.end2.reference.name;
+               propertiesObj.type = 'array';
                /**
                 * Add MinItems of multiplicity is 1..*
                 */
                if (assoc.end2.multiplicity === "1..*") {
-                    propertiesObj.minItems=1;
+                    propertiesObj.minItems = 1;
                }
           } else {
-               propertiesObj['$ref']=constant.getReference() + assoc.end2.reference.name;
+               propertiesObj['$ref'] = constant.getReference() + assoc.end2.reference.name;
           }
           return mainPropertiesObj;
      }
