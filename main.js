@@ -1,5 +1,6 @@
-const openAPI =require('./src/openapi');
-const constant =require('./src/constant');
+const openAPI = require('./src/openapi');
+const constant = require('./src/constant');
+
 /**
  * @function _handleGenerate
  * @description OpenAPI generation when OpenAPI Initialization  
@@ -9,8 +10,8 @@ const constant =require('./src/constant');
  */
 function _handleGenerate(umlPackage, path, options) {
      // If options is not passed, get from preference
-     
      options = options || getGenOptions();
+
      // If umlPackage is not assigned, popup ElementPicker
      if (!umlPackage) {
           app.elementPickerDialog
@@ -38,9 +39,7 @@ function _handleGenerate(umlPackage, path, options) {
  * @param {Object} options
  */
 function fileTypeSelection(umlPackage, options) {
-     let filters = [
-          // { name: "YML Files", extensions: [ "yml" ] }
-     ];
+     let filters = [];
 
      let fileOptions = [{
                text: "JSON and YAML",
@@ -55,13 +54,14 @@ function fileTypeSelection(umlPackage, options) {
                value: 3
           }
      ];
+
      app.dialogs.showSelectDropdownDialog(constant.msg_file_select, fileOptions).then(function({
           buttonId,
           returnValue
      }) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, filters);
-               const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options,returnValue);
+               const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
                mOpenApi.initUMLPackage();
 
           } else {
@@ -90,4 +90,4 @@ function init() {
      app.commands.register('openapi:show-toast', _handleGenerate);
 }
 
-exports.init = init
+exports.init = init;
