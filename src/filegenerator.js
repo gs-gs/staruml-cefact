@@ -27,7 +27,6 @@ class FileGenerator {
                let basePath;
                //Direct json from JsonOject
                basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
-               // fs.writeFileSync(basePath, JSON.stringify(MainJSON.getJSON()));
                fs.writeFileSync(basePath, JSON.stringify(MainJSON.getJSON(), null, 4));
                
 
@@ -53,29 +52,14 @@ class FileGenerator {
           try {
                
                if (openAPI.getFileType() == 1) {
-                    /**
-                     * Convert yml data to JSON file
-                     */
                     this.createJSON();
-
-                    
+                    this.createYAML();                    
                } else if (openAPI.getFileType() == 2) {
-
-                    // Direct YML from JsonObject
+                    // Convert JSON object to YAML using j2yaml and save the file
                     this.createYAML();
-                    
-               } else {
-
-
-
-                    //Direct conversion from JsonObject to JSON/YAML
-
-                    //Direct json from JsonOject
+               } else if (openAPI.getFileType() == 3) {
+                    //  Directly create JSON file from JSON Object
                     this.createJSON();
-
-                    // Direct YML from JsonObject
-                    this.createYAML();
-                   
                }
                app.toast.info(constant.msgsuccess);
           } catch (error) {

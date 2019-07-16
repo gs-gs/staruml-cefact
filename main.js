@@ -43,7 +43,7 @@ function fileTypeSelection(umlPackage, options) {
      ];
 
      let fileOptions = [{
-               text: "JSON",
+               text: "JSON and YAML",
                value: 1
           },
           {
@@ -51,7 +51,7 @@ function fileTypeSelection(umlPackage, options) {
                value: 2
           },
           {
-               text: "BOTH",
+               text: "JSON",
                value: 3
           }
      ];
