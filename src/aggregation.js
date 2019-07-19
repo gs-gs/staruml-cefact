@@ -34,6 +34,21 @@ class Aggregation {
           aggregationClasses.push(assoc.end2.reference);
           mainPropertiesObj[assoc.name] = propertiesObj;
 
+          let arrIsID=[];
+          let filterClasses = aggregationClasses.filter(itemClass => {
+
+               let filterAttributes = itemClass.attributes.filter(item => {
+
+                    return !item.hasOwnProperty("isID");;
+               });
+
+               if(filterAttributes.length>0){
+                    arrIsID.push(filterAttributes);
+               }
+               
+          });
+          console.log("(!isID) : ",arrIsID);
+
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
                let itemsObj = {};

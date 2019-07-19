@@ -62,6 +62,10 @@ function fileTypeSelection(umlPackage, options) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, filters);
                const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options,returnValue);
+
+               console.log("OpenAPI-umlPackage",umlPackage);
+               console.log("OpenAPI-path",basePath);
+               console.log("OpenAPI-options",options);
                mOpenApi.initUMLPackage();
 
           } else {
