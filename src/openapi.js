@@ -76,7 +76,7 @@ class OpenApi {
                               if (child instanceof type.UMLClass) {
                                    setTimeout(function() {
                                         try {
-                                             _this.findClass(child, _this.options);
+                                             _this.findClass(child);
                                         } catch (error) {
                                              console.error("Found error", error.message);
                                              _this.utils.writeErrorToFile(error);
@@ -87,7 +87,7 @@ class OpenApi {
 
                                    OpenApi.operations.push(child);
                               } else if (child instanceof type.UMLGeneralization) {
-                                   setTimeout(function () { _this.findClass(child.target, options); }, 5);
+                                   setTimeout(function () { _this.findClass(child.target); }, 5);
                               }
 
                          });
@@ -179,6 +179,8 @@ class OpenApi {
                               setTimeout(function() {
                                    _this.findClass(child);
                               }, 5);
+                         } else if (child instanceof type.UMLGeneralization) {
+                              setTimeout(function () { _this.findClass(child.target); }, 5);
                          }
                     });
                }
