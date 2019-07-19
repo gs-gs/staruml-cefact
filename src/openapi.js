@@ -86,6 +86,8 @@ class OpenApi {
                               } else if (child instanceof type.UMLInterface) {
 
                                    OpenApi.operations.push(child);
+                              } else if (child instanceof type.UMLGeneralization) {
+                                   setTimeout(function () { _this.findClass(child.target, options); }, 5);
                               }
 
                          });
