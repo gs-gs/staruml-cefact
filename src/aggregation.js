@@ -50,9 +50,8 @@ class Aggregation {
           if(arrIsID.length==0){
                let jsonError={
                     isWarning:true,
-                    msg:"There is no {isID} field defined in "+assoc.end2.reference.name+" property"
+                    msg:"There is no \"isID\" Attribute in Target Class \""+assoc.end2.reference.name+"\" which is referenced in the Source Class \""+assoc.end1.reference.name+"\""
                };
-               // app.dialogs.showErrorDialog("There is no {id} properties defined in Aggregation.");
                openAPI.setError(jsonError);
           }
 
