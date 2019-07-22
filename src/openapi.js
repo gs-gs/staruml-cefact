@@ -32,6 +32,7 @@ class OpenApi {
           this.utils=new Utils();   
           OpenApi.fileType=fileType;
           OpenApi.uniqueClassesArr=[];
+          OpenApi.error={};
           // OpenApi.isDuplicate=false;
           // OpenApi.duplicateClasses = [];
      }
@@ -191,6 +192,26 @@ class OpenApi {
      }
 
      /**
+      * @function setError
+      * @description save error or warning to be shown to UI
+      * @static
+      * @memberof OpenApi
+      */
+     static setError(error){
+          OpenApi.error=error;
+     }
+
+     /**
+      * @function getError
+      * @description returns error or warning to be shown to UI
+      * @static
+      * @memberof OpenApi
+      */
+     static getError(){
+          return OpenApi.error;
+     }
+
+     /**
       * @function getUniqueClasses
       * @description save and returns the array of unique classes
       * @static
@@ -276,6 +297,10 @@ class OpenApi {
                     MainJSON.addServers(server);
 
                     // console.log("Result generated JSON Object : ", MainJSON.getJSON());
+                    if(OpenApi.error.hasOwnProperty('isWarning') && OpenApi.error.isWarning==true){
+                         app.dialogs.showErrorDialog(OpenApi.getError().msg);
+                         return;
+                    }
                     let generator = new FileGenerator();
                     generator.generate();
                // } else {
@@ -301,3 +326,5 @@ module.exports.getClasses=OpenApi.getUniqueClasses;
 module.exports.getUMLPackage=OpenApi.getPackage;
 module.exports.getPaths=OpenApi.getOperations;
 module.exports.getFileType=OpenApi.getType;
+module.exports.getError=OpenApi.getError;
+module.exports.setError=OpenApi.setError;

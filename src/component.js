@@ -109,7 +109,6 @@ class Component {
                                    // Adding Aggregation
                                    let aggregation=new Aggregation();
                                    mainPropertiesObj=aggregation.addAggregationProperties(mainPropertiesObj,aggregationClasses,assoc);
-
                               } else {
 
                                    // Adding composition

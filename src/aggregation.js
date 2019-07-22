@@ -39,7 +39,7 @@ class Aggregation {
 
                let filterAttributes = itemClass.attributes.filter(item => {
 
-                    return !item.hasOwnProperty("isID");;
+                    return item.isID==true;
                });
 
                if(filterAttributes.length>0){
@@ -47,7 +47,14 @@ class Aggregation {
                }
                
           });
-          console.log("(!isID) : ",arrIsID);
+          if(arrIsID.length==0){
+               let jsonError={
+                    isWarning:true,
+                    msg:"There is no {isID} field defined in "+assoc.end2.reference.name+" property"
+               };
+               // app.dialogs.showErrorDialog("There is no {id} properties defined in Aggregation.");
+               openAPI.setError(jsonError);
+          }
 
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
