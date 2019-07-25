@@ -18,7 +18,6 @@ class Aggregation {
      constructor() {
           
      }
-
      
      /**
       *
@@ -61,8 +60,6 @@ class Aggregation {
                propertiesObj.items = itemsObj;
                let allOfArray = [];
                itemsObj.allOf = allOfArray;
-
-
 
                let objAllOfArry = {};
                objAllOfArry['$ref'] = constant.getReference() + assoc.end2.reference.name + 'Ids';

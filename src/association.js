@@ -18,16 +18,16 @@ class Association {
       * @constructor Association
       */
      constructor() {
-          this.utils=new Utils();   
-          this.arrAssoc=[];  
-          this.required=new Required();
+          this.utils = new Utils();   
+          this.arrAssoc = [];  
+          this.required = new Required();
      }
 
-     getAssociations(){
+     getAssociations() {
           return this.arrAssoc;
      }
      
-     addAssociationProperties(assocClassLink,mainPropertiesObj){
+     addAssociationProperties(assocClassLink, mainPropertiesObj) {
           /**
            * Add asscociation class Properties
            * eg.
@@ -53,63 +53,60 @@ class Association {
       */
      writeAssociationClassProperties(mainPropertiesObj, associationClass) {
           try {
-               let propertiesObj={};
+               let propertiesObj = {};
                var end2Attributes = associationClass.associationSide.end2.reference.attributes;
                var classSideAtributes = associationClass.classSide.attributes;
                mainPropertiesObj[associationClass.classSide.name]=propertiesObj;
 
                if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
-                    let itemsObj={};
-                    propertiesObj.items=itemsObj;
-                    let allOfArray=[];
-                    itemsObj.allOf=allOfArray;
+                    let itemsObj = {};
+                    propertiesObj.items = itemsObj;
+                    let allOfArray = [];
+                    itemsObj.allOf = allOfArray;
 
-                    let objAllOfArry={};
+                    let objAllOfArry = {};
                     if (associationClass.associationSide.end1.aggregation == constant.shared){
-                         objAllOfArry['$ref']=constant.getReference() + associationClass.associationSide.end2.reference.name + 'Ids';
+                         objAllOfArry['$ref'] = constant.getReference() + associationClass.associationSide.end2.reference.name + 'Ids';
                     }
                     else{
-                         objAllOfArry['$ref']=constant.getReference() + associationClass.associationSide.end2.reference.name;
+                         objAllOfArry['$ref'] = constant.getReference() + associationClass.associationSide.end2.reference.name;
                     }
 
                     allOfArray.push(objAllOfArry);
 
-
-                    objAllOfArry={};
-                    objAllOfArry['$ref']=constant.getReference() + associationClass.classSide.name;
+                    objAllOfArry = {};
+                    objAllOfArry['$ref'] = constant.getReference() + associationClass.classSide.name;
                     allOfArray.push(objAllOfArry);
 
-                    objAllOfArry={};
-                    objAllOfArry['type']='object';
+                    objAllOfArry = {};
+                    objAllOfArry['type'] = 'object';
                     allOfArray.push(objAllOfArry);
 
-
-
-                    propertiesObj.type='array';
+                    propertiesObj.type = 'array';
                     if (associationClass.associationSide.end2.multiplicity == "1..*") {
-                         propertiesObj.minItems=1;
+                         propertiesObj.minItems = 1;
                     }
 
                } else {
                     //AskQue
-                    let allOfArray=[];
-                    let objAllOfArry={};
-                    propertiesObj.allOf=allOfArray;
+                    let allOfArray = [];
+                    let objAllOfArry = {};
+                    propertiesObj.allOf = allOfArray;
 
                     if (associationClass.associationSide.end1.aggregation == constant.shared){
-                         objAllOfArry['$ref']=constant.getReference()+ associationClass.associationSide.end2.reference.name + 'Ids';
+                         objAllOfArry['$ref'] = constant.getReference() + associationClass.associationSide.end2.reference.name + 'Ids';
                     }
                     else{
-                         objAllOfArry['$ref']=constant.getReference()+ associationClass.associationSide.end2.reference.name;
+                         objAllOfArry['$ref'] = constant.getReference() + associationClass.associationSide.end2.reference.name;
                     }
                     allOfArray.push(objAllOfArry);
 
-                    objAllOfArry={};
-                    objAllOfArry['$ref']=constant.getReference()+ associationClass.classSide.name;
+                    objAllOfArry = {};
+                    objAllOfArry['$ref'] = constant.getReference() + associationClass.classSide.name;
                     allOfArray.push(objAllOfArry);
 
-                    objAllOfArry={};
-                    objAllOfArry['type']='object';
+                    objAllOfArry = {};
+                    objAllOfArry['type'] = 'object';
                     allOfArray.push(objAllOfArry);
 
                }
@@ -144,9 +141,8 @@ class Association {
       * @param {Object} Main open api json object 
       * @param {UMLClass} assciation 
       */
-     writeAssociationProperties(mainClassesObj, assciation,mainSchemaObj) {
+     writeAssociationProperties(mainClassesObj, assciation, mainSchemaObj) {
           try {
-
                let tempClass;
                if (assciation instanceof type.UMLAssociation) {
                     tempClass = assciation.end2.reference;
@@ -170,58 +166,44 @@ class Association {
                });
 
                if (filterAttributes.length > 0) {
+                    let cName = (assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids';
+                    
+                    mainClassesObj = {};
+                    let mainPropertiesObj = {};
+                    mainSchemaObj[cName] = mainClassesObj;
+                    mainClassesObj.type = 'object';
+                    mainClassesObj.properties = mainPropertiesObj;
 
-               
-               let cName=(assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids';
-               
-               mainClassesObj={};
-               let mainPropertiesObj={}
-               mainSchemaObj[cName]=mainClassesObj
-               
+                    filterAttributes.forEach(attr => {
+                         let propertiesObj = {};
+                         mainPropertiesObj[attr.name] = propertiesObj;
+                         if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
+                              let itemsObj = {};
+                              propertiesObj.items = itemsObj;
+                              itemsObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+                              itemsObj.type = this.utils.getType(attr.type);
 
-               mainClassesObj.type='object';
+                              propertiesObj.type = 'array';
+                              /**
+                               * Add MinItems of multiplicity is 1..*
+                               */
+                              if (attr.multiplicity === "1..*") {
+                                   propertiesObj.minItems = 1;
+                              }
 
-               
-               mainClassesObj.properties=mainPropertiesObj;
-
-
-               filterAttributes.forEach(attr => {
-                    let propertiesObj={};
-                    mainPropertiesObj[attr.name]=propertiesObj;
-                    if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                         let itemsObj={};
-                         propertiesObj.items=itemsObj;
-
-
-                         itemsObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-                         itemsObj.type=this.utils.getType(attr.type);
-
-                         propertiesObj.type='array';
-                         /**
-                          * Add MinItems of multiplicity is 1..*
-                          */
-                         if (attr.multiplicity === "1..*") {
-                              propertiesObj.minItems=1;
+                         } else {
+                              propertiesObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+                              propertiesObj.type = this.utils.getType(attr.type);
+                              
+                              if (attr.type instanceof type.UMLEnumeration) {
+                                   propertiesObj.enum = this.utils.getEnumerationLiteral(attr.type);
+                              }
                          }
+                    });
 
-                    } else {
-                         propertiesObj.description=(attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-
-                         propertiesObj.type=this.utils.getType(attr.type);
-                         if (attr.type instanceof type.UMLEnumeration) {
-                              propertiesObj.enum=this.utils.getEnumerationLiteral(attr.type);
-                         }
-
+                    if (this.required.getRequiredAttributes(filterAttributes).length > 0) {
+                         mainClassesObj.required = this.required.addRequiredAttributes(filterAttributes);
                     }
-               });
-
-
-
-               if (this.required.getRequiredAttributes(filterAttributes).length > 0) {
-                    mainClassesObj.required=this.required.addRequiredAttributes(filterAttributes);
-               }
-
-
                }
           } catch (error) {
                console.error("Found error", error.message);

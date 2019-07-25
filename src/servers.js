@@ -1,8 +1,4 @@
 /**
- *
- *
- * @class Server
-/**
  * Server class returns the API Server 
  *
  * @class Server
@@ -14,8 +10,7 @@ class Servers {
       * @constructor Server
       */
      constructor() {
-          this.servers=[];
-         
+          this.servers = [];         
      }
 
      

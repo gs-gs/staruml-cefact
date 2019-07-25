@@ -1,11 +1,11 @@
 const fs = require('fs');
-const Info=require('./info');
-const Component=require('./component');
-const Utils=require('./utils');
-const FileGenerator=require('./filegenerator');
-const Paths=require('./paths');
-const Servers=require('./servers');
-const MainJSON=require('./mainjson');
+const Info = require('./info');
+const Component = require('./component');
+const Utils = require('./utils');
+const FileGenerator = require('./filegenerator');
+const Paths = require('./paths');
+const Servers = require('./servers');
+const MainJSON = require('./mainjson');
 
 /**
  *
@@ -32,17 +32,16 @@ class OpenApi {
           this.utils=new Utils();   
           OpenApi.fileType=fileType;
           OpenApi.uniqueClassesArr=[];
+
           OpenApi.error={};
           // OpenApi.isDuplicate=false;
           // OpenApi.duplicateClasses = [];
+
      }
 
-     
-
      /**
-      * Generates file as user have selected fileType (JSON, YML, BOTH)
-      *
-      * @function generate
+      * @function initUMLPackage
+      * @description initializes UML Package
       */
      initUMLPackage() {
           try {
@@ -67,11 +66,9 @@ class OpenApi {
       * @description get all models from UMLPacakage
       */
      getUMLModels() {
-          
           try {
                let _this = this;
                if (OpenApi.umlPackage instanceof type.UMLPackage) {
-
                     if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
                          OpenApi.umlPackage.ownedElements.forEach(child => {
                               if (child instanceof type.UMLClass) {
@@ -83,14 +80,11 @@ class OpenApi {
                                              _this.utils.writeErrorToFile(error);
                                         }
                                    }, 10);
-                                   //  _this.schemas.push(child);
                               } else if (child instanceof type.UMLInterface) {
-
                                    OpenApi.operations.push(child);
                               } else if (child instanceof type.UMLGeneralization) {
                                    setTimeout(function () { _this.findClass(child.target); }, 5);
                               }
-
                          });
                     }
 
@@ -112,7 +106,6 @@ class OpenApi {
 
                               let uniqueArr = [];
                               let duplicateClasses = [];
-
                               let isDuplicate = false;
                               resArr.forEach(item => {
                                    let filter = uniqueArr.filter(subItem => {
@@ -130,7 +123,6 @@ class OpenApi {
                               });
                               OpenApi.uniqueClassesArr = uniqueArr;
 
-
                               if (!isDuplicate) {
                                    _this.generateOpenAPI();
                               } else {
@@ -140,9 +132,7 @@ class OpenApi {
                               console.error("Found error", error.message);
                               _this.utils.writeErrorToFile(error);
                          }
-
                     }, 500);
-
                }
           } catch (error) {
                console.error("Found error", error.message);
@@ -218,7 +208,7 @@ class OpenApi {
       * @returns returns array of unique classes
       * @memberof OpenApi
       */
-     static getUniqueClasses(){
+     static getUniqueClasses() {
           return OpenApi.uniqueClassesArr;
      }
 
@@ -229,7 +219,7 @@ class OpenApi {
       * @returns returns filePath
       * @memberof OpenApi
       */
-     static getPath(){
+     static getPath() {
           return OpenApi.filePath;
      }
 
@@ -240,7 +230,7 @@ class OpenApi {
       * @returns returns UMLPackage
       * @memberof OpenApi
       */
-     static getPackage(){
+     static getPackage() {
           return OpenApi.umlPackage;
      }
 
@@ -251,7 +241,7 @@ class OpenApi {
       * @returns operations
       * @memberof OpenApi
       */
-     static getOperations(){
+     static getOperations() {
           return OpenApi.operations;
      }
 
@@ -262,7 +252,7 @@ class OpenApi {
       * @returns fileType
       * @memberof OpenApi
       */
-     static getType(){
+     static getType() {
           return OpenApi.fileType;
      }
      
@@ -272,52 +262,42 @@ class OpenApi {
       */
      generateOpenAPI() {
           try {
-               // if (OpenApi.isDuplicate) {
-                    // Add openapi component
-                    let component = new Component();
-                    MainJSON.addComponent(component);
+               // Add openapi component
+               let component = new Component();
+               MainJSON.addComponent(component);
+
+               // Add openapi information
+               let mInfo = new Info();
+               MainJSON.addInfo(mInfo);
+
+               // Add openapi version
+               MainJSON.addApiVersion('3.0.0')
+
+               //Add openapi paths
+               let paths = new Paths();
+               MainJSON.addPaths(paths);
+
+               //Add openapi servers
+               let server = new Servers();
+               MainJSON.addServers(server);
+
+                   
 
 
-                    // Add openapi information
-                    let mInfo = new Info();
-                    MainJSON.addInfo(mInfo);
+               if(OpenApi.error.hasOwnProperty('isWarning') && OpenApi.error.isWarning==true){
+                     app.dialogs.showErrorDialog(OpenApi.getError().msg);
+                     return;
+                }
+               let generator = new FileGenerator();
+               generator.generate();
+           
 
-
-                    // Add openapi version
-                    MainJSON.addApiVersion('3.0.0')
-
-
-                    //Add openapi paths
-                    let paths = new Paths();
-                    MainJSON.addPaths(paths);
-
-
-                    //Add openapi servers
-                    let server = new Servers();
-                    MainJSON.addServers(server);
-
-                    // console.log("Result generated JSON Object : ", MainJSON.getJSON());
-                    if(OpenApi.error.hasOwnProperty('isWarning') && OpenApi.error.isWarning==true){
-                         app.dialogs.showErrorDialog(OpenApi.getError().msg);
-                         return;
-                    }
-                    let generator = new FileGenerator();
-                    generator.generate();
-               // } else {
-               //      app.dialogs.showErrorDialog("There " + (OpenApi.duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + OpenApi.duplicateClasses.join() + (OpenApi.duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
-               // }
 
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
-
      }
-
-     
-
-     
-
 }
 
 module.exports.getFilePath=OpenApi.getPath;

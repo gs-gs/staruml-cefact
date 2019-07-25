@@ -14,8 +14,7 @@ class MainJSON {
       * @constructor MainJSON
       */
      constructor() {
-          MainJSON.mainOpenApiObj={};
-          
+          MainJSON.mainOpenApiObj = {};
      }
 
      /**
@@ -25,9 +24,8 @@ class MainJSON {
       * @param {Object} component
       * @memberof MainJSON
       */
-     static saveComponent(component)
-     {
-          MainJSON.mainOpenApiObj.components=component.getComponent();
+     static saveComponent(component) {
+          MainJSON.mainOpenApiObj.components = component.getComponent();
      }
 
      /**
@@ -37,8 +35,8 @@ class MainJSON {
       * @param {Object} mInfo
       * @memberof MainJSON
       */
-     static saveInfo(mInfo){
-          MainJSON.mainOpenApiObj.info=mInfo.getInfo();
+     static saveInfo(mInfo) {
+          MainJSON.mainOpenApiObj.info = mInfo.getInfo();
      }
 
      /**
@@ -48,8 +46,8 @@ class MainJSON {
       * @param {string} version
       * @memberof MainJSON
       */
-     static saveApiVersion(version){
-          MainJSON.mainOpenApiObj.openapi=version;
+     static saveApiVersion(version) {
+          MainJSON.mainOpenApiObj.openapi = version;
      }
 
      /**
@@ -59,8 +57,8 @@ class MainJSON {
       * @param {object} mPaths
       * @memberof MainJSON
       */
-     static savePaths(mPaths){
-          MainJSON.mainOpenApiObj.paths=mPaths.getOperations();
+     static savePaths(mPaths) {
+          MainJSON.mainOpenApiObj.paths = mPaths.getOperations();
      }
 
      /**
@@ -70,8 +68,8 @@ class MainJSON {
       * @param {Array} servers
       * @memberof MainJSON
       */
-     static saveServers(servers){
-          MainJSON.mainOpenApiObj.servers=servers.getServers();
+     static saveServers(servers) {
+          MainJSON.mainOpenApiObj.servers = servers.getServers();
      }
 
      /**
@@ -80,7 +78,7 @@ class MainJSON {
       * @static
       * @memberof MainJSON
       */
-     static giveJson(){
+     static giveJson() {
           return MainJSON.mainOpenApiObj;
      }
 }

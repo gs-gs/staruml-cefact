@@ -1,6 +1,7 @@
 const openAPI = require('./openapi');
 const fs = require('fs');
-const constant=require('./constant');
+const constant = require('./constant');
+
 /**
  *
  *
@@ -16,6 +17,7 @@ class Utils {
           this.errorContent = [];
           this.mFileName = '/error.txt';
      }
+
      /**
       * @function writeErrorToFile
       * @description Catch the error and write it to file
@@ -38,7 +40,7 @@ class Utils {
       */
      buildDescription(desc) {
           if (desc)
-               return desc.replace(/\'/g, "''")
+               return desc.replace(/\'/g, "''");
 
           return null;
      }
@@ -52,15 +54,14 @@ class Utils {
       * @param {boolean} required
       * @param {string} schema 
       */
-     buildParameter(name, type, description, required, schema,paramsObject) {
-
-          paramsObject.name=name;
-          paramsObject.in=type;
-          paramsObject.description=description;
-          paramsObject.required=required;
-          paramsObject.schema=schema;
-
+     buildParameter(name, type, description, required, schema, paramsObject) {
+          paramsObject.name = name;
+          paramsObject.in = type;
+          paramsObject.description = description;
+          paramsObject.required = required;
+          paramsObject.schema = schema;
      }
+
      /**
       * @function getType
       * @description Returns type of attribute in string, Get attribute type number,boolean,string 
@@ -82,23 +83,20 @@ class Utils {
       * @param {Object} requestBodyObj
       * @memberof Operations
       */
-     buildRequestBody(objInterface,requestBodyObj) {
+     buildRequestBody(objInterface, requestBodyObj) {
+          let contentObj = {};
+          requestBodyObj.content = contentObj;
 
-          let contentObj={};
-          requestBodyObj.content=contentObj;
+          let appJsonObject = {};
+          contentObj['application/json'] = appJsonObject;
 
-          let appJsonObject={};
-          contentObj['application/json']=appJsonObject;
+          let schemaObj = {};
+          appJsonObject.schema = schemaObj;
 
-          let schemaObj={};
-          appJsonObject.schema=schemaObj;
-
-          schemaObj['$ref']=constant.getReference() + objInterface.source.name;
-
+          schemaObj['$ref'] = constant.getReference() + objInterface.source.name;
 
           requestBodyObj.description='';
           requestBodyObj.required=true;
-
      }
 
      /**
@@ -112,21 +110,20 @@ class Utils {
           try {
                objOperation.parameters.forEach(itemParameters => {
                     let paramsObject = {};
+
                     if (itemParameters.name != "id" && itemParameters.name != "identifier") {
                          parametersArray.push(paramsObject);
                          let objSchema = {};
                          objSchema.type = 'string';
+
                          if (!(itemParameters.type instanceof type.UMLClass)) {
                               this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
                                    this.utils.buildDescription(itemParameters.documentation) :
-                                   "missing description"), false, objSchema,paramsObject);
+                                   "missing description"), false, objSchema, paramsObject);
                          } else {
-
                               this.buildParameter(itemParameters.type.name + "." + itemParameters.name, "query", (itemParameters.documentation ?
                                    this.utils.buildDescription(itemParameters.documentation) :
-                                   "missing description"), false, objSchema,paramsObject);
-
-
+                                   "missing description"), false, objSchema, paramsObject);
                          }
                     }
                });
@@ -146,63 +143,6 @@ class Utils {
                return (result);
           }
      }
-     // writeQueryParameters(parametersArray, objOperation) {
-     //      ////Here to start
-     //      try {
-     //           objOperation.parameters.forEach(itemParameters => {
-     //                let paramsObject={};
-                    
-     //                if (itemParameters.name != "id" && itemParameters.name != "identifier") {
-     //                     parametersArray.push(paramsObject);
-     //                     let objSchema={};
-     //                     objSchema.type='string';
-     //                     if (!(itemParameters.type instanceof type.UMLClass)) {
-     //                          //  name, type, description, required, schema
-                              
-     //                          this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
-     //                               this.utils.buildDescription(itemParameters.documentation) :
-     //                               "missing description"), false, objSchema,paramsObject);
-
-     //                               //AskQue
-     //                               // this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
-     //                               //      this.utils.buildDescription(itemParameters.documentation) :
-     //                               //      "missing description"), false, "{type: string}");
-     //                     } else {
-
-     //                          let param = itemParameters.type.attributes.filter(item => {
-     //                               return itemParameters.name.toUpperCase() == item.name.toUpperCase();
-     //                          });
-
-     //                          if (param.length == 0) {
-     //                               let generalizeClasses = this.generalization.findGeneralizationOfClass(itemParameters.type,getFilePath());
-     //                               console.log(generalizeClasses);
-     //                               param = generalizeClasses[0].target.attributes.filter(item => {
-     //                                    return itemParameters.name.toUpperCase() == item.name.toUpperCase();
-     //                               });
-     //                          }
-
-     //                          if (param[0].type == "DateTime") {
-     //                               this.buildParameter("before_" + param[0].name, "query", (itemParameters.documentation ?
-     //                                    this.utils.buildDescription(itemParameters.documentation) :
-     //                                    "missing description"), false, objSchema,paramsObject);
-     //                               this.buildParameter("after_" + param[0].name, "query", (itemParameters.documentation ?
-     //                                    this.utils.buildDescription(itemParameters.documentation) :
-     //                                    "missing description"), false, objSchema,paramsObject);
-
-     //                          } else {
-     //                               this.buildParameter(param[0].name, "query", (itemParameters.documentation ?
-     //                                    this.utils.buildDescription(itemParameters.documentation) :
-     //                                    "missing description"), false, objSchema,paramsObject);
-     //                          }
-
-     //                     }
-     //                }
-     //           });
-     //      } catch (error) {
-     //           console.error("Found error", error.message);
-     //           this.writeErrorToFile(error,getFilePath());
-     //      }
-     // }
      
 }
 
