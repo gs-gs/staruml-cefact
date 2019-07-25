@@ -33,6 +33,27 @@ class Aggregation {
           aggregationClasses.push(assoc.end2.reference);
           mainPropertiesObj[assoc.name] = propertiesObj;
 
+          let arrIsID=[];
+          let filterClasses = aggregationClasses.filter(itemClass => {
+
+               let filterAttributes = itemClass.attributes.filter(item => {
+
+                    return item.isID==true;
+               });
+
+               if(filterAttributes.length>0){
+                    arrIsID.push(filterAttributes);
+               }
+               
+          });
+          if(arrIsID.length==0){
+               let jsonError={
+                    isWarning:true,
+                    msg:"There is no \"isID\" Attribute in Target Class \""+assoc.end2.reference.name+"\" which is referenced in the Source Class \""+assoc.end1.reference.name+"\""
+               };
+               openAPI.setError(jsonError);
+          }
+
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
                let itemsObj = {};

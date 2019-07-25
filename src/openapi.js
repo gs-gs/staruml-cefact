@@ -32,6 +32,11 @@ class OpenApi {
           this.utils=new Utils();   
           OpenApi.fileType=fileType;
           OpenApi.uniqueClassesArr=[];
+
+          OpenApi.error={};
+          // OpenApi.isDuplicate=false;
+          // OpenApi.duplicateClasses = [];
+
      }
 
      /**
@@ -69,7 +74,7 @@ class OpenApi {
                               if (child instanceof type.UMLClass) {
                                    setTimeout(function() {
                                         try {
-                                             _this.findClass(child, _this.options);
+                                             _this.findClass(child);
                                         } catch (error) {
                                              console.error("Found error", error.message);
                                              _this.utils.writeErrorToFile(error);
@@ -77,6 +82,8 @@ class OpenApi {
                                    }, 10);
                               } else if (child instanceof type.UMLInterface) {
                                    OpenApi.operations.push(child);
+                              } else if (child instanceof type.UMLGeneralization) {
+                                   setTimeout(function () { _this.findClass(child.target); }, 5);
                               }
                          });
                     }
@@ -163,6 +170,8 @@ class OpenApi {
                               setTimeout(function() {
                                    _this.findClass(child);
                               }, 5);
+                         } else if (child instanceof type.UMLGeneralization) {
+                              setTimeout(function () { _this.findClass(child.target); }, 5);
                          }
                     });
                }
@@ -170,6 +179,26 @@ class OpenApi {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
+     }
+
+     /**
+      * @function setError
+      * @description save error or warning to be shown to UI
+      * @static
+      * @memberof OpenApi
+      */
+     static setError(error){
+          OpenApi.error=error;
+     }
+
+     /**
+      * @function getError
+      * @description returns error or warning to be shown to UI
+      * @static
+      * @memberof OpenApi
+      */
+     static getError(){
+          return OpenApi.error;
      }
 
      /**
@@ -252,8 +281,17 @@ class OpenApi {
                let server = new Servers();
                MainJSON.addServers(server);
 
+                   
+
+
+               if(OpenApi.error.hasOwnProperty('isWarning') && OpenApi.error.isWarning==true){
+                     app.dialogs.showErrorDialog(OpenApi.getError().msg);
+                     return;
+                }
                let generator = new FileGenerator();
                generator.generate();
+           
+
 
           } catch (error) {
                console.error("Found error", error.message);
@@ -262,9 +300,11 @@ class OpenApi {
      }
 }
 
-module.exports.getFilePath = OpenApi.getPath;
-module.exports.OpenApi = OpenApi;
-module.exports.getClasses = OpenApi.getUniqueClasses;
-module.exports.getUMLPackage = OpenApi.getPackage;
-module.exports.getPaths = OpenApi.getOperations;
-module.exports.getFileType = OpenApi.getType;
+module.exports.getFilePath=OpenApi.getPath;
+module.exports.OpenApi=OpenApi;
+module.exports.getClasses=OpenApi.getUniqueClasses;
+module.exports.getUMLPackage=OpenApi.getPackage;
+module.exports.getPaths=OpenApi.getOperations;
+module.exports.getFileType=OpenApi.getType;
+module.exports.getError=OpenApi.getError;
+module.exports.setError=OpenApi.setError;
