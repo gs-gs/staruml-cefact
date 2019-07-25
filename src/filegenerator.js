@@ -51,13 +51,24 @@ class FileGenerator {
           try {
                if (openAPI.getFileType() == 1) {
                     this.createJSON();
-                    this.createYAML();                    
+
+
                } else if (openAPI.getFileType() == 2) {
                     // Convert JSON object to YAML using j2yaml and save the file
                     this.createYAML();
-               } else if (openAPI.getFileType() == 3) {
-                    //  Directly create JSON file from JSON Object
+
+               } else {
+
+
+
+                    //Direct conversion from JsonObject to JSON/YAML
+
+                    //Direct json from JsonOject
                     this.createJSON();
+
+                    // Direct YML from JsonObject
+                    this.createYAML();
+
                }
                app.toast.info(constant.msgsuccess);
           } catch (error) {

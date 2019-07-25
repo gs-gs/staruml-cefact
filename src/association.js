@@ -1,7 +1,7 @@
-const Utils=require('./utils');
-const Generalization=require('./generalization');
-const Required=require('./required');
-const constant =require('./constant');
+const Utils = require('./utils');
+const Generalization = require('./generalization');
+const Required = require('./required');
+const constant = require('./constant');
 /**
  *
  *
@@ -18,15 +18,14 @@ class Association {
       * @constructor Association
       */
      constructor() {
-          this.utils = new Utils();   
-          this.arrAssoc = [];  
+          this.utils = new Utils();
+          this.arrAssoc = [];
           this.required = new Required();
      }
 
      getAssociations() {
           return this.arrAssoc;
      }
-     
      addAssociationProperties(assocClassLink, mainPropertiesObj) {
           /**
            * Add asscociation class Properties
@@ -56,7 +55,7 @@ class Association {
                let propertiesObj = {};
                var end2Attributes = associationClass.associationSide.end2.reference.attributes;
                var classSideAtributes = associationClass.classSide.attributes;
-               mainPropertiesObj[associationClass.classSide.name]=propertiesObj;
+               mainPropertiesObj[associationClass.classSide.name] = propertiesObj;
 
                if (associationClass.associationSide.end2.multiplicity == "0..*" || associationClass.associationSide.end2.multiplicity == "1..*") {
                     let itemsObj = {};
@@ -65,10 +64,9 @@ class Association {
                     itemsObj.allOf = allOfArray;
 
                     let objAllOfArry = {};
-                    if (associationClass.associationSide.end1.aggregation == constant.shared){
+                    if (associationClass.associationSide.end1.aggregation == constant.shared) {
                          objAllOfArry['$ref'] = constant.getReference() + associationClass.associationSide.end2.reference.name + 'Ids';
-                    }
-                    else{
+                    } else {
                          objAllOfArry['$ref'] = constant.getReference() + associationClass.associationSide.end2.reference.name;
                     }
 
@@ -82,6 +80,8 @@ class Association {
                     objAllOfArry['type'] = 'object';
                     allOfArray.push(objAllOfArry);
 
+
+
                     propertiesObj.type = 'array';
                     if (associationClass.associationSide.end2.multiplicity == "1..*") {
                          propertiesObj.minItems = 1;
@@ -93,10 +93,9 @@ class Association {
                     let objAllOfArry = {};
                     propertiesObj.allOf = allOfArray;
 
-                    if (associationClass.associationSide.end1.aggregation == constant.shared){
+                    if (associationClass.associationSide.end1.aggregation == constant.shared) {
                          objAllOfArry['$ref'] = constant.getReference() + associationClass.associationSide.end2.reference.name + 'Ids';
-                    }
-                    else{
+                    } else {
                          objAllOfArry['$ref'] = constant.getReference() + associationClass.associationSide.end2.reference.name;
                     }
                     allOfArray.push(objAllOfArry);
@@ -132,7 +131,6 @@ class Association {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
-
      }
 
      /**
@@ -151,7 +149,7 @@ class Association {
                     tempClass = assciation;
                }
 
-               let generalization=new Generalization();
+               let generalization = new Generalization();
                let generalizeClasses = generalization.findGeneralizationOfClass(tempClass);
 
                let filterAttributes = tempClass.attributes.filter(item => {
@@ -166,13 +164,20 @@ class Association {
                });
 
                if (filterAttributes.length > 0) {
-                    let cName = (assciation instanceof type.UMLAssociation) ?assciation.name:tempClass.name + 'Ids';
-                    
+
+
+                    let cName = (assciation instanceof type.UMLAssociation) ? assciation.name : tempClass.name + 'Ids';
+
                     mainClassesObj = {};
-                    let mainPropertiesObj = {};
-                    mainSchemaObj[cName] = mainClassesObj;
+                    let mainPropertiesObj = {}
+                    mainSchemaObj[cName] = mainClassesObj
+
+
                     mainClassesObj.type = 'object';
+
+
                     mainClassesObj.properties = mainPropertiesObj;
+
 
                     filterAttributes.forEach(attr => {
                          let propertiesObj = {};
@@ -180,6 +185,8 @@ class Association {
                          if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
                               let itemsObj = {};
                               propertiesObj.items = itemsObj;
+
+
                               itemsObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
                               itemsObj.type = this.utils.getType(attr.type);
 
@@ -193,17 +200,22 @@ class Association {
 
                          } else {
                               propertiesObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+
                               propertiesObj.type = this.utils.getType(attr.type);
-                              
                               if (attr.type instanceof type.UMLEnumeration) {
                                    propertiesObj.enum = this.utils.getEnumerationLiteral(attr.type);
                               }
+
                          }
                     });
+
+
 
                     if (this.required.getRequiredAttributes(filterAttributes).length > 0) {
                          mainClassesObj.required = this.required.addRequiredAttributes(filterAttributes);
                     }
+
+
                }
           } catch (error) {
                console.error("Found error", error.message);

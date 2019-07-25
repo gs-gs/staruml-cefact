@@ -20,7 +20,8 @@ class Info {
           this.mainInfoObj.title = openAPI.getUMLPackage().name + ' API';
           this.mainInfoObj.version = '1.0.0';
      }
-     
+
+
      /**
       * Return Info object 
       * 

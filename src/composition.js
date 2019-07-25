@@ -1,5 +1,5 @@
-const openAPI =require('./openapi');
-const constant =require('./constant');
+const openAPI = require('./openapi');
+const constant = require('./constant');
 /**
  *
  *
@@ -16,9 +16,10 @@ class Composition {
       * @constructor Composition
       */
      constructor() {
-         
+
      }
-     
+
+
      /**
       *
       *
@@ -27,7 +28,7 @@ class Composition {
       * @returns mainPropertiesObj
       * @memberof Component
       */
-     addComposition(mainPropertiesObj,assoc){
+     addComposition(mainPropertiesObj, assoc) {
           let propertiesObj = {};
           mainPropertiesObj[assoc.name] = propertiesObj;
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {

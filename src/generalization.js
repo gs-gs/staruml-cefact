@@ -16,33 +16,37 @@ class Generalization {
       * @constructor Generalization
       */
      constructor() {
-          
+
      }
 
-    /**
+
+     /**
       *
       * @param {Array} arrGeneral
       * @param {Object} mainClassesObj
       * @returns
       * @memberof Component
       */
-     addGeneralization(arrGeneral,mainClassesObj) {
+     addGeneralization(arrGeneral, mainClassesObj) {
           /**
            * Add Generalization class
            * Inherite all properties of parent class
            */
           if (arrGeneral.length > 0) {
-               console.log("---WG-1");
-               let allOfArray=[];
-               mainClassesObj.allOf=allOfArray;
+               console.log("---WG-1")
+               let allOfArray = [];
+               mainClassesObj.allOf = allOfArray;
                arrGeneral.forEach(generalizeClass => {
-                    let allOfObj={};
-                    allOfObj['$ref']=constant.getReference()+ generalizeClass.target.name;
+                    let allOfObj = {};
+                    allOfObj['$ref'] = constant.getReference() + generalizeClass.target.name;
                     allOfArray.push(allOfObj);
-                    allOfObj={};
-                    allOfObj['type']='object';
+
+
+                    allOfObj = {};
+                    allOfObj['type'] = 'object';
                     allOfArray.push(allOfObj);
                });
+
           }
 
           return mainClassesObj;

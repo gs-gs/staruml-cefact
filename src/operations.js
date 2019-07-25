@@ -1,5 +1,5 @@
 const constant = require('./constant');
-const Utils = require('./utils');
+const Utils = require('./utils')
 /**
  *
  *
@@ -15,30 +15,40 @@ class Operations {
           this.utils = new Utils();
      }
 
-    /**
-     *
-     *
-     * @param {UMLInterface} objInterface 
-     * @param {*} objOperation
-     * @returns
-     * @memberof Operations
-     */
-     get(objInterface,objOperation) {
-         let wOperationObject = {};
+     /**
+      *
+      *
+      * @param {UMLInterface} objInterface 
+      * @param {*} objOperation
+      * @returns
+      * @memberof Operations
+      */
+     get(objInterface, objOperation) {
+
+          let wOperationObject = {};
+
           let tagsArray = [];
+
+
           wOperationObject.tags = tagsArray;
+
           tagsArray.push(objInterface.target.name);
+
+
           wOperationObject.description = 'Get a list of ' + objInterface.source.name;
 
           let parametersArray = [];
           wOperationObject.parameters = parametersArray;
+          // codeWriter.writeLine("parameters: " + (objOperation.parameters.filter(itemParameters => itemParameters.name != "id" && itemParameters.name != "identifier").length > 0 ?
+          //      "" :
+          //      "[]"), 0, 0);
 
-          this.utils.writeQueryParameters(parametersArray,objOperation);
+          this.utils.writeQueryParameters(parametersArray, objOperation);
 
           let responsesObject = {};
           wOperationObject.responses = responsesObject;
 
-          let ok200Object = {};
+          let ok200Object = {}
           responsesObject['200'] = ok200Object;
 
           ok200Object.description = 'OK';
@@ -69,29 +79,36 @@ class Operations {
       * @returns wOperationObject
       * @memberof Operations
       */
-     post(objInterface,end2Interface) {
-          let wOperationObject = {};
-          let tagsArray = [];
-          wOperationObject.tags = tagsArray;
-          tagsArray.push(objInterface.target.name);
-          wOperationObject.description = 'Create a new ' + objInterface.source.name;
+     post(objInterface, end2Interface) {
 
-          if(end2Interface!=null) {
+          let wOperationObject = {};
+
+          let tagsArray = [];
+
+          wOperationObject.tags = tagsArray;
+
+          tagsArray.push(objInterface.target.name);
+
+
+          wOperationObject.description = 'Create a new ' + objInterface.source.name;
+          ///
+          if (end2Interface != null) {
                let parametersArray = [];
                wOperationObject.parameters = parametersArray;
                let paramsObject = {};
                parametersArray.push(paramsObject);
-     
+
                let objSchema = {};
                objSchema.type = 'string';
-     
+
                this.utils.buildParameter(end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
           }
-
-          let requestBodyObj = {};
+          ///
+          let requestBodyObj = {}
           wOperationObject.requestBody = requestBodyObj;
-          this.utils.buildRequestBody(objInterface,requestBodyObj);
-          
+          this.utils.buildRequestBody(objInterface, requestBodyObj);
+
+
           let responsesObject = {};
           wOperationObject.responses = responsesObject;
 
@@ -113,7 +130,7 @@ class Operations {
           return wOperationObject;
      }
 
-     
+
      /**
       *
       *
@@ -122,11 +139,15 @@ class Operations {
       * @returns wOperationObject
       * @memberof Operations
       */
-     put(objInterface,operationAttribute) {
+     put(objInterface, operationAttribute) {
           let wOperationObject = {};
+
           let tagsArray = [];
           wOperationObject.tags = tagsArray;
+
           tagsArray.push(objInterface.target.name);
+
+
           wOperationObject.description = 'Update an existing ' + objInterface.source.name;
 
           let parametersArray = [];
@@ -138,21 +159,19 @@ class Operations {
           objSchema.type = 'string';
 
           this.utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? this.utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
-
           objInterface.target.attributes.forEach(itemAttribute => {
                let paramsObject = {};
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                     this.utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? this.utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
-
                     parametersArray.push(paramsObject);
                }
           });
 
-          let requestBodyObj = {};
+          let requestBodyObj = {}
           wOperationObject.requestBody = requestBodyObj;
 
-          this.utils.buildRequestBody(objInterface,requestBodyObj);
-          
+          this.utils.buildRequestBody(objInterface, requestBodyObj);
+
           let resObj = {};
           wOperationObject.responses = resObj;
 
@@ -182,11 +201,15 @@ class Operations {
       * @returns wOperationObject
       * @memberof Operations
       */
-     patch(objInterface,operationAttribute) {
+     patch(objInterface, operationAttribute) {
           let wOperationObject = {};
+
           let tagsArray = [];
           wOperationObject.tags = tagsArray;
+
           tagsArray.push(objInterface.target.name);
+
+
           wOperationObject.description = 'Update ' + objInterface.source.name;
 
           let parametersArray = [];
@@ -198,22 +221,21 @@ class Operations {
           objSchema.type = 'string';
 
           this.utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? this.utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
-
           objInterface.target.attributes.forEach(itemAttribute => {
                let paramsObject = {};
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                     this.utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? this.utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
-
                     parametersArray.push(paramsObject);
                }
           });
 
-          let requestBodyObj = {};
+          let requestBodyObj = {}
           wOperationObject.requestBody = requestBodyObj;
           this.utils.buildRequestBody(objInterface, requestBodyObj);
 
           let resObj = {};
           wOperationObject.responses = resObj;
+
 
           let noContentObj = {};
           resObj['204'] = noContentObj;
@@ -221,7 +243,6 @@ class Operations {
 
           return wOperationObject;
      }
-
      /**
       *
       *
@@ -234,9 +255,13 @@ class Operations {
       */
      delete(objInterface, operationAttribute, end1Interface, end2Interface) {
           let wOperationObject = {};
+
           let tagsArray = [];
           wOperationObject.tags = tagsArray;
+
           tagsArray.push(objInterface.target.name);
+
+
           wOperationObject.description = 'Delete an existing ' + objInterface.source.name;
 
           let parametersArray = [];
@@ -247,25 +272,27 @@ class Operations {
           let objSchema = {};
           objSchema.type = 'string';
 
-          if(operationAttribute != null && end1Interface == null && end2Interface == null) {
+          if (operationAttribute != null && end1Interface == null && end2Interface == null) {
+               ///
                this.utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? this.utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
 
                objInterface.target.attributes.forEach(itemAttribute => {
                     let paramsObject = {};
                     if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                          this.utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? this.utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
-                         
                          parametersArray.push(paramsObject);
                     }
                });
-
-          } else if(operationAttribute == null && end1Interface != null && end2Interface != null) {
+               ///
+          } else if (operationAttribute == null && end1Interface != null && end2Interface != null) {
+               ///
                this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
 
+               //AskQue
                let paramsObject1 = {};
-               this.utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema,paramsObject1);
-               
+               this.utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject1);
                parametersArray.push(paramsObject1);
+               ///
           }
 
           let resObj = {};
@@ -277,7 +304,6 @@ class Operations {
 
           return wOperationObject;
      }
-
      /**
       *
       *
@@ -288,14 +314,19 @@ class Operations {
       */
      getOperationAttribute(objInterface, operationAttribute) {
           let wOperationObject = {};
+
+
           let tagsArray = [];
           wOperationObject.tags = tagsArray;
+
           tagsArray.push(objInterface.target.name);
+
+
           wOperationObject.description = 'Get single ' + objInterface.source.name + ' by ' + operationAttribute.name;
 
           let parametersArray = [];
           wOperationObject.parameters = parametersArray;
-          
+          ///---
           let paramsObject = {};
           parametersArray.push(paramsObject);
 
@@ -308,11 +339,10 @@ class Operations {
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                     let paramsObject = {};
                     this.utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? this.utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
-                    
                     parametersArray.push(paramsObject);
                }
           })
-          
+          ///---
           let responsesObj = {};
           wOperationObject.responses = responsesObj;
 
@@ -323,6 +353,7 @@ class Operations {
 
           let contentObj = {};
           ok200ResOjb.content = contentObj;
+
 
           let appJsonObj = {};
           contentObj['application/json'] = appJsonObj;

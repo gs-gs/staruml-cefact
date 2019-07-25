@@ -1,5 +1,9 @@
 const openAPI = require('./openapi');
 /**
+ *
+ *
+ * @class Required
+/**
  * Required class returns the API Required 
  *
  * @class Required
@@ -11,7 +15,7 @@ class Required {
       * @constructor Required
       */
      constructor() {
-         
+
      }
 
      /**
@@ -27,8 +31,8 @@ class Required {
                     if (item.multiplicity == "1" || item.multiplicity == "1..*") {
                          requiredAttr.push(item.name);
                     }
-               });
 
+               });
                return (requiredAttr);
           }
      }
@@ -42,18 +46,18 @@ class Required {
       */
      addRequiredAttributes(arrAttributes) {
           let requiredAttr = [];
-
           if (arrAttributes) {
+
                arrAttributes.forEach(item => {
                     if (item.multiplicity == "1" || item.multiplicity == "1..*") {
                          requiredAttr.push(item.name);
                     }
+
                });
-               
                return (requiredAttr);
           }
      }
-     
+
 }
 
 module.exports = Required;

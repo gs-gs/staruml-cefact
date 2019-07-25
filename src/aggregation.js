@@ -1,5 +1,5 @@
-const openAPI =require('./openapi');
-const constant =require('./constant');
+const openAPI = require('./openapi');
+const constant = require('./constant');
 /**
  *
  *
@@ -16,9 +16,10 @@ class Aggregation {
       * @constructor Aggregation
       */
      constructor() {
-          
+
      }
-     
+
+
      /**
       *
       *
@@ -28,28 +29,28 @@ class Aggregation {
       * @returns mainPropertiesObj
       * @memberof Component
       */
-     addAggregationProperties(mainPropertiesObj,aggregationClasses,assoc) {
-          let propertiesObj={};
+     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc) {
+          let propertiesObj = {};
           aggregationClasses.push(assoc.end2.reference);
           mainPropertiesObj[assoc.name] = propertiesObj;
 
-          let arrIsID=[];
+          let arrIsID = [];
           let filterClasses = aggregationClasses.filter(itemClass => {
 
                let filterAttributes = itemClass.attributes.filter(item => {
 
-                    return item.isID==true;
+                    return item.isID == true;
                });
 
-               if(filterAttributes.length>0){
+               if (filterAttributes.length > 0) {
                     arrIsID.push(filterAttributes);
                }
-               
+
           });
-          if(arrIsID.length==0){
-               let jsonError={
-                    isWarning:true,
-                    msg:"There is no \"isID\" Attribute in Target Class \""+assoc.end2.reference.name+"\" which is referenced in the Source Class \""+assoc.end1.reference.name+"\""
+          if (arrIsID.length == 0) {
+               let jsonError = {
+                    isWarning: true,
+                    msg: "There is no \"isID\" Attribute in Target Class \"" + assoc.end2.reference.name + "\" which is referenced in the Source Class \"" + assoc.end1.reference.name + "\""
                };
                openAPI.setError(jsonError);
           }

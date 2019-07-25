@@ -22,7 +22,7 @@ class Component {
      constructor() {
           this.mainComponentObj = {};
           this.mainSchemaObj = {};
-          this.utils = new Utils();     
+          this.utils = new Utils();
           this.arrAttr = [];
           this.arrAssoc = [];
           this.required = new Required();
@@ -46,6 +46,7 @@ class Component {
           classes.forEach(objClass => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
+
                let accosElems = objClass.ownedElements.filter(item => {
                     return item instanceof type.UMLAssociation;
                });
@@ -59,22 +60,30 @@ class Component {
                });
 
                this.mainSchemaObj[objClass.name] = mainClassesObj
-               mainClassesObj.type='object';
+
+               mainClassesObj.type = 'object';
 
                // Adding Properties
-               let properties = new Properties(objClass,assocSideClassLink);
+               let properties = new Properties(objClass, assocSideClassLink);
                mainPropertiesObj = properties.addProperties();
                mainClassesObj.properties = mainPropertiesObj;
+
+
+
                this.arrAttr = properties.getAttributes();
 
+
                // Adding Association
-               mainPropertiesObj = this.association.addAssociationProperties(assocClassLink,mainPropertiesObj);
+               mainPropertiesObj = this.association.addAssociationProperties(assocClassLink, mainPropertiesObj);
+
                this.arrAssoc = this.association.getAssociations();
 
 
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
                let aggregationClasses = [];
                let classAssociations = this.association.getAssociationOfClass(objClass);
+
+               // Git issue #12
                let classAssociationObj = {};
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
@@ -85,12 +94,13 @@ class Component {
                          if (filterAssoc.length == 0 && assoc.name != "") {
                               if (assoc.end1.aggregation == constant.shared) {
                                    // Adding Aggregation
-                                   let aggregation=new Aggregation();
-                                   mainPropertiesObj=aggregation.addAggregationProperties(mainPropertiesObj,aggregationClasses,assoc);
+                                   let aggregation = new Aggregation();
+                                   mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc);
                               } else {
                                    // Adding composition
-                                   let composition=new Composition();
-                                   mainPropertiesObj=composition.addComposition(mainPropertiesObj,assoc);
+                                   let composition = new Composition();
+                                   mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc);
+
                               }
 
                               this.arrAssoc.push(assoc);
@@ -107,7 +117,9 @@ class Component {
                });
 
                // Adding Generalization
-               mainClassesObj = this.generalization.addGeneralization(arrGeneral,mainClassesObj);
+               mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj);
+
+
                let filterAttributes = this.arrAttr.filter(item => {
                     return item.isID;
                });
@@ -118,14 +130,16 @@ class Component {
                     let allOfObj = {};
                     allOfObj['$ref'] = constant.getReference() + objClass.name + 'Ids';
                     allOfArray.push(allOfObj);
-                    allOfObj={};
-                    allOfObj['type']='object';
+
+                    allOfObj = {};
+                    allOfObj['type'] = 'object';
                     allOfArray.push(allOfObj);
+
                }
 
                // Adding Required
                if (this.required.getRequiredAttributes(this.arrAttr).length > 0) {
-                    mainClassesObj.required=this.required.addRequiredAttributes(this.arrAttr);
+                    mainClassesObj.required = this.required.addRequiredAttributes(this.arrAttr);
                }
 
                /**
@@ -141,7 +155,7 @@ class Component {
                     });
 
                     if (filter.length == 0) {
-                         this.association.writeAssociationProperties(mainClassesObj, itemClass,this.mainSchemaObj);
+                         this.association.writeAssociationProperties(mainClassesObj, itemClass, this.mainSchemaObj);
                          arrIdClasses.push(itemClass)
                     }
                });
@@ -149,7 +163,12 @@ class Component {
 
           return this.mainComponentObj;
      }
-          
+
+
+
+
+
+
 }
 
 module.exports = Component;
