@@ -23,17 +23,17 @@ class OpenApi {
       * @param {Object} options
       * @param {integer} fileType
       */
-     constructor(umlPackage, basePath, options,fileType) {
+     constructor(umlPackage, basePath, options, fileType) {
           OpenApi.umlPackage = umlPackage;
-          OpenApi.filePath=basePath;
+          OpenApi.filePath = basePath;
           this.options = options;
           this.schemas = [];
           OpenApi.operations = [];
-          this.utils=new Utils();   
-          OpenApi.fileType=fileType;
-          OpenApi.uniqueClassesArr=[];
+          this.utils = new Utils();
+          OpenApi.fileType = fileType;
+          OpenApi.uniqueClassesArr = [];
 
-          OpenApi.error={};
+          OpenApi.error = {};
           // OpenApi.isDuplicate=false;
           // OpenApi.duplicateClasses = [];
 
@@ -72,7 +72,7 @@ class OpenApi {
                     if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
                          OpenApi.umlPackage.ownedElements.forEach(child => {
                               if (child instanceof type.UMLClass) {
-                                   setTimeout(function() {
+                                   setTimeout(function () {
                                         try {
                                              _this.findClass(child);
                                         } catch (error) {
@@ -83,12 +83,14 @@ class OpenApi {
                               } else if (child instanceof type.UMLInterface) {
                                    OpenApi.operations.push(child);
                               } else if (child instanceof type.UMLGeneralization) {
-                                   setTimeout(function () { _this.findClass(child.target); }, 5);
+                                   setTimeout(function () {
+                                        _this.findClass(child.target);
+                                   }, 5);
                               }
                          });
                     }
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                          try {
                               let resArr = [];
                               _this.schemas.forEach(item => {
@@ -100,7 +102,7 @@ class OpenApi {
                                    }
                               });
 
-                              resArr.sort(function(a, b) {
+                              resArr.sort(function (a, b) {
                                    return a.name.localeCompare(b.name);
                               });
 
@@ -157,7 +159,7 @@ class OpenApi {
                     umlClass.ownedElements.forEach(child => {
                          if (child instanceof type.UMLAssociation) {
                               if (child.end1.reference.name != child.end2.reference.name) {
-                                   setTimeout(function() {
+                                   setTimeout(function () {
                                         try {
                                              _this.findClass(child.end2.reference);
                                         } catch (error) {
@@ -167,11 +169,13 @@ class OpenApi {
                                    }, 5);
                               }
                          } else if (child instanceof type.UMLClass) {
-                              setTimeout(function() {
+                              setTimeout(function () {
                                    _this.findClass(child);
                               }, 5);
                          } else if (child instanceof type.UMLGeneralization) {
-                              setTimeout(function () { _this.findClass(child.target); }, 5);
+                              setTimeout(function () {
+                                   _this.findClass(child.target);
+                              }, 5);
                          }
                     });
                }
@@ -187,8 +191,8 @@ class OpenApi {
       * @static
       * @memberof OpenApi
       */
-     static setError(error){
-          OpenApi.error=error;
+     static setError(error) {
+          OpenApi.error = error;
      }
 
      /**
@@ -197,7 +201,7 @@ class OpenApi {
       * @static
       * @memberof OpenApi
       */
-     static getError(){
+     static getError() {
           return OpenApi.error;
      }
 
@@ -255,7 +259,7 @@ class OpenApi {
      static getType() {
           return OpenApi.fileType;
      }
-     
+
      /**
       * @function generateOpenAPI
       * @description generate open api json
@@ -281,16 +285,16 @@ class OpenApi {
                let server = new Servers();
                MainJSON.addServers(server);
 
-                   
 
 
-               if(OpenApi.error.hasOwnProperty('isWarning') && OpenApi.error.isWarning==true){
-                     app.dialogs.showErrorDialog(OpenApi.getError().msg);
-                     return;
-                }
+
+               if (OpenApi.error.hasOwnProperty('isWarning') && OpenApi.error.isWarning == true) {
+                    app.dialogs.showErrorDialog(OpenApi.getError().msg);
+                    return;
+               }
                let generator = new FileGenerator();
                generator.generate();
-           
+
 
 
           } catch (error) {
@@ -300,11 +304,11 @@ class OpenApi {
      }
 }
 
-module.exports.getFilePath=OpenApi.getPath;
-module.exports.OpenApi=OpenApi;
-module.exports.getClasses=OpenApi.getUniqueClasses;
-module.exports.getUMLPackage=OpenApi.getPackage;
-module.exports.getPaths=OpenApi.getOperations;
-module.exports.getFileType=OpenApi.getType;
-module.exports.getError=OpenApi.getError;
-module.exports.setError=OpenApi.setError;
+module.exports.getFilePath = OpenApi.getPath;
+module.exports.OpenApi = OpenApi;
+module.exports.getClasses = OpenApi.getUniqueClasses;
+module.exports.getUMLPackage = OpenApi.getPackage;
+module.exports.getPaths = OpenApi.getOperations;
+module.exports.getFileType = OpenApi.getType;
+module.exports.getError = OpenApi.getError;
+module.exports.setError = OpenApi.setError;

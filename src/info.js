@@ -31,7 +31,7 @@ class Info {
      getInfo() {
           return this.mainInfoObj;
      }
-     
+
 }
 
 module.exports = Info;
