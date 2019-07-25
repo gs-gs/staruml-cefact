@@ -14,11 +14,11 @@ class Servers {
       * @constructor Server
       */
      constructor() {
-          this.servers=[];
-         
+          this.servers = [];
+
      }
 
-     
+
      /**
       * Return Server object 
       * 

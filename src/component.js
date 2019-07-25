@@ -1,12 +1,12 @@
-const Utils=require('./utils');
-const Properties =require('./properties');
-const Association =require('./association');
-const Aggregation =require('./aggregation');
-const Composition =require('./composition');
-const Generalization =require('./generalization');
-const Required =require('./required');
+const Utils = require('./utils');
+const Properties = require('./properties');
+const Association = require('./association');
+const Aggregation = require('./aggregation');
+const Composition = require('./composition');
+const Generalization = require('./generalization');
+const Required = require('./required');
 const openAPI = require('./openapi');
-const constant =require('./constant');
+const constant = require('./constant');
 
 /**
  * Component class adds all classes from the class diagram
@@ -20,15 +20,15 @@ class Component {
       * @memberof Component
       */
      constructor() {
-          this.mainComponentObj={};
-          this.mainSchemaObj={};
-          this.utils=new Utils();     
+          this.mainComponentObj = {};
+          this.mainSchemaObj = {};
+          this.utils = new Utils();
           this.arrAttr = [];
           this.arrAssoc = [];
-          this.required= new Required();
-          this.generalization=new Generalization();
-          this.association=new Association();
-          
+          this.required = new Required();
+          this.generalization = new Generalization();
+          this.association = new Association();
+
      }
 
      /**
@@ -39,15 +39,15 @@ class Component {
       */
      getComponent() {
 
-          let classes=openAPI.getClasses();
+          let classes = openAPI.getClasses();
           let classLink = app.repository.select("@UMLAssociationClassLink");
           let arrIdClasses = [];
           let flagNoName = false;
           let noNameRel = [];
-          this.mainComponentObj.schemas=this.mainSchemaObj;
+          this.mainComponentObj.schemas = this.mainSchemaObj;
           classes.forEach(objClass => {
-               let mainClassesObj={};
-               let mainPropertiesObj={}
+               let mainClassesObj = {};
+               let mainPropertiesObj = {}
 
                let accosElems = objClass.ownedElements.filter(item => {
                     return item instanceof type.UMLAssociation;
@@ -61,23 +61,23 @@ class Component {
                     return item.associationSide.end1.reference._id == objClass._id;
                });
 
-               this.mainSchemaObj[objClass.name]=mainClassesObj
+               this.mainSchemaObj[objClass.name] = mainClassesObj
 
-               mainClassesObj.type='object';
+               mainClassesObj.type = 'object';
 
 
                // Adding Properties
-               let properties=new Properties(objClass,assocSideClassLink);
-               mainPropertiesObj=properties.addProperties();
-               mainClassesObj.properties=mainPropertiesObj;
-               
-               
+               let properties = new Properties(objClass, assocSideClassLink);
+               mainPropertiesObj = properties.addProperties();
+               mainClassesObj.properties = mainPropertiesObj;
+
+
 
                this.arrAttr = properties.getAttributes();
-               
+
 
                // Adding Association
-               mainPropertiesObj=this.association.addAssociationProperties(assocClassLink,mainPropertiesObj);
+               mainPropertiesObj = this.association.addAssociationProperties(assocClassLink, mainPropertiesObj);
 
                this.arrAssoc = this.association.getAssociations();
 
@@ -92,7 +92,7 @@ class Component {
                let classAssociations = this.association.getAssociationOfClass(objClass);
 
                // Git issue #12
-               let classAssociationObj={};
+               let classAssociationObj = {};
                classAssociations.forEach(assoc => {
                     // for (i = 0, len = objClass.ownedElements.length; i < len; i++) {
                     //     let assoc = objClass.ownedElements[i];
@@ -107,13 +107,13 @@ class Component {
                               if (assoc.end1.aggregation == constant.shared) {
 
                                    // Adding Aggregation
-                                   let aggregation=new Aggregation();
-                                   mainPropertiesObj=aggregation.addAggregationProperties(mainPropertiesObj,aggregationClasses,assoc);
+                                   let aggregation = new Aggregation();
+                                   mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc);
                               } else {
 
                                    // Adding composition
-                                   let composition=new Composition();
-                                   mainPropertiesObj=composition.addComposition(mainPropertiesObj,assoc);
+                                   let composition = new Composition();
+                                   mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc);
 
                               }
                               this.arrAssoc.push(assoc);
@@ -139,7 +139,7 @@ class Component {
 
 
                // Adding Generalization
-               mainClassesObj=this.generalization.addGeneralization(arrGeneral,mainClassesObj);
+               mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj);
 
 
                let filterAttributes = this.arrAttr.filter(item => {
@@ -148,21 +148,21 @@ class Component {
 
 
                if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
-                    let allOfArray=[];
-                    mainClassesObj.allOf=allOfArray;
-                    let allOfObj={};
-                    allOfObj['$ref']=constant.getReference() + objClass.name + 'Ids';
+                    let allOfArray = [];
+                    mainClassesObj.allOf = allOfArray;
+                    let allOfObj = {};
+                    allOfObj['$ref'] = constant.getReference() + objClass.name + 'Ids';
                     allOfArray.push(allOfObj);
 
-                    allOfObj={};
-                    allOfObj['type']='object';
+                    allOfObj = {};
+                    allOfObj['type'] = 'object';
                     allOfArray.push(allOfObj);
-                    
+
                }
 
                // Adding Required
                if (this.required.getRequiredAttributes(this.arrAttr).length > 0) {
-                    mainClassesObj.required=this.required.addRequiredAttributes(this.arrAttr);
+                    mainClassesObj.required = this.required.addRequiredAttributes(this.arrAttr);
                }
 
                /**
@@ -177,7 +177,7 @@ class Component {
                          return itemClass.name == subItem.name;
                     });
                     if (filter.length == 0) {
-                         this.association.writeAssociationProperties(mainClassesObj, itemClass,this.mainSchemaObj);
+                         this.association.writeAssociationProperties(mainClassesObj, itemClass, this.mainSchemaObj);
                          arrIdClasses.push(itemClass)
                     }
                });
@@ -188,12 +188,12 @@ class Component {
 
           return this.mainComponentObj;
      }
-     
-     
-     
 
-     
-     
+
+
+
+
+
 }
 
 module.exports = Component;

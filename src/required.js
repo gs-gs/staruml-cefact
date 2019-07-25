@@ -1,4 +1,4 @@
-const openAPI =require('./openapi');
+const openAPI = require('./openapi');
 /**
  *
  *
@@ -15,7 +15,7 @@ class Required {
       * @constructor Required
       */
      constructor() {
-         
+
      }
 
      /**
@@ -47,7 +47,7 @@ class Required {
      addRequiredAttributes(arrAttributes) {
           let requiredAttr = [];
           if (arrAttributes) {
-               
+
                arrAttributes.forEach(item => {
                     if (item.multiplicity == "1" || item.multiplicity == "1..*") {
                          requiredAttr.push(item.name);
@@ -57,7 +57,7 @@ class Required {
                return (requiredAttr);
           }
      }
-     
+
 }
 
 module.exports = Required;

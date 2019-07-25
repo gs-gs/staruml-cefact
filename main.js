@@ -1,5 +1,5 @@
-const openAPI =require('./src/openapi');
-const constant =require('./src/constant');
+const openAPI = require('./src/openapi');
+const constant = require('./src/constant');
 /**
  * @function _handleGenerate
  * @description OpenAPI generation when OpenAPI Initialization  
@@ -9,13 +9,13 @@ const constant =require('./src/constant');
  */
 function _handleGenerate(umlPackage, path, options) {
      // If options is not passed, get from preference
-     
+
      options = options || getGenOptions();
      // If umlPackage is not assigned, popup ElementPicker
      if (!umlPackage) {
           app.elementPickerDialog
                .showDialog("Select the package or project to generate from", null, null) //type.UMLPackage
-               .then(function({
+               .then(function ({
                     buttonId,
                     returnValue
                }) {
@@ -55,17 +55,17 @@ function fileTypeSelection(umlPackage, options) {
                value: 3
           }
      ];
-     app.dialogs.showSelectDropdownDialog(constant.msg_file_select, fileOptions).then(function({
+     app.dialogs.showSelectDropdownDialog(constant.msg_file_select, fileOptions).then(function ({
           buttonId,
           returnValue
      }) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, filters);
-               const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options,returnValue);
+               const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
 
-               console.log("OpenAPI-umlPackage",umlPackage);
-               console.log("OpenAPI-path",basePath);
-               console.log("OpenAPI-options",options);
+               console.log("OpenAPI-umlPackage", umlPackage);
+               console.log("OpenAPI-path", basePath);
+               console.log("OpenAPI-options", options);
                mOpenApi.initUMLPackage();
 
           } else {

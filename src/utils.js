@@ -1,6 +1,6 @@
 const openAPI = require('./openapi');
 const fs = require('fs');
-const constant=require('./constant');
+const constant = require('./constant');
 /**
  *
  *
@@ -24,13 +24,13 @@ class Utils {
       */
      writeErrorToFile(error) {
           this.errorContent.push(error.message);
-          fs.writeFile(openAPI.getFilePath() + this.mFileName, JSON.stringify(this.errorContent), function(err) {
+          fs.writeFile(openAPI.getFilePath() + this.mFileName, JSON.stringify(this.errorContent), function (err) {
                if (err) {
                     console.error("Error writing file", err);
                }
           });
      }
-     
+
      /**
       * @function buildDescription
       * @description Description replace (') with ('')
@@ -52,13 +52,13 @@ class Utils {
       * @param {boolean} required
       * @param {string} schema 
       */
-     buildParameter(name, type, description, required, schema,paramsObject) {
+     buildParameter(name, type, description, required, schema, paramsObject) {
 
-          paramsObject.name=name;
-          paramsObject.in=type;
-          paramsObject.description=description;
-          paramsObject.required=required;
-          paramsObject.schema=schema;
+          paramsObject.name = name;
+          paramsObject.in = type;
+          paramsObject.description = description;
+          paramsObject.required = required;
+          paramsObject.schema = schema;
 
      }
      /**
@@ -82,22 +82,22 @@ class Utils {
       * @param {Object} requestBodyObj
       * @memberof Operations
       */
-     buildRequestBody(objInterface,requestBodyObj) {
+     buildRequestBody(objInterface, requestBodyObj) {
 
-          let contentObj={};
-          requestBodyObj.content=contentObj;
+          let contentObj = {};
+          requestBodyObj.content = contentObj;
 
-          let appJsonObject={};
-          contentObj['application/json']=appJsonObject;
+          let appJsonObject = {};
+          contentObj['application/json'] = appJsonObject;
 
-          let schemaObj={};
-          appJsonObject.schema=schemaObj;
+          let schemaObj = {};
+          appJsonObject.schema = schemaObj;
 
-          schemaObj['$ref']=constant.getReference() + objInterface.source.name;
+          schemaObj['$ref'] = constant.getReference() + objInterface.source.name;
 
 
-          requestBodyObj.description='';
-          requestBodyObj.required=true;
+          requestBodyObj.description = '';
+          requestBodyObj.required = true;
 
      }
 
@@ -119,12 +119,12 @@ class Utils {
                          if (!(itemParameters.type instanceof type.UMLClass)) {
                               this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
                                    this.utils.buildDescription(itemParameters.documentation) :
-                                   "missing description"), false, objSchema,paramsObject);
+                                   "missing description"), false, objSchema, paramsObject);
                          } else {
 
                               this.buildParameter(itemParameters.type.name + "." + itemParameters.name, "query", (itemParameters.documentation ?
                                    this.utils.buildDescription(itemParameters.documentation) :
-                                   "missing description"), false, objSchema,paramsObject);
+                                   "missing description"), false, objSchema, paramsObject);
 
 
                          }
@@ -151,14 +151,14 @@ class Utils {
      //      try {
      //           objOperation.parameters.forEach(itemParameters => {
      //                let paramsObject={};
-                    
+
      //                if (itemParameters.name != "id" && itemParameters.name != "identifier") {
      //                     parametersArray.push(paramsObject);
      //                     let objSchema={};
      //                     objSchema.type='string';
      //                     if (!(itemParameters.type instanceof type.UMLClass)) {
      //                          //  name, type, description, required, schema
-                              
+
      //                          this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
      //                               this.utils.buildDescription(itemParameters.documentation) :
      //                               "missing description"), false, objSchema,paramsObject);
@@ -203,7 +203,7 @@ class Utils {
      //           this.writeErrorToFile(error,getFilePath());
      //      }
      // }
-     
+
 }
 
 module.exports = Utils;
