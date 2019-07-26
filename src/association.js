@@ -51,70 +51,70 @@ class Association {
       * @param {UMLAssociationClassLink} associationClass 
       */
      writeAssociationClassProperties(mainPropertiesObj, associationClass) {
-               let propertiesObj = {};
-               
-
-               if(associationClass!=null && associationClass.classSide!=null && associationClass.associationSide !=null){
-                    mainPropertiesObj[associationClass.classSide.name] = propertiesObj;
-                    let associationSide=associationClass.associationSide;
-                    let end2=associationClass.associationSide.end2;
-                    let multiplicity=associationClass.associationSide.end2.multiplicity;
+          let propertiesObj = {};
 
 
-                    if (multiplicity == "0..*" || multiplicity == "1..*") {
-                         let itemsObj = {};
-                         propertiesObj.items = itemsObj;
-                         let allOfArray = [];
-                         itemsObj.allOf = allOfArray;
-     
-                         let objAllOfArry = {};
-                         if (associationSide.end1.aggregation == constant.shared) {
-                              objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name + 'Ids';
-                         } else {
-                              objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name;
-                         }
-     
-                         allOfArray.push(objAllOfArry);
-     
-                         objAllOfArry = {};
-                         objAllOfArry['$ref'] = constant.getReference() + associationClass.classSide.name;
-                         allOfArray.push(objAllOfArry);
-     
-                         objAllOfArry = {};
-                         objAllOfArry['type'] = 'object';
-                         allOfArray.push(objAllOfArry);
-     
-     
-     
-                         propertiesObj.type = 'array';
-                         if (associationSide.end2.multiplicity == "1..*") {
-                              propertiesObj.minItems = 1;
-                         }
-     
+          if (associationClass != null && associationClass.classSide != null && associationClass.associationSide != null) {
+               mainPropertiesObj[associationClass.classSide.name] = propertiesObj;
+               let associationSide = associationClass.associationSide;
+               let end2 = associationClass.associationSide.end2;
+               let multiplicity = associationClass.associationSide.end2.multiplicity;
+
+
+               if (multiplicity == "0..*" || multiplicity == "1..*") {
+                    let itemsObj = {};
+                    propertiesObj.items = itemsObj;
+                    let allOfArray = [];
+                    itemsObj.allOf = allOfArray;
+
+                    let objAllOfArry = {};
+                    if (associationSide.end1.aggregation == constant.shared) {
+                         objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name + 'Ids';
                     } else {
-                         let allOfArray = [];
-                         let objAllOfArry = {};
-                         propertiesObj.allOf = allOfArray;
-     
-                         if (associationSide.end1.aggregation == constant.shared) {
-                              objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name + 'Ids';
-                         } else {
-                              objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name;
-                         }
-                         allOfArray.push(objAllOfArry);
-     
-                         objAllOfArry = {};
-                         objAllOfArry['$ref'] = constant.getReference() + associationClass.classSide.name;
-                         allOfArray.push(objAllOfArry);
-     
-                         objAllOfArry = {};
-                         objAllOfArry['type'] = 'object';
-                         allOfArray.push(objAllOfArry);
-     
+                         objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name;
                     }
 
+                    allOfArray.push(objAllOfArry);
+
+                    objAllOfArry = {};
+                    objAllOfArry['$ref'] = constant.getReference() + associationClass.classSide.name;
+                    allOfArray.push(objAllOfArry);
+
+                    objAllOfArry = {};
+                    objAllOfArry['type'] = 'object';
+                    allOfArray.push(objAllOfArry);
+
+
+
+                    propertiesObj.type = 'array';
+                    if (associationSide.end2.multiplicity == "1..*") {
+                         propertiesObj.minItems = 1;
+                    }
+
+               } else {
+                    let allOfArray = [];
+                    let objAllOfArry = {};
+                    propertiesObj.allOf = allOfArray;
+
+                    if (associationSide.end1.aggregation == constant.shared) {
+                         objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name + 'Ids';
+                    } else {
+                         objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name;
+                    }
+                    allOfArray.push(objAllOfArry);
+
+                    objAllOfArry = {};
+                    objAllOfArry['$ref'] = constant.getReference() + associationClass.classSide.name;
+                    allOfArray.push(objAllOfArry);
+
+                    objAllOfArry = {};
+                    objAllOfArry['type'] = 'object';
+                    allOfArray.push(objAllOfArry);
 
                }
+
+
+          }
 
      }
      /**

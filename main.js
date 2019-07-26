@@ -10,7 +10,7 @@ const constant = require('./src/constant');
 function _handleGenerate(umlPackage, options = getGenOptions()) {
      // If options is not passed, get from preference
 
-     
+
      // If umlPackage is not assigned, popup ElementPicker
      if (!umlPackage) {
           app.elementPickerDialog
