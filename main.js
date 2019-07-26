@@ -7,10 +7,10 @@ const constant = require('./src/constant');
  * @param {string} path
  * @param {Object} options
  */
-function _handleGenerate(umlPackage, path, options) {
+function _handleGenerate(umlPackage, options = getGenOptions()) {
      // If options is not passed, get from preference
 
-     options = options || getGenOptions();
+     
      // If umlPackage is not assigned, popup ElementPicker
      if (!umlPackage) {
           app.elementPickerDialog
@@ -38,9 +38,6 @@ function _handleGenerate(umlPackage, path, options) {
  * @param {Object} options
  */
 function fileTypeSelection(umlPackage, options) {
-     let filters = [
-          // { name: "YML Files", extensions: [ "yml" ] }
-     ];
 
      let fileOptions = [{
                text: "JSON",
@@ -60,12 +57,9 @@ function fileTypeSelection(umlPackage, options) {
           returnValue
      }) {
           if (buttonId === 'ok') {
-               const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, filters);
+               const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, null);
                const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
 
-               console.log("OpenAPI-umlPackage", umlPackage);
-               console.log("OpenAPI-path", basePath);
-               console.log("OpenAPI-options", options);
                mOpenApi.initUMLPackage();
 
           } else {
