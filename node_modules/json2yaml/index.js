@@ -96,7 +96,7 @@
         }
     };
 
-    return '---' + handlers[typeOf(data)](data) + '\n';
+    return handlers[typeOf(data)](data) + '\n';
   }
 
   module.exports.stringify = stringify;
