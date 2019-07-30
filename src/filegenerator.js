@@ -71,34 +71,66 @@ class FileGenerator {
                     this.createYAML();
 
                }
-               console.log("Mode", openAPI.getMode());
-               if (openAPI.getMode() == 0) {
+               console.log("Mode", openAPI.getAppMode());
+               if (openAPI.getAppMode() == openAPI.APP_MODE_GEN) {
                     if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
                          app.dialogs.showErrorDialog(openAPI.getError().msg);
                          return;
                     }
                     app.toast.info(constant.msgsuccess);
-               } else if (openAPI.getMode() == 1) {
-                    let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
-                    parser.validate(pathValidator, (err, api) => {
-                         if (err) {
-                              // Error
+               } else if (openAPI.getAppMode() == openAPI.APP_MODE_TEST) {
 
-                              app.dialogs.showErrorDialog("Error in Package \'" + openAPI.getUMLPackage().name + "\' : " + err.message);
-                              console.log("Error : ", err.toJSON());
-                              console.log("Error : ", err.message);
-                         } else {
-                              // Success
-                              app.toast.info("Package \'" + openAPI.getUMLPackage().name + "\' Tested Successfully");
-                              console.log("success : ", api);
-                         }
-                    });
+                    if(openAPI.getTestMode()==openAPI.TEST_MODE_SINGLE){
+                         this.validateSwagger().then(data => {
+                              app.dialogs.showAlertDialog(data.message);
+                              console.log(data)
+                         })
+                         .catch(error => {
+                              app.dialogs.showErrorDialog(error.message);
+                              console.log(error)
+                         });
+                    }
+                    else if(openAPI.getTestMode()==openAPI.TEST_MODE_ALL){
+                         this.validateSwagger().then(data => {
+                              // app.dialogs.showErrorDialog(data.message);
+                              openAPI.addSummery(data.message);
+                              console.log(data)
+                         })
+                         .catch(error => {
+                              // app.dialogs.showErrorDialog(error.message);
+                              openAPI.addSummery(error.message);
+                              console.log(error)
+                         });
+                    }
                }
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
      }
+     validateSwagger() {
+          return new Promise((resolve, reject)=>{
+               let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
+               parser.validate(pathValidator, (err, api) => {
+                    if (err) {
+                         // Error
+
+                         // app.dialogs.showErrorDialog("Error in Package \'" + openAPI.getUMLPackage().name + "\' : " + err.message);
+                         // console.log("Error : ", err.toJSON());
+                         // console.log("Error : ", err.message);
+                         reject(err);
+                    } else {
+                         resolve({
+                              message:"Package \'" + openAPI.getUMLPackage().name + "\' Tested Successfully"
+                         })
+                         // Success
+                         // console.log("success : ", api);
+
+                         // app.dialogs.showAlertDialog("Package \'" + openAPI.getUMLPackage().name + "\' Tested Successfully");
+                    }
+               });
+          });
+      }
 }
 
 module.exports = FileGenerator;
