@@ -6,7 +6,8 @@ const j2yaml = require('json2yaml');
 const openAPI = require('./openapi');
 const MainJSON = require('./mainjson');
 const constant = require('./constant');
-
+const SwaggerParser = require("swagger-parser");
+let parser = new SwaggerParser();
 /**
  * FileGenerator class generate JSON, YAML file based of selection
  *
@@ -70,7 +71,29 @@ class FileGenerator {
                     this.createYAML();
 
                }
-               app.toast.info(constant.msgsuccess);
+               console.log("Mode", openAPI.getMode());
+               if (openAPI.getMode() == 0) {
+                    if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
+                         app.dialogs.showErrorDialog(openAPI.getError().msg);
+                         return;
+                    }
+                    app.toast.info(constant.msgsuccess);
+               } else if (openAPI.getMode() == 1) {
+                    let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
+                    parser.validate(pathValidator, (err, api) => {
+                         if (err) {
+                              // Error
+
+                              app.dialogs.showErrorDialog("Error in Package \'" + openAPI.getUMLPackage().name + "\' : " + err.message);
+                              console.log("Error : ", err.toJSON());
+                              console.log("Error : ", err.message);
+                         } else {
+                              // Success
+                              app.toast.info("Package \'" + openAPI.getUMLPackage().name + "\' Tested Successfully");
+                              console.log("success : ", api);
+                         }
+                    });
+               }
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
