@@ -45,7 +45,14 @@ class OpenApi {
       */
      initUMLPackage() {
           try {
-               fs.mkdirSync(OpenApi.filePath);
+               try {
+                    if (!fs.existsSync(OpenApi.filePath)) {
+                         fs.mkdirSync(OpenApi.filePath);
+                    }
+               } catch (err) {
+                    console.error(err)
+               }
+
                if (OpenApi.umlPackage instanceof type.UMLPackage) {
                     this.getUMLModels();
                } else {
@@ -186,6 +193,26 @@ class OpenApi {
      }
 
      /**
+      * @function setMode
+      * @description set Extention mode weather is in TEST(1) or GENERATE(0) MODE
+      * @static
+      * @memberof OpenApi
+      */
+     static setMode(mode) {
+          OpenApi.mode = mode;
+     }
+
+     /**
+      * @function getMode
+      * @description returns the Extention mode weather is in TEST(1) or GENERATE(0) MODE
+      * @static
+      * @memberof OpenApi
+      */
+     static getMode() {
+          return OpenApi.mode;
+     }
+
+     /**
       * @function setError
       * @description save error or warning to be shown to UI
       * @static
@@ -280,7 +307,6 @@ class OpenApi {
                //Add openapi paths
                let paths = new Paths();
                MainJSON.addPaths(paths);
-
                //Add openapi servers
                let server = new Servers();
                MainJSON.addServers(server);
@@ -288,10 +314,6 @@ class OpenApi {
 
 
 
-               if (OpenApi.error.hasOwnProperty('isWarning') && OpenApi.error.isWarning == true) {
-                    app.dialogs.showErrorDialog(OpenApi.getError().msg);
-                    return;
-               }
                let generator = new FileGenerator();
                generator.generate();
 
@@ -312,3 +334,5 @@ module.exports.getPaths = OpenApi.getOperations;
 module.exports.getFileType = OpenApi.getType;
 module.exports.getError = OpenApi.getError;
 module.exports.setError = OpenApi.setError;
+module.exports.setMode = OpenApi.setMode;
+module.exports.getMode = OpenApi.getMode;
