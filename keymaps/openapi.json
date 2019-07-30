@@ -1,4 +1,5 @@
 {
      "cmdctrl-w": "generate:show-toast",
-     "cmdctrl-e": "testextension:test-extension"
+     "cmdctrl-e": "testextension:test-extension",
+     "cmdctrl-a": "testallextension:test-all-extension"
 }

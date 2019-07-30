@@ -9,9 +9,13 @@
                     "id": "tools.openapi.generate",
                     "command": "generate:show-toast"
                }, {
-                    "label": "Test Extension",
+                    "label": "Test Package",
                     "id": "tools.openapi.testextension",
                     "command": "testextension:test-extension"
+               }, {
+                    "label": "Test Entire Project",
+                    "id": "tools.openapi.testallextension",
+                    "command": "testallextension:test-all-extension"
                }]
           }]
      }]
