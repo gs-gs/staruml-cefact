@@ -32,6 +32,7 @@ class OpenApi {
           this.utils = new Utils();
           OpenApi.fileType = fileType;
           OpenApi.uniqueClassesArr = [];
+          
 
           OpenApi.error = {};
           // OpenApi.isDuplicate=false;
@@ -193,12 +194,32 @@ class OpenApi {
      }
 
      /**
+      * @function setTestMode
+      * @description set Extention test mode
+      * @static
+      * @memberof OpenApi
+      */
+     static setTestMode(testmode) {
+          OpenApi.testmode = testmode;
+     }
+
+     /**
+      * @function getTestMode
+      * @description returns the Extention test mode
+      * @static
+      * @memberof OpenApi
+      */
+     static getTestMode() {
+          return OpenApi.testmode;
+     }
+
+     /**
       * @function setMode
       * @description set Extention mode weather is in TEST(1) or GENERATE(0) MODE
       * @static
       * @memberof OpenApi
       */
-     static setMode(mode) {
+     static setAppMode(mode) {
           OpenApi.mode = mode;
      }
 
@@ -208,7 +229,7 @@ class OpenApi {
       * @static
       * @memberof OpenApi
       */
-     static getMode() {
+     static getAppMode() {
           return OpenApi.mode;
      }
 
@@ -324,6 +345,42 @@ class OpenApi {
                this.utils.writeErrorToFile(error);
           }
      }
+     
+    
+}
+
+let summeryMessages=[];
+/**
+ * @function addSummery
+ * @description Stores test messages in summery to show at once after ALL test
+ * @static
+ * @memberof OpenApi
+ */
+function addSummery(message) {
+     let msg={
+          message:message
+     }
+     summeryMessages.push(msg);
+}
+/**
+ * @function getSummery
+ * @description returns Stored summery messages to show at once after ALL test
+ * @static
+ * @memberof OpenApi
+ */
+function getSummery() {
+     return summeryMessages;
+}
+
+
+/**
+ * @function resetSummery
+ * @description reset all stored summery
+ * @static
+ * @memberof OpenApi
+ */
+function resetSummery() {
+     summeryMessages=[];
 }
 
 module.exports.getFilePath = OpenApi.getPath;
@@ -334,5 +391,14 @@ module.exports.getPaths = OpenApi.getOperations;
 module.exports.getFileType = OpenApi.getType;
 module.exports.getError = OpenApi.getError;
 module.exports.setError = OpenApi.setError;
-module.exports.setMode = OpenApi.setMode;
-module.exports.getMode = OpenApi.getMode;
+module.exports.setAppMode = OpenApi.setAppMode;
+module.exports.getAppMode = OpenApi.getAppMode;
+module.exports.APP_MODE_GEN = 1;
+module.exports.APP_MODE_TEST = 2;
+module.exports.setTestMode = OpenApi.setTestMode;
+module.exports.getTestMode = OpenApi.getTestMode;
+module.exports.TEST_MODE_SINGLE = 1;
+module.exports.TEST_MODE_ALL = 2;
+module.exports.addSummery = addSummery;
+module.exports.getSummery = getSummery;
+module.exports.resetSummery = resetSummery;
