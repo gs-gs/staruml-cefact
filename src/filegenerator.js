@@ -1,7 +1,6 @@
 const Utils = require('./utils');
 const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml');
 const j2yaml = require('json2yaml');
 const openAPI = require('./openapi');
 const MainJSON = require('./mainjson');
