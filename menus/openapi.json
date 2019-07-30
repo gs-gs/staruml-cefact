@@ -7,7 +7,11 @@
                "submenu": [{
                     "label": "Generate API",
                     "id": "tools.openapi.generate",
-                    "command": "openapi:show-toast"
+                    "command": "generate:show-toast"
+               }, {
+                    "label": "Test Extension",
+                    "id": "tools.openapi.testextension",
+                    "command": "testextension:test-extension"
                }]
           }]
      }]
