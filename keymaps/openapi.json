@@ -1,3 +1,4 @@
 {
-     "cmdctrl-w": "openapi:show-toast"
+     "cmdctrl-w": "generate:show-toast",
+     "cmdctrl-e": "testextension:test-extension"
 }
