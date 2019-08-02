@@ -32,7 +32,7 @@ class OpenApi {
           this.utils = new Utils();
           OpenApi.fileType = fileType;
           OpenApi.uniqueClassesArr = [];
-          
+
 
           OpenApi.error = {};
           // OpenApi.isDuplicate=false;
@@ -345,11 +345,11 @@ class OpenApi {
                this.utils.writeErrorToFile(error);
           }
      }
-     
-    
+
+
 }
 
-let summeryMessages=[];
+let summeryMessages = [];
 /**
  * @function addSummery
  * @description Stores test messages in summery to show at once after ALL test
@@ -357,8 +357,8 @@ let summeryMessages=[];
  * @memberof OpenApi
  */
 function addSummery(message) {
-     let msg={
-          message:message
+     let msg = {
+          message: message
      }
      summeryMessages.push(msg);
 }
@@ -380,7 +380,7 @@ function getSummery() {
  * @memberof OpenApi
  */
 function resetSummery() {
-     summeryMessages=[];
+     summeryMessages = [];
 }
 
 module.exports.getFilePath = OpenApi.getPath;

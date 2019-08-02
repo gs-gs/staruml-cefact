@@ -70,7 +70,7 @@ class FileGenerator {
                     this.createYAML();
 
                }
-               
+
                if (openAPI.getAppMode() == openAPI.APP_MODE_GEN) {
                     // check for if any error  available or not 
                     if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
@@ -85,39 +85,38 @@ class FileGenerator {
                     } else if (openAPI.getFileType() == 2) {
                          basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
                     }
-                    
+
                     // Validate generated file to validate 
                     this.validateSwagger(basePath).then(data => {
-                         app.toast.info(constant.msgsuccess);
-                    })
-                    .catch(error => {
-                         app.dialogs.showErrorDialog(error.message);
-                         console.log(error)
-                    });
-                    
-               } else if (openAPI.getAppMode() == openAPI.APP_MODE_TEST) {
-                    let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
-                    if(openAPI.getTestMode()==openAPI.TEST_MODE_SINGLE){
-                         this.validateSwagger(pathValidator).then(data => {
-                              app.dialogs.showAlertDialog(data.message);
-                              console.log(data)
+                              app.toast.info(constant.msgsuccess);
                          })
                          .catch(error => {
                               app.dialogs.showErrorDialog(error.message);
                               console.log(error)
                          });
-                    }
-                    else if(openAPI.getTestMode()==openAPI.TEST_MODE_ALL){
+
+               } else if (openAPI.getAppMode() == openAPI.APP_MODE_TEST) {
+                    let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
+                    if (openAPI.getTestMode() == openAPI.TEST_MODE_SINGLE) {
                          this.validateSwagger(pathValidator).then(data => {
-                              // app.dialogs.showErrorDialog(data.message);
-                              openAPI.addSummery(data.message);
-                              console.log(data)
-                         })
-                         .catch(error => {
-                              // app.dialogs.showErrorDialog(error.message);
-                              openAPI.addSummery(error.message);
-                              console.log(error)
-                         });
+                                   app.dialogs.showAlertDialog(data.message);
+                                   console.log(data)
+                              })
+                              .catch(error => {
+                                   app.dialogs.showErrorDialog(error.message);
+                                   console.log(error)
+                              });
+                    } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
+                         this.validateSwagger(pathValidator).then(data => {
+                                   // app.dialogs.showErrorDialog(data.message);
+                                   openAPI.addSummery(data.message);
+                                   console.log(data)
+                              })
+                              .catch(error => {
+                                   // app.dialogs.showErrorDialog(error.message);
+                                   openAPI.addSummery(error.message);
+                                   console.log(error)
+                              });
                     }
                }
           } catch (error) {
@@ -126,8 +125,8 @@ class FileGenerator {
           }
      }
      validateSwagger(pathValidator) {
-          return new Promise((resolve, reject)=>{
-               
+          return new Promise((resolve, reject) => {
+
                parser.validate(pathValidator, (err, api) => {
                     if (err) {
                          // Error
@@ -135,12 +134,12 @@ class FileGenerator {
                     } else {
                          // Success
                          resolve({
-                              message:"Package \'" + openAPI.getUMLPackage().name + "\' Tested Successfully"
+                              message: "Package \'" + openAPI.getUMLPackage().name + "\' Tested Successfully"
                          })
                     }
                });
           });
-      }
+     }
 }
 
 module.exports = FileGenerator;
