@@ -13,7 +13,6 @@
     },
     "license": "MIT",
     "dependencies": {
-        "json2yaml": "^1.1.0",
         "node-async-loop": "^1.2.2",
         "swagger-parser": "^8.0.0"
     }
