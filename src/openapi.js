@@ -6,6 +6,8 @@ const FileGenerator = require('./filegenerator');
 const Paths = require('./paths');
 const Servers = require('./servers');
 const MainJSON = require('./mainjson');
+const SwaggerParser = require("swagger-parser");
+let parser = new SwaggerParser();
 
 /**
  *
@@ -382,6 +384,22 @@ function getSummery() {
 function resetSummery() {
      summeryMessages = [];
 }
+function validateSwagger(pathValidator) {
+     return new Promise((resolve, reject) => {
+
+          parser.validate(pathValidator, (err, api) => {
+               if (err) {
+                    // Error
+                    reject(err);
+               } else {
+                    // Success
+                    resolve({
+                         message: "Package \'" + OpenApi.getPackage().name + "\' Tested Successfully"
+                    })
+               }
+          });
+     });
+}
 
 module.exports.getFilePath = OpenApi.getPath;
 module.exports.OpenApi = OpenApi;
@@ -402,3 +420,4 @@ module.exports.TEST_MODE_ALL = 2;
 module.exports.addSummery = addSummery;
 module.exports.getSummery = getSummery;
 module.exports.resetSummery = resetSummery;
+module.exports.validateSwagger = validateSwagger;
