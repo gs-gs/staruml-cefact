@@ -1,12 +1,12 @@
 const Utils = require('./utils');
 const fs = require('fs');
 const path = require('path');
-const j2yaml = require('json2yaml');
 const openAPI = require('./openapi');
 const MainJSON = require('./mainjson');
 const constant = require('./constant');
 const SwaggerParser = require("swagger-parser");
 let parser = new SwaggerParser();
+let YAML = SwaggerParser.YAML;
 /**
  * FileGenerator class generate JSON, YAML file based of selection
  *
@@ -19,15 +19,16 @@ class FileGenerator {
       * @constructor FileGenerator
       */
      constructor() {
+          this.basePath='';
           this.utils = new Utils();
      }
 
      createJSON() {
           try {
-               let basePath;
+               
                //Direct json from JsonOject
-               basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
-               fs.writeFileSync(basePath, JSON.stringify(MainJSON.getJSON(), null, 4));
+               this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
+               fs.writeFileSync(this.basePath, JSON.stringify(MainJSON.getJSON(), null, 4));
 
           } catch (error) {
                console.error("Error generating JSON file", error);
@@ -35,10 +36,9 @@ class FileGenerator {
           }
      }
      createYAML() {
-          let basePath;
-          let ymlText = j2yaml.stringify(MainJSON.getJSON());
-          basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
-          fs.writeFileSync(basePath, ymlText);
+          let ymlText = YAML.stringify(MainJSON.getJSON());
+          this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
+          fs.writeFileSync(this.basePath, ymlText);
      }
 
      /**
@@ -49,6 +49,7 @@ class FileGenerator {
       */
      generate() {
           try {
+               console.log("MainJSON",MainJSON.getJSON());
                if (openAPI.getFileType() == 1) {
                     this.createJSON();
 
@@ -79,21 +80,21 @@ class FileGenerator {
                     }
 
                     // Finds the path of generated file to validate by swagger-parser
-                    let basePath;
-                    if (openAPI.getFileType() == 1) {
-                         basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
-                    } else if (openAPI.getFileType() == 2) {
-                         basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
-                    }
+                    // let basePath;
+                    // if (openAPI.getFileType() == 1) {
+                    //      basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
+                    // } else if (openAPI.getFileType() == 2) {
+                    //      basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
+                    // }
 
                     // Validate generated file to validate 
-                    this.validateSwagger(basePath).then(data => {
-                              app.toast.info(constant.msgsuccess);
-                         })
-                         .catch(error => {
-                              app.dialogs.showErrorDialog(error.message);
-                              console.log(error)
-                         });
+                    this.validateSwagger(this.basePath).then(data => {
+                         app.toast.info(constant.msgsuccess);
+                    })
+                    .catch(error => {
+                         app.dialogs.showErrorDialog(error.message);
+                         console.log(error)
+                    });
 
                } else if (openAPI.getAppMode() == openAPI.APP_MODE_TEST) {
                     let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');

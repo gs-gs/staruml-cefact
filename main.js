@@ -13,7 +13,6 @@ var path = require('path');
  */
 function _handleGenerate(umlPackage, options = getGenOptions()) {
      // If options is not passed, get from preference
-
      openAPI.setAppMode(openAPI.APP_MODE_GEN); //0 mode for Generate API
      // If umlPackage is not assigned, popup ElementPicker
      if (!umlPackage) {
@@ -115,7 +114,6 @@ function getPackageOptions(ownedElements) {
  * @description Handle test case for valid OpenApi Specification
  */
 function _handleTestExtension() {
-
 
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
      openAPI.setTestMode(openAPI.TEST_MODE_SINGLE);
