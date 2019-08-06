@@ -5,7 +5,6 @@ const openAPI = require('./openapi');
 const MainJSON = require('./mainjson');
 const constant = require('./constant');
 const SwaggerParser = require("swagger-parser");
-let parser = new SwaggerParser();
 let YAML = SwaggerParser.YAML;
 /**
  * FileGenerator class generate JSON, YAML file based of selection
@@ -79,16 +78,7 @@ class FileGenerator {
                          return;
                     }
 
-                    // Finds the path of generated file to validate by swagger-parser
-                    // let basePath;
-                    // if (openAPI.getFileType() == 1) {
-                    //      basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
-                    // } else if (openAPI.getFileType() == 2) {
-                    //      basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
-                    // }
-
-                    // Validate generated file to validate 
-                    this.validateSwagger(this.basePath).then(data => {
+                    openAPI.validateSwagger(this.basePath).then(data => {
                          app.toast.info(constant.msgsuccess);
                     })
                     .catch(error => {
@@ -99,7 +89,7 @@ class FileGenerator {
                } else if (openAPI.getAppMode() == openAPI.APP_MODE_TEST) {
                     let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                     if (openAPI.getTestMode() == openAPI.TEST_MODE_SINGLE) {
-                         this.validateSwagger(pathValidator).then(data => {
+                         openAPI.validateSwagger(pathValidator).then(data => {
                                    app.dialogs.showAlertDialog(data.message);
                                    console.log(data)
                               })
@@ -108,7 +98,7 @@ class FileGenerator {
                                    console.log(error)
                               });
                     } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
-                         this.validateSwagger(pathValidator).then(data => {
+                         openAPI.validateSwagger(pathValidator).then(data => {
                                    // app.dialogs.showErrorDialog(data.message);
                                    openAPI.addSummery(data.message);
                                    console.log(data)
@@ -124,22 +114,6 @@ class FileGenerator {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
-     }
-     validateSwagger(pathValidator) {
-          return new Promise((resolve, reject) => {
-
-               parser.validate(pathValidator, (err, api) => {
-                    if (err) {
-                         // Error
-                         reject(err);
-                    } else {
-                         // Success
-                         resolve({
-                              message: "Package \'" + openAPI.getUMLPackage().name + "\' Tested Successfully"
-                         })
-                    }
-               });
-          });
      }
 }
 

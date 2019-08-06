@@ -1,4 +1,5 @@
 const openAPI = require('./openapi');
+const version=require('../package.json').version
 /**
  *
  *
@@ -16,9 +17,9 @@ class Info {
       */
      constructor() {
           this.mainInfoObj = {};
-          this.mainInfoObj.description = openAPI.getUMLPackage().name + ' API - 1.0.0';
+          this.mainInfoObj.description = openAPI.getUMLPackage().name + ' API - '+version;
           this.mainInfoObj.title = openAPI.getUMLPackage().name + ' API';
-          this.mainInfoObj.version = '1.0.0';
+          this.mainInfoObj.version = version;
      }
 
 
