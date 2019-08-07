@@ -38,6 +38,8 @@ class Component {
       */
      getComponent() {
           let classes = openAPI.getClasses();
+          console.log("Total Classes",classes);
+          console.log("Total Paths",openAPI.getPaths());
           let classLink = app.repository.select("@UMLAssociationClassLink");
           let arrIdClasses = [];
           let flagNoName = false;
@@ -65,6 +67,7 @@ class Component {
 
                // Adding Properties
                let properties = new Properties(objClass, assocSideClassLink);
+                    // Adds Attributes, With Enum, With Multiplicity
                mainPropertiesObj = properties.addProperties();
                mainClassesObj.properties = mainPropertiesObj;
 
@@ -73,7 +76,7 @@ class Component {
                this.arrAttr = properties.getAttributes();
 
 
-               // Adding Association
+               // Adding Association : Adds Attributes with Multiplicity, without Multiplicity
                mainPropertiesObj = this.association.addAssociationProperties(assocClassLink, mainPropertiesObj);
 
                this.arrAssoc = this.association.getAssociations();
@@ -93,11 +96,11 @@ class Component {
 
                          if (filterAssoc.length == 0 && assoc.name != "") {
                               if (assoc.end1.aggregation == constant.shared) {
-                                   // Adding Aggregation
+                                   // Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity
                                    let aggregation = new Aggregation();
                                    mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc);
                               } else {
-                                   // Adding composition
+                                   // Adding composition : Adds Attributes with Multiplicity, without Multiplicity
                                    let composition = new Composition();
                                    mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc);
 
@@ -116,7 +119,7 @@ class Component {
                     }
                });
 
-               // Adding Generalization
+               // Adding Generalization : Adds refs of Class in 'allOf' object
                mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj);
 
 
@@ -124,6 +127,7 @@ class Component {
                     return item.isID;
                });
 
+               // Generate Ids Class if needed
                if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
                     let allOfArray = [];
                     mainClassesObj.allOf = allOfArray;
