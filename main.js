@@ -3,6 +3,11 @@ var asyncLoop = require('node-async-loop');
 const constant = require('./src/constant');
 var fs = require('fs');
 var path = require('path');
+const $RefParser = require("json-schema-ref-parser");
+const SwaggerParser = require("swagger-parser");
+let parser = new SwaggerParser();
+const title=require('./package.json').title;
+const description=require('./package.json').description;
 
 // var mdjson = require('metadata-json');
 /**
@@ -17,7 +22,7 @@ function _handleGenerate(umlPackage, options = getGenOptions()) {
      // If umlPackage is not assigned, popup ElementPicker
      if (!umlPackage) {
           app.elementPickerDialog
-               .showDialog("Select the package or project to generate from", null, null) //type.UMLPackage
+               .showDialog(constant.DIALOG_MSG_PICKERDIALOG, null, null) //type.UMLPackage
                .then(function ({
                     buttonId,
                     returnValue
@@ -27,7 +32,7 @@ function _handleGenerate(umlPackage, options = getGenOptions()) {
                               umlPackage = returnValue;
                               fileTypeSelection(umlPackage, options);
                          } else {
-                              app.dialogs.showErrorDialog("Please select the project or a package");
+                              app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERRORDIALOG);
                          }
                     }
                });
@@ -42,7 +47,11 @@ function _handleGenerate(umlPackage, options = getGenOptions()) {
  */
 function fileTypeSelection(umlPackage, options) {
 
-     let fileOptions = [{
+     let fileOptions = [
+          {
+               text: "JSON & YML",
+               value: 3
+          },{
                text: "JSON",
                value: 1
           },
@@ -50,10 +59,7 @@ function fileTypeSelection(umlPackage, options) {
                text: "YML",
                value: 2
           },
-          {
-               text: "BOTH",
-               value: 3
-          }
+          
      ];
      app.dialogs.showSelectDropdownDialog(constant.msg_file_select, fileOptions).then(function ({
           buttonId,
@@ -115,10 +121,57 @@ function getPackageOptions(ownedElements) {
  */
 function _handleTestExtension() {
 
+     // "/home/vi109/Desktop/Identity-API.json/IdentityAPI.json"
+     
+
+     // console.log(parser);
+     
+     // await parser.dereference('/home/vi109/Desktop/Identity-API.yml');
+     // if (parser.$refs.circular) {
+     //   console.log('The API contains circular references');
+     // }
+
+     // fs.readFile('/home/vi109/Desktop/Identity-API.json/IdentityAPI.json', function (err, contents) {
+     //      if (err){
+     //            return console.error(err);
+     //      }
+     //      var data = JSON.parse(contents);
+     //     console.log('readObject',data);
+     //     $RefParser.dereference(data.components, (err, schema) => {
+     //      if (err) {
+     //        console.error('Refparser',err);
+     //      }
+     //      else {
+     //        // `schema` is just a normal JavaScript object that contains your entire JSON Schema,
+     //        // including referenced files, combined into a single object
+     //        console.log('Refparser',schema);
+     //      }
+     //    });
+     //  });
+
+     // openAPI.validateSwagger("/home/vi109/Desktop/Identity-API.json/IdentityAPI.json").then(data => {
+     //      console.log(data)
+     // })
+     // .catch(error => {
+     //      app.dialogs.showErrorDialog(error.message);
+     //      console.log(error)
+     // });
+
+     // $RefParser.dereference('/home/vi109/Desktop/Identity-API.json/IdentityAPI.json', (err, schema) => {
+     //      if (err) {
+     //        console.error('Refparser',err);
+     //      }
+     //      else {
+     //        // `schema` is just a normal JavaScript object that contains your entire JSON Schema,
+     //        // including referenced files, combined into a single object
+     //        console.log('Refparser','success');
+     //      }
+     //    });
+
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
      openAPI.setTestMode(openAPI.TEST_MODE_SINGLE);
      app.elementPickerDialog
-               .showDialog("Select the package or project to test", null, null) //type.UMLPackage
+               .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) //type.UMLPackage
                .then(function ({
                     buttonId,
                     returnValue
@@ -129,7 +182,7 @@ function _handleTestExtension() {
                               testSinglePackage(umlPackage);
 
                          } else {
-                              app.dialogs.showErrorDialog("Please select the project or a package");
+                              app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERRORDIALOG);
                          }
                     }
                });
@@ -234,6 +287,20 @@ function _handleAllTestPackages() {
      });
      testAllPackage(mPackages);
 }
+function _handleAboutUsExtension(){
+     console.log('Project',app.repository.select("@Project"));
+     // returns elements of type.Project: [Project]
+
+     console.log('UMLClass',app.repository.select("@UMLClass"));
+     // returns elements of type.UMLClass: [Book, Author]
+
+     console.log('IdentityAPI',app.repository.select("IdentityAPI")[0]);
+     console.log('classes',app.repository.select("IdentityAPI::@UMLClass"));
+     console.log('interfaces',app.repository.select("IdentityAPI::@UMLInterface"));
+     
+     console.log(app);
+     app.dialogs.showInfoDialog(title+"\n\n"+description);
+}
 /**
  * @function init
  * @description OpenAPI Initialization
@@ -242,6 +309,7 @@ function init() {
      app.commands.register('generate:show-toast', _handleGenerate);
      app.commands.register('testextension:test-extension', _handleTestExtension)
      app.commands.register('testallextension:test-all-extension', _handleAllTestPackages)
+     app.commands.register('generate:show-about-ext', _handleAboutUsExtension)
 }
 
 exports.init = init
