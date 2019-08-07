@@ -1,5 +1,5 @@
 const openAPI = require('./openapi');
-const version=require('../package.json').version
+const version=require('../package.json').version;
 const constant = require('../src/constant');
 /**
  *

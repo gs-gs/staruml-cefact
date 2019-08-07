@@ -19,9 +19,9 @@ const Constant = {
      IDEAL_JSON_FILE_NAME: 'SampleModel.json',
      DISPLAY_REPO_NAME:reponame,
      DISPLAY_VERSION:version,
-     DIALOG_MSG_PICKERDIALOG:"Select the package or project to generate from \n"+"( "+reponame+" v"+version+" )",
+     DIALOG_MSG_PICKERDIALOG:"Select the package or project to generate OpenAPI Specs.",
      DIALOG_MSG_ERRORDIALOG: "Please select the project or a package",
-     DIALOG_MSG_TEST_PICKERDIALOG: "Select the package or project to test \n"+"( "+reponame+" v"+version+" )",
+     DIALOG_MSG_TEST_PICKERDIALOG: "Select the package or project to test OpenAPI Specs.",
      msg_description:"This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: "+version
      
 }
