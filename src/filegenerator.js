@@ -99,12 +99,10 @@ class FileGenerator {
                               });
                     } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
                          openAPI.validateSwagger(pathValidator).then(data => {
-                                   // app.dialogs.showErrorDialog(data.message);
                                    openAPI.addSummery(data.message);
                                    console.log(data)
                               })
                               .catch(error => {
-                                   // app.dialogs.showErrorDialog(error.message);
                                    openAPI.addSummery(error.message);
                                    console.log(error)
                               });
