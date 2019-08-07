@@ -314,26 +314,24 @@ class OpenApi {
       */
      generateOpenAPI() {
           try {
-               // Add openapi component
-               let component = new Component();
-               MainJSON.addComponent(component);
+               // Add openapi version
+               MainJSON.addApiVersion('3.0.0');
 
                // Add openapi information
                let mInfo = new Info();
                MainJSON.addInfo(mInfo);
 
-               // Add openapi version
-               MainJSON.addApiVersion('3.0.0')
-
-               //Add openapi paths
-               let paths = new Paths();
-               MainJSON.addPaths(paths);
                //Add openapi servers
                let server = new Servers();
                MainJSON.addServers(server);
 
-
-
+               //Add openapi paths
+               let paths = new Paths();
+               MainJSON.addPaths(paths);
+               
+               // Add openapi component
+               let component = new Component();
+               MainJSON.addComponent(component);
 
                let generator = new FileGenerator();
                generator.generate();
