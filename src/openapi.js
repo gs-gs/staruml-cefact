@@ -1,3 +1,4 @@
+const constant = require('./constant');
 const fs = require('fs');
 const Info = require('./info');
 const Component = require('./component');
@@ -390,7 +391,7 @@ function validateSwagger(pathValidator) {
                } else {
                     // Success
                     resolve({
-                         message: "Package \'" + OpenApi.getPackage().name + "\' Tested Successfully"
+                         message: "success"
                     })
                }
           });
