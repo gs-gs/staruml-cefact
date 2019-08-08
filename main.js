@@ -149,13 +149,7 @@ function _handleTestExtension() {
      //    });
      //  });
 
-     // openAPI.validateSwagger("/home/vi109/Desktop/Identity-API.json/IdentityAPI.json").then(data => {
-     //      console.log(data)
-     // })
-     // .catch(error => {
-     //      app.dialogs.showErrorDialog(error.message);
-     //      console.log(error)
-     // });
+  
 
      // $RefParser.dereference('/home/vi109/Desktop/Identity-API.json/IdentityAPI.json', (err, schema) => {
      //      if (err) {
