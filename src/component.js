@@ -38,8 +38,6 @@ class Component {
       */
      getComponent() {
           let classes = openAPI.getClasses();
-          console.log("Total Classes",classes);
-          console.log("Total Paths",openAPI.getPaths());
           let classLink = app.repository.select("@UMLAssociationClassLink");
           let arrIdClasses = [];
           let flagNoName = false;
@@ -67,7 +65,7 @@ class Component {
 
                // Adding Properties
                let properties = new Properties(objClass, assocSideClassLink);
-                    // Adds Attributes, With Enum, With Multiplicity
+               // Adds Attributes, With Enum, With Multiplicity
                mainPropertiesObj = properties.addProperties();
                mainClassesObj.properties = mainPropertiesObj;
 

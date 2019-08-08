@@ -1,5 +1,5 @@
 const openAPI = require('./openapi');
-const version=require('../package.json').version;
+const version = require('../package.json').version;
 const constant = require('../src/constant');
 /**
  *
@@ -17,23 +17,23 @@ class Info {
       * @constructor Info
       */
      constructor() {
-          var version='';
-          var description='';
-          if(openAPI.getUMLPackage().hasOwnProperty('documentation')){
+          var version = '';
+          var description = '';
+          if (openAPI.getUMLPackage().hasOwnProperty('documentation')) {
                var re = openAPI.getUMLPackage().documentation.split("\n");
-               if(re.length>=1){
-                    var verArr=re[0].split(":")
-                    if(verArr.length>1){
-                         version=verArr[1];
+               if (re.length >= 1) {
+                    var verArr = re[0].split(":")
+                    if (verArr.length > 1) {
+                         version = verArr[1];
                     }
                }
-               if(re.length>1){
-                    description=re[1]+'<br><br>'+constant.msg_description;
+               if (re.length > 1) {
+                    description = re[1] + '<br><br>' + constant.msg_description;
                }
-               console.log("version",version);
-               console.log("description",description);
-               
-               
+               console.log("version", version);
+               console.log("description", description);
+
+
           }
           this.mainInfoObj = {};
           this.mainInfoObj.description = description;

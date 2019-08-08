@@ -16,11 +16,11 @@
                     "label": "Test Entire Project",
                     "id": "tools.openapi.testallextension",
                     "command": "testallextension:test-all-extension"
-               },{
+               }, {
                     "label": "Extension version : 0.2.2",
                     "id": "tools.openapi.version",
                     "command": "generate:show-version-dialog"
-               },{
+               }, {
                     "label": "About Extension",
                     "id": "tools.openapi.aboutext",
                     "command": "generate:show-about-ext"
