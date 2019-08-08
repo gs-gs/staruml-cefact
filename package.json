@@ -6,6 +6,9 @@
     "engines": {
         "staruml": ">=3.0.0"
     },
+    "scripts": {
+        "test": "mocha"
+    },
     "author": {
         "name": "GoSource Pty Ltd",
         "email": "info@gosource.com.au",
@@ -14,6 +17,7 @@
     "license": "MIT",
     "dependencies": {
         "json-schema-ref-parser": "^7.1.0",
+        "mocha": "^6.2.0",
         "node-async-loop": "^1.2.2",
         "swagger-parser": "^8.0.0"
     }
