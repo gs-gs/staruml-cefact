@@ -1,4 +1,5 @@
-const version=require('../package.json').version
+const version = require('../package.json').version
+const openAPI = require('./openapi');
 const reponame=require('../package.json').name
 const Constant = {
      entry: '#',
@@ -6,7 +7,10 @@ const Constant = {
      schemas: 'schemas',
      path: '/',
      shared: 'shared',
-     msgsuccess: 'OpenAPI generation completed',
+     msgsuccess: 'OpenAPI generated for Package : ',
+     msgerror: 'OpenAPI generation failure for Package : ',
+     strerror:'Error : ',
+     strpath:'Path : ',
      msgpackage: 'Package not available',
      msg_file_select: 'Select one of the following type.',
      msg_file_saveas: 'Save File as...',
