@@ -8,6 +8,7 @@ const SwaggerParser = require("swagger-parser");
 let parser = new SwaggerParser();
 const title=require('./package.json').title;
 const description=require('./package.json').description;
+const version=require('./package.json').version;
 
 // var mdjson = require('metadata-json');
 /**
@@ -295,15 +296,71 @@ function _handleAboutUsExtension(){
      console.log(app);
      app.dialogs.showInfoDialog(title+"\n\n"+description);
 }
+function _handleMenusJson(){
+     console.log(app.menu);
+     //tools.openapi.version
+     fs.readFile(__dirname+'/menus/openapi.json', function (err, contents) {
+          if (err){
+                return console.error(err);
+          }
+          var data = JSON.parse(contents);
+          console.log('menusJson',data);
+          let submenu=data.menu[0].submenu[0].submenu;
+          let repObj={};
+          let position=0;
+          let found=0;
+          submenu.forEach((element,index) => {
+               if (element.id=='tools.openapi.version') {
+                    element.label='Extension Mayur version : '+version
+                    position=index;
+                    found=1;
+                    repObj=element;
+               }
+          });
+          if(found==1){
+               submenu[position]=repObj;
+               data.menu[0].submenu[0].submenu=submenu;
+               fs.writeFileSync(__dirname+'/menus/openapi.json', JSON.stringify(data, null, 4));
+          }
+          app.menu.template.forEach((template,index) => {
+               //'tools.openapi.version'
+               if (template.id=="tools") {
+                    template.submenu.forEach((subItem,index) => {
+                         if (subItem.id=='tool.openapi') {
+                              subItem.submenu.forEach((subOutMenu,index) => {
+                                   if (subOutMenu.id=='tools.openapi.version') {
+                                        subOutMenu.label='Extension Mayur version : '+version
+                                        // position=index;
+                                        // found=1;
+                                        // repObj=element;
+                                   }
+                              });
+                         }
+                    });
+
+                    //element.label='Extension Mayur version : '+version
+                    //position=index;
+                    //found=1;
+                    //repObj=element;
+               }
+          });
+          console.log("DataTemplate",app.menu.template);
+          app.menu.add(app.menu.template);
+          
+
+         
+      });
+}
 /**
  * @function init
  * @description OpenAPI Initialization
  */
 function init() {
      app.commands.register('generate:show-toast', _handleGenerate);
-     app.commands.register('testextension:test-extension', _handleTestExtension)
-     app.commands.register('testallextension:test-all-extension', _handleAllTestPackages)
-     app.commands.register('generate:show-about-ext', _handleAboutUsExtension)
+     app.commands.register('testextension:test-extension', _handleTestExtension);
+     app.commands.register('testallextension:test-all-extension', _handleAllTestPackages);
+     app.commands.register('generate:show-about-ext', _handleAboutUsExtension);
+     // _handleMenusJson();
 }
 
 exports.init = init
