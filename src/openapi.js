@@ -31,11 +31,12 @@ class OpenApi {
           OpenApi.filePath = basePath;
           this.options = options;
           this.schemas = [];
+          this.pkgPath=[];
           OpenApi.operations = [];
           this.utils = new Utils();
           OpenApi.fileType = fileType;
           OpenApi.uniqueClassesArr = [];
-
+          OpenApi.strPackagePath='';
 
           OpenApi.error = {};
           // OpenApi.isDuplicate=false;
@@ -309,12 +310,47 @@ class OpenApi {
           return OpenApi.fileType;
      }
 
+     resetPackagePath(){
+          this.pkgPath=[];
+     }
+     
+     static getPackagePath(){
+          return OpenApi.strPackagePath;
+     }
+     static setPackagepath(strPackagePath){
+          OpenApi.strPackagePath=strPackagePath;
+     }
+     findHierarchy(umlPackage){
+          this.pkgPath.push(umlPackage.name);
+          if(umlPackage.hasOwnProperty('_parent') && umlPackage._parent!=null && umlPackage._parent instanceof type.UMLPackage){
+               
+               this.findHierarchy(umlPackage._parent);
+          }
+          return this.pkgPath;
+     }
+     reversePkgPath(){
+          let str='';
+          for(let i=(this.pkgPath.length-1);i>=0;i--){
+               str+=this.pkgPath[i]+'\\';
+          }
+          return str;
+     }
+
      /**
       * @function generateOpenAPI
       * @description generate open api json
       */
      generateOpenAPI() {
           try {
+
+
+               this.resetPackagePath();
+               let arrPath=this.findHierarchy(OpenApi.getPackage());
+               let rPath=this.reversePkgPath(arrPath);
+               console.log("pkgPath",rPath);
+               OpenApi.setPackagepath(rPath);
+
+
                // Add openapi version
                MainJSON.addApiVersion('3.0.0');
 
@@ -418,3 +454,4 @@ module.exports.addSummery = addSummery;
 module.exports.getSummery = getSummery;
 module.exports.resetSummery = resetSummery;
 module.exports.validateSwagger = validateSwagger;
+module.exports.getPackagePath = OpenApi.getPackagePath;

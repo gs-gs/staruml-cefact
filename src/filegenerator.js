@@ -79,7 +79,7 @@ class FileGenerator {
                     }
 
                     openAPI.validateSwagger(this.basePath).then(data => {
-                         let bindSuccesMsg=constant.msgsuccess+'\''+openAPI.getUMLPackage().name+'\''+'\n\n'+constant.strpath+this.basePath
+                         let bindSuccesMsg=constant.msgsuccess+'\''+openAPI.getUMLPackage().name+'\' {'+openAPI.getPackagePath()+'}'+'\n\n'+constant.strpath+this.basePath
                          if(openAPI.getFileType() == 3){
                               let jsonFilePath = this.basePath.replace(".yml", ".json");
                               bindSuccesMsg=bindSuccesMsg+constant.strend+constant.stronlypath+jsonFilePath;
@@ -87,7 +87,7 @@ class FileGenerator {
                          app.dialogs.showAlertDialog(bindSuccesMsg);
                     })
                     .catch(error => {
-                         let bindFailureMsg=constant.msgerror+'\''+openAPI.getUMLPackage().name+'\''+'\n\n'+constant.strerror+error.message
+                         let bindFailureMsg=constant.msgerror+'\''+openAPI.getUMLPackage().name+'\' {'+openAPI.getPackagePath()+'}'+'\n\n'+constant.strerror+error.message
                          app.dialogs.showErrorDialog(bindFailureMsg);
                          console.log(error)
                     });
@@ -96,20 +96,20 @@ class FileGenerator {
                     let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                     if (openAPI.getTestMode() == openAPI.TEST_MODE_SINGLE) {
                          openAPI.validateSwagger(pathValidator).then(data => {
-                              let bindSuccesMsg=constant.msgstestuccess+'\''+openAPI.getUMLPackage().name+'\''+'\n\n'+constant.strpath+pathValidator
+                              let bindSuccesMsg=constant.msgstestuccess+'\''+openAPI.getUMLPackage().name+'\' {'+openAPI.getPackagePath()+'}'+'\n\n'+constant.strpath+pathValidator
                               app.dialogs.showAlertDialog(bindSuccesMsg);
                          })
                          .catch(error => {
-                              let bindFailureMsg=constant.msgtesterror+'\''+openAPI.getUMLPackage().name+'\''+'\n\n'+constant.strerror+error.message
+                              let bindFailureMsg=constant.msgtesterror+'\''+openAPI.getUMLPackage().name+'\' {'+openAPI.getPackagePath()+'}'+'\n\n'+constant.strerror+error.message
                               app.dialogs.showErrorDialog(bindFailureMsg);
                          });
                     } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
                          openAPI.validateSwagger(pathValidator).then(data => {
-                              let bindSuccesMsg=constant.msgstestuccess+'\''+openAPI.getUMLPackage().name+'\''+'\n'+constant.strpath+pathValidator
+                              let bindSuccesMsg=constant.msgstestuccess+'\''+openAPI.getUMLPackage().name+'\' {'+openAPI.getPackagePath()+'}'+'\n'+constant.strpath+pathValidator
                               openAPI.addSummery(bindSuccesMsg);
                          })
                          .catch(error => {
-                              let bindFailureMsg=constant.msgtesterror+'\''+openAPI.getUMLPackage().name+'\''+'\n'+constant.strerror+error.message
+                              let bindFailureMsg=constant.msgtesterror+'\''+openAPI.getUMLPackage().name+'\' {'+openAPI.getPackagePath()+'}'+'\n'+constant.strerror+error.message
                               openAPI.addSummery(bindFailureMsg);
                          });
                     }
