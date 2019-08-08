@@ -106,11 +106,11 @@ class FileGenerator {
                     } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
                          openAPI.validateSwagger(pathValidator).then(data => {
                                    let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
-                                   openAPI.addSummery(bindSuccesMsg);
+                                   openAPI.addSummery(bindSuccesMsg,'success');
                               })
                               .catch(error => {
                                    let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + error.message
-                                   openAPI.addSummery(bindFailureMsg);
+                                   openAPI.addSummery(bindFailureMsg,'failure');
                               });
                     }
                }

@@ -153,11 +153,19 @@ function testAllPackage(item) {
                setTimeout(function () {
                     let summery = openAPI.getSummery();
 
+                    let status='success';
                     summery.filter((item, index) => {
-
+                         if(item.status=='failure'){
+                              status='failure'
+                         }
                          strSummery += item.message + '\n\n';
                     });
-                    app.dialogs.showAlertDialog(strSummery);
+                    if(status=='success'){
+                         app.dialogs.showAlertDialog(strSummery);
+                    }else{
+                         app.dialogs.showErrorDialog(strSummery);
+                    }
+                    
                }, 1500);
           }
      });

@@ -390,9 +390,10 @@ let summeryMessages = [];
  * @static
  * @memberof OpenApi
  */
-function addSummery(message) {
+function addSummery(message,status) {
      let msg = {
-          message: message
+          message: message,
+          status:status
      }
      summeryMessages.push(msg);
 }

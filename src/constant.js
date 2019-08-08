@@ -30,7 +30,7 @@ const Constant = {
      DIALOG_MSG_ERRORDIALOG: "Please select the project or a package",
      DIALOG_MSG_TEST_PICKERDIALOG: "Select the package or project to test OpenAPI Specs.",
      msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
-     fileOptions = [{
+     fileOptions : [{
                text: "JSON & YML",
                value: 3
           }, {
