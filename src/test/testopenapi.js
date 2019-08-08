@@ -1,4 +1,3 @@
-const fs = require('fs');
 const Info = require('../info');
 const Component = require('../component');
 const Utils = require('../utils');
@@ -6,7 +5,6 @@ const TestFileGenerator = require('../test/testfilegenerator');
 const Paths = require('../paths');
 const Servers = require('../servers');
 const MainJSON = require('../mainjson');
-const constant = require('../../src/constant');
 
 /**
  *

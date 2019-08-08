@@ -1,5 +1,4 @@
 const openAPI = require('./openapi');
-const version = require('../package.json').version;
 const constant = require('../src/constant');
 /**
  *
@@ -30,10 +29,6 @@ class Info {
                if (re.length > 1) {
                     description = re[1] + '<br><br>' + constant.msg_description;
                }
-               console.log("version", version);
-               console.log("description", description);
-
-
           }
           this.mainInfoObj = {};
           this.mainInfoObj.description = description;

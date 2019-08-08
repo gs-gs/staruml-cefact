@@ -75,7 +75,6 @@ class Aggregation {
                     propertiesObj.minItems = 1;
                }
           } else {
-               //AskQue
                let allOfArray = [];
                propertiesObj.allOf = allOfArray;
 

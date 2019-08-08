@@ -16,7 +16,6 @@
     },
     "license": "MIT",
     "dependencies": {
-        "json-schema-ref-parser": "^7.1.0",
         "mocha": "^6.2.0",
         "node-async-loop": "^1.2.2",
         "swagger-parser": "^8.0.0"

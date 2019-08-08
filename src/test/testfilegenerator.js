@@ -19,7 +19,11 @@ class TestFileGenerator {
      constructor() {
           this.utils = new Utils();
      }
-
+     /**
+      * @function createJSON
+      * @description This function creats OpenAPI json file at Selected file path
+      * @memberof TestFileGenerator
+      */
      createJSON() {
           try {
                let basePath;
@@ -36,8 +40,8 @@ class TestFileGenerator {
 
      /**
       *
-      * 
-      * 
+      * @function generate
+      * @description Function generate OpenAPI file for testing purpose
       * @memberof TestFileGenerator
       */
      generate() {

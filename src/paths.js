@@ -279,11 +279,6 @@ class Paths {
                this.utils.writeErrorToFile(error);
           }
      }
-
-
-
-
-
 }
 
 module.exports = Paths;

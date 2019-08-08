@@ -166,11 +166,6 @@ class Component {
           return this.mainComponentObj;
      }
 
-
-
-
-
-
 }
 
 module.exports = Component;

@@ -1,4 +1,3 @@
-const openAPI = require('./openapi');
 /**
  *
  *

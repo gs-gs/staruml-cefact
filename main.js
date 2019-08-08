@@ -3,14 +3,9 @@ var asyncLoop = require('node-async-loop');
 const constant = require('./src/constant');
 var fs = require('fs');
 var path = require('path');
-const $RefParser = require("json-schema-ref-parser");
-const SwaggerParser = require("swagger-parser");
-let parser = new SwaggerParser();
 const title = require('./package.json').title;
 const description = require('./package.json').description;
-const version = require('./package.json').version;
 
-// var mdjson = require('metadata-json');
 /**
  * @function _handleGenerate
  * @description OpenAPI generation when OpenAPI Initialization  
@@ -48,20 +43,7 @@ function _handleGenerate(umlPackage, options = getGenOptions()) {
  */
 function fileTypeSelection(umlPackage, options) {
 
-     let fileOptions = [{
-               text: "JSON & YML",
-               value: 3
-          }, {
-               text: "JSON",
-               value: 1
-          },
-          {
-               text: "YML",
-               value: 2
-          },
-
-     ];
-     app.dialogs.showSelectDropdownDialog(constant.msg_file_select, fileOptions).then(function ({
+     app.dialogs.showSelectDropdownDialog(constant.msg_file_select, constant.fileOptions).then(function ({
           buttonId,
           returnValue
      }) {
@@ -89,78 +71,12 @@ function getGenOptions() {
           debug: app.preferences.get(constant.PREF_DEBUG_KEY)
      };
 }
-/**
- * @function getPackageOptions
- * @param {Array} ownedElements
- * @description Returns the array of Package list 
- * @returns {Array}
- */
-function getPackageOptions(ownedElements) {
-     let umlPackageList = [];
-     ownedElements.filter((item, index) => {
-
-          if (item instanceof type.UMLPackage) {
-               var mObject = {};
-               mObject.text = item.name;
-               mObject.value = index;
-               umlPackageList.push(mObject);
-
-
-
-
-
-          }
-     });
-     return umlPackageList;
-}
-
 
 /**
  * @function _handleTestExtension
  * @description Handle test case for valid OpenApi Specification
  */
 function _handleTestExtension() {
-
-     // "/home/vi109/Desktop/Identity-API.json/IdentityAPI.json"
-
-
-     // console.log(parser);
-
-     // await parser.dereference('/home/vi109/Desktop/Identity-API.yml');
-     // if (parser.$refs.circular) {
-     //   console.log('The API contains circular references');
-     // }
-
-     // fs.readFile('/home/vi109/Desktop/Identity-API.json/IdentityAPI.json', function (err, contents) {
-     //      if (err){
-     //            return console.error(err);
-     //      }
-     //      var data = JSON.parse(contents);
-     //     console.log('readObject',data);
-     //     $RefParser.dereference(data.components, (err, schema) => {
-     //      if (err) {
-     //        console.error('Refparser',err);
-     //      }
-     //      else {
-     //        // `schema` is just a normal JavaScript object that contains your entire JSON Schema,
-     //        // including referenced files, combined into a single object
-     //        console.log('Refparser',schema);
-     //      }
-     //    });
-     //  });
-
-
-
-     // $RefParser.dereference('/home/vi109/Desktop/Identity-API.json/IdentityAPI.json', (err, schema) => {
-     //      if (err) {
-     //        console.error('Refparser',err);
-     //      }
-     //      else {
-     //        // `schema` is just a normal JavaScript object that contains your entire JSON Schema,
-     //        // including referenced files, combined into a single object
-     //        console.log('Refparser','success');
-     //      }
-     //    });
 
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
      openAPI.setTestMode(openAPI.TEST_MODE_SINGLE);
@@ -286,73 +202,7 @@ function _handleAllTestPackages() {
  * @description This function dislplay the title and description of the extension
  */
 function _handleAboutUsExtension() {
-     //console.log('Project',app.repository.select("@Project"));
-     //console.log('UMLClass',app.repository.select("@UMLClass"));
-     //console.log('IdentityAPI',app.repository.select("IdentityAPI")[0]);
-     //console.log('classes',app.repository.select("IdentityAPI::@UMLClass"));
-     //console.log('interfaces',app.repository.select("IdentityAPI::@UMLInterface"));
-
-     console.log(app);
      app.dialogs.showInfoDialog(title + "\n\n" + description);
-}
-/**
- * @function _handleMenusJson
- * @description Change menu items dynamically
- */
-function _handleMenusJson() {
-     console.log(app.menu);
-     //tools.openapi.version
-     fs.readFile(__dirname + '/menus/openapi.json', function (err, contents) {
-          if (err) {
-               return console.error(err);
-          }
-          var data = JSON.parse(contents);
-          console.log('menusJson', data);
-          let submenu = data.menu[0].submenu[0].submenu;
-          let repObj = {};
-          let position = 0;
-          let found = 0;
-          submenu.forEach((element, index) => {
-               if (element.id == 'tools.openapi.version') {
-                    element.label = 'Extension Mayur version : ' + version
-                    position = index;
-                    found = 1;
-                    repObj = element;
-               }
-          });
-          if (found == 1) {
-               submenu[position] = repObj;
-               data.menu[0].submenu[0].submenu = submenu;
-               fs.writeFileSync(__dirname + '/menus/openapi.json', JSON.stringify(data, null, 4));
-          }
-          app.menu.template.forEach((template, index) => {
-               //'tools.openapi.version'
-               if (template.id == "tools") {
-                    template.submenu.forEach((subItem, index) => {
-                         if (subItem.id == 'tool.openapi') {
-                              subItem.submenu.forEach((subOutMenu, index) => {
-                                   if (subOutMenu.id == 'tools.openapi.version') {
-                                        subOutMenu.label = 'Extension Mayur version : ' + version
-                                        // position=index;
-                                        // found=1;
-                                        // repObj=element;
-                                   }
-                              });
-                         }
-                    });
-
-                    //element.label='Extension Mayur version : '+version
-                    //position=index;
-                    //found=1;
-                    //repObj=element;
-               }
-          });
-          console.log("DataTemplate", app.menu.template);
-          app.menu.add(app.menu.template);
-
-
-
-     });
 }
 /**
  * @function init
@@ -363,7 +213,6 @@ function init() {
      app.commands.register('testextension:test-extension', _handleTestExtension);
      app.commands.register('testallextension:test-all-extension', _handleAllTestPackages);
      app.commands.register('generate:show-about-ext', _handleAboutUsExtension);
-     // _handleMenusJson();
 }
 
 exports.init = init

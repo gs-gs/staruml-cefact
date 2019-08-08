@@ -1,4 +1,3 @@
-const constant = require('./constant');
 const fs = require('fs');
 const Info = require('./info');
 const Component = require('./component');

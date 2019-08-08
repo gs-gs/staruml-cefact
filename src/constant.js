@@ -1,5 +1,4 @@
 const version = require('../package.json').version
-const openAPI = require('./openapi');
 const reponame = require('../package.json').name
 const Constant = {
      entry: '#',
@@ -30,7 +29,19 @@ const Constant = {
      DIALOG_MSG_PICKERDIALOG: "Select the package or project to generate OpenAPI Specs.",
      DIALOG_MSG_ERRORDIALOG: "Please select the project or a package",
      DIALOG_MSG_TEST_PICKERDIALOG: "Select the package or project to test OpenAPI Specs.",
-     msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version
+     msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
+     fileOptions = [{
+               text: "JSON & YML",
+               value: 3
+          }, {
+               text: "JSON",
+               value: 1
+          },
+          {
+               text: "YML",
+               value: 2
+          },
+     ]
 
 }
 
