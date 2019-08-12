@@ -1,19 +1,13 @@
 const openAPI = require('./openapi');
 const constant = require('../src/constant');
+
 /**
- *
- *
- * @class Info
-/**
- * Info class returns the API Info 
- *
- * @class Info
+ * @class Info 
+ * @description class returns the API Info 
  */
 class Info {
      /**
-      * Creates an instance of Info.
-      * 
-      * @constructor Info
+      * @constructor Creates an instance of Info.
       */
      constructor() {
           var version = '';
@@ -38,10 +32,10 @@ class Info {
 
 
      /**
-      * Return Info object 
-      * 
-      * @function getData
-      * @return {string}
+      * @function getInfo
+      * @description Return Info object 
+      * @return {Object}
+      * @memberof Info
       */
      getInfo() {
           return this.mainInfoObj;

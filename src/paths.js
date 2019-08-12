@@ -4,15 +4,12 @@ const Generalization = require('./generalization');
 const constant = require('./constant');
 const Operations = require('./operations');
 /**
- *
- *
  * @class Paths
+ * @description class returns the Paths
  */
 class Paths {
      /**
-      * Creates an instance of Paths.
-      * 
-      * @constructor Paths
+      * @constructor Creates an instance of Paths.
       */
      constructor() {
           this.utils = new Utils();
@@ -21,10 +18,10 @@ class Paths {
      }
 
      /**
-      * Return Operations object 
-      * 
       * @function getOperations
+      * @description Return Operations object 
       * @return {object} mainPathsObject
+      * @memberof Paths
       */
      getOperations() {
           let mainPathsObject = {};
@@ -142,6 +139,7 @@ class Paths {
       * @param {UMLInterfaceRealization} interfaceRealization 
       * @param {UMLAssociation} interfaceAssociation 
       * @param {Object} mainPathsObject
+      * @memberof Paths 
       */
 
      writeInterfaceComposite(interfaceRealization, interfaceAssociation, mainPathsObject) {

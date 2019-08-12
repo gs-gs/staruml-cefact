@@ -2,20 +2,14 @@ const Utils = require('./utils');
 const Generalization = require('./generalization');
 const Required = require('./required');
 const constant = require('./constant');
+
 /**
- *
- *
  * @class Association
-/**
- * Association class returns the API Association 
- *
- * @class Association
+ * @description class returns the API Association 
  */
 class Association {
      /**
-      * Creates an instance of Association.
-      * 
-      * @constructor Association
+      * @constructor Creates an instance of Association.
       */
      constructor() {
           this.utils = new Utils();

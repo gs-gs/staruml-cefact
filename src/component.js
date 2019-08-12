@@ -9,9 +9,8 @@ const openAPI = require('./openapi');
 const constant = require('./constant');
 
 /**
- * Component class adds all classes from the class diagram
- *
- * @class Component
+ * @class Component 
+ * @description class adds all classes from the class diagram
  */
 class Component {
      /**
@@ -31,9 +30,9 @@ class Component {
      }
 
      /**
-      *
-      *
-      * @returns mainComponentObj
+      * @function getComponent
+      * @description Returns component object 
+      * @returns {Object}
       * @memberof Component
       */
      getComponent() {

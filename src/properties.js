@@ -1,18 +1,11 @@
 const Utils = require('./utils');
 /**
- *
- *
- * @class Properties
-/**
- * Properties class returns the Attributes available in class 
- *
+ * @description class returns the Attributes available in class  
  * @class Properties
  */
 class Properties {
      /**
-      * Creates an instance of Properties.
-      * 
-      * @constructor Properties
+      * @constructor Creates an instance of Properties.
       */
      constructor(objClass, assocSideClassLink) {
           this.objClass = objClass;
@@ -22,9 +15,9 @@ class Properties {
      }
 
      /**
-      *
-      *
-      * @returns 
+      * @function getAttributes
+      * @description Returns the array of properties
+      * @returns {Array}
       * @memberof Properties
       */
      getAttributes() {
@@ -32,9 +25,8 @@ class Properties {
      }
 
      /**
-      *
-      *
-      * @returns
+      * @function addProperties
+      * @description Adds properties to mainPropertiesObject
       * @memberof Properties
       */
      addProperties() {

@@ -10,20 +10,18 @@ const SwaggerParser = require("swagger-parser");
 let parser = new SwaggerParser();
 
 /**
- *
- *
- * @class OpenApi
+ * @class OpenApi 
+ * @description class returns the OpenAPI
  */
 class OpenApi {
 
      /**
-      * Creates an instance of OpenApi.
-      * 
-      * @constructor OpenApi
+      * @constructor Creates an instance of OpenApi.
       * @param {UMLPackage} umlPackage
       * @param {string} basePath
       * @param {Object} options
       * @param {integer} fileType
+      * @memberof OpenAPI
       */
      constructor(umlPackage, basePath, options, fileType) {
           OpenApi.umlPackage = umlPackage;
@@ -46,6 +44,7 @@ class OpenApi {
      /**
       * @function initUMLPackage
       * @description initializes UML Package
+      * @memberof OpenAPI
       */
      initUMLPackage() {
           try {
@@ -74,7 +73,8 @@ class OpenApi {
 
      /**
       * @function getUMLModels
-      * @description get all models from UMLPacakage
+      * @description get and stores UMLInterface, UMLClass & UMLGeneralization 
+      * @memberof OpenAPI
       */
      getUMLModels() {
           try {
@@ -155,10 +155,10 @@ class OpenApi {
 
 
      /**
-      * 
       * @function findClass
       * @description finds the element from the class
       * @param {UMLClass} elem
+      * @memberof OpenAPI
       */
      findClass(umlClass) {
           try {
@@ -215,7 +215,7 @@ class OpenApi {
      }
 
      /**
-      * @function setMode
+      * @function setAppMode
       * @description set Extention mode weather is in TEST(1) or GENERATE(0) MODE
       * @static
       * @memberof OpenApi
@@ -225,7 +225,7 @@ class OpenApi {
      }
 
      /**
-      * @function getMode
+      * @function getAppMode
       * @description returns the Extention mode weather is in TEST(1) or GENERATE(0) MODE
       * @static
       * @memberof OpenApi
@@ -258,7 +258,7 @@ class OpenApi {
       * @function getUniqueClasses
       * @description save and returns the array of unique classes
       * @static
-      * @returns returns array of unique classes
+      * @returns {Array}
       * @memberof OpenApi
       */
      static getUniqueClasses() {
@@ -269,7 +269,7 @@ class OpenApi {
       * @function getPath
       * @description returns filePath
       * @static
-      * @returns returns filePath
+      * @returns {string}
       * @memberof OpenApi
       */
      static getPath() {
@@ -280,7 +280,7 @@ class OpenApi {
       * @function getPackage
       * @description returns UMLPackage
       * @static
-      * @returns returns UMLPackage
+      * @returns {UMLPackage}
       * @memberof OpenApi
       */
      static getPackage() {
@@ -291,7 +291,7 @@ class OpenApi {
       * @function getOperations
       * @description returns path operations
       * @static
-      * @returns operations
+      * @returns {operations}
       * @memberof OpenApi
       */
      static getOperations() {
@@ -302,23 +302,49 @@ class OpenApi {
       * @function getType
       * @description returns fileType
       * @static
-      * @returns fileType
+      * @returns {integer}
       * @memberof OpenApi
       */
      static getType() {
           return OpenApi.fileType;
      }
 
+     /**
+      * @function resetPackagePath
+      * @description reset package path array
+      * @memberof OpenApi
+      */
      resetPackagePath() {
           this.pkgPath = [];
      }
 
+     /**
+      * @function getPackagepath
+      * @description returns the stored package path
+      * @static
+      * @returns {string}
+      * @memberof OpenApi
+      */
      static getPackagePath() {
           return OpenApi.strPackagePath;
      }
+     /**
+      * @function setPackagepath
+      * @description stores package path 
+      * @static
+      * @param {string} strPackagePath
+      * @memberof OpenApi
+      */
      static setPackagepath(strPackagePath) {
           OpenApi.strPackagePath = strPackagePath;
      }
+     /**
+      * @function findHierarchy
+      * @description finds the package hierarchy recursively
+      * @param {UMLPackage} umlPackage
+      * @returns {Array}
+      * @memberof OpenApi
+      */
      findHierarchy(umlPackage) {
           this.pkgPath.push(umlPackage.name);
           if (umlPackage.hasOwnProperty('_parent') && umlPackage._parent != null && umlPackage._parent instanceof type.UMLPackage) {
@@ -327,6 +353,12 @@ class OpenApi {
           }
           return this.pkgPath;
      }
+     /**
+      * @function reversePkgPath
+      * @description returns the package path recursively
+      * @returns {string}
+      * @memberof OpenApi
+      */
      reversePkgPath() {
           let str = '';
           for (let i = (this.pkgPath.length - 1); i >= 0; i--) {
@@ -337,7 +369,8 @@ class OpenApi {
 
      /**
       * @function generateOpenAPI
-      * @description generate open api json
+      * @description generate open api json object
+      * @memberof OpenApi
       */
      generateOpenAPI() {
           try {
@@ -387,21 +420,19 @@ let summeryMessages = [];
 /**
  * @function addSummery
  * @description Stores test messages in summery to show at once after ALL test
- * @static
- * @memberof OpenApi
  */
-function addSummery(message,status) {
+function addSummery(message, status) {
      let msg = {
           message: message,
-          status:status
+          status: status
      }
      summeryMessages.push(msg);
 }
+
 /**
  * @function getSummery
  * @description returns Stored summery messages to show at once after ALL test
- * @static
- * @memberof OpenApi
+ * @returns {Array}
  */
 function getSummery() {
      return summeryMessages;
@@ -411,13 +442,16 @@ function getSummery() {
 /**
  * @function resetSummery
  * @description reset all stored summery
- * @static
- * @memberof OpenApi
  */
 function resetSummery() {
      summeryMessages = [];
 }
-
+/**
+ * @function validateSwagger
+ * @description Validate OpenAPI Specs from the file with swagger-parser
+ * @param {string} pathValidator
+ * @returns {Promise}
+ */
 function validateSwagger(pathValidator) {
      return new Promise((resolve, reject) => {
 

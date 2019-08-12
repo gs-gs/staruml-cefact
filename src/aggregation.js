@@ -1,19 +1,12 @@
 const openAPI = require('./openapi');
 const constant = require('./constant');
 /**
- *
- *
- * @class Aggregation
-/**
- * Aggregation class returns the API Aggregation 
- *
- * @class Aggregation
+ * @class Aggregation 
+ * @description class returns the API Aggregation 
  */
 class Aggregation {
      /**
-      * Creates an instance of Aggregation.
-      * 
-      * @constructor Aggregation
+      * @constructor Creates an instance of Aggregation.
       */
      constructor() {
 
@@ -21,13 +14,13 @@ class Aggregation {
 
 
      /**
-      *
-      *
+      * @function addAggregationProperties
+      * @description adds aggregation properties in mainPropertiesObj
       * @param {Object} mainPropertiesObj
       * @param {Array} aggregationClasses
       * @param {UMLAssociation} assoc
-      * @returns mainPropertiesObj
-      * @memberof Component
+      * @returns {Object}
+      * @memberof Aggregation
       */
      addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc) {
           let propertiesObj = {};

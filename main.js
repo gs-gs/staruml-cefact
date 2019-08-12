@@ -8,7 +8,7 @@ const description = require('./package.json').description;
 
 /**
  * @function generateSpecs
- * @description OpenAPI generation when OpenAPI Initialization  
+ * @description Generates OpenAPI Specification When user select generate specs from Tools->OpenAPI-> Generate Specs
  * @param {UMLPackage} umlPackage
  * @param {Object} options
  */
@@ -37,7 +37,7 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
 
 /**
  * @function fileTypeSelection
- * @description Selects file type from the dropdown
+ * @description Display dropdown dialog and allow user to select file type from dropdown dailog like (JSON & YAML, JSON, YAML)
  * @param {UMLPackage} umlPackage
  * @param {Object} options
  */
@@ -61,8 +61,8 @@ function fileTypeSelection(umlPackage, options) {
 
 /**
  * @function getGenOptions
- * @description Get options from the preferences
- * @returns {Object}
+ * @description returns the app preferences stored by user
+ * @returns {Object} 
  */
 function getGenOptions() {
      return {
@@ -73,8 +73,8 @@ function getGenOptions() {
 }
 
 /**
- * @function _testSingleProject
- * @description Handle test case for valid OpenApi Specification 
+ * @function testSinglePackage
+ * @description Test single package which user has selected from elementPickerDialog
  */
 function testSinglePackage() {
 
@@ -89,7 +89,6 @@ function testSinglePackage() {
                if (buttonId === "ok") {
                     if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
                          umlPackage = returnValue;
-                         // testSinglePackage(umlPackage);
                          removeOutputFiles();
                          generateTestAPI(umlPackage)
 
@@ -102,7 +101,7 @@ function testSinglePackage() {
 
 /**
  * @function removeOutputFiles
- * @description Removes previously test generated .json files from the output folder
+ * @description Remove previously test generated .json files from the output folder
  */
 function removeOutputFiles() {
      const directory = __dirname + constant.IDEAL_TEST_FILE_PATH;
@@ -123,11 +122,11 @@ function removeOutputFiles() {
 }
 
 /**
- * @function testAllPackage
+ * @function starTestingAllPackage
+ * @description Start testing all packages one by one of the project
  * @params {UMLPackage} item
- * @description Test Entire Packages of Project
  */
-function testAllPackage(item) {
+function starTestingAllPackage(item) {
 
 
      removeOutputFiles();
@@ -148,19 +147,19 @@ function testAllPackage(item) {
                setTimeout(function () {
                     let summery = openAPI.getSummery();
 
-                    let status='success';
+                    let status = 'success';
                     summery.filter((item, index) => {
-                         if(item.status=='failure'){
-                              status='failure'
+                         if (item.status == 'failure') {
+                              status = 'failure'
                          }
                          strSummery += item.message + '\n\n';
                     });
-                    if(status=='success'){
+                    if (status == 'success') {
                          app.dialogs.showInfoDialog(strSummery);
-                    }else{
+                    } else {
                          app.dialogs.showErrorDialog(strSummery);
                     }
-                    
+
                }, 1500);
           }
      });
@@ -169,7 +168,7 @@ function testAllPackage(item) {
 /**
  * @function generateTestAPI
  * @params {UMLPackage} umlPackage
- * @description Async function to test api 
+ * @description Async function to generate test api 
  * */
 async function generateTestAPI(umlPackage) {
 
@@ -199,12 +198,12 @@ function testEntireProject() {
                mPackages.push(element);
           }
      });
-     testAllPackage(mPackages);
+     starTestingAllPackage(mPackages);
 }
 
 /**
  * @function aboutUsExtension
- * @description This function dislplay the title and description of OpenAPI Specification
+ * @description Display Information about Extension like the title and description of OpenAPI Specification.
  */
 function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
@@ -214,10 +213,13 @@ function aboutUsExtension() {
  * @description function will be called when the extension is loaded
  */
 function init() {
-     // 
+     // Register command to Generate Specification
      app.commands.register('openapi:generate-specs', generateSpecs);
+     // Register command to Test Single Pacakge
      app.commands.register('openapi:test-single-package', testSinglePackage);
+     // Register command to Test Entire Project
      app.commands.register('openapi:test-entire-package', testEntireProject);
+     // Register command to Display Extension information in dialog
      app.commands.register('openapi:about-us', aboutUsExtension);
      // app.preferences.register(javaPreferences);
 }

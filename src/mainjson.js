@@ -1,17 +1,10 @@
 /**
- *
- *
- * @class MainJSON
-/**
- * MainJSON class returns the API MainJSON 
- *
- * @class MainJSON
+ * @class MainJSON 
+ * @description class returns the API MainJSON 
  */
 class MainJSON {
      /**
-      * Creates an instance of MainJSON.
-      * 
-      * @constructor MainJSON
+      * @constructor Creates an instance of MainJSON.
       */
      constructor() {
           MainJSON.mainOpenApiObj = {};

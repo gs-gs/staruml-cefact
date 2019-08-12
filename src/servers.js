@@ -1,17 +1,10 @@
 /**
- *
- *
  * @class Server
-/**
- * Server class returns the API Server 
- *
- * @class Server
+ * @description Server class returns the API Server 
  */
 class Servers {
      /**
-      * Creates an instance of Server.
-      * 
-      * @constructor Server
+      * @constructor Creates an instance of Server.
       */
      constructor() {
           this.servers = [];
@@ -20,10 +13,9 @@ class Servers {
 
 
      /**
-      * Return Server object 
-      * 
-      * @function getData
-      * @return {string}
+      * @function getServers
+      * @description Return Server object 
+      * @return {Object}
       */
      getServers() {
           return this.servers;

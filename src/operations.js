@@ -1,26 +1,23 @@
 const constant = require('./constant');
 const Utils = require('./utils')
 /**
- *
- *
  * @class Operations
+ * @description class returns the Operations
  */
 class Operations {
      /**
-      * Creates an instance of Operations.
-      * 
-      * @constructor Operations
+      * @constructor Creates an instance of Operations.
       */
      constructor() {
           this.utils = new Utils();
      }
 
      /**
-      *
-      *
+      * @function get
+      * @description returns the object of get method
       * @param {UMLInterface} objInterface 
-      * @param {*} objOperation
-      * @returns
+      * @param {objOperation} objOperation
+      * @returns {Object} 
       * @memberof Operations
       */
      get(objInterface, objOperation) {
@@ -69,11 +66,11 @@ class Operations {
      }
 
      /**
-      *
-      *
+      * @function post
+      * @description returns object of post method
       * @param {UMLInterface} objInterface
       * @param {UMLInterface} end2Interface
-      * @returns wOperationObject
+      * @returns {Object}
       * @memberof Operations
       */
      post(objInterface, end2Interface) {
@@ -129,11 +126,11 @@ class Operations {
 
 
      /**
-      *
-      *
-      * @param {*} objInterface
-      * @param {*} operationAttribute
-      * @returns wOperationObject
+      * @function put
+      * @description returns the object of put method
+      * @param {UMLInterface} objInterface
+      * @param {UMLAttribute} operationAttribute
+      * @returns {Object}
       * @memberof Operations
       */
      put(objInterface, operationAttribute) {
@@ -191,11 +188,11 @@ class Operations {
      }
 
      /**
-      *
-      *
-      * @param {*} objInterface
-      * @param {*} operationAttribute
-      * @returns wOperationObject
+      * @function patch
+      * @description returns the object of patch method
+      * @param {UMLInterface} objInterface
+      * @param {UMLAttribute} operationAttribute
+      * @returns {Object}
       * @memberof Operations
       */
      patch(objInterface, operationAttribute) {
@@ -241,13 +238,13 @@ class Operations {
           return wOperationObject;
      }
      /**
-      *
-      *
-      * @param {*} objInterface
-      * @param {*} operationAttribute
-      * @param {*} end1Interface
-      * @param {*} end2Interface
-      * @returns
+      * @function delete
+      * @description Returns the object of delete method
+      * @param {UMLInterface} objInterface
+      * @param {UMLAttribute} operationAttribute
+      * @param {UMLAssociationEnd} end1Interface
+      * @param {UMLAssociationEnd} end2Interface
+      * @returns {Object}
       * @memberof Operations
       */
      delete(objInterface, operationAttribute, end1Interface, end2Interface) {
@@ -302,11 +299,11 @@ class Operations {
           return wOperationObject;
      }
      /**
-      *
-      *
-      * @param {*} objInterface
-      * @param {*} operationAttribute
-      * @returns wOperationObject
+      * @function getOperationAttribute
+      * @description returns the attributes object of Operation object
+      * @param {UMLInterface} objInterface
+      * @param {UMLAttribute} operationAttribute
+      * @returns {Object}
       * @memberof Operations
       */
      getOperationAttribute(objInterface, operationAttribute) {

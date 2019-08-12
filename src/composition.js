@@ -1,18 +1,11 @@
 const constant = require('./constant');
 /**
- *
- *
- * @class Composition
-/**
- * Composition class returns the API Composition 
- *
- * @class Composition
+ * @class Composition 
+ * @description class returns the API Composition 
  */
 class Composition {
      /**
-      * Creates an instance of Composition.
-      * 
-      * @constructor Composition
+      * @constructor Creates an instance of Composition.
       */
      constructor() {
 
@@ -24,8 +17,8 @@ class Composition {
       *
       * @param {Object} mainPropertiesObj
       * @param {UMLAssociation} assoc
-      * @returns mainPropertiesObj
-      * @memberof Component
+      * @returns {Object}
+      * @memberof Composition
       */
      addComposition(mainPropertiesObj, assoc) {
           let propertiesObj = {};

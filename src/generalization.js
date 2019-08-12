@@ -1,19 +1,13 @@
 const openAPI = require('./openapi');
 const constant = require('./constant');
+
 /**
- *
- *
- * @class Generalization
-/**
- * Generalization class returns the API Generalization 
- *
- * @class Generalization
+ * @class Generalization 
+ * @description class returns the API Generalization 
  */
 class Generalization {
      /**
-      * Creates an instance of Generalization.
-      * 
-      * @constructor Generalization
+      * @constructor Creates an instance of Generalization.
       */
      constructor() {
 
@@ -21,11 +15,12 @@ class Generalization {
 
 
      /**
-      *
+      * @function addGeneralization
+      * @description add Generalization in mainClassesObj
       * @param {Array} arrGeneral
       * @param {Object} mainClassesObj
-      * @returns
-      * @memberof Component
+      * @returns {Object}
+      * @memberof Generalization
       */
      addGeneralization(arrGeneral, mainClassesObj) {
           /**
@@ -33,7 +28,6 @@ class Generalization {
            * Inherite all properties of parent class
            */
           if (arrGeneral.length > 0) {
-               console.log("---WG-1")
                let allOfArray = [];
                mainClassesObj.allOf = allOfArray;
                arrGeneral.forEach(generalizeClass => {
@@ -56,6 +50,7 @@ class Generalization {
       * @function findGeneralizationOfClass
       * @description Find all generalization of UMLClass
       * @param {UMLClass} objClass 
+      * @memberof Generalization
       */
      findGeneralizationOfClass(objClass) {
           try {

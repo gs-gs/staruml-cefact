@@ -1,17 +1,10 @@
 /**
- *
- *
- * @class Required
-/**
- * Required class returns the API Required 
- *
+ * @description Required class returns the API Required 
  * @class Required
  */
 class Required {
      /**
-      * Creates an instance of Required.
-      * 
-      * @constructor Required
+      * @constructor Creates an instance of Required.
       */
      constructor() {
 
@@ -19,9 +12,10 @@ class Required {
 
      /**
       * @function getRequiredAttributes
-      * @description 
+      * @description array of string
       * @param {UMLAttributes[]} arrAttributes 
-      * @returns {Array} array of string
+      * @returns {Array}
+      * @memberof Required
       */
      getRequiredAttributes(arrAttributes) {
           if (arrAttributes) {
@@ -37,11 +31,11 @@ class Required {
      }
 
      /**
-      *
-      *
+      * @function addRequiredAttributes
+      * @description returns the array of required attributes in String
       * @param {Array} arrAttributes
-      * @returns
-      * @memberof Component
+      * @returns {Array}
+      * @memberof Required
       */
      addRequiredAttributes(arrAttributes) {
           let requiredAttr = [];

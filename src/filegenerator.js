@@ -7,21 +7,23 @@ const constant = require('./constant');
 const SwaggerParser = require("swagger-parser");
 let YAML = SwaggerParser.YAML;
 /**
- * FileGenerator class generate JSON, YAML file based of selection
- *
- * @class FileGenerator
+ * @class FileGenerator 
+ * @description class generate JSON, YAML file based of selection
  */
 class FileGenerator {
      /**
-      * Creates an instance of FileGenerator.
-      * 
-      * @constructor FileGenerator
+      * @constructor Creates an instance of FileGenerator.
       */
      constructor() {
           this.basePath = '';
           this.utils = new Utils();
      }
 
+     /**
+      * @function createJSON
+      * @description Generate OpenAPI Specs & Writes it in JSON file
+      * @memberof FileGenerator
+      */
      createJSON() {
           try {
 
@@ -34,6 +36,12 @@ class FileGenerator {
                this.utils.writeErrorToFile(error);
           }
      }
+
+     /**
+      * @function createYAML 
+      * @description Generate OpenAPI Specs & Writes it in YAML file
+      * @memberof FileGenerator
+      */
      createYAML() {
           let ymlText = YAML.stringify(MainJSON.getJSON());
           this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
@@ -41,14 +49,12 @@ class FileGenerator {
      }
 
      /**
-      *
-      * 
-      * 
+      * @function generate
+      * @description Generate OpenAPI Specs in JSON & YAML, JSON or YAML
       * @memberof FileGenerator
       */
      generate() {
           try {
-               console.log("MainJSON", MainJSON.getJSON());
                if (openAPI.getFileType() == 1) {
                     this.createJSON();
 
@@ -106,11 +112,11 @@ class FileGenerator {
                     } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
                          openAPI.validateSwagger(pathValidator).then(data => {
                                    let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
-                                   openAPI.addSummery(bindSuccesMsg,'success');
+                                   openAPI.addSummery(bindSuccesMsg, 'success');
                               })
                               .catch(error => {
                                    let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + error.message
-                                   openAPI.addSummery(bindFailureMsg,'failure');
+                                   openAPI.addSummery(bindFailureMsg, 'failure');
                               });
                     }
                }

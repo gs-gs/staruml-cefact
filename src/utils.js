@@ -2,15 +2,12 @@ const openAPI = require('./openapi');
 const fs = require('fs');
 const constant = require('./constant');
 /**
- *
- *
+ * @description class is general utility class for the whole project
  * @class Utils
  */
 class Utils {
      /**
-      * Creates an instance of Utils.
-      * 
-      * @constructor Utils
+      * @constructor Creates an instance of Utils.
       */
      constructor() {
           this.errorContent = [];
@@ -19,7 +16,7 @@ class Utils {
      /**
       * @function writeErrorToFile
       * @description Catch the error and write it to file
-      * @param {*} error
+      * @param {Object} error
       * @memberof Utils
       */
      writeErrorToFile(error) {
@@ -35,6 +32,7 @@ class Utils {
       * @function buildDescription
       * @description Description replace (') with ('')
       * @param {string} desc
+      * @memberof Utils
       */
      buildDescription(desc) {
           if (desc)
@@ -51,6 +49,7 @@ class Utils {
       * @param {string} description
       * @param {boolean} required
       * @param {string} schema 
+      * @memberof Utils
       */
      buildParameter(name, type, description, required, schema, paramsObject) {
 
@@ -64,8 +63,9 @@ class Utils {
      /**
       * @function getType
       * @description Returns type of attribute in string, Get attribute type number,boolean,string 
-      * @returns string 
+      * @returns {string} 
       * @param {string} starUMLType 
+      * @memberof Utils
       */
      getType(starUMLType) {
           if (starUMLType === "Numeric") {
@@ -76,11 +76,11 @@ class Utils {
      }
 
      /**
-      *
-      *
+      * @function buildRequestBody
+      * @description Adds request body to requestBodyObj
       * @param {UMLInterfaceRealization} objInterface
       * @param {Object} requestBodyObj
-      * @memberof Operations
+      * @memberof Utils
       */
      buildRequestBody(objInterface, requestBodyObj) {
 
@@ -102,11 +102,11 @@ class Utils {
      }
 
      /**
-      *
-      *
+      * @function writeQueryParameters
+      * @description adds query paramerter in object
       * @param {Array} parametersArray
       * @param {Object} objOperation
-      * @memberof Operations
+      * @memberof Utils
       */
      writeQueryParameters(parametersArray, objOperation) {
           try {
@@ -137,8 +137,10 @@ class Utils {
      }
      /**
       * @function getEnumerationLiteral
-      * @description 
+      * @description return Enumeratoin literals
       * @param {UMLEnumaration} objEnum 
+      * @returns {Array}
+      * @memberof Utils
       */
      getEnumerationLiteral(objEnum) {
           if (objEnum) {
