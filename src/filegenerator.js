@@ -97,7 +97,7 @@ class FileGenerator {
                     if (openAPI.getTestMode() == openAPI.TEST_MODE_SINGLE) {
                          openAPI.validateSwagger(pathValidator).then(data => {
                                    let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
-                                   app.dialogs.showAlertDialog(bindSuccesMsg);
+                                   app.dialogs.showInfoDialog(bindSuccesMsg);
                               })
                               .catch(error => {
                                    let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
