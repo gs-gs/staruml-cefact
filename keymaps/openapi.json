@@ -1,5 +1,5 @@
 {
-     "cmdctrl-w": "generate:show-toast",
-     "cmdctrl-e": "testextension:test-extension",
-     "cmdctrl-a": "testallextension:test-all-extension"
+     "cmdctrl-w": "openapi:generate-specs",
+     "cmdctrl-e": "openapi:test-single-package",
+     "cmdctrl-a": "openapi:test-entire-package"
 }

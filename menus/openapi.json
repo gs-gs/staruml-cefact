@@ -7,15 +7,15 @@
                "submenu": [{
                     "label": "Generate Specs",
                     "id": "tools.openapi.generate",
-                    "command": "generate:show-toast"
+                    "command": "openapi:generate-specs"
                }, {
                     "label": "Test Package",
                     "id": "tools.openapi.testextension",
-                    "command": "testextension:test-extension"
+                    "command": "openapi:test-single-package"
                }, {
                     "label": "Test Entire Project",
                     "id": "tools.openapi.testallextension",
-                    "command": "testallextension:test-all-extension"
+                    "command": "openapi:test-entire-package"
                }, {
                     "label": "Extension version : 0.2.2",
                     "id": "tools.openapi.version",
@@ -23,7 +23,7 @@
                }, {
                     "label": "About Extension",
                     "id": "tools.openapi.aboutext",
-                    "command": "generate:show-about-ext"
+                    "command": "openapi:about-us"
                }]
           }]
      }]
