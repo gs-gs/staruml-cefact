@@ -39,9 +39,6 @@ class Operations {
 
           let parametersArray = [];
           wOperationObject.parameters = parametersArray;
-          // codeWriter.writeLine("parameters: " + (objOperation.parameters.filter(itemParameters => itemParameters.name != "id" && itemParameters.name != "identifier").length > 0 ?
-          //      "" :
-          //      "[]"), 0, 0);
 
           this.utils.writeQueryParameters(parametersArray, objOperation);
 
