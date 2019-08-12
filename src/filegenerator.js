@@ -84,7 +84,7 @@ class FileGenerator {
                                    let jsonFilePath = this.basePath.replace(".yml", ".json");
                                    bindSuccesMsg = bindSuccesMsg + constant.strend + constant.stronlypath + jsonFilePath;
                               }
-                              app.dialogs.showAlertDialog(bindSuccesMsg);
+                              app.dialogs.showInfoDialog(bindSuccesMsg);
                          })
                          .catch(error => {
                               let bindFailureMsg = constant.msgerror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
