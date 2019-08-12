@@ -7,12 +7,12 @@ const title = require('./package.json').title;
 const description = require('./package.json').description;
 
 /**
- * @function _handleGenerate
+ * @function generateSpecs
  * @description OpenAPI generation when OpenAPI Initialization  
  * @param {UMLPackage} umlPackage
  * @param {Object} options
  */
-function _handleGenerate(umlPackage, options = getGenOptions()) {
+function generateSpecs(umlPackage, options = getGenOptions()) {
      // If options is not passed, get from preference
      openAPI.setAppMode(openAPI.APP_MODE_GEN); //0 mode for Generate API
      // If umlPackage is not assigned, popup ElementPicker
@@ -73,10 +73,10 @@ function getGenOptions() {
 }
 
 /**
- * @function _handleTestExtension
- * @description Handle test case for valid OpenApi Specification
+ * @function _testSingleProject
+ * @description Handle test case for valid OpenApi Specification 
  */
-function _handleTestExtension() {
+function testSinglePackage() {
 
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
      openAPI.setTestMode(openAPI.TEST_MODE_SINGLE);
@@ -89,7 +89,9 @@ function _handleTestExtension() {
                if (buttonId === "ok") {
                     if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
                          umlPackage = returnValue;
-                         testSinglePackage(umlPackage);
+                         // testSinglePackage(umlPackage);
+                         removeOutputFiles();
+                         generateTestAPI(umlPackage)
 
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERRORDIALOG);
@@ -97,6 +99,7 @@ function _handleTestExtension() {
                }
           });
 }
+
 /**
  * @function removeOutputFiles
  * @description Removes previously test generated .json files from the output folder
@@ -118,19 +121,11 @@ function removeOutputFiles() {
           }
      });
 }
-/**
- * @function testSinglePackage
- * @params {UMLPackage} item
- * @description Test Single Package 
- */
-function testSinglePackage(item) {
-     removeOutputFiles();
-     generateTestAPI(item)
-}
+
 /**
  * @function testAllPackage
  * @params {UMLPackage} item
- * @description Test All Packages of Project
+ * @description Test Entire Packages of Project
  */
 function testAllPackage(item) {
 
@@ -161,7 +156,7 @@ function testAllPackage(item) {
                          strSummery += item.message + '\n\n';
                     });
                     if(status=='success'){
-                         app.dialogs.showAlertDialog(strSummery);
+                         app.dialogs.showInfoDialog(strSummery);
                     }else{
                          app.dialogs.showErrorDialog(strSummery);
                     }
@@ -174,7 +169,7 @@ function testAllPackage(item) {
 /**
  * @function generateTestAPI
  * @params {UMLPackage} umlPackage
- * @description Generate test api 
+ * @description Async function to test api 
  * */
 async function generateTestAPI(umlPackage) {
 
@@ -186,11 +181,12 @@ async function generateTestAPI(umlPackage) {
      await mOpenApi.initUMLPackage();
 
 }
+
 /**
- * @function _handleTestExtension
- * @description Handle test case for valid OpenApi Specification
+ * @function testEntireProject
+ * @description Test Entire Project for valid OpenApi Specifications
  */
-function _handleAllTestPackages() {
+function testEntireProject() {
      var packages = app.repository.select("@UMLPackage")
 
      openAPI.resetSummery();
@@ -205,22 +201,25 @@ function _handleAllTestPackages() {
      });
      testAllPackage(mPackages);
 }
+
 /**
- * @function _handleAboutUsExtension
- * @description This function dislplay the title and description of the extension
+ * @function aboutUsExtension
+ * @description This function dislplay the title and description of OpenAPI Specification
  */
-function _handleAboutUsExtension() {
+function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
 }
 /**
  * @function init
- * @description OpenAPI Initialization
+ * @description function will be called when the extension is loaded
  */
 function init() {
-     app.commands.register('generate:show-toast', _handleGenerate);
-     app.commands.register('testextension:test-extension', _handleTestExtension);
-     app.commands.register('testallextension:test-all-extension', _handleAllTestPackages);
-     app.commands.register('generate:show-about-ext', _handleAboutUsExtension);
+     // 
+     app.commands.register('openapi:generate-specs', generateSpecs);
+     app.commands.register('openapi:test-single-package', testSinglePackage);
+     app.commands.register('openapi:test-entire-package', testEntireProject);
+     app.commands.register('openapi:about-us', aboutUsExtension);
+     // app.preferences.register(javaPreferences);
 }
 
 exports.init = init
