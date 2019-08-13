@@ -49,12 +49,14 @@ function fileTypeSelection(umlPackage, options) {
      }) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, null);
-               const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
-
-               mOpenApi.initUMLPackage();
-
+               if (basePath != null) {
+                    const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
+                    mOpenApi.initUMLPackage();
+               } else {
+                    console.log("Dialog cancelled")
+               }
           } else {
-               console.log("User canceled")
+               console.log("Dialog cancelled")
           }
      });
 }
