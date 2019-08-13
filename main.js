@@ -13,10 +13,11 @@ const description = require('./package.json').description;
  * @param {Object} options
  */
 function generateSpecs(umlPackage, options = getGenOptions()) {
-     // If options is not passed, get from preference
+     // There are two modes of extension, TEST & GENERATE. Here we set APP_MODE_GEN.
      openAPI.setAppMode(openAPI.APP_MODE_GEN); //0 mode for Generate API
      // If umlPackage is not assigned, popup ElementPicker
      if (!umlPackage) {
+          // Open element picker dialog to pick package 
           app.elementPickerDialog
                .showDialog(constant.DIALOG_MSG_PICKERDIALOG, null, null) //type.UMLPackage
                .then(function ({
@@ -80,8 +81,11 @@ function getGenOptions() {
  */
 function testSinglePackage() {
 
+     // There are two modes of extension, TEST & GENERATE. Here we set TEST mode.
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
+     // There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_SINGLE)
      openAPI.setTestMode(openAPI.TEST_MODE_SINGLE);
+     // Open element picker dialog to pick package 
      app.elementPickerDialog
           .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) //type.UMLPackage
           .then(function ({
@@ -190,8 +194,11 @@ async function generateTestAPI(umlPackage) {
 function testEntireProject() {
      var packages = app.repository.select("@UMLPackage")
 
+     // reset old stored error summery
      openAPI.resetSummery();
+     // There are two modes of extension, TEST & GENERATE. Here we set APP_MODE_TEST.
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
+     // There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_ALL)
      openAPI.setTestMode(openAPI.TEST_MODE_ALL);
 
      let mPackages = [];

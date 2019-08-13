@@ -83,8 +83,6 @@ class Component {
                let aggregationClasses = [];
                let classAssociations = this.association.getAssociationOfClass(objClass);
 
-               // Git issue #12
-               let classAssociationObj = {};
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
                          let filterAssoc = this.arrAssoc.filter(item => {

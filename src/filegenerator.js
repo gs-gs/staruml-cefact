@@ -76,7 +76,7 @@ class FileGenerator {
                     this.createYAML();
 
                }
-
+               // Check for APP Mode (APP_MODE_GEN or APP_MODE_TEST)
                if (openAPI.getAppMode() == openAPI.APP_MODE_GEN) {
                     // check for if any error  available or not 
                     if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
@@ -100,6 +100,7 @@ class FileGenerator {
 
                } else if (openAPI.getAppMode() == openAPI.APP_MODE_TEST) {
                     let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
+                    // Check for TEST Mode (TEST_MODE_SINGLE or TEST_MODE_ALL)
                     if (openAPI.getTestMode() == openAPI.TEST_MODE_SINGLE) {
                          openAPI.validateSwagger(pathValidator).then(data => {
                                    let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator

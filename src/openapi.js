@@ -379,7 +379,6 @@ class OpenApi {
                this.resetPackagePath();
                let arrPath = this.findHierarchy(OpenApi.getPackage());
                let rPath = this.reversePkgPath(arrPath);
-               console.log("pkgPath", rPath);
                OpenApi.setPackagepath(rPath);
 
 
@@ -408,7 +407,6 @@ class OpenApi {
 
 
           } catch (error) {
-               console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
      }

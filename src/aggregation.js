@@ -47,7 +47,7 @@ class Aggregation {
                };
                openAPI.setError(jsonError);
           }
-
+          // Check and add multiplicity
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
                let itemsObj = {};
@@ -68,6 +68,7 @@ class Aggregation {
                     propertiesObj.minItems = 1;
                }
           } else {
+               // Add reference of Schema
                let allOfArray = [];
                propertiesObj.allOf = allOfArray;
 

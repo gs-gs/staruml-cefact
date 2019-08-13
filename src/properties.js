@@ -48,6 +48,7 @@ class Properties {
                     }
                     // if(!attr.isID ){
                     mainPropertiesObj[attr.name] = propertiesObj;
+                    // Add Multiplicity
                     if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
                          let itemsObj = {};
                          propertiesObj.items = itemsObj;
@@ -70,10 +71,12 @@ class Properties {
                          propertiesObj.type = this.utils.getType(attr.type);
 
                          if (attr.type instanceof type.UMLEnumeration) {
+                              // Add Enumeration
                               propertiesObj.enum = this.utils.getEnumerationLiteral(attr.type);
                          }
                     }
                     if (attr.defaultValue != "") {
+                         // Add default field
                          propertiesObj.default = attr.defaultValue;
                     }
                     // }
