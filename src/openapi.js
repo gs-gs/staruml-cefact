@@ -8,7 +8,8 @@ const Servers = require('./servers');
 const MainJSON = require('./mainjson');
 const SwaggerParser = require("swagger-parser");
 let parser = new SwaggerParser();
-
+var forEach = require('async-foreach').forEach;
+// var filterAsync = require('node-filter-async');
 /**
  * @class OpenApi 
  * @description class returns the OpenAPI
@@ -41,6 +42,7 @@ class OpenApi {
 
      }
 
+
      /**
       * @function initUMLPackage
       * @description initializes UML Package
@@ -70,7 +72,96 @@ class OpenApi {
                app.toast.error("Generation Failed!");
           }
      }
+     allDone(notAborted, arr) {
+          // console.log("done-resArr",resArr);
+          console.log("done-notAborted", notAborted);
+          console.log("done-arr", arr);
 
+
+
+     }
+     getElements() {
+          
+          let _this = this;
+               if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
+
+                    OpenApi.umlPackage.ownedElements.forEach(child => {
+                         if (child instanceof type.UMLClass) {
+                              setTimeout(function(){
+                                   _this.findClass(child);
+                              },10);
+                         } else if (child instanceof type.UMLInterface) {
+                              OpenApi.operations.push(child);
+                         } else if (child instanceof type.UMLGeneralization) {
+                              setTimeout(function(){
+                                   _this.findClass(child);
+                              },5);
+                         } else if (child instanceof type.UMLClassDiagram) {
+                              let arClassesFromView = [];
+                              child.ownedViews.forEach(item => {
+                                   if (item instanceof type.UMLClassView && item.model instanceof type.UMLClass) {
+                                        arClassesFromView.push(item.model);
+                                   }
+                              });
+                              console.log("arClassesFromView", arClassesFromView);
+                         }
+
+                    });
+               }
+     }
+     ifDone() {
+
+          let _this = this;
+
+
+          try {
+
+               let resArr = [];
+               forEach(_this.schemas, function (item, index, arr) {
+
+                    let filter = resArr.filter(subItem => {
+                         return subItem._id == item._id;
+                    });
+                    if (filter.length == 0) {
+                         resArr.push(item);
+                    }
+               }, function (notAborted, arr) {
+                    resArr.sort(function (a, b) {
+                         return a.name.localeCompare(b.name);
+                    });
+                    let uniqueArr = [];
+                    let duplicateClasses = [];
+                    let isDuplicate = false;
+
+                    forEach(resArr, function (item, index, arr) {
+                         let filter = uniqueArr.filter(subItem => {
+                              return item.name == subItem.name;
+                         });
+                         if (filter.length == 0) {
+                              uniqueArr.push(item);
+                         } else {
+                              isDuplicate = true;
+                              duplicateClasses.push(item.name);
+                              let firstElem = uniqueArr.indexOf(filter[0]);
+                              uniqueArr[firstElem].attributes = uniqueArr[firstElem].attributes.concat(item.attributes);
+                              uniqueArr[firstElem].ownedElements = uniqueArr[firstElem].ownedElements.concat(item.ownedElements);
+                         }
+                    }, function (notAborted, arr) {
+                         OpenApi.uniqueClassesArr = uniqueArr;
+                         console.log("uniqueClassesArr", uniqueArr);
+                         if (!isDuplicate) {
+                              _this.generateOpenAPI();
+                         } else {
+                              app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
+                         }
+                    });
+               });
+
+          } catch (error) {
+               console.error("Found error", error.message);
+               _this.utils.writeErrorToFile(error);
+          }
+     }
      /**
       * @function getUMLModels
       * @description get and stores UMLInterface, UMLClass & UMLGeneralization 
@@ -78,74 +169,13 @@ class OpenApi {
       */
      getUMLModels() {
           try {
-               let _this = this;
+               let _this=this;
+               
                if (OpenApi.umlPackage instanceof type.UMLPackage) {
-                    if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
-                         OpenApi.umlPackage.ownedElements.forEach(child => {
-                              if (child instanceof type.UMLClass) {
-                                   setTimeout(function () {
-                                        try {
-                                             _this.findClass(child);
-                                        } catch (error) {
-                                             console.error("Found error", error.message);
-                                             _this.utils.writeErrorToFile(error);
-                                        }
-                                   }, 10);
-                              } else if (child instanceof type.UMLInterface) {
-                                   OpenApi.operations.push(child);
-                              } else if (child instanceof type.UMLGeneralization) {
-                                   setTimeout(function () {
-                                        _this.findClass(child.target);
-                                   }, 5);
-                              }
-                         });
-                    }
-
-                    setTimeout(function () {
-                         try {
-                              let resArr = [];
-                              _this.schemas.forEach(item => {
-                                   let filter = resArr.filter(subItem => {
-                                        return subItem._id == item._id;
-                                   });
-                                   if (filter.length == 0) {
-                                        resArr.push(item);
-                                   }
-                              });
-
-                              resArr.sort(function (a, b) {
-                                   return a.name.localeCompare(b.name);
-                              });
-
-                              let uniqueArr = [];
-                              let duplicateClasses = [];
-                              let isDuplicate = false;
-                              resArr.forEach(item => {
-                                   let filter = uniqueArr.filter(subItem => {
-                                        return item.name == subItem.name;
-                                   });
-                                   if (filter.length == 0) {
-                                        uniqueArr.push(item);
-                                   } else {
-                                        isDuplicate = true;
-                                        duplicateClasses.push(item.name);
-                                        let firstElem = uniqueArr.indexOf(filter[0]);
-                                        uniqueArr[firstElem].attributes = uniqueArr[firstElem].attributes.concat(item.attributes);
-                                        uniqueArr[firstElem].ownedElements = uniqueArr[firstElem].ownedElements.concat(item.ownedElements);
-                                   }
-                              });
-                              OpenApi.uniqueClassesArr = uniqueArr;
-
-                              if (!isDuplicate) {
-                                   _this.generateOpenAPI();
-                              } else {
-                                   app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
-                              }
-                         } catch (error) {
-                              console.error("Found error", error.message);
-                              _this.utils.writeErrorToFile(error);
-                         }
-                    }, 500);
+                    this.getElements();
+                    setTimeout(function(){
+                         _this.ifDone();
+                    },500);
                }
           } catch (error) {
                console.error("Found error", error.message);
@@ -159,7 +189,7 @@ class OpenApi {
       * @description finds the element from the class
       * @param {UMLClass} elem
       * @memberof OpenAPI
-      */
+      */     
      findClass(umlClass) {
           try {
                let _this = this;
@@ -169,12 +199,7 @@ class OpenApi {
                          if (child instanceof type.UMLAssociation) {
                               if (child.end1.reference.name != child.end2.reference.name) {
                                    setTimeout(function () {
-                                        try {
                                              _this.findClass(child.end2.reference);
-                                        } catch (error) {
-                                             console.error("Found error", error.message);
-                                             _this.utils.writeErrorToFile(error);
-                                        }
                                    }, 5);
                               }
                          } else if (child instanceof type.UMLClass) {

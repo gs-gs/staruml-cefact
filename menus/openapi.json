@@ -24,6 +24,10 @@
                     "label": "About Extension",
                     "id": "tools.openapi.aboutext",
                     "command": "openapi:about-us"
+               }, {
+                    "label": "XMI Export",
+                    "id": "tools.openapi.exportpkg",
+                    "command": "openapi:export-pkg"
                }]
           }]
      }]
