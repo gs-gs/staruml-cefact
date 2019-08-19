@@ -83,31 +83,29 @@ class OpenApi {
      getElements() {
           
           let _this = this;
-               if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
-
-                    OpenApi.umlPackage.ownedElements.forEach(child => {
-                         if (child instanceof type.UMLClass) {
-                              setTimeout(function(){
-                                   _this.findClass(child);
-                              },10);
-                         } else if (child instanceof type.UMLInterface) {
-                              OpenApi.operations.push(child);
-                         } else if (child instanceof type.UMLGeneralization) {
-                              setTimeout(function(){
-                                   _this.findClass(child);
-                              },5);
-                         } else if (child instanceof type.UMLClassDiagram) {
-                              let arClassesFromView = [];
-                              child.ownedViews.forEach(item => {
-                                   if (item instanceof type.UMLClassView && item.model instanceof type.UMLClass) {
-                                        arClassesFromView.push(item.model);
-                                   }
-                              });
-                              console.log("arClassesFromView", arClassesFromView);
-                         }
-
-                    });
-               }
+          if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
+               OpenApi.umlPackage.ownedElements.forEach(child => {
+                    if (child instanceof type.UMLClass) {
+                         setTimeout(function(){
+                              _this.findClass(child);
+                         },10);
+                    } else if (child instanceof type.UMLInterface) {
+                         OpenApi.operations.push(child);
+                    } else if (child instanceof type.UMLGeneralization) {
+                         setTimeout(function(){
+                              _this.findClass(child);
+                         },5);
+                    } else if (child instanceof type.UMLClassDiagram) {
+                         let arClassesFromView = [];
+                         child.ownedViews.forEach(item => {
+                              if (item instanceof type.UMLClassView && item.model instanceof type.UMLClass) {
+                                   arClassesFromView.push(item.model);
+                              }
+                         });
+                         console.log("arClassesFromView", arClassesFromView);
+                    }
+               });
+          }
      }
      ifDone() {
 
@@ -117,15 +115,19 @@ class OpenApi {
           try {
 
                let resArr = [];
-               forEach(_this.schemas, function (item, index, arr) {
 
+
+               _this.schemas.forEach(item => {
                     let filter = resArr.filter(subItem => {
                          return subItem._id == item._id;
                     });
                     if (filter.length == 0) {
                          resArr.push(item);
                     }
-               }, function (notAborted, arr) {
+                    
+               });
+               setTimeout(function(){
+
                     resArr.sort(function (a, b) {
                          return a.name.localeCompare(b.name);
                     });
@@ -137,6 +139,7 @@ class OpenApi {
                          let filter = uniqueArr.filter(subItem => {
                               return item.name == subItem.name;
                          });
+
                          if (filter.length == 0) {
                               uniqueArr.push(item);
                          } else {
@@ -146,16 +149,21 @@ class OpenApi {
                               uniqueArr[firstElem].attributes = uniqueArr[firstElem].attributes.concat(item.attributes);
                               uniqueArr[firstElem].ownedElements = uniqueArr[firstElem].ownedElements.concat(item.ownedElements);
                          }
-                    }, function (notAborted, arr) {
                          OpenApi.uniqueClassesArr = uniqueArr;
-                         console.log("uniqueClassesArr", uniqueArr);
-                         if (!isDuplicate) {
-                              _this.generateOpenAPI();
-                         } else {
-                              app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
-                         }
+                         
+                    }, function (notAborted, arr) {
+                         setTimeout(function () {
+                              if (!isDuplicate) {
+                                   console.log("uniqueaRR", OpenApi.uniqueClassesArr);
+                                   _this.generateOpenAPI();
+                              } else {
+                                   app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
+                              }
+                         }, 200);
                     });
-               });
+
+               },1000);
+
 
           } catch (error) {
                console.error("Found error", error.message);
@@ -175,7 +183,7 @@ class OpenApi {
                     this.getElements();
                     setTimeout(function(){
                          _this.ifDone();
-                    },500);
+                    },1000);
                }
           } catch (error) {
                console.error("Found error", error.message);
