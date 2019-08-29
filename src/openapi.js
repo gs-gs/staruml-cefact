@@ -154,7 +154,14 @@ class OpenApi {
                     }, function (notAborted, arr) {
                          setTimeout(function () {
                               if (!isDuplicate) {
-                                   console.log("uniqueaRR", OpenApi.uniqueClassesArr);
+                                   // console.log("uniqueaRR", OpenApi.uniqueClassesArr);
+
+                                   let mClasses=[];
+                                   OpenApi.uniqueClassesArr.forEach(element => {
+                                             mClasses.push(element.name);
+                                   });
+                                   console.log("uniqueaRR", mClasses);
+
                                    _this.generateOpenAPI();
                               } else {
                                    app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");

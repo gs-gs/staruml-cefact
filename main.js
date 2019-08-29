@@ -273,6 +273,50 @@ function exportFragment() {
                          umlPackage = returnValue;
                          console.log("Selected Package", umlPackage);
                          var _filename = umlPackage.name
+                         //------------1
+                         let umlClasses = app.repository.select(_filename+"::@UMLClass");
+                         umlClasses.sort(function (a, b) {
+                              return a.name.localeCompare(b.name);
+                         });
+
+                         let mClasses=[];
+                         umlClasses.forEach(element => {
+                                   mClasses.push(element.name);
+                         });
+                         console.log("Selected Package Uml Classes", mClasses);
+
+                         //------------2
+                         let umlGeneralization = app.repository.select("@UMLGeneralization");
+                         // umlGeneralization = umlGeneralization.filter(item => {
+                         //      return item.source._id == objClass._id
+                         // });
+                         umlGeneralization.sort(function (a, b) {
+                              return a.name.localeCompare(b.name);
+                         });
+
+                         let mGeneralization=[];
+                         umlGeneralization.forEach(element => {
+                              mGeneralization.push(element);
+                         });
+                         console.log("Selected Package Uml Generalization", mGeneralization);
+
+                         //------------3
+                         let associations = app.repository.select("@UMLAssociation");
+                         // associations = associations.filter(item => {
+                         //      return item.end1.reference._id == objClass._id
+                         // });
+                         associations.sort(function (a, b) {
+                              return a.name.localeCompare(b.name);
+                         });
+
+                         let mAssociations=[];
+                         associations.forEach(element => {
+                              mAssociations.push(element);
+                         });
+                         console.log("Selected Package Uml Association", mAssociations);
+
+                         
+                         /*
                          // var _filename = app.project.getProject().name
 
                          var filename = app.dialogs.showSaveDialog('Export Project As XMI', _filename + '.xmi', XMI_FILE_FILTERS)
@@ -280,6 +324,7 @@ function exportFragment() {
                               // xmi21writer.saveToFile(filename);
                               xmi21writer.savePackageToFile(umlPackage,filename);
                          }
+                         */
 
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERRORDIALOG);
