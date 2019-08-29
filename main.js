@@ -13,19 +13,19 @@ const description = require('./package.json').description;
  * @param {Object} options
  */
 function generateSpecs(umlPackage, options = getGenOptions()) {
-     // There are two modes of extension, TEST & GENERATE. Here we set APP_MODE_GEN.
-     openAPI.setAppMode(openAPI.APP_MODE_GEN); //0 mode for Generate API
-     // If umlPackage is not assigned, popup ElementPicker
+     /* There are two modes of extension, TEST & GENERATE. Here we set APP_MODE_GEN. */
+     openAPI.setAppMode(openAPI.APP_MODE_GEN); /* 0 mode for Generate API */
+     /* If umlPackage is not assigned, popup ElementPicker */
      if (!umlPackage) {
-          // Open element picker dialog to pick package 
+          /* Open element picker dialog to pick package */
           app.elementPickerDialog
-               .showDialog(constant.DIALOG_MSG_PICKERDIALOG, null, null) //type.UMLPackage
+               .showDialog(constant.DIALOG_MSG_PICKERDIALOG, null, null) /* type.UMLPackage */
                .then(function ({
                     buttonId,
                     returnValue
                }) {
                     if (buttonId === "ok") {
-                         if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
+                         if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { /* || returnValue instanceof type.UMLPackage */
                               umlPackage = returnValue;
                               fileTypeSelection(umlPackage, options);
                          } else {
@@ -81,13 +81,13 @@ function getGenOptions() {
  */
 function testSinglePackage() {
 
-     // There are two modes of extension, TEST & GENERATE. Here we set TEST mode.
+     /* There are two modes of extension, TEST & GENERATE. Here we set TEST mode. */
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
-     // There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_SINGLE)
+     /* There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_SINGLE) */
      openAPI.setTestMode(openAPI.TEST_MODE_SINGLE);
-     // Open element picker dialog to pick package 
+     /* Open element picker dialog to pick package */
      app.elementPickerDialog
-          .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) //type.UMLPackage
+          .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) /* type.UMLPackage */
           .then(function ({
                buttonId,
                returnValue
@@ -179,7 +179,7 @@ function starTestingAllPackage(item) {
 async function generateTestAPI(umlPackage) {
 
      const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
-     // const umlPackage = testPkgList[0];
+     /* const umlPackage = testPkgList[0]; */
      const options = getGenOptions();
 
      const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, 1);
@@ -194,11 +194,11 @@ async function generateTestAPI(umlPackage) {
 function testEntireProject() {
      var packages = app.repository.select("@UMLPackage")
 
-     // reset old stored error summery
+     /* reset old stored error summery */
      openAPI.resetSummery();
-     // There are two modes of extension, TEST & GENERATE. Here we set APP_MODE_TEST.
+     /* There are two modes of extension, TEST & GENERATE. Here we set APP_MODE_TEST. */
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
-     // There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_ALL)
+     /* There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_ALL) */
      openAPI.setTestMode(openAPI.TEST_MODE_ALL);
 
      let mPackages = [];
@@ -223,13 +223,13 @@ function aboutUsExtension() {
  * @description function will be called when the extension is loaded
  */
 function init() {
-     // Register command to Generate Specification
+     /* Register command to Generate Specification */
      app.commands.register('openapi:generate-specs', generateSpecs);
-     // Register command to Test Single Pacakge
+     /* Register command to Test Single Pacakge */
      app.commands.register('openapi:test-single-package', testSinglePackage);
-     // Register command to Test Entire Project
+     /* Register command to Test Entire Project */
      app.commands.register('openapi:test-entire-package', testEntireProject);
-     // Register command to Display Extension information in dialog
+     /* Register command to Display Extension information in dialog */
      app.commands.register('openapi:about-us', aboutUsExtension);
      
 }

@@ -55,7 +55,7 @@ class Association {
                let multiplicity = associationClass.associationSide.end2.multiplicity;
 
 
-               // Check and add multiplicity
+               /* Check and add multiplicity */
                if (multiplicity == "0..*" || multiplicity == "1..*") {
                     let itemsObj = {};
                     propertiesObj.items = itemsObj;
@@ -87,7 +87,7 @@ class Association {
                     }
 
                } else {
-                    // Add reference of Schema
+                    /* Add reference of Schema */
                     let allOfArray = [];
                     let objAllOfArry = {};
                     propertiesObj.allOf = allOfArray;

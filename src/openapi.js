@@ -9,7 +9,7 @@ const MainJSON = require('./mainjson');
 const SwaggerParser = require("swagger-parser");
 let parser = new SwaggerParser();
 var forEach = require('async-foreach').forEach;
-// var filterAsync = require('node-filter-async');
+/* var filterAsync = require('node-filter-async'); */
 /**
  * @class OpenApi 
  * @description class returns the OpenAPI
@@ -37,8 +37,8 @@ class OpenApi {
           OpenApi.strPackagePath = '';
 
           OpenApi.error = {};
-          // OpenApi.isDuplicate=false;
-          // OpenApi.duplicateClasses = [];
+          /* OpenApi.isDuplicate=false; */
+          /* OpenApi.duplicateClasses = []; */
 
      }
 
@@ -73,7 +73,7 @@ class OpenApi {
           }
      }
      allDone(notAborted, arr) {
-          // console.log("done-resArr",resArr);
+          /* console.log("done-resArr",resArr); */
           console.log("done-notAborted", notAborted);
           console.log("done-arr", arr);
 
@@ -154,7 +154,7 @@ class OpenApi {
                     }, function (notAborted, arr) {
                          setTimeout(function () {
                               if (!isDuplicate) {
-                                   // console.log("uniqueaRR", OpenApi.uniqueClassesArr);
+                                   /* console.log("uniqueaRR", OpenApi.uniqueClassesArr); */
 
                                    let mClasses=[];
                                    OpenApi.uniqueClassesArr.forEach(element => {
@@ -422,22 +422,22 @@ class OpenApi {
                OpenApi.setPackagepath(rPath);
 
 
-               // Add openapi version
+               /*  Add openapi version */
                MainJSON.addApiVersion('3.0.0');
 
-               // Add openapi information
+               /* Add openapi information */
                let mInfo = new Info();
                MainJSON.addInfo(mInfo);
 
-               //Add openapi servers
+               /* Add openapi servers */
                let server = new Servers();
                MainJSON.addServers(server);
 
-               //Add openapi paths
+               /* Add openapi paths */
                let paths = new Paths();
                MainJSON.addPaths(paths);
 
-               // Add openapi component
+               /* Add openapi component */
                let component = new Component();
                MainJSON.addComponent(component);
 
@@ -495,10 +495,10 @@ function validateSwagger(pathValidator) {
 
           parser.validate(pathValidator, (err, api) => {
                if (err) {
-                    // Error
+                    /* Error */
                     reject(err);
                } else {
-                    // Success
+                    /* Success */
                     resolve({
                          message: "success"
                     })

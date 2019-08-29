@@ -85,7 +85,7 @@ class Operations {
 
 
           wOperationObject.description = 'Create a new ' + objInterface.source.name;
-          ///
+          
           if (end2Interface != null) {
                let parametersArray = [];
                wOperationObject.parameters = parametersArray;
@@ -97,7 +97,7 @@ class Operations {
 
                this.utils.buildParameter(end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
           }
-          ///
+          
           let requestBodyObj = {}
           wOperationObject.requestBody = requestBodyObj;
           this.utils.buildRequestBody(objInterface, requestBodyObj);
@@ -267,7 +267,7 @@ class Operations {
           objSchema.type = 'string';
 
           if (operationAttribute != null && end1Interface == null && end2Interface == null) {
-               ///
+               
                this.utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? this.utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
 
                objInterface.target.attributes.forEach(itemAttribute => {
@@ -277,16 +277,16 @@ class Operations {
                          parametersArray.push(paramsObject);
                     }
                });
-               ///
+               
           } else if (operationAttribute == null && end1Interface != null && end2Interface != null) {
-               ///
+               
                this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
 
-               //AskQue
+               /* AskQue */
                let paramsObject1 = {};
                this.utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject1);
                parametersArray.push(paramsObject1);
-               ///
+               
           }
 
           let resObj = {};
@@ -320,7 +320,7 @@ class Operations {
 
           let parametersArray = [];
           wOperationObject.parameters = parametersArray;
-          ///---
+          
           let paramsObject = {};
           parametersArray.push(paramsObject);
 
@@ -336,7 +336,7 @@ class Operations {
                     parametersArray.push(paramsObject);
                }
           })
-          ///---
+          
           let responsesObj = {};
           wOperationObject.responses = responsesObj;
 
