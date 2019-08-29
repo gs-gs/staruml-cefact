@@ -5,7 +5,6 @@ var fs = require('fs');
 var path = require('path');
 const title = require('./package.json').title;
 const description = require('./package.json').description;
-const xmi21writer = require('./src/xmi21writer')
 
 /**
  * @function generateSpecs
@@ -218,120 +217,7 @@ function testEntireProject() {
 function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
 }
-const XMI_FILE_FILTERS = [{
-          name: 'XMI Files',
-          extensions: ['xmi']
-     },
-     {
-          name: 'All Files',
-          extensions: ['*']
-     }
-]
-/**
- * @function exportPkg
- * @description 
- */
-function exportPkg() {
-     app.elementPickerDialog
-          .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) //type.UMLPackage
-          .then(function ({
-               buttonId,
-               returnValue
-          }) {
-               if (buttonId === "ok") {
-                    if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
-                         umlPackage = returnValue;
-                         console.log("Selected Package", umlPackage);
-                         var _filename = umlPackage.name
-                         // var _filename = app.project.getProject().name
 
-                         var filename = app.dialogs.showSaveDialog('Export Project As XMI', _filename + '.xmi', XMI_FILE_FILTERS)
-                         if (filename) {
-                              // xmi21writer.saveToFile(filename);
-                              xmi21writer.savePackageToFile(umlPackage,filename);
-                         }
-
-                    } else {
-                         app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERRORDIALOG);
-                    }
-               }
-          });
-}
-/**
- * @function exportPkg
- * @description 
- */
-function exportFragment() {
-     app.elementPickerDialog
-          .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) //type.UMLPackage
-          .then(function ({
-               buttonId,
-               returnValue
-          }) {
-               if (buttonId === "ok") {
-                    if (returnValue instanceof type.Project || returnValue instanceof type.UMLPackage) { //|| returnValue instanceof type.UMLPackage
-                         umlPackage = returnValue;
-                         console.log("Selected Package", umlPackage);
-                         var _filename = umlPackage.name
-                         //------------1
-                         let umlClasses = app.repository.select(_filename+"::@UMLClass");
-                         umlClasses.sort(function (a, b) {
-                              return a.name.localeCompare(b.name);
-                         });
-
-                         let mClasses=[];
-                         umlClasses.forEach(element => {
-                                   mClasses.push(element.name);
-                         });
-                         console.log("Selected Package Uml Classes", mClasses);
-
-                         //------------2
-                         let umlGeneralization = app.repository.select("@UMLGeneralization");
-                         // umlGeneralization = umlGeneralization.filter(item => {
-                         //      return item.source._id == objClass._id
-                         // });
-                         umlGeneralization.sort(function (a, b) {
-                              return a.name.localeCompare(b.name);
-                         });
-
-                         let mGeneralization=[];
-                         umlGeneralization.forEach(element => {
-                              mGeneralization.push(element);
-                         });
-                         console.log("Selected Package Uml Generalization", mGeneralization);
-
-                         //------------3
-                         let associations = app.repository.select("@UMLAssociation");
-                         // associations = associations.filter(item => {
-                         //      return item.end1.reference._id == objClass._id
-                         // });
-                         associations.sort(function (a, b) {
-                              return a.name.localeCompare(b.name);
-                         });
-
-                         let mAssociations=[];
-                         associations.forEach(element => {
-                              mAssociations.push(element);
-                         });
-                         console.log("Selected Package Uml Association", mAssociations);
-
-                         
-                         /*
-                         // var _filename = app.project.getProject().name
-
-                         var filename = app.dialogs.showSaveDialog('Export Project As XMI', _filename + '.xmi', XMI_FILE_FILTERS)
-                         if (filename) {
-                              // xmi21writer.saveToFile(filename);
-                              xmi21writer.savePackageToFile(umlPackage,filename);
-                         }
-                         */
-
-                    } else {
-                         app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERRORDIALOG);
-                    }
-               }
-          });
-}
 /**
  * @function init
  * @description function will be called when the extension is loaded
@@ -345,9 +231,6 @@ function init() {
      app.commands.register('openapi:test-entire-package', testEntireProject);
      // Register command to Display Extension information in dialog
      app.commands.register('openapi:about-us', aboutUsExtension);
-     // app.preferences.register(javaPreferences);
-     // app.commands.register('openapi:export-pkg', exportPkg);
-     app.commands.register('openapi:export-pkg', exportFragment);
      
 }
 
