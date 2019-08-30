@@ -72,14 +72,7 @@ class OpenApi {
                app.toast.error("Generation Failed!");
           }
      }
-     allDone(notAborted, arr) {
-          /* console.log("done-resArr",resArr); */
-          console.log("done-notAborted", notAborted);
-          console.log("done-arr", arr);
-
-
-
-     }
+     
      getElements() {
           
           let _this = this;
@@ -102,10 +95,52 @@ class OpenApi {
                                    arClassesFromView.push(item.model);
                               }
                          });
-                         console.log("arClassesFromView", arClassesFromView);
+                         // console.log("arClassesFromView", arClassesFromView);
                     }
                });
           }
+          
+          
+
+     }
+     
+     findElements(umlClass,resolve,reject) {
+          try {
+               let _this = this;
+               _this.schemas.push(umlClass);
+               if (umlClass.ownedElements.length > 0) {
+                    umlClass.ownedElements.forEach(child => {
+                         if (child instanceof type.UMLAssociation) {
+                              if (child.end1.reference.name != child.end2.reference.name) {
+                                   setTimeout(function () {
+                                             _this.findElements(child.end2.reference,resolve,reject);
+                                   }, 5);
+                              }
+                         } else if (child instanceof type.UMLClass) {
+                              setTimeout(function () {
+                                   _this.findElements(child,resolve,reject);
+                              }, 5);
+                         } else if (child instanceof type.UMLGeneralization) {
+                              setTimeout(function () {
+                                   _this.findElements(child.target,resolve,reject);
+                              }, 5);
+                         }
+                    });
+               }
+               else{
+                    resolve("success");
+               }
+          } catch (error) {
+               console.error("Found error", error.message);
+               this.utils.writeErrorToFile(error);
+               reject(error);
+          }
+     }
+     handleFindClass(umlClass) {
+          let _this=this;
+          return new Promise((resolve, reject) => {
+               _this.findElements(umlClass,resolve,reject);
+          });
      }
      ifDone() {
 
@@ -153,6 +188,7 @@ class OpenApi {
                          
                     }, function (notAborted, arr) {
                          setTimeout(function () {
+                              // _this.getOtherWay();
                               if (!isDuplicate) {
                                    /* console.log("uniqueaRR", OpenApi.uniqueClassesArr); */
 
@@ -160,7 +196,12 @@ class OpenApi {
                                    OpenApi.uniqueClassesArr.forEach(element => {
                                              mClasses.push(element.name);
                                    });
-                                   console.log("uniqueaRR", mClasses);
+                                   console.log("uniqueaClasses", mClasses);
+                                   let mPaths=[];
+                                   OpenApi.operations.forEach(element => {
+                                        mPaths.push(element.name);
+                                   });
+                                   console.log("uniqueaPath", mPaths);
 
                                    _this.generateOpenAPI();
                               } else {
@@ -177,20 +218,131 @@ class OpenApi {
                _this.utils.writeErrorToFile(error);
           }
      }
+     getOtherWay() {
+
+          let umlPackage = OpenApi.getPackage();
+          console.log("Selected Package", umlPackage);
+          var _pkgName = umlPackage.name
+          /* ------------ 1. UMLClass ------------ */
+          let umlClasses = app.repository.select(_pkgName + "::@UMLClass");
+          
+          OpenApi.operations = app.repository.select(_pkgName + "::@UMLInterface");
+
+          /* ------------ 2. Association Classes ------------ */
+          let associations = app.repository.select("@UMLAssociation");
+
+          forEach(associations,(child,index) => {
+               if (child.end1.reference.name != child.end2.reference.name) {
+                    let filter = umlClasses.filter(subItem => {
+                         return child.end2.reference.name == subItem.name;
+                    });
+     
+                    if (filter.length == 0) {
+                         umlClasses.push(child.end2.reference);
+                    } 
+               }
+          });
+
+          /* ------------ 3. Generalization Classes Classes ------------ */
+
+          let generalization = app.repository.select("@UMLGeneralization");
+
+          forEach(generalization,(child,index) => {
+               let filter = umlClasses.filter(subItem => {
+                    return child.target.name == subItem.name;
+               });
+               if (filter.length == 0) {
+                    umlClasses.push(child.target.name);
+               } 
+          });
+
+
+          /* ------------ 4. Filter unique classes ------------ */
+          let resArr = [];
+          forEach(umlClasses,(item,index) => {
+               let filter = resArr.filter(subItem => {
+                    return subItem._id == item._id;
+               });
+               if (filter.length == 0) {
+                    resArr.push(item);
+               }
+               
+          });
+
+          /* ------------ 5. Sort unique classes ------------ */
+          resArr.sort(function (a, b) {
+               return a.name.localeCompare(b.name);
+          });
+
+          let uniqueArr = [];
+          let duplicateClasses = [];
+          let isDuplicate = false;
+
+          
+
+          forEach(resArr, function (item, index) {
+               let filter = uniqueArr.filter(subItem => {
+                    return item.name == subItem.name;
+               });
+
+               if (filter.length == 0) {
+                    uniqueArr.push(item);
+               } else {
+                    isDuplicate = true;
+                    duplicateClasses.push(item.name);
+                    let firstElem = uniqueArr.indexOf(filter[0]);
+                    uniqueArr[firstElem].attributes = uniqueArr[firstElem].attributes.concat(item.attributes);
+                    uniqueArr[firstElem].ownedElements = uniqueArr[firstElem].ownedElements.concat(item.ownedElements);
+               }
+               OpenApi.uniqueClassesArr = uniqueArr;
+               
+          });
+
+          if (!isDuplicate) {
+
+               let mClasses=[];
+               forEach(OpenApi.uniqueClassesArr,element => {
+                         mClasses.push(element.name);
+               });
+
+               let mPaths=[];
+               forEach(OpenApi.operations,element => {
+                    mPaths.push(element.name);
+               });
+
+               console.log("Query Total Classes", mClasses);
+               console.log("Query Total Interfaces", mPaths);
+
+               this.generateOpenAPI();
+          } else {
+               app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
+          }
+
+          
+         
+
+     }
      /**
       * @function getUMLModels
       * @description get and stores UMLInterface, UMLClass & UMLGeneralization 
       * @memberof OpenAPI
       */
      getUMLModels() {
+          let _this=this;
           try {
-               let _this=this;
+               
                
                if (OpenApi.umlPackage instanceof type.UMLPackage) {
-                    this.getElements();
+                    /* _this.getElements();
                     setTimeout(function(){
                          _this.ifDone();
-                    },1000);
+                         
+                    },1000); */
+
+                    
+                    _this.getOtherWay();
+                   
+
                }
           } catch (error) {
                console.error("Found error", error.message);
@@ -209,6 +361,7 @@ class OpenApi {
           try {
                let _this = this;
                _this.schemas.push(umlClass);
+               // console.log("ABC---",umlClass.name);
                if (umlClass.ownedElements.length > 0) {
                     umlClass.ownedElements.forEach(child => {
                          if (child instanceof type.UMLAssociation) {
@@ -504,6 +657,9 @@ function validateSwagger(pathValidator) {
                     })
                }
           });
+     })
+     .catch(error => {
+          reject(error);
      });
 }
 
