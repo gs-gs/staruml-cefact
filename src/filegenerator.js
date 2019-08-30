@@ -5,7 +5,9 @@ const openAPI = require('./openapi');
 const MainJSON = require('./mainjson');
 const constant = require('./constant');
 const SwaggerParser = require("swagger-parser");
+let parser = new SwaggerParser();
 let YAML = SwaggerParser.YAML;
+
 /**
  * @class FileGenerator 
  * @description class generate JSON, YAML file based of selection
@@ -102,7 +104,8 @@ class FileGenerator {
                     let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                     /* Check for TEST Mode (TEST_MODE_SINGLE or TEST_MODE_ALL) */
                     if (openAPI.getTestMode() == openAPI.TEST_MODE_SINGLE) {
-                         openAPI.validateSwagger(pathValidator).then(data => {
+                         /* 
+                              openAPI.validateSwagger(pathValidator).then(data => {
                                    let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
                                    app.dialogs.showInfoDialog(bindSuccesMsg);
                               })
@@ -110,6 +113,74 @@ class FileGenerator {
                                    let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
                                    app.dialogs.showErrorDialog(bindFailureMsg);
                               });
+
+                         */
+
+                        fs.readFile(pathValidator,'utf-8', function(err, data) {
+                         if(err){
+                              console.log(err);
+                         }else if(data){
+                              // console.log(data);
+                              parser.validate(pathValidator, (error, api) => {
+                                   let res=null;
+                                   if(error){
+                                        res = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
+                                        // app.dialogs.showErrorDialog(bindFailureMsg);
+                                   }else{
+                                        res = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
+                                        // app.dialogs.showInfoDialog(bindSuccesMsg);
+                                   }
+                                   console.log(res);
+                              });
+                               /* try {
+                                   let api = await SwaggerParser.validate(data);
+                                   console.log(api);
+                              } catch (err) {
+                                   console.log(err);
+                              } */
+                         }
+                       });
+
+
+                    //       try {
+                    //               parser.validate(pathValidator, (err, api) => {
+                    //                     console.log(err);
+                    //                     if (err) {
+                    //                          /* Error */
+                    //                          let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
+                    //                          // app.dialogs.showErrorDialog(bindFailureMsg);
+                                             
+                    //                     } else {
+                    //                          /* Success */
+                    //                          let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
+                    //                          // app.dialogs.showInfoDialog(bindSuccesMsg);
+                    //                     }
+                    //                });
+                    //     } catch (err) {
+                    //          console.log(err);
+                    //     }  
+
+                              // try {
+
+
+                                   
+                              //      parser.validate(pathValidator, (err, api) => {
+                              //           console.log(err);
+                              //           if (err) {
+                              //                /* Error */
+                              //                let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
+                              //                // app.dialogs.showErrorDialog(bindFailureMsg);
+                                             
+                              //           } else {
+                              //                /* Success */
+                              //                let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
+                              //                // app.dialogs.showInfoDialog(bindSuccesMsg);
+                              //           }
+                              //      });
+                              // } catch (err) {
+                              //      console.log(err);
+                              // }
+
                     } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
                          openAPI.validateSwagger(pathValidator).then(data => {
                                    let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
