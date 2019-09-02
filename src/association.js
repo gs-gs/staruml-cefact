@@ -2,7 +2,7 @@ const Utils = require('./utils');
 const Generalization = require('./generalization');
 const Required = require('./required');
 const constant = require('./constant');
-
+const openAPI = require('./openapi');
 /**
  * @class Association
  * @description class returns the API Association 
@@ -120,7 +120,8 @@ class Association {
       */
      getAssociationOfClass(objClass) {
           try {
-               let associations = app.repository.select("@UMLAssociation");
+               /* let associations = app.repository.select("@UMLAssociation"); */
+               let associations=app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
                let filterAssociation = associations.filter(item => {
                     return item.end1.reference._id == objClass._id
                });
@@ -131,6 +132,28 @@ class Association {
           }
      }
 
+     /* getAssociationOfClass(objClass) {
+          try {
+               let _this = this;
+               let associations = app.repository.select("@UMLAssociation");
+               
+               let assocCurrentPkg = [];
+               forEach(associations, async (child, index) => {
+                    let result = await openAPI.getParentPkg(child);
+                    if (result != null && result == openAPI.getUMLPackage().name && child.name != "") {
+                         assocCurrentPkg.push(child);
+                    }
+
+               });
+               let filterAssociation = assocCurrentPkg.filter(item => {
+                    return item.end1.reference._id == objClass._id
+               });
+               return filterAssociation;
+          } catch (error) {
+               console.error("Found error", error.message);
+               this.utils.writeErrorToFile(error);
+          }
+     } */
      /**
       * @function writeAssociationProperties
       * @description 
