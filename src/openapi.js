@@ -72,22 +72,22 @@ class OpenApi {
                app.toast.error("Generation Failed!");
           }
      }
-     
+
      getElements() {
-          
+
           let _this = this;
           if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
                OpenApi.umlPackage.ownedElements.forEach(child => {
                     if (child instanceof type.UMLClass) {
-                         setTimeout(function(){
+                         setTimeout(function () {
                               _this.findClass(child);
-                         },10);
+                         }, 10);
                     } else if (child instanceof type.UMLInterface) {
                          OpenApi.operations.push(child);
                     } else if (child instanceof type.UMLGeneralization) {
-                         setTimeout(function(){
+                         setTimeout(function () {
                               _this.findClass(child);
-                         },5);
+                         }, 5);
                     } else if (child instanceof type.UMLClassDiagram) {
                          let arClassesFromView = [];
                          child.ownedViews.forEach(item => {
@@ -99,12 +99,12 @@ class OpenApi {
                     }
                });
           }
-          
-          
+
+
 
      }
-     
-     findElements(umlClass,resolve,reject) {
+
+     findElements(umlClass, resolve, reject) {
           try {
                let _this = this;
                _this.schemas.push(umlClass);
@@ -113,21 +113,20 @@ class OpenApi {
                          if (child instanceof type.UMLAssociation) {
                               if (child.end1.reference.name != child.end2.reference.name) {
                                    setTimeout(function () {
-                                             _this.findElements(child.end2.reference,resolve,reject);
+                                        _this.findElements(child.end2.reference, resolve, reject);
                                    }, 5);
                               }
                          } else if (child instanceof type.UMLClass) {
                               setTimeout(function () {
-                                   _this.findElements(child,resolve,reject);
+                                   _this.findElements(child, resolve, reject);
                               }, 5);
                          } else if (child instanceof type.UMLGeneralization) {
                               setTimeout(function () {
-                                   _this.findElements(child.target,resolve,reject);
+                                   _this.findElements(child.target, resolve, reject);
                               }, 5);
                          }
                     });
-               }
-               else{
+               } else {
                     resolve("success");
                }
           } catch (error) {
@@ -137,9 +136,9 @@ class OpenApi {
           }
      }
      handleFindClass(umlClass) {
-          let _this=this;
+          let _this = this;
           return new Promise((resolve, reject) => {
-               _this.findElements(umlClass,resolve,reject);
+               _this.findElements(umlClass, resolve, reject);
           });
      }
      ifDone() {
@@ -159,9 +158,9 @@ class OpenApi {
                     if (filter.length == 0) {
                          resArr.push(item);
                     }
-                    
+
                });
-               setTimeout(function(){
+               setTimeout(function () {
 
                     resArr.sort(function (a, b) {
                          return a.name.localeCompare(b.name);
@@ -185,19 +184,19 @@ class OpenApi {
                               uniqueArr[firstElem].ownedElements = uniqueArr[firstElem].ownedElements.concat(item.ownedElements);
                          }
                          OpenApi.uniqueClassesArr = uniqueArr;
-                         
+
                     }, function (notAborted, arr) {
                          setTimeout(function () {
                               // _this.getOtherWay();
                               if (!isDuplicate) {
                                    /* console.log("uniqueaRR", OpenApi.uniqueClassesArr); */
 
-                                   let mClasses=[];
+                                   let mClasses = [];
                                    OpenApi.uniqueClassesArr.forEach(element => {
-                                             mClasses.push(element.name);
+                                        mClasses.push(element.name);
                                    });
                                    console.log("uniqueaClasses", mClasses);
-                                   let mPaths=[];
+                                   let mPaths = [];
                                    OpenApi.operations.forEach(element => {
                                         mPaths.push(element.name);
                                    });
@@ -210,7 +209,7 @@ class OpenApi {
                          }, 200);
                     });
 
-               },1000);
+               }, 1000);
 
 
           } catch (error) {
@@ -218,55 +217,77 @@ class OpenApi {
                _this.utils.writeErrorToFile(error);
           }
      }
-     getOtherWay() {
 
+     async getOtherWay() {
+
+          let _this = this;
           let umlPackage = OpenApi.getPackage();
           console.log("Selected Package", umlPackage);
           var _pkgName = umlPackage.name
           /* ------------ 1. UMLClass ------------ */
           let umlClasses = app.repository.select(_pkgName + "::@UMLClass");
-          
+          console.log("UMLClass", umlClasses);
+
           OpenApi.operations = app.repository.select(_pkgName + "::@UMLInterface");
+          console.log("UMLOperation", OpenApi.operations);
 
-          /* ------------ 2. Association Classes ------------ */
-          let associations = app.repository.select("@UMLAssociation");
+          /* ------------ 2. Association Class------------ */
+          console.log("--asso-start");
+          let assocCurrentPkg = await OpenApi.getUMLAssociation();
+          console.log(assocCurrentPkg);
+          console.log("--asso-end");
 
-          forEach(associations,(child,index) => {
+          console.log("assoc--1");
+          let tmpAsso = [];
+          forEach(assocCurrentPkg, (child, index) => {
+               console.log("assoc--2");
                if (child.end1.reference.name != child.end2.reference.name) {
+
                     let filter = umlClasses.filter(subItem => {
                          return child.end2.reference.name == subItem.name;
                     });
-     
+
                     if (filter.length == 0) {
                          umlClasses.push(child.end2.reference);
-                    } 
+                         tmpAsso.push(child.end2.reference);
+                    }
                }
+
           });
+          console.log(tmpAsso);
+          console.log("assoc--3");
+          /* ------------ 3. Generalization Class ------------ */
 
-          /* ------------ 3. Generalization Classes Classes ------------ */
+          console.log("--gen-start");
+          let generaCurrentPkg = await OpenApi.getUMLGeneralization();
+          console.log("--gen-end");
 
-          let generalization = app.repository.select("@UMLGeneralization");
-
-          forEach(generalization,(child,index) => {
+          console.log("gen--1");
+          let tmpGen=[];
+          forEach(generaCurrentPkg, (child, index) => {
+               console.log("gen--2");
                let filter = umlClasses.filter(subItem => {
                     return child.target.name == subItem.name;
                });
                if (filter.length == 0) {
                     umlClasses.push(child.target.name);
-               } 
+                    tmpGen.push(child.target.name);
+               }
           });
+          console.log(tmpGen);
+          console.log("gen--3");
 
 
           /* ------------ 4. Filter unique classes ------------ */
           let resArr = [];
-          forEach(umlClasses,(item,index) => {
+          forEach(umlClasses, (item, index) => {
                let filter = resArr.filter(subItem => {
                     return subItem._id == item._id;
                });
                if (filter.length == 0) {
                     resArr.push(item);
                }
-               
+
           });
 
           /* ------------ 5. Sort unique classes ------------ */
@@ -278,7 +299,7 @@ class OpenApi {
           let duplicateClasses = [];
           let isDuplicate = false;
 
-          
+
 
           forEach(resArr, function (item, index) {
                let filter = uniqueArr.filter(subItem => {
@@ -295,31 +316,28 @@ class OpenApi {
                     uniqueArr[firstElem].ownedElements = uniqueArr[firstElem].ownedElements.concat(item.ownedElements);
                }
                OpenApi.uniqueClassesArr = uniqueArr;
-               
+
           });
 
           if (!isDuplicate) {
 
-               let mClasses=[];
-               forEach(OpenApi.uniqueClassesArr,element => {
-                         mClasses.push(element.name);
+               let mClasses = [];
+               forEach(OpenApi.uniqueClassesArr, element => {
+                    mClasses.push(element.name);
                });
 
-               let mPaths=[];
-               forEach(OpenApi.operations,element => {
+               let mPaths = [];
+               forEach(OpenApi.operations, element => {
                     mPaths.push(element.name);
                });
 
                console.log("Query Total Classes", mClasses);
                console.log("Query Total Interfaces", mPaths);
 
-               this.generateOpenAPI();
+               _this.generateOpenAPI();
           } else {
                app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
           }
-
-          
-         
 
      }
      /**
@@ -327,21 +345,25 @@ class OpenApi {
       * @description get and stores UMLInterface, UMLClass & UMLGeneralization 
       * @memberof OpenAPI
       */
-     getUMLModels() {
-          let _this=this;
+     async getUMLModels() {
+          let _this = this;
           try {
-               
-               
-               if (OpenApi.umlPackage instanceof type.UMLPackage) {
-                    /* _this.getElements();
-                    setTimeout(function(){
-                         _this.ifDone();
-                         
-                    },1000); */
 
-                    
+
+               if (OpenApi.umlPackage instanceof type.UMLPackage) {
+                    /*  _this.getElements();
+                     setTimeout(function(){
+                          _this.ifDone();
+                          
+                     },1000); */
+                    // let umlAsso=await OpenApi.getUMLAssociation();
+                    // setTimeout(function(){
+
+                    // console.log("Common",umlAsso);
+                    // },100);
+
                     _this.getOtherWay();
-                   
+
 
                }
           } catch (error) {
@@ -356,7 +378,7 @@ class OpenApi {
       * @description finds the element from the class
       * @param {UMLClass} elem
       * @memberof OpenAPI
-      */     
+      */
      findClass(umlClass) {
           try {
                let _this = this;
@@ -367,7 +389,7 @@ class OpenApi {
                          if (child instanceof type.UMLAssociation) {
                               if (child.end1.reference.name != child.end2.reference.name) {
                                    setTimeout(function () {
-                                             _this.findClass(child.end2.reference);
+                                        _this.findClass(child.end2.reference);
                                    }, 5);
                               }
                          } else if (child instanceof type.UMLClass) {
@@ -531,6 +553,109 @@ class OpenApi {
      static setPackagepath(strPackagePath) {
           OpenApi.strPackagePath = strPackagePath;
      }
+     static async getUMLAssociation() {
+          return new Promise((resolve, reject) => {
+
+               /*  let associations = app.repository.select("@UMLAssociation"); */
+               let tmpAssociation = [];
+               try {
+                    let umlClasses = app.repository.select(OpenApi.getPackage().name + "::@UMLClass");
+                    /*  let associations = app.repository.select("@UMLAssociation"); */
+                    forEach(umlClasses, async (objClass, index) => {
+                         let umlAssociation = app.repository.select(OpenApi.getPackage().name + "::" + objClass.name + "::@UMLAssociation");
+                         console.log(objClass.name,umlAssociation);
+                         if (umlAssociation.length > 0) {
+                              umlAssociation.forEach(function (element) {
+                                   tmpAssociation.push(element);
+                              });
+                              
+                         }
+                    });
+
+
+                    resolve(tmpAssociation);
+               } catch (error) {
+                    console.error("Found error", error.message);
+                    this.utils.writeErrorToFile(error);
+               }
+
+
+               /* let assocCurrentPkg = [];
+               console.log("---1");
+               forEach(associations, async (child, index) => {
+                    console.log("---2");
+                    let result = await OpenApi.getParentPkg(child);
+                    if (result != null && result == OpenApi.getPackage().name && child.name != "") {
+                         assocCurrentPkg.push(child);
+                    }
+
+               }); */
+               /* console.log("---3"); */
+               // resolve(associations);
+               /* resolve(assocCurrentPkg); */
+          });
+     }
+     static async getUMLGeneralization() {
+          return new Promise((resolve, reject) => {
+
+               let tmpGeneralization = [];
+               try {
+                    let umlClasses = app.repository.select(OpenApi.getPackage().name + "::@UMLClass");
+                    forEach(umlClasses, async (objClass, index) => {
+                         let umlGenera = app.repository.select(OpenApi.getPackage().name + "::" + objClass.name + "::@UMLGeneralization");
+                         if (umlGenera.length > 0) {
+                              umlGenera.forEach(function (element) {
+                                   tmpGeneralization.push(element);
+                              });
+                         }
+                    });
+
+
+                    resolve(tmpGeneralization);
+               } catch (error) {
+                    console.error("Found error", error.message);
+                    this.utils.writeErrorToFile(error);
+               }
+          });
+     }
+     /**
+      * Finds the parent package of element from UMLModel
+      *
+      * @param {*} element
+      * @returns
+      * @memberof OpenApi
+      */
+     static async getParentPkg(element) {
+          return await new Promise((resolve, reject) => {
+               let result = OpenApi.getElementPackage(element);
+               if (result != null) {
+                    resolve(result);
+               } else {
+                    reject(null);
+               }
+          });
+     }
+     /**
+      * @function getElementPackage
+      * @description finds package of element
+      * @param {Object} element
+      * @returns {String}
+      * @memberof OpenApi
+      */
+     static async getElementPackage(element) {
+          if (element != null && element._parent != null && element.hasOwnProperty('_parent')) {
+
+               element = element._parent;
+               if (element instanceof type.UMLPackage && element.name != "") {
+                    return element.name;
+               } else {
+                    return await this.getElementPackage(element);
+               }
+          } else {
+               return null;
+          }
+
+     }
      /**
       * @function findHierarchy
       * @description finds the package hierarchy recursively
@@ -599,6 +724,7 @@ class OpenApi {
 
 
 
+
           } catch (error) {
                this.utils.writeErrorToFile(error);
           }
@@ -646,21 +772,21 @@ function resetSummery() {
 function validateSwagger(pathValidator) {
      return new Promise((resolve, reject) => {
 
-          parser.validate(pathValidator, (err, api) => {
-               if (err) {
-                    /* Error */
-                    reject(err);
-               } else {
-                    /* Success */
-                    resolve({
-                         message: "success"
-                    })
-               }
+               parser.validate(pathValidator, (err, api) => {
+                    if (err) {
+                         /* Error */
+                         reject(err);
+                    } else {
+                         /* Success */
+                         resolve({
+                              message: "success"
+                         })
+                    }
+               });
+          })
+          .catch(error => {
+               reject(error);
           });
-     })
-     .catch(error => {
-          reject(error);
-     });
 }
 
 module.exports.getFilePath = OpenApi.getPath;
@@ -684,3 +810,6 @@ module.exports.getSummery = getSummery;
 module.exports.resetSummery = resetSummery;
 module.exports.validateSwagger = validateSwagger;
 module.exports.getPackagePath = OpenApi.getPackagePath;
+module.exports.getParentPkg = OpenApi.getParentPkg;
+module.exports.getUMLAssociation = OpenApi.getUMLAssociation;
+module.exports.getUMLGeneralization = OpenApi.getUMLGeneralization;
