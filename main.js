@@ -5,6 +5,7 @@ var fs = require('fs');
 var path = require('path');
 const title = require('./package.json').title;
 const description = require('./package.json').description;
+var forEach = require('async-foreach').forEach;
 
 /**
  * @function generateSpecs
@@ -25,9 +26,9 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                     returnValue
                }) {
                     if (buttonId === "ok") {
-                         let varSel=returnValue.getClassName();
-                         let valPackagename=type.UMLPackage.name;
-                         if (varSel == valPackagename) { 
+                         let varSel = returnValue.getClassName();
+                         let valPackagename = type.UMLPackage.name;
+                         if (varSel == valPackagename) {
                               umlPackage = returnValue;
                               fileTypeSelection(umlPackage, options);
                          } else {
@@ -83,7 +84,6 @@ function getGenOptions() {
  */
 function testSinglePackage() {
 
-
      /* There are two modes of extension, TEST & GENERATE. Here we set TEST mode. */
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
      /* There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_SINGLE) */
@@ -96,11 +96,13 @@ function testSinglePackage() {
                returnValue
           }) {
                if (buttonId === "ok") {
-                    let varSel=returnValue.getClassName();
-                    let valPackagename=type.UMLPackage.name;
-                    if (varSel == valPackagename) { 
+                    let varSel = returnValue.getClassName();
+                    let valPackagename = type.UMLPackage.name;
+                    if (varSel == valPackagename) {
                          umlPackage = returnValue;
+                         /* let result=await removeOutputFiles(); */
                          removeOutputFiles();
+                         /*  console.log("Result",result); */
                          generateTestAPI(umlPackage)
 
                     } else {
@@ -108,29 +110,16 @@ function testSinglePackage() {
                     }
                }
           });
-          
-}
-function swaggerTest() {
-     const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
-     let pathValidator = path.join(basePath, 'Academic.json');
-     try {
-          openAPI.validateSwagger(pathValidator).then(data => {
-                    let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
-                    app.dialogs.showInfoDialog(bindSuccesMsg);
-               })
-               .catch(error => {
-                    console.error("Found error", error.message);          
-                    app.dialogs.showErrorDialog(error.message);
-               });
-     } catch (error) {
-          console.error("Found error", error.message);
-     }
+
 }
 /**
  * @function removeOutputFiles
  * @description Remove previously test generated .json files from the output folder
  */
 function removeOutputFiles() {
+     /* return new Promise((resolve, reject) => { */
+
+
      const directory = __dirname + constant.IDEAL_TEST_FILE_PATH;
 
      if (!fs.existsSync(directory)) {
@@ -146,6 +135,8 @@ function removeOutputFiles() {
                });
           }
      });
+     /* resolve("Success"); */
+     /* }); */
 }
 
 /**
@@ -247,12 +238,12 @@ function init() {
      /* Register command to Generate Specification */
      app.commands.register('openapi:generate-specs', generateSpecs);
      /* Register command to Test Single Pacakge */
-     app.commands.register('openapi:test-single-package', testSinglePackage/* swaggerTest */);
+     app.commands.register('openapi:test-single-package', testSinglePackage /* swaggerTest */ );
      /* Register command to Test Entire Project */
      app.commands.register('openapi:test-entire-package', testEntireProject);
      /* Register command to Display Extension information in dialog */
      app.commands.register('openapi:about-us', aboutUsExtension);
-     
+
 }
 
 exports.init = init
