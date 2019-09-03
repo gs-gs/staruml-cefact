@@ -13,8 +13,8 @@ class Composition {
 
 
      /**
-      *
-      *
+      * @function addComposition
+      * @description adds composition in properties object
       * @param {Object} mainPropertiesObj
       * @param {UMLAssociation} assoc
       * @returns {Object}

@@ -17,19 +17,25 @@ class Association {
           this.required = new Required();
      }
 
+     /**
+      * @function getAssociations
+      * @description returns the array of Associations
+      * @returns
+      * @memberof Association
+      */
      getAssociations() {
           return this.arrAssoc;
      }
+     /**
+      * @function addAssociationProperties
+      * @description Returns the association properties object 
+      * @param {*} assocClassLink
+      * @param {*} mainPropertiesObj
+      * @returns
+      * @memberof Association
+      */
      addAssociationProperties(assocClassLink, mainPropertiesObj) {
-          /**
-           * Add asscociation class Properties
-           * eg.
-           *   TransportMeansParty
-                    allOf:
-                    - $ref: '#/components/schemas/TransportPartyIds'
-                    - $ref: '#/components/schemas/TransportMeansParty'
-                    - type: object
-               */
+          
           if (assocClassLink.length > 0) {
                assocClassLink.forEach(item => {
                     this.writeAssociationClassProperties(mainPropertiesObj, item);
@@ -120,7 +126,7 @@ class Association {
       */
      getAssociationOfClass(objClass) {
           try {
-               let associations=app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
+               let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
                let filterAssociation = associations.filter(item => {
                     return item.end1.reference._id == objClass._id
                });
@@ -131,28 +137,6 @@ class Association {
           }
      }
 
-     /* getAssociationOfClass(objClass) {
-          try {
-               let _this = this;
-               let associations = app.repository.select("@UMLAssociation");
-               
-               let assocCurrentPkg = [];
-               forEach(associations, async (child, index) => {
-                    let result = await openAPI.getParentPkg(child);
-                    if (result != null && result == openAPI.getUMLPackage().name && child.name != "") {
-                         assocCurrentPkg.push(child);
-                    }
-
-               });
-               let filterAssociation = assocCurrentPkg.filter(item => {
-                    return item.end1.reference._id == objClass._id
-               });
-               return filterAssociation;
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
-          }
-     } */
      /**
       * @function writeAssociationProperties
       * @description 

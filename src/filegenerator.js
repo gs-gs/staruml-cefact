@@ -92,11 +92,11 @@ class FileGenerator {
                     } else if (openAPI.getFileType() == 2) {
                          /* Convert JSON object to YAML using j2yaml and save the file */
                          console.log("---f-start");
-                         this.createYAML().then(function(result){
+                         this.createYAML().then(function (result) {
                               console.log("Result", result);
                               console.log("---f-end");
                               resolve("success-generate");
-                         }).catch(function(error){
+                         }).catch(function (error) {
                               reject(error);
                          });
                          console.log("---f-end");
@@ -119,11 +119,11 @@ class FileGenerator {
 
                          /* Direct YML from JsonObject */
                          console.log("---f-start");
-                         this.createYAML().then(function(result){
+                         this.createYAML().then(function (result) {
                               console.log("Result", result);
                               console.log("---f-end");
                               resolve("success-generate");
-                         }).catch(function(error){
+                         }).catch(function (error) {
                               reject(error);
                          });
                          console.log("---f-end");
@@ -138,21 +138,24 @@ class FileGenerator {
                }
           });
      }
+
+     /**
+      * @function validateAndPrompt
+      * @description Validate generated OpenApi using swagger parser and returns promise result
+      * @returns 
+      * @memberof FileGenerator
+      */
      validateAndPrompt() {
           let _this = this;
           return new Promise((resolve, reject) => {
 
                try {
-
-
-
-
                     /* Check for APP Mode (APP_MODE_GEN or APP_MODE_TEST) */
                     if (openAPI.getAppMode() == openAPI.APP_MODE_GEN) {
                          /* check for if any error  available or not  */
                          if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
-                              let error={
-                                   error:openAPI.getError.msg
+                              let error = {
+                                   error: openAPI.getError.msg
                               };
                               reject(error);
                               app.dialogs.showErrorDialog(openAPI.getError().msg);
@@ -186,16 +189,16 @@ class FileGenerator {
                                         let jsonFilePath = this.basePath.replace(".yml", ".json");
                                         bindSuccesMsg = bindSuccesMsg + constant.strend + constant.stronlypath + jsonFilePath;
                                    }
-                                   let success={
-                                        success:bindSuccesMsg
+                                   let success = {
+                                        success: bindSuccesMsg
                                    };
                                    resolve(success);
                                    app.dialogs.showInfoDialog(bindSuccesMsg);
                               })
                               .catch(error => {
                                    let bindFailureMsg = constant.msgerror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                   let errorObj={
-                                        error:bindFailureMsg
+                                   let errorObj = {
+                                        error: bindFailureMsg
                                    };
                                    reject(errorObj);
                                    console.log(error)
@@ -209,16 +212,16 @@ class FileGenerator {
 
                               openAPI.validateSwagger(pathValidator).then(data => {
                                         let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
-                                        let success={
-                                             success:bindSuccesMsg
+                                        let success = {
+                                             success: bindSuccesMsg
                                         };
                                         resolve(success);
                                         app.dialogs.showInfoDialog(bindSuccesMsg);
                                    })
                                    .catch(error => {
                                         let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                        let errorObj={
-                                             error:bindFailureMsg
+                                        let errorObj = {
+                                             error: bindFailureMsg
                                         };
                                         reject(errorObj);
                                         app.dialogs.showErrorDialog(bindFailureMsg);
@@ -278,8 +281,8 @@ class FileGenerator {
                               openAPI.validateSwagger(pathValidator).then(data => {
                                         let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
                                         openAPI.addSummery(bindSuccesMsg, 'success');
-                                        let success={
-                                             success:bindSuccesMsg
+                                        let success = {
+                                             success: bindSuccesMsg
                                         };
                                         resolve(success);
 
@@ -287,8 +290,8 @@ class FileGenerator {
                                    .catch(error => {
                                         let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + error.message
                                         openAPI.addSummery(bindFailureMsg, 'failure');
-                                        let errorObj={
-                                             error:bindFailureMsg
+                                        let errorObj = {
+                                             error: bindFailureMsg
                                         };
                                         reject(errorObj);
                                    });

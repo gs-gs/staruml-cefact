@@ -65,26 +65,6 @@ class Generalization {
                this.writeErrorToFile(error);
           }
      }
-
-     /* async findGeneralizationOfClass(objClass) {
-          return new Promise((resolve, reject) => {
-               try {
-                    // let generalizeClasses = app.repository.select("@UMLGeneralization");
-                    console.log("--gen-start");
-                    let generaCurrentPkg = await openAPI.getUMLGeneralization();
-                    console.log("--gen-end");
-                    let filterGeneral = generaCurrentPkg.filter(item => {
-                         return item.source._id == objClass._id
-                    });
-                    resolve(filterGeneral);
-               } catch (error) {
-                    console.error("Found error", error.message);
-                    reject(error);
-                    this.writeErrorToFile(error);
-               }
-          });
-          
-     } */
 }
 
 module.exports = Generalization;
