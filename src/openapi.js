@@ -222,25 +222,25 @@ class OpenApi {
 
           let _this = this;
           let umlPackage = OpenApi.getPackage();
-          console.log("Selected Package", umlPackage);
+          /* console.log("Selected Package", umlPackage); */
           var _pkgName = umlPackage.name
           /* ------------ 1. UMLClass ------------ */
           let umlClasses = app.repository.select(_pkgName + "::@UMLClass");
-          console.log("UMLClass", umlClasses);
+          /* console.log("UMLClass", umlClasses); */
 
           OpenApi.operations = app.repository.select(_pkgName + "::@UMLInterface");
-          console.log("UMLOperation", OpenApi.operations);
+          /* console.log("UMLOperation", OpenApi.operations); */
 
           /* ------------ 2. Association Class------------ */
-          console.log("--asso-start");
+          /* console.log("--asso-start"); */
           let assocCurrentPkg = await OpenApi.getUMLAssociation();
-          console.log(assocCurrentPkg);
-          console.log("--asso-end");
+          /* console.log(assocCurrentPkg); */
+          /* console.log("--asso-end"); */
 
-          console.log("assoc--1");
+          /* console.log("assoc--1"); */
           let tmpAsso = [];
           forEach(assocCurrentPkg, (child, index) => {
-               console.log("assoc--2");
+               /* console.log("assoc--2"); */
                if (child.end1.reference.name != child.end2.reference.name) {
 
                     let filter = umlClasses.filter(subItem => {
@@ -254,34 +254,37 @@ class OpenApi {
                }
 
           });
-          console.log(tmpAsso);
-          console.log("assoc--3");
+          /* console.log(tmpAsso); */
+          /* console.log("assoc--3"); */
           /* ------------ 3. Generalization Class ------------ */
 
-          console.log("--gen-start");
+          /* console.log("--gen-start"); */
           let generaCurrentPkg = await OpenApi.getUMLGeneralization();
-          console.log("--gen-end");
+          /* console.log("--gen-end"); */
 
-          console.log("gen--1");
-          let tmpGen=[];
+          /* console.log("gen--1"); */
+          let tmpGen = [];
           forEach(generaCurrentPkg, (child, index) => {
-               console.log("gen--2");
+               /* console.log("gen--2"); */
                let filter = umlClasses.filter(subItem => {
                     return child.target.name == subItem.name;
                });
                if (filter.length == 0) {
-                    umlClasses.push(child.target.name);
+                    umlClasses.push(child.target);
                     tmpGen.push(child.target.name);
                }
           });
-          console.log(tmpGen);
-          console.log("gen--3");
+          /* console.log(tmpGen); */
+          /* console.log("gen--3"); */
 
 
           /* ------------ 4. Filter unique classes ------------ */
           let resArr = [];
+          /* console.log("fil-un-1"); */
           forEach(umlClasses, (item, index) => {
+               /* console.log("fil-un-2"); */
                let filter = resArr.filter(subItem => {
+                    /* console.log("fil-un-2-1"); */
                     return subItem._id == item._id;
                });
                if (filter.length == 0) {
@@ -289,20 +292,26 @@ class OpenApi {
                }
 
           });
+          /* console.log("fil-un-3"); */
 
           /* ------------ 5. Sort unique classes ------------ */
+          /* console.log("sort-1"); */
           resArr.sort(function (a, b) {
+               /* console.log("sort-2"); */
                return a.name.localeCompare(b.name);
           });
+          /* console.log("sort-3"); */
 
           let uniqueArr = [];
           let duplicateClasses = [];
           let isDuplicate = false;
 
 
-
+          /* console.log("sort-un-1"); */
           forEach(resArr, function (item, index) {
+               /* console.log("sort-un--2"); */
                let filter = uniqueArr.filter(subItem => {
+                    /* console.log("sort-un--2-1"); */
                     return item.name == subItem.name;
                });
 
@@ -318,11 +327,14 @@ class OpenApi {
                OpenApi.uniqueClassesArr = uniqueArr;
 
           });
+          /* console.log("sort-un--3"); */
 
+          /* console.log("duplicate-1"); */
           if (!isDuplicate) {
 
                let mClasses = [];
                forEach(OpenApi.uniqueClassesArr, element => {
+                    /* console.log("duplicate-2"); */
                     mClasses.push(element.name);
                });
 
@@ -338,6 +350,7 @@ class OpenApi {
           } else {
                app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
           }
+          /* console.log("duplicate-3"); */
 
      }
      /**
@@ -556,19 +569,17 @@ class OpenApi {
      static async getUMLAssociation() {
           return new Promise((resolve, reject) => {
 
-               /*  let associations = app.repository.select("@UMLAssociation"); */
                let tmpAssociation = [];
                try {
                     let umlClasses = app.repository.select(OpenApi.getPackage().name + "::@UMLClass");
-                    /*  let associations = app.repository.select("@UMLAssociation"); */
                     forEach(umlClasses, async (objClass, index) => {
                          let umlAssociation = app.repository.select(OpenApi.getPackage().name + "::" + objClass.name + "::@UMLAssociation");
-                         console.log(objClass.name,umlAssociation);
+                         /* console.log(objClass.name,umlAssociation); */
                          if (umlAssociation.length > 0) {
                               umlAssociation.forEach(function (element) {
                                    tmpAssociation.push(element);
                               });
-                              
+
                          }
                     });
 
@@ -690,10 +701,10 @@ class OpenApi {
       * @description generate open api json object
       * @memberof OpenApi
       */
-     generateOpenAPI() {
+     async generateOpenAPI() {
           try {
 
-
+               let _this=this;
                this.resetPackagePath();
                let arrPath = this.findHierarchy(OpenApi.getPackage());
                let rPath = this.reversePkgPath(arrPath);
@@ -702,25 +713,45 @@ class OpenApi {
 
                /*  Add openapi version */
                MainJSON.addApiVersion('3.0.0');
+               console.log("-----version-generated");
 
                /* Add openapi information */
                let mInfo = new Info();
                MainJSON.addInfo(mInfo);
+               console.log("-----info-generated");
 
                /* Add openapi servers */
                let server = new Servers();
                MainJSON.addServers(server);
+               console.log("-----server-generated");
 
                /* Add openapi paths */
                let paths = new Paths();
                MainJSON.addPaths(paths);
+               console.log("-----path-generated");
 
                /* Add openapi component */
                let component = new Component();
                MainJSON.addComponent(component);
-
+               console.log("-----component-generated");
+               console.log(MainJSON.getJSON());
                let generator = new FileGenerator();
-               generator.generate();
+               let result = await generator.generate();
+               console.log("Result", result);
+               console.log("-----file-generated");
+               await generator.validateAndPrompt();
+               /* try {
+                    console.log("Path : ",OpenApi.getPath());
+                    if (fs.existsSync(OpenApi.getPath())) {
+                         console.log("File : exist");
+                    }
+               } catch (err) {
+                    console.error(err)
+               } */
+               
+
+
+               
 
 
 
@@ -772,20 +803,32 @@ function resetSummery() {
 function validateSwagger(pathValidator) {
      return new Promise((resolve, reject) => {
 
-               parser.validate(pathValidator, (err, api) => {
-                    if (err) {
-                         /* Error */
-                         reject(err);
-                    } else {
-                         /* Success */
-                         resolve({
-                              message: "success"
-                         })
+               try {
+                    console.log("Filepath :",pathValidator);
+                    if (fs.existsSync(pathValidator)) {
+                         console.log("File exist");
+                         setTimeout(function(){
+                         parser.validate(pathValidator, (err, api) => {
+                              if (err) {
+                                   /* Error */
+                                   reject(err);
+                              } else {
+                                   /* Success */
+                                   resolve({
+                                        message: "success"
+                                   })
+                              }
+                         }).catch(function (error) {
+                              reject(error);
+                         });
+                    },100);
                     }
-               });
-          })
-          .catch(error => {
-               reject(error);
+               } catch (err) {
+                    console.error(err)
+                    reject(err);
+               }
+
+
           });
 }
 
