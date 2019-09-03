@@ -120,7 +120,6 @@ class Association {
       */
      getAssociationOfClass(objClass) {
           try {
-               /* let associations = app.repository.select("@UMLAssociation"); */
                let associations=app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
                let filterAssociation = associations.filter(item => {
                     return item.end1.reference._id == objClass._id
