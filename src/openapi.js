@@ -726,13 +726,16 @@ class OpenApi {
                /* Add openapi component */
                let component = new Component();
                MainJSON.addComponent(component);
-               console.log("-----component-generated");
+               console.log("-----component-generated-----");
                console.log(MainJSON.getJSON());
                let generator = new FileGenerator();
-               let result = await generator.generate();
-               console.log("Result", result);
-               console.log("-----file-generated");
-               await generator.validateAndPrompt();
+               let fileGenerate = await generator.generate();
+               console.log("-----file-generated-----");
+               console.log("result", fileGenerate);
+               let validate=await generator.validateAndPrompt();
+               console.log("-----validate & prompt-----");
+               console.log("result",validate);
+
 
           } catch (error) {
                this.utils.writeErrorToFile(error);

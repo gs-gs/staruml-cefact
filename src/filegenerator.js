@@ -35,7 +35,10 @@ class FileGenerator {
                     this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                     fs.writeFileSync(this.basePath, JSON.stringify(MainJSON.getJSON(), null, 4));
                     console.log("file-generate-ended");
-                    resolve("success-createJSON");
+                    resolve({
+                         result:'success',
+                         message:'JSON file generated successfully'
+                    });
 
                } catch (error) {
 
@@ -57,7 +60,10 @@ class FileGenerator {
                     let ymlText = YAML.stringify(MainJSON.getJSON());
                     this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
                     fs.writeFileSync(this.basePath, ymlText);
-                    resolve("success-createYAML");
+                    resolve({
+                         result:'success',
+                         message:'YAML file generated successfully'
+                    });
                } catch (error) {
 
                     console.error("Error generating JSON file", error);
@@ -77,12 +83,12 @@ class FileGenerator {
                let _this = this;
                try {
                     if (openAPI.getFileType() == 1) {
-                         console.log("---f-start");
+                         console.log("---json-generate-start");
                          this.createJSON().then(function (result) {
-                              console.log("Result", result);
-                              console.log("---f-end");
-                              resolve("success-generate");
+                              console.log("---json-generate-end");
+                              resolve(result);
                          }).catch(function (error) {
+                              console.error(error);
                               reject(error);
                          });
 
@@ -91,15 +97,15 @@ class FileGenerator {
 
                     } else if (openAPI.getFileType() == 2) {
                          /* Convert JSON object to YAML using j2yaml and save the file */
-                         console.log("---f-start");
+                         console.log("---yaml-generate-start");
                          this.createYAML().then(function (result) {
                               console.log("Result", result);
-                              console.log("---f-end");
-                              resolve("success-generate");
+                              console.log("---yaml-generate-end");
+                              resolve(result);
                          }).catch(function (error) {
+                              console.error(error);
                               reject(error);
                          });
-                         console.log("---f-end");
 
                     } else {
 
@@ -108,31 +114,33 @@ class FileGenerator {
                          /* Direct conversion from JsonObject to JSON/YAML */
 
                          /* Direct json from JsonOject */
-                         console.log("---f-start-1");
+                         console.log("---json-generate-start");
                          this.createJSON().then(function (result) {
                               console.log("Result", result);
-                              console.log("---f-end-1");
-                              resolve("success-generate");
+                              console.log("---json-generate-end");
+                              resolve(result);
                          }).catch(function (error) {
+                              console.error(error);
                               reject(error);
                          });
 
                          /* Direct YML from JsonObject */
-                         console.log("---f-start");
+                         console.log("---yaml-generate-start");
                          this.createYAML().then(function (result) {
                               console.log("Result", result);
-                              console.log("---f-end");
-                              resolve("success-generate");
+                              console.log("---yaml-generate-end");
+                              resolve(result);
                          }).catch(function (error) {
+                              console.error(error);
                               reject(error);
+                              
                          });
-                         console.log("---f-end");
 
                     }
 
 
                } catch (error) {
-                    console.error("Found error", error.message);
+                    console.error(error);
                     this.utils.writeErrorToFile(error);
                     reject(error);
                }
@@ -162,27 +170,7 @@ class FileGenerator {
                               // return;
                          }
 
-                         /* fs.readFile(_this.basePath, 'utf-8', function (error, data) {
-                              if (error) {
-                                   let bindFailureMsg = constant.msgerror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                   app.dialogs.showErrorDialog(bindFailureMsg);
-                              } else if (data) {
-                                   parser.validate(_this.basePath, (error, api) => {
-                                        let result = null;
-                                        if (error) {
-                                             result = constant.msgerror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                             app.dialogs.showErrorDialog(result);
-                                        } else {
-                                             let bindSuccesMsg = constant.msgsuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + _this.basePath
-                                             if (openAPI.getFileType() == 3) {
-                                                  let jsonFilePath = _this.basePath.replace(".yml", ".json");
-                                                  bindSuccesMsg = bindSuccesMsg + constant.strend + constant.stronlypath + jsonFilePath;
-                                             }
-                                             app.dialogs.showInfoDialog(bindSuccesMsg);
-                                        }
-                                   });
-                              }
-                         }); */
+                         
                          openAPI.validateSwagger(this.basePath).then(data => {
                                    let bindSuccesMsg = constant.msgsuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + this.basePath
                                    if (openAPI.getFileType() == 3) {
@@ -201,7 +189,7 @@ class FileGenerator {
                                         error: bindFailureMsg
                                    };
                                    reject(errorObj);
-                                   console.log(error)
+                                   console.error(error)
                                    app.dialogs.showErrorDialog(bindFailureMsg);
                               });
 
@@ -223,60 +211,12 @@ class FileGenerator {
                                         let errorObj = {
                                              error: bindFailureMsg
                                         };
+                                        console.error(error);
                                         reject(errorObj);
                                         app.dialogs.showErrorDialog(bindFailureMsg);
                                    });
 
-
-
-                              /* fs.readFile(pathValidator, 'utf-8', function (error, data) {
-                                   console.log("error---1", error);
-                                   console.log("error---1", data);
-                                   // console.log(data);
-                                   if (error) {
-                                        let result = null;
-                                        console.log(error);
-                                        result = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                        app.dialogs.showErrorDialog(result);
-                                   } else if (data) {
-                                        // console.log(data);
-                                        parser.validate(pathValidator, (error, api) => {
-                                             console.log("error---2", error);
-                                             console.log("error---2", api);
-                                             let result = null;
-                                             if (error) {
-                                                  result = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                                  app.dialogs.showErrorDialog(result);
-                                             } else {
-                                                  result = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
-                                                  app.dialogs.showInfoDialog(result);
-                                             }
-                                        });
-                                        
-                                   }
-                              }); */
-
                          } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
-
-                              /* fs.readFile(pathValidator, 'utf-8', function (error, data) {
-                                   if (error) {
-                                        console.log(error);
-                                        let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + error.message
-                                        openAPI.addSummery(bindFailureMsg, 'failure');
-                                   } else if (data) {
-                                        // console.log(data);
-                                        parser.validate(pathValidator, (error, api) => {
-                                             if (error) {
-                                                  let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + error.message
-                                                  openAPI.addSummery(bindFailureMsg, 'failure');
-                                             } else {
-                                                  let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
-                                                  openAPI.addSummery(bindSuccesMsg, 'success');
-                                             }
-                                        });
-                                       
-                                   }
-                              }); */
 
                               openAPI.validateSwagger(pathValidator).then(data => {
                                         let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
@@ -293,11 +233,13 @@ class FileGenerator {
                                         let errorObj = {
                                              error: bindFailureMsg
                                         };
+                                        console.error(error);
                                         reject(errorObj);
                                    });
                          }
                     }
                } catch (error) {
+                    console.error(error);
                     reject(error);
                }
           });
