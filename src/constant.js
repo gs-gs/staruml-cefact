@@ -11,6 +11,7 @@ const Constant = {
      msgerror: 'OpenAPI Specs generation failure for Package : ',
      msgtesterror: 'OpenAPI Specs Test Failure for Package : ',
      strerror: 'Error : ',
+     strerrorgenfail: 'Generation Failed!',
      strpath: 'File Generated at \nPath :',
      stronlypath: '\nPath : ',
      strend: '     ',
