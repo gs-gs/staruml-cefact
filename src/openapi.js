@@ -320,10 +320,8 @@ class OpenApi {
                                    message:"Success"
                               });
                          } else {
-                              reject({
-                                   result:"error",
-                                   message:"There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name."
-                              });
+                              let message="There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.";
+                              reject(new Error(message));
                               
                               
                          }
@@ -347,31 +345,15 @@ class OpenApi {
      async getUMLModels() {
           let _this = this;
           try {
-
-
                if (OpenApi.umlPackage instanceof type.UMLPackage) {
-                    /*  _this.getElements();
-                     setTimeout(function(){
-                          _this.ifDone();
-                          
-                     },1000); */
-                    // let umlAsso=await OpenApi.getUMLAssociation();
-                    // setTimeout(function(){
-
-                    // console.log("Common",umlAsso);
-                    // },100);
-                    // _this.getModelElements();
                     let result=await _this.getModelElements();
                     if(result.result=='success'){
                          console.log("Result",result);
                          _this.generateOpenAPI();
                     }
-                    
-
-
                }
           } catch (error) {
-               console.error("Found error", error.message);
+               console.error("getUMLModels",error);
                this.utils.writeErrorToFile(error);
                app.dialogs.showErrorDialog(error.message);
           }
@@ -738,6 +720,8 @@ class OpenApi {
 
 
           } catch (error) {
+
+               console.error("generateOpenAPI",error);
                this.utils.writeErrorToFile(error);
           }
      }

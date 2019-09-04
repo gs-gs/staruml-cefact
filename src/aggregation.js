@@ -28,7 +28,7 @@ class Aggregation {
           mainPropertiesObj[assoc.name] = propertiesObj;
 
           let arrIsID = [];
-          let filterClasses = aggregationClasses.filter(itemClass => {
+          aggregationClasses.filter(itemClass => {
 
                let filterAttributes = itemClass.attributes.filter(item => {
 
