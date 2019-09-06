@@ -160,7 +160,7 @@ class FileGenerator {
                     if (openAPI.getAppMode() == openAPI.APP_MODE_GEN) {
                          /* check for if any error  available or not  */
                          if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
-                              // app.dialogs.showErrorDialog(openAPI.getError().msg);
+                              /*  app.dialogs.showErrorDialog(openAPI.getError().msg); */
                               reject(new Error(openAPI.getError().msg));
                          } else {
 
@@ -174,11 +174,11 @@ class FileGenerator {
                                              result: constant.FIELD_SUCCESS,
                                              message: bindSuccesMsg
                                         });
-                                        app.dialogs.showInfoDialog(bindSuccesMsg);
+                                        /*  app.dialogs.showInfoDialog(bindSuccesMsg); */
                                    })
                                    .catch(error => {
                                         let bindFailureMsg = constant.msgerror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                        // app.dialogs.showErrorDialog(bindFailureMsg);
+                                        /*  app.dialogs.showErrorDialog(bindFailureMsg); */
                                         reject(new Error(bindFailureMsg));
                                    });
                          }
@@ -195,11 +195,11 @@ class FileGenerator {
                                              result: constant.FIELD_SUCCESS,
                                              message: bindSuccesMsg
                                         });
-                                        app.dialogs.showInfoDialog(bindSuccesMsg);
+                                        /*  app.dialogs.showInfoDialog(bindSuccesMsg); */
                                    })
                                    .catch(error => {
                                         let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                        // app.dialogs.showErrorDialog(bindFailureMsg);
+                                        /*  app.dialogs.showErrorDialog(bindFailureMsg); */
                                         reject(new Error(bindFailureMsg));
                                    });
 

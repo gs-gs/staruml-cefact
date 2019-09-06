@@ -206,65 +206,7 @@ class OpenApi {
 
 
      }
-     /**
-      * @function getUMLModels
-      * @description get and stores UMLInterface, UMLClass & UMLGeneralization 
-      * @memberof OpenAPI
-      */
-     /* async getUMLModels() {
-          let _this = this;
-          try {
-               if (OpenApi.umlPackage instanceof type.UMLPackage) {
-                    let resultElement = await _this.getModelElements();
-                    console.log("resultElement", resultElement);
-                    if (resultElement.result == 'success') {
-                         let resultGen=await _this.generateOpenAPI();
-                         console.log("resultGen", resultGen);
-                    }
-               }
-          } catch (error) {
-               console.error("getUMLModels", error);
-               this.utils.writeErrorToFile(error);
-               app.dialogs.showErrorDialog(error.message);
-          }
-     } */
-
-
-     /**
-      * @function findClass
-      * @description finds the element from the class
-      * @param {UMLClass} elem
-      * @memberof OpenAPI
-      */
-     /* findClass(umlClass) {
-          try {
-               let _this = this;
-               _this.schemas.push(umlClass);
-               // console.log("ABC---",umlClass.name);
-               if (umlClass.ownedElements.length > 0) {
-                    umlClass.ownedElements.forEach(child => {
-                         if (child instanceof type.UMLAssociation) {
-                              if (child.end1.reference.name != child.end2.reference.name) {
-                                   setTimeout(function () {
-                                        _this.findClass(child.end2.reference);
-                                   }, 5);
-                              }
-                         } else if (child instanceof type.UMLClass) {
-                              setTimeout(function () {
-                                   _this.findClass(child);
-                              }, 5);
-                         } else if (child instanceof type.UMLGeneralization) {
-                              setTimeout(function () {
-                                   _this.findClass(child.target);
-                              }, 5);
-                         }
-                    });
-               }
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
-          }
-     } */
+     
 
      /**
       * @function setTestMode
@@ -649,10 +591,9 @@ function validateSwagger(pathValidator) {
      return new Promise((resolve, reject) => {
 
           try {
-               // console.log("Filepath :", pathValidator);
+               /*  console.log("Filepath :", pathValidator); */
                if (fs.existsSync(pathValidator)) {
                     console.log("File exist");
-                    // setTimeout(function () {
                     parser.validate(pathValidator, (err, api) => {
                          if (err) {
                               /* Error */
@@ -667,7 +608,6 @@ function validateSwagger(pathValidator) {
                     }).catch(function (error) {
                          reject(error);
                     });
-                    // }, 100);
                }
           } catch (err) {
                console.error("--mayur", err)

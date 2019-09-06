@@ -10,6 +10,7 @@ const Constant = {
      msgstestuccess: 'OpenAPI Specs Tested Successfully for Package : ',
      msgerror: 'OpenAPI Specs generation failure for Package : ',
      msgtesterror: 'OpenAPI Specs Test Failure for Package : ',
+     titleopenapi: 'OpenAPI Specs Generation',
      strerror: 'Error : ',
      strerrorgenfail: 'Generation Failed!',
      strpath: 'File Generated at \nPath :',

@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 const title = require('./package.json').title;
 const description = require('./package.json').description;
+let vDialog = null;
 
 /**
  * @function generateSpecs
@@ -38,17 +39,30 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
 }
 async function getUMLModel(umlPackage, basePath, options, returnValue) {
      const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
+
      try {
           let result = await mOpenApi.initUMLPackage()
-          console.log("initializa", result);
+          console.log("initialize", result);
           let resultElement = await mOpenApi.getModelElements();
           console.log("resultElement", resultElement);
           let resultGen = await mOpenApi.generateOpenAPI();
           console.log("resultGen", resultGen);
+          if (resultGen.result == constant.FIELD_SUCCESS) {
+               vDialog.close();
+               setTimeout(function () {
+                    app.dialogs.showInfoDialog(resultGen.message);
+
+               }, 10);
+               vDialog = null;
+          }
+
 
      } catch (err) {
-          app.dialogs.showErrorDialog(err.message);
-          console.error("Error getUMLModel", err);
+          vDialog.close();
+          setTimeout(function(){
+               app.dialogs.showErrorDialog(err.message);
+               console.error("Error getUMLModel", err);
+          },10);
      }
 }
 /**
@@ -66,7 +80,11 @@ function fileTypeSelection(umlPackage, options) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, null);
                if (basePath != null) {
-                    getUMLModel(umlPackage, basePath, options, returnValue);
+                    let dm = app.dialogs;
+                    vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + umlPackage.name + "\' package", [], true);
+                    setTimeout(function () {
+                         getUMLModel(umlPackage, basePath, options, returnValue);
+                    }, 10);
 
                } else {
                     console.log("Dialog cancelled : basePath not available")
@@ -115,7 +133,12 @@ function testSinglePackage() {
                          /* let result=await removeOutputFiles(); */
                          removeOutputFiles();
                          /*  console.log("Result",result); */
-                         testSingleOpenAPI(umlPackage);
+
+                         let dm = app.dialogs;
+                         vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package", [], true);
+                         setTimeout(function(){
+                              testSingleOpenAPI(umlPackage);
+                         },10);
 
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
@@ -176,26 +199,29 @@ async function starTestingAllPackage(pkgList) {
                console.log("resultGen", resultGen);
 
           } catch (err) {
-               // app.dialogs.showErrorDialog(err.message);
-               console.error("Error getUMLModel", err);
+               /*  app.dialogs.showErrorDialog(err.message); */
+               console.error("Error startTestingAllPackage", err);
           }
      }
-     console.log('Done!');
+     vDialog.close();
+     vDialog=null;
+     setTimeout(function () {
 
-     let summery = openAPI.getSummery();
-
-     let status = 'success';
-     summery.filter((item, index) => {
-          if (item.status == 'failure') {
-               status = 'failure'
+          console.log('Done!');
+          let summery = openAPI.getSummery();
+          let status = 'success';
+          summery.filter((item, index) => {
+               if (item.status == 'failure') {
+                    status = 'failure'
+               }
+               strSummery += item.message + '\n\n';
+          });
+          if (status == 'success') {
+               app.dialogs.showInfoDialog(strSummery);
+          } else {
+               app.dialogs.showErrorDialog(strSummery);
           }
-          strSummery += item.message + '\n\n';
-     });
-     if (status == 'success') {
-          app.dialogs.showInfoDialog(strSummery);
-     } else {
-          app.dialogs.showErrorDialog(strSummery);
-     }
+     }, 10);
 }
 
 /**
@@ -215,9 +241,20 @@ async function testSingleOpenAPI(umlPackage) {
           console.log("resultElement", resultElement);
           let resultGen = await mOpenApi.generateOpenAPI();
           console.log("resultGen", resultGen);
+          if (resultGen.result == constant.FIELD_SUCCESS) {
+               vDialog.close();
+               setTimeout(function () {
+                    app.dialogs.showInfoDialog(resultGen.message);
+               },10);
+               vDialog=null;
+          }
      } catch (err) {
-          app.dialogs.showErrorDialog(err.message);
-          console.error("Error getUMLModel", err);
+          vDialog.close();
+          vDialog=null;
+          setTimeout(function(){
+               app.dialogs.showErrorDialog(err.message);
+               console.error("Error testSingleOpenAPI", err);
+          });
      }
 }
 
@@ -241,13 +278,20 @@ function testEntireProject() {
                mPackages.push(element);
           }
      });
-     starTestingAllPackage(mPackages);
+     vDialog = null;
+     let dm = app.dialogs;
+     vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec testing is being processed for the entire project.", [], true);
+     setTimeout(function () {
+
+          starTestingAllPackage(mPackages);
+     }, 10);
 }
 
 /**
  * @function aboutUsExtension
  * @description Display Information about Extension like the title and description of OpenAPI Specification.
  */
+
 function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
 }
