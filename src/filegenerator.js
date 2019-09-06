@@ -36,7 +36,7 @@ class FileGenerator {
                     fs.writeFileSync(this.basePath, JSON.stringify(MainJSON.getJSON(), null, 4));
                     console.log("file-generate-ended");
                     resolve({
-                         result: 'success',
+                         result: constant.FIELD_SUCCESS,
                          message: 'JSON file generated successfully'
                     });
 
@@ -61,7 +61,7 @@ class FileGenerator {
                     this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.yml');
                     fs.writeFileSync(this.basePath, ymlText);
                     resolve({
-                         result: 'success',
+                         result: constant.FIELD_SUCCESS,
                          message: 'YAML file generated successfully'
                     });
                } catch (error) {
@@ -160,46 +160,46 @@ class FileGenerator {
                     if (openAPI.getAppMode() == openAPI.APP_MODE_GEN) {
                          /* check for if any error  available or not  */
                          if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
-                              app.dialogs.showErrorDialog(openAPI.getError().msg);
+                              // app.dialogs.showErrorDialog(openAPI.getError().msg);
                               reject(new Error(openAPI.getError().msg));
                          } else {
 
                               openAPI.validateSwagger(this.basePath).then(data => {
-                                   let bindSuccesMsg = constant.msgsuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + this.basePath
-                                   if (openAPI.getFileType() == 3) {
-                                        let jsonFilePath = this.basePath.replace(".yml", ".json");
-                                        bindSuccesMsg = bindSuccesMsg + constant.strend + constant.stronlypath + jsonFilePath;
-                                   }
-                                   let success = {
-                                        success: bindSuccesMsg
-                                   };
-                                   resolve(success);
-                                   app.dialogs.showInfoDialog(bindSuccesMsg);
-                              })
-                              .catch(error => {
-                                   let bindFailureMsg = constant.msgerror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                   app.dialogs.showErrorDialog(bindFailureMsg);
-                                   reject(new Error(bindFailureMsg));
-                              });
+                                        let bindSuccesMsg = constant.msgsuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + this.basePath
+                                        if (openAPI.getFileType() == 3) {
+                                             let jsonFilePath = this.basePath.replace(".yml", ".json");
+                                             bindSuccesMsg = bindSuccesMsg + constant.strend + constant.stronlypath + jsonFilePath;
+                                        }
+                                        resolve({
+                                             result: constant.FIELD_SUCCESS,
+                                             message: bindSuccesMsg
+                                        });
+                                        app.dialogs.showInfoDialog(bindSuccesMsg);
+                                   })
+                                   .catch(error => {
+                                        let bindFailureMsg = constant.msgerror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
+                                        // app.dialogs.showErrorDialog(bindFailureMsg);
+                                        reject(new Error(bindFailureMsg));
+                                   });
                          }
 
                     } else if (openAPI.getAppMode() == openAPI.APP_MODE_TEST) {
-                         
+
                          let pathValidator = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                          /* Check for TEST Mode (TEST_MODE_SINGLE or TEST_MODE_ALL) */
                          if (openAPI.getTestMode() == openAPI.TEST_MODE_SINGLE) {
 
                               openAPI.validateSwagger(pathValidator).then(data => {
                                         let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
-                                        let success = {
-                                             success: bindSuccesMsg
-                                        };
-                                        resolve(success);
+                                        resolve({
+                                             result: constant.FIELD_SUCCESS,
+                                             message: bindSuccesMsg
+                                        });
                                         app.dialogs.showInfoDialog(bindSuccesMsg);
                                    })
                                    .catch(error => {
                                         let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                        app.dialogs.showErrorDialog(bindFailureMsg);
+                                        // app.dialogs.showErrorDialog(bindFailureMsg);
                                         reject(new Error(bindFailureMsg));
                                    });
 
@@ -208,10 +208,10 @@ class FileGenerator {
                               openAPI.validateSwagger(pathValidator).then(data => {
                                         let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
                                         openAPI.addSummery(bindSuccesMsg, 'success');
-                                        let success = {
-                                             success: bindSuccesMsg
-                                        };
-                                        resolve(success);
+                                        resolve({
+                                             result: constant.FIELD_SUCCESS,
+                                             message: bindSuccesMsg
+                                        });
 
                                    })
                                    .catch(error => {
