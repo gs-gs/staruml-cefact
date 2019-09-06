@@ -1,11 +1,9 @@
 const openAPI = require('./src/openapi');
-var asyncLoop = require('node-async-loop');
 const constant = require('./src/constant');
 var fs = require('fs');
 var path = require('path');
 const title = require('./package.json').title;
 const description = require('./package.json').description;
-var forEach = require('async-foreach').forEach;
 
 /**
  * @function generateSpecs
