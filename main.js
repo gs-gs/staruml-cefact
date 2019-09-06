@@ -38,11 +38,25 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                });
      }
 }
+async function getUMLModel(umlPackage, basePath, options, returnValue) {
+     const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
+     try {
+          let result = await mOpenApi.initUMLPackage()
+          console.log("initializa", result);
+          let resultElement = await mOpenApi.getModelElements();
+          console.log("resultElement", resultElement);
+          let resultGen = await mOpenApi.generateOpenAPI();
+          console.log("resultGen", resultGen);
 
+     } catch (err) {
+          app.dialogs.showErrorDialog(err.message);
+          console.error("Error getUMLModel", err);
+     }
+}
 /**
  * @function fileTypeSelection
  * @description Display dropdown dialog and allow user to select file type from dropdown dailog like (JSON & YAML, JSON, YAML)
- * @param {UMLPackage} umlPackage
+ * @param {UMLPackage} umljPackage
  * @param {Object} options
  */
 function fileTypeSelection(umlPackage, options) {
@@ -54,10 +68,10 @@ function fileTypeSelection(umlPackage, options) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, null);
                if (basePath != null) {
-                    const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
-                    mOpenApi.initUMLPackage();
+                    getUMLModel(umlPackage, basePath, options, returnValue);
+
                } else {
-                    console.log("Dialog cancelled")
+                    console.log("Dialog cancelled : basePath not available")
                }
           } else {
                console.log("Dialog cancelled")
@@ -83,7 +97,7 @@ function getGenOptions() {
  * @description Test single package which user has selected from elementPickerDialog
  */
 function testSinglePackage() {
-
+     let _this = this;
      /* There are two modes of extension, TEST & GENERATE. Here we set TEST mode. */
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
      /* There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_SINGLE) */
@@ -103,7 +117,7 @@ function testSinglePackage() {
                          /* let result=await removeOutputFiles(); */
                          removeOutputFiles();
                          /*  console.log("Result",result); */
-                         generateTestAPI(umlPackage)
+                         testSingleOpenAPI(umlPackage);
 
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
@@ -135,8 +149,7 @@ function removeOutputFiles() {
                });
           }
      });
-     /* resolve("Success"); */
-     /* }); */
+
 }
 
 /**
@@ -144,59 +157,70 @@ function removeOutputFiles() {
  * @description Start testing all packages one by one of the project
  * @params {UMLPackage} item
  */
-function starTestingAllPackage(item) {
+async function starTestingAllPackage(pkgList) {
 
 
      removeOutputFiles();
 
      let strSummery = '';
-     asyncLoop(item, function (umlPackage, next) {
-          setTimeout(function () {
-               generateTestAPI(umlPackage)
-               next();
-          }, 1000);
 
-     }, function (err) {
-          if (err) {
-               console.error('Error: ' + err.message);
-               return;
-          } else {
+     for (const umlPackage of pkgList) {
 
-               setTimeout(function () {
-                    let summery = openAPI.getSummery();
+          const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
+          const options = getGenOptions();
+          const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, 1);
+          try {
+               let result = await mOpenApi.initUMLPackage()
+               console.log("initializa", result);
+               let resultElement = await mOpenApi.getModelElements();
+               console.log("resultElement", resultElement);
+               let resultGen = await mOpenApi.generateOpenAPI();
+               console.log("resultGen", resultGen);
 
-                    let status = 'success';
-                    summery.filter((item, index) => {
-                         if (item.status == 'failure') {
-                              status = 'failure'
-                         }
-                         strSummery += item.message + '\n\n';
-                    });
-                    if (status == 'success') {
-                         app.dialogs.showInfoDialog(strSummery);
-                    } else {
-                         app.dialogs.showErrorDialog(strSummery);
-                    }
-
-               }, 1500);
+          } catch (err) {
+               // app.dialogs.showErrorDialog(err.message);
+               console.error("Error getUMLModel", err);
           }
+     }
+     console.log('Done!');
+
+     let summery = openAPI.getSummery();
+
+     let status = 'success';
+     summery.filter((item, index) => {
+          if (item.status == 'failure') {
+               status = 'failure'
+          }
+          strSummery += item.message + '\n\n';
      });
+     if (status == 'success') {
+          app.dialogs.showInfoDialog(strSummery);
+     } else {
+          app.dialogs.showErrorDialog(strSummery);
+     }
 }
 
 /**
- * @function generateTestAPI
+ * @function testSingleOpenAPI
  * @params {UMLPackage} umlPackage
  * @description Async function to generate test api 
  * */
-async function generateTestAPI(umlPackage) {
+async function testSingleOpenAPI(umlPackage) {
 
      const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
-     /* const umlPackage = testPkgList[0]; */
      const options = getGenOptions();
-
      const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, 1);
-     await mOpenApi.initUMLPackage();
-
+     try {
+          let result = await mOpenApi.initUMLPackage()
+          console.log("initializa", result);
+          let resultElement = await mOpenApi.getModelElements();
+          console.log("resultElement", resultElement);
+          let resultGen = await mOpenApi.generateOpenAPI();
+          console.log("resultGen", resultGen);
+     } catch (err) {
+          app.dialogs.showErrorDialog(err.message);
+          console.error("Error getUMLModel", err);
+     }
 }
 
 /**
