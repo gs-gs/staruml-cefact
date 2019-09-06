@@ -25,6 +25,8 @@ const Constant = {
      IDEAL_MDJ_FILE_NAME: 'SampleModel.mdj',
      IDEAL_TEST_FILE_PATH: '/src/output',
      IDEAL_JSON_FILE_NAME: 'SampleModel.json',
+     FIELD_SUCCESS: 'success',
+     FIELD_ERROR: 'error',
      DISPLAY_REPO_NAME: reponame,
      DISPLAY_VERSION: version,
      DIALOG_MSG_PICKERDIALOG: "Select the package or project to generate OpenAPI Specs.",
