@@ -50,165 +50,34 @@ class OpenApi {
       * @memberof OpenAPI
       */
      initUMLPackage() {
-          try {
-               try {
-                    if (!fs.existsSync(OpenApi.filePath)) {
-                         fs.mkdirSync(OpenApi.filePath);
-                    }
-               } catch (err) {
-                    console.error(err)
-               }
-
-               if (OpenApi.umlPackage instanceof type.UMLPackage) {
-                    this.getUMLModels();
-               } 
-          } catch (_e) {
-               console.error(_e);
-               app.toast.error(constant.strerrorgenfail);
-          }
-     }
-
-     /* getElements() {
-
-          let _this = this;
-          if (Array.isArray(OpenApi.umlPackage.ownedElements)) {
-               OpenApi.umlPackage.ownedElements.forEach(child => {
-                    if (child instanceof type.UMLClass) {
-                         setTimeout(function () {
-                              _this.findClass(child);
-                         }, 10);
-                    } else if (child instanceof type.UMLInterface) {
-                         OpenApi.operations.push(child);
-                    } else if (child instanceof type.UMLGeneralization) {
-                         setTimeout(function () {
-                              _this.findClass(child);
-                         }, 5);
-                    } else if (child instanceof type.UMLClassDiagram) {
-                         let arClassesFromView = [];
-                         child.ownedViews.forEach(item => {
-                              if (item instanceof type.UMLClassView && item.model instanceof type.UMLClass) {
-                                   arClassesFromView.push(item.model);
-                              }
-                         });
-                    }
-               });
-          }
-
-
-
-     } */
-
-     /* findElements(umlClass, resolve, reject) {
-          try {
-               let _this = this;
-               _this.schemas.push(umlClass);
-               if (umlClass.ownedElements.length > 0) {
-                    umlClass.ownedElements.forEach(child => {
-                         if (child instanceof type.UMLAssociation) {
-                              if (child.end1.reference.name != child.end2.reference.name) {
-                                   setTimeout(function () {
-                                        _this.findElements(child.end2.reference, resolve, reject);
-                                   }, 5);
-                              }
-                         } else if (child instanceof type.UMLClass) {
-                              setTimeout(function () {
-                                   _this.findElements(child, resolve, reject);
-                              }, 5);
-                         } else if (child instanceof type.UMLGeneralization) {
-                              setTimeout(function () {
-                                   _this.findElements(child.target, resolve, reject);
-                              }, 5);
-                         }
-                    });
-               } else {
-                    resolve("success");
-               }
-          } catch (error) {
-               console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
-               reject(error);
-          }
-     } */
-     /* handleFindClass(umlClass) {
-          let _this = this;
           return new Promise((resolve, reject) => {
-               _this.findElements(umlClass, resolve, reject);
-          });
-     } */
-     /* ifDone() {
-
-          let _this = this;
-
-
-          try {
-
-               let resArr = [];
-
-
-               _this.schemas.forEach(item => {
-                    let filter = resArr.filter(subItem => {
-                         return subItem._id == item._id;
-                    });
-                    if (filter.length == 0) {
-                         resArr.push(item);
+               try {
+                    try {
+                         if (!fs.existsSync(OpenApi.filePath)) {
+                              fs.mkdirSync(OpenApi.filePath);
+                              resolve({
+                                   result: "success",
+                                   message: "Package initialize successfully"
+                              })
+                         } else {
+                              resolve({
+                                   result: "success",
+                                   message: "Package initialize successfully"
+                              })
+                         }
+                    } catch (err) {
+                         console.error(err)
+                         reject(err);
                     }
 
-               });
-               setTimeout(function () {
+               } catch (_e) {
+                    console.error(_e);
+                    reject(_e);
+                    app.toast.error(constant.strerrorgenfail);
+               }
+          });
 
-                    resArr.sort(function (a, b) {
-                         return a.name.localeCompare(b.name);
-                    });
-                    let uniqueArr = [];
-                    let duplicateClasses = [];
-                    let isDuplicate = false;
-
-                    forEach(resArr, function (item, index, arr) {
-                         let filter = uniqueArr.filter(subItem => {
-                              return item.name == subItem.name;
-                         });
-
-                         if (filter.length == 0) {
-                              uniqueArr.push(item);
-                         } else {
-                              isDuplicate = true;
-                              duplicateClasses.push(item.name);
-                              let firstElem = uniqueArr.indexOf(filter[0]);
-                              uniqueArr[firstElem].attributes = uniqueArr[firstElem].attributes.concat(item.attributes);
-                              uniqueArr[firstElem].ownedElements = uniqueArr[firstElem].ownedElements.concat(item.ownedElements);
-                         }
-                         OpenApi.uniqueClassesArr = uniqueArr;
-
-                    }, function (notAborted, arr) {
-                         setTimeout(function () {
-                              if (!isDuplicate) {
-
-                                   let mClasses = [];
-                                   OpenApi.uniqueClassesArr.forEach(element => {
-                                        mClasses.push(element.name);
-                                   });
-                                   console.log("uniqueaClasses", mClasses);
-                                   let mPaths = [];
-                                   OpenApi.operations.forEach(element => {
-                                        mPaths.push(element.name);
-                                   });
-                                   console.log("uniqueaPath", mPaths);
-
-                                   _this.generateOpenAPI();
-                              } else {
-                                   app.dialogs.showErrorDialog("There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.");
-                              }
-                         }, 200);
-                    });
-
-               }, 1000);
-
-
-          } catch (error) {
-               console.error("Found error", error.message);
-               _this.utils.writeErrorToFile(error);
-          }
-     } */
+     }
 
      getModelElements() {
 
@@ -244,7 +113,7 @@ class OpenApi {
 
                     /* ------------ 3. Generalization Class ------------ */
 
-                    OpenApi.getUMLGeneralization().then(function(generaCurrentPkg){
+                    OpenApi.getUMLGeneralization().then(function (generaCurrentPkg) {
 
                          let tmpGen = [];
                          forEach(generaCurrentPkg, (child, index) => {
@@ -299,7 +168,7 @@ class OpenApi {
                               OpenApi.uniqueClassesArr = uniqueArr;
 
                          });
-                         
+
 
                          if (!isDuplicate) {
 
@@ -316,21 +185,21 @@ class OpenApi {
                               console.log("Query Total Classes", mClasses);
                               console.log("Query Total Interfaces", mPaths);
                               resolve({
-                                   result:"success",
-                                   message:"Success"
+                                   result: constant.FIELD_SUCCESS,
+                                   message: "model element generated"
                               });
                          } else {
-                              let message="There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.";
+                              let message = "There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.";
                               reject(new Error(message));
-                              
-                              
+
+
                          }
 
-                    }).catch(function(err){
+                    }).catch(function (err) {
                          reject(err);
                     });
-                    
-               }).catch(function(err){
+
+               }).catch(function (err) {
                     reject(err)
                });
           });
@@ -342,22 +211,23 @@ class OpenApi {
       * @description get and stores UMLInterface, UMLClass & UMLGeneralization 
       * @memberof OpenAPI
       */
-     async getUMLModels() {
+     /* async getUMLModels() {
           let _this = this;
           try {
                if (OpenApi.umlPackage instanceof type.UMLPackage) {
-                    let result=await _this.getModelElements();
-                    if(result.result=='success'){
-                         console.log("Result",result);
-                         _this.generateOpenAPI();
+                    let resultElement = await _this.getModelElements();
+                    console.log("resultElement", resultElement);
+                    if (resultElement.result == 'success') {
+                         let resultGen=await _this.generateOpenAPI();
+                         console.log("resultGen", resultGen);
                     }
                }
           } catch (error) {
-               console.error("getUMLModels",error);
+               console.error("getUMLModels", error);
                this.utils.writeErrorToFile(error);
                app.dialogs.showErrorDialog(error.message);
           }
-     }
+     } */
 
 
      /**
@@ -676,54 +546,64 @@ class OpenApi {
       * @description generate open api json object
       * @memberof OpenApi
       */
-     async generateOpenAPI() {
-          try {
+     generateOpenAPI() {
+          return new Promise((resolve, reject) => {
+               try {
 
-               let _this = this;
-               this.resetPackagePath();
-               let arrPath = this.findHierarchy(OpenApi.getPackage());
-               let rPath = this.reversePkgPath(arrPath);
-               OpenApi.setPackagepath(rPath);
-
-
-               /*  Add openapi version */
-               MainJSON.addApiVersion('3.0.0');
-               console.log("-----version-generated");
-
-               /* Add openapi information */
-               let mInfo = new Info();
-               MainJSON.addInfo(mInfo);
-               console.log("-----info-generated");
-
-               /* Add openapi servers */
-               let server = new Servers();
-               MainJSON.addServers(server);
-               console.log("-----server-generated");
-
-               /* Add openapi paths */
-               let paths = new Paths();
-               MainJSON.addPaths(paths);
-               console.log("-----path-generated");
-
-               /* Add openapi component */
-               let component = new Component();
-               MainJSON.addComponent(component);
-               console.log("-----component-generated-----");
-               console.log(MainJSON.getJSON());
-               let generator = new FileGenerator();
-               let fileGenerate = await generator.generate();
-               console.log("-----file-generated-----");
-               console.log("result", fileGenerate);
-               let validate=await generator.validateAndPrompt();
-               console.log("-----validate & prompt-----");
-               console.log("result",validate);
+                    let _this = this;
+                    this.resetPackagePath();
+                    let arrPath = this.findHierarchy(OpenApi.getPackage());
+                    let rPath = this.reversePkgPath(arrPath);
+                    OpenApi.setPackagepath(rPath);
 
 
-          } catch (error) {
+                    /*  Add openapi version */
+                    MainJSON.addApiVersion('3.0.0');
+                    console.log("-----version-generated");
 
-               console.error("generateOpenAPI",error);
-               this.utils.writeErrorToFile(error);
-          }
+                    /* Add openapi information */
+                    let mInfo = new Info();
+                    MainJSON.addInfo(mInfo);
+                    console.log("-----info-generated");
+
+                    /* Add openapi servers */
+                    let server = new Servers();
+                    MainJSON.addServers(server);
+                    console.log("-----server-generated");
+
+                    /* Add openapi paths */
+                    let paths = new Paths();
+                    MainJSON.addPaths(paths);
+                    console.log("-----path-generated");
+
+                    /* Add openapi component */
+                    let component = new Component();
+                    MainJSON.addComponent(component);
+                    console.log("-----component-generated-----");
+                    console.log(MainJSON.getJSON());
+                    let generator = new FileGenerator();
+                    generator.generate().then(function (fileGenerate) {
+                         console.log("-----file-generated-----");
+                         console.log("result-file-generated", fileGenerate);
+                         generator.validateAndPrompt().then(function (result) {
+                              console.log("-----validate & prompt-----");
+                              console.log("result-validate & prompt", result);
+                              resolve(result);
+                         }).catch(function (err) {
+                              reject(err);
+                         });
+
+                    }).catch(function (err) {
+                         reject(err);
+                    });
+
+               } catch (error) {
+
+                    console.error("generateOpenAPI", error);
+                    this.utils.writeErrorToFile(error);
+                    reject(error);
+               }
+          });
      }
 
 
@@ -780,6 +660,7 @@ function validateSwagger(pathValidator) {
                          } else {
                               /* Success */
                               resolve({
+                                   result: constant.FIELD_SUCCESS,
                                    message: "success"
                               })
                          }
@@ -789,7 +670,7 @@ function validateSwagger(pathValidator) {
                     // }, 100);
                }
           } catch (err) {
-               console.error(err)
+               console.error("--mayur", err)
                reject(err);
           }
 
