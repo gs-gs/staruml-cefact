@@ -189,36 +189,56 @@ class FileGenerator {
                          /* Check for TEST Mode (TEST_MODE_SINGLE or TEST_MODE_ALL) */
                          if (openAPI.getTestMode() == openAPI.TEST_MODE_SINGLE) {
 
-                              openAPI.validateSwagger(pathValidator).then(data => {
-                                        let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
-                                        resolve({
-                                             result: constant.FIELD_SUCCESS,
-                                             message: bindSuccesMsg
+                              if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
+                                   /*  app.dialogs.showErrorDialog(openAPI.getError().msg); */
+                                   let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + openAPI.getError().msg;
+                                   reject(new Error(bindFailureMsg));
+                              } else {
+
+
+                                   openAPI.validateSwagger(pathValidator).then(data => {
+                                             let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + pathValidator
+                                             resolve({
+                                                  result: constant.FIELD_SUCCESS,
+                                                  message: bindSuccesMsg
+                                             });
+                                             /*  app.dialogs.showInfoDialog(bindSuccesMsg); */
+                                        })
+                                        .catch(error => {
+                                             let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
+                                             /*  app.dialogs.showErrorDialog(bindFailureMsg); */
+                                             reject(new Error(bindFailureMsg));
                                         });
-                                        /*  app.dialogs.showInfoDialog(bindSuccesMsg); */
-                                   })
-                                   .catch(error => {
-                                        let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strerror + error.message
-                                        /*  app.dialogs.showErrorDialog(bindFailureMsg); */
-                                        reject(new Error(bindFailureMsg));
-                                   });
+                              }
 
                          } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
 
-                              openAPI.validateSwagger(pathValidator).then(data => {
-                                        let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
-                                        openAPI.addSummery(bindSuccesMsg, 'success');
-                                        resolve({
-                                             result: constant.FIELD_SUCCESS,
-                                             message: bindSuccesMsg
-                                        });
+                              if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
+                                   /*  app.dialogs.showErrorDialog(openAPI.getError().msg); */
+                                   // reject(new Error(openAPI.getError().msg));
 
-                                   })
-                                   .catch(error => {
-                                        let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + error.message
-                                        openAPI.addSummery(bindFailureMsg, 'failure');
-                                        reject(new Error(bindFailureMsg));
-                                   });
+                                   let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + openAPI.getError().msg;
+
+                                   openAPI.addSummery(bindFailureMsg, 'failure');
+                                   reject(new Error(openAPI.getError().msg));
+
+                              } else {
+
+                                   openAPI.validateSwagger(pathValidator).then(data => {
+                                             let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
+                                             openAPI.addSummery(bindSuccesMsg, 'success');
+                                             resolve({
+                                                  result: constant.FIELD_SUCCESS,
+                                                  message: bindSuccesMsg
+                                             });
+
+                                        })
+                                        .catch(error => {
+                                             let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + error.message
+                                             openAPI.addSummery(bindFailureMsg, 'failure');
+                                             reject(new Error(bindFailureMsg));
+                                        });
+                              }
                          }
                     }
                } catch (error) {
