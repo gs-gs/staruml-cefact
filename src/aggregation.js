@@ -28,7 +28,43 @@ class Aggregation {
           mainPropertiesObj[assoc.name] = propertiesObj;
 
           let arrIsID = [];
+          /* To check aggregation has isID attribute or not */
+          let attrAssoc = assoc.end2.reference.attributes.filter(attr => {
+               return attr.isID && (attr.isID == true)
+          });
+          if (attrAssoc.length > 0) {
+               arrIsID.push(attrAssoc);
+          }
           aggregationClasses.filter(itemClass => {
+               /* This will store the attributes of target class of Generalization */
+               let tAttArray = [];
+               /* Check and add if there any isID attributes of parent Class  */
+               itemClass.ownedElements.forEach(item => {
+
+                    if (item instanceof type.UMLGeneralization) {
+                         let generalizationSourceID = item.source._id;
+                         if (itemClass._id == generalizationSourceID) {
+
+
+                              let attrIsID = item.target.attributes.filter(attr => {
+                                   return attr.isID && (attr.isID == true)
+                              });
+                              if (attrIsID.length > 0) {
+                                   tAttArray.push(item);
+                              }
+                              console.log("attrIsID", attrIsID);
+                         }
+                    }
+                    /* else if(item instanceof type.UMLAssociation) {
+                         if (item.end1.aggregation == constant.shared){
+                              tAttArray.push(item.end2.reference);
+                         }
+                    } */
+
+               });
+               if (tAttArray.length > 0) {
+                    arrIsID.push(tAttArray);
+               }
 
                let filterAttributes = itemClass.attributes.filter(item => {
 
