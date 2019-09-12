@@ -189,7 +189,14 @@ class OpenApi {
                                    message: "model element generated"
                               });
                          } else {
-                              let message = "There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate " + duplicateClasses.join() + (duplicateClasses.length > 1 ? " classes" : " class") + " for same name.";
+                              let message=null;
+                              if(duplicateClasses.length > 1){
+                                   message = "There are duplicate \'" + duplicateClasses.join("\", \"") +"\'"+" classes for same name.";
+                              }else{
+                                   message = "There is duplicate \'" + duplicateClasses.join("\", \"") + "\'"+" class for same name.";
+                              }
+
+                              // let message = "There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate \"" + duplicateClasses.join("\", \"") + (duplicateClasses.length > 1 ? "\""+" classes" : "\""+" class") + " for same name.";
                               reject(new Error(message));
 
 
