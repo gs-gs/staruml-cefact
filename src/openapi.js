@@ -10,6 +10,7 @@ const constant = require('../src/constant');
 const SwaggerParser = require("swagger-parser");
 let parser = new SwaggerParser();
 var forEach = require('async-foreach').forEach;
+const openAPI = require('./openapi');
 /* var filterAsync = require('node-filter-async'); */
 /**
  * @class OpenApi 
@@ -30,7 +31,7 @@ class OpenApi {
           OpenApi.filePath = basePath;
           this.options = options;
           this.schemas = [];
-          this.pkgPath = [];
+          OpenApi.pkgPath = [];
           OpenApi.operations = [];
           this.utils = new Utils();
           OpenApi.fileType = fileType;
@@ -196,9 +197,15 @@ class OpenApi {
                                    message = "There is duplicate \'" + duplicateClasses.join("\", \"") + "\'"+" class for same name.";
                               }
 
-                              // let message = "There " + (duplicateClasses.length > 1 ? "are" : "is") + " duplicate \"" + duplicateClasses.join("\", \"") + (duplicateClasses.length > 1 ? "\""+" classes" : "\""+" class") + " for same name.";
-                              reject(new Error(message));
+                              if (openAPI.getAppMode() == openAPI.APP_MODE_TEST && openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
+                                   let jsonError = {
+                                        isDuplicate: true,
+                                        msg: message
+                                   };
+                                   openAPI.setError(jsonError);
+                              }
 
+                              reject(new Error(message));
 
                          }
 
@@ -336,7 +343,7 @@ class OpenApi {
       * @memberof OpenApi
       */
      resetPackagePath() {
-          this.pkgPath = [];
+          OpenApi.pkgPath = [];
      }
 
      /**
@@ -468,13 +475,13 @@ class OpenApi {
       * @returns {Array}
       * @memberof OpenApi
       */
-     findHierarchy(umlPackage) {
-          this.pkgPath.push(umlPackage.name);
+     static findHierarchy(umlPackage) {
+          OpenApi.pkgPath.push(umlPackage.name);
           if (umlPackage.hasOwnProperty('_parent') && umlPackage._parent != null && umlPackage._parent instanceof type.UMLPackage) {
 
                this.findHierarchy(umlPackage._parent);
           }
-          return this.pkgPath;
+          return OpenApi.pkgPath;
      }
      /**
       * @function reversePkgPath
@@ -482,10 +489,10 @@ class OpenApi {
       * @returns {string}
       * @memberof OpenApi
       */
-     reversePkgPath() {
+     static reversePkgPath() {
           let str = '';
-          for (let i = (this.pkgPath.length - 1); i >= 0; i--) {
-               str += this.pkgPath[i] + '\\';
+          for (let i = (OpenApi.pkgPath.length - 1); i >= 0; i--) {
+               str += OpenApi.pkgPath[i] + '\\';
           }
           return str;
      }
@@ -501,8 +508,8 @@ class OpenApi {
 
                     let _this = this;
                     this.resetPackagePath();
-                    let arrPath = this.findHierarchy(OpenApi.getPackage());
-                    let rPath = this.reversePkgPath(arrPath);
+                    let arrPath = OpenApi.findHierarchy(OpenApi.getPackage());
+                    let rPath = OpenApi.reversePkgPath(arrPath);
                     OpenApi.setPackagepath(rPath);
 
 
@@ -649,3 +656,5 @@ module.exports.getPackagePath = OpenApi.getPackagePath;
 module.exports.getParentPkg = OpenApi.getParentPkg;
 module.exports.getUMLAssociation = OpenApi.getUMLAssociation;
 module.exports.getUMLGeneralization = OpenApi.getUMLGeneralization;
+module.exports.findHierarchy = OpenApi.findHierarchy;
+module.exports.reversePkgPath = OpenApi.reversePkgPath;

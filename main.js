@@ -201,6 +201,14 @@ async function starTestingAllPackage(pkgList) {
           } catch (err) {
                /*  app.dialogs.showErrorDialog(err.message); */
                console.error("Error startTestingAllPackage", err);
+               if (openAPI.getError().hasOwnProperty('isDuplicate') && openAPI.getError().isDuplicate == true) {
+
+                    let arrPath = openAPI.findHierarchy(umlPackage);
+                    let pkgPath = openAPI.reversePkgPath(arrPath);
+
+                    let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
+                    openAPI.addSummery(bindFailureMsg, 'failure');
+               }
           }
      }
      vDialog.close();
