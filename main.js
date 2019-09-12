@@ -262,7 +262,7 @@ async function testSingleOpenAPI(umlPackage) {
           setTimeout(function(){
                app.dialogs.showErrorDialog(err.message);
                console.error("Error testSingleOpenAPI", err);
-          });
+          },10);
      }
 }
 
