@@ -93,7 +93,7 @@ class Component {
                               if (assoc.end1.aggregation == constant.shared) {
                                    /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
                                    let aggregation = new Aggregation();
-                                   console.log("Classname",objClass.name);
+                                   console.log("Classname", objClass.name);
                                    mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc);
 
                                    /* aggregationClasses.filter(itemClass => {

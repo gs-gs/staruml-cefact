@@ -59,10 +59,10 @@ async function getUMLModel(umlPackage, basePath, options, returnValue) {
 
      } catch (err) {
           vDialog.close();
-          setTimeout(function(){
+          setTimeout(function () {
                app.dialogs.showErrorDialog(err.message);
                console.error("Error getUMLModel", err);
-          },10);
+          }, 10);
      }
 }
 /**
@@ -136,9 +136,9 @@ function testSinglePackage() {
 
                          let dm = app.dialogs;
                          vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package", [], true);
-                         setTimeout(function(){
+                         setTimeout(function () {
                               testSingleOpenAPI(umlPackage);
-                         },10);
+                         }, 10);
 
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
@@ -212,7 +212,7 @@ async function starTestingAllPackage(pkgList) {
           }
      }
      vDialog.close();
-     vDialog=null;
+     vDialog = null;
      setTimeout(function () {
 
           console.log('Done!');
@@ -253,16 +253,16 @@ async function testSingleOpenAPI(umlPackage) {
                vDialog.close();
                setTimeout(function () {
                     app.dialogs.showInfoDialog(resultGen.message);
-               },10);
-               vDialog=null;
+               }, 10);
+               vDialog = null;
           }
      } catch (err) {
           vDialog.close();
-          vDialog=null;
-          setTimeout(function(){
+          vDialog = null;
+          setTimeout(function () {
                app.dialogs.showErrorDialog(err.message);
                console.error("Error testSingleOpenAPI", err);
-          },10);
+          }, 10);
      }
 }
 
