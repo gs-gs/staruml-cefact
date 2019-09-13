@@ -190,11 +190,11 @@ class OpenApi {
                                    message: "model element generated"
                               });
                          } else {
-                              let message=null;
-                              if(duplicateClasses.length > 1){
-                                   message = "There are duplicate \'" + duplicateClasses.join("\', \'") +"\'"+" classes for same name.";
-                              }else{
-                                   message = "There is duplicate \'" + duplicateClasses.join("\', \'") + "\'"+" class for same name.";
+                              let message = null;
+                              if (duplicateClasses.length > 1) {
+                                   message = "There are duplicate \'" + duplicateClasses.join("\', \'") + "\'" + " classes for same name.";
+                              } else {
+                                   message = "There is duplicate \'" + duplicateClasses.join("\', \'") + "\'" + " class for same name.";
                               }
 
                               if (openAPI.getAppMode() == openAPI.APP_MODE_TEST && openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
@@ -220,7 +220,7 @@ class OpenApi {
 
 
      }
-     
+
 
      /**
       * @function setTestMode

@@ -35,7 +35,7 @@ class Association {
       * @memberof Association
       */
      addAssociationProperties(assocClassLink, mainPropertiesObj) {
-          
+
           if (assocClassLink.length > 0) {
                assocClassLink.forEach(item => {
                     this.writeAssociationClassProperties(mainPropertiesObj, item);
