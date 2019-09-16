@@ -127,6 +127,7 @@ class Association {
      getAssociationOfClass(objClass) {
           try {
                let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
+               // let associations = app.repository.select("@UMLAssociation");
                let filterAssociation = associations.filter(item => {
                     return item.end1.reference._id == objClass._id
                });
@@ -154,7 +155,9 @@ class Association {
                }
 
                let generalization = new Generalization();
-               let generalizeClasses = generalization.findGeneralizationOfClass(tempClass);
+               // let generalizeClasses = generalization.findGeneralizationOfClass(tempClass);
+               let generalizeClasses=[];
+               generalization.findGeneralizationRecursivelyOfClass(tempClass, generalizeClasses);
 
                let filterAttributes = tempClass.attributes.filter(item => {
                     return item.isID;
