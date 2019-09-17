@@ -11,7 +11,37 @@ class Aggregation {
      constructor() {
 
      }
-
+     /**
+      * @function findParentClassAggregationIsID
+      * @description Function will check recursively for ownedElements UMLGeneralization of target class to check if target has isID property or not
+      * @param {UMLClass} itemClass
+      * @param {Array} parentGeneralizationClassAttribute
+      * @memberof Aggregation
+      */
+     findParentClassAggregationIsID(itemClass, parentGeneralizationClassAttribute) {
+          if (itemClass instanceof type.UMLClass) {
+               itemClass.ownedElements.forEach(item => {
+                    if (item instanceof type.UMLGeneralization) {
+                         let generalizationSourceID = item.source._id;
+                         if (itemClass._id == generalizationSourceID) {
+                              let attrIsID = item.target.attributes.filter(attr => {
+                                   return attr.isID && (attr.isID == true)
+                              });
+                              if (attrIsID.length > 0) {
+                                   parentGeneralizationClassAttribute.push(attrIsID);
+                              }
+                              console.log("attrIsID", attrIsID);
+                              this.findParentClassAggregationIsID(item.target, parentGeneralizationClassAttribute);
+                         }
+                    }
+                    /* else if(item instanceof type.UMLAssociation) {
+                         if (item.end1.aggregation == constant.shared){
+                              tAttArray.push(item.end2.reference);
+                         }
+                    } */
+               });
+          }
+     }
 
      /**
       * @function addAggregationProperties
@@ -28,7 +58,41 @@ class Aggregation {
           mainPropertiesObj[assoc.name] = propertiesObj;
 
           let arrIsID = [];
+          /* To check aggregation has isID attribute or not */
+          let attrAssoc = assoc.end2.reference.attributes.filter(attr => {
+               return attr.isID && (attr.isID == true)
+          });
+          if (attrAssoc.length > 0) {
+               arrIsID.push(attrAssoc);
+          }
           aggregationClasses.filter(itemClass => {
+               /* This will store the attributes of target class of Generalization */
+               let parentGeneralizationClassAttribute = [];
+               this.findParentClassAggregationIsID(itemClass, parentGeneralizationClassAttribute);
+               console.log("parentIDs", parentGeneralizationClassAttribute);
+               /* Check and add if there any isID attributes of parent Class  */
+               /* itemClass.ownedElements.forEach(item => {
+
+                    if (item instanceof type.UMLGeneralization) {
+                         let generalizationSourceID = item.source._id;
+                         if (itemClass._id == generalizationSourceID) {
+
+
+                              let attrIsID = item.target.attributes.filter(attr => {
+                                   return attr.isID && (attr.isID == true)
+                              });
+                              if (attrIsID.length > 0) {
+                                   tAttArray.push(item);
+                              }
+                              console.log("attrIsID", attrIsID);
+                         }
+                    }
+
+               }); */
+
+               if (parentGeneralizationClassAttribute.length > 0) {
+                    arrIsID.push(parentGeneralizationClassAttribute);
+               }
 
                let filterAttributes = itemClass.attributes.filter(item => {
 
@@ -40,10 +104,11 @@ class Aggregation {
                }
 
           });
+          /* If no isID attribute found in Aggregation, Will be prompt error to user. */
           if (arrIsID.length == 0) {
                let jsonError = {
                     isWarning: true,
-                    msg: "There is no \"isID\" Attribute in Target Class \"" + assoc.end2.reference.name + "\" which is referenced in the Source Class \"" + assoc.end1.reference.name + "\""
+                    msg: "There is no \'isID\' Attribute in Target Class \'" + assoc.end2.reference.name + "\' which is referenced in the Source Class \'" + assoc.end1.reference.name + "\'"
                };
                openAPI.setError(jsonError);
           }

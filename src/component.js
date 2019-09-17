@@ -93,7 +93,28 @@ class Component {
                               if (assoc.end1.aggregation == constant.shared) {
                                    /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
                                    let aggregation = new Aggregation();
+                                   console.log("Classname", objClass.name);
                                    mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc);
+
+                                   /* aggregationClasses.filter(itemClass => {
+                                        // This will store the attributes of target class of Generalization
+                                        let targetAttribute = itemClass.ownedElements.filter(item => {
+                         
+                                             if(item instanceof type.UMLGeneralization){
+                                                  let generalizationSourceID=item.source._id;
+                                                  return itemClass._id==generalizationSourceID;
+                                             }
+                                             
+                                        });
+                                        if(targetAttribute.length>0){
+                                             targetAttribute.filter((attrib)=>{
+                                                  return attrib.isID && attrib
+                                             });
+                                             arrIsID.push(targetAttribute);
+                                        }
+                                   }); */
+
+
                               } else {
                                    /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
                                    let composition = new Composition();

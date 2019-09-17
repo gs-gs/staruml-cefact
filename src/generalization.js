@@ -47,6 +47,30 @@ class Generalization {
      }
 
      /**
+      * @function findGeneralizationRecursivelyOfClass
+      * @description Function will check recursively for ownedElements UMLGeneralization of target class to check if target has isID property or not
+      * @param {UMLClass} itemClass
+      * @param {Array} parentGeneralizationClassAttribute
+      * @memberof Aggregation
+      */
+     findGeneralizationRecursivelyOfClass(itemClass, parentGeneralizationClassAttribute) {
+          if (itemClass instanceof type.UMLClass) {
+               itemClass.ownedElements.forEach(item => {
+                    if (item instanceof type.UMLGeneralization) {
+
+                         
+                         let generalizationSourceID = item.source._id;
+                         if (itemClass._id == generalizationSourceID) {
+                              parentGeneralizationClassAttribute.push(item);
+                              this.findGeneralizationRecursivelyOfClass(item.target, parentGeneralizationClassAttribute);
+                         }
+                    }
+                    
+               });
+          }
+          console.log("Generalization classes", parentGeneralizationClassAttribute);
+     }
+     /**
       * @function findGeneralizationOfClass
       * @description Find all generalization of UMLClass
       * @param {UMLClass} objClass 
@@ -55,7 +79,7 @@ class Generalization {
      findGeneralizationOfClass(objClass) {
           try {
                let generalizeClasses = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLGeneralization");
-               /*  let generalizeClasses = app.repository.select("@UMLGeneralization"); */
+               //  let generalizeClasses = app.repository.select("@UMLGeneralization");
                let filterGeneral = generalizeClasses.filter(item => {
                     return item.source._id == objClass._id
                });
