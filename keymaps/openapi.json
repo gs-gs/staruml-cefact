@@ -1,5 +1,0 @@
-{
-     "cmdctrl-w": "openapi:generate-specs",
-     "cmdctrl-e": "openapi:test-single-package",
-     "cmdctrl-a": "openapi:test-entire-package"
-}
