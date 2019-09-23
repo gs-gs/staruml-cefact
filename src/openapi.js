@@ -631,7 +631,63 @@ function validateSwagger(pathValidator) {
 
      });
 }
+/**
+ * @function findPackageWiseUMLAssociation
+ * @description finds package wise UMLAssociation hierarchy recursively
+ * @param {UMLPackage} umlPackage
+ * @returns {Array}
+ * @memberof OpenApi
+ */
+let filteredAssociation = [];
+function getPackageWiseUMLAssociation() {
+     // new Promise((resolve, reject) => {
 
+          let _this = this;
+          let associations = app.repository.select("@UMLAssociation");
+          filteredAssociation=[];
+          forEach(associations,  (item) => {
+               // var clonedElement = Object.assign(item, item);
+               // var clonedItem = Object.assign(item, item);
+
+               // var copyObject=copy(item);
+               findParentPackage(item,item);
+               // let mItem = findParentPackage(item,item);
+               /* console.log("mItem", mItem);
+               if(mItem!=null){
+                    filteredAssociation.push(mPkg);
+               } */
+               
+          });
+          // resolve(filteredAssociation);
+          return filteredAssociation;
+     // });
+}
+function copy(mainObj) {
+     let objCopy = {}; // objCopy will store a copy of the mainObj
+     let key;
+   
+     for (key in mainObj) {
+       objCopy[key] = mainObj[key]; // copies each property to the objCopy object
+     }
+     return objCopy;
+   }
+function findParentPackage(ele,item) {
+     // return new Promise((resolve, reject) => {
+
+     if (ele instanceof type.UMLPackage) {
+          if (ele != null && ele.name == 'Movements'/* openAPI.getUMLPackage().name */) {
+               // console.log("ele",ele);
+               // console.log("item",item);
+               filteredAssociation.push(item);
+               // return item;
+          }
+          
+          // resolve(assocItem);
+     } else if (ele.hasOwnProperty('_parent') && ele._parent != null) {
+          findParentPackage(ele._parent,item);
+     }
+     // return null;
+}
 module.exports.getFilePath = OpenApi.getPath;
 module.exports.OpenApi = OpenApi;
 module.exports.getClasses = OpenApi.getUniqueClasses;
@@ -658,3 +714,4 @@ module.exports.getUMLAssociation = OpenApi.getUMLAssociation;
 module.exports.getUMLGeneralization = OpenApi.getUMLGeneralization;
 module.exports.findHierarchy = OpenApi.findHierarchy;
 module.exports.reversePkgPath = OpenApi.reversePkgPath;
+module.exports.getPackageWiseUMLAssociation = getPackageWiseUMLAssociation;

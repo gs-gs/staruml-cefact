@@ -301,7 +301,12 @@ function testEntireProject() {
  */
 
 function aboutUsExtension() {
-     app.dialogs.showInfoDialog(title + "\n\n" + description);
+     let Package={
+          name:'Movements'
+     };
+     let arrASS = openAPI.getPackageWiseUMLAssociation(Package);
+     console.log("arr-assso--", arrASS);
+     // app.dialogs.showInfoDialog(title + "\n\n" + description);
 }
 
 /**
