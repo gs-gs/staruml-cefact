@@ -126,17 +126,67 @@ class Association {
       */
      getAssociationOfClass(objClass) {
           try {
-               let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
-               // let associations = app.repository.select("@UMLAssociation");
+               /* let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation"); */
+               /* let associations = app.repository.select("@UMLAssociation"); */
+
+               /* let associations = openAPI.getPackageWiseUMLAssociation(openAPI.getUMLPackage().name); */
+
+               /* 
                let filterAssociation = associations.filter(item => {
                     return item.end1.reference._id == objClass._id
                });
-               return filterAssociation;
+                */
+
+               /* Find the all UMLAssociation of project */
+               let associations = app.repository.select("@UMLAssociation");
+
+               /* Filter association whose end1 (Source) Class is current class */
+               let filterAssociation = associations.filter(item => {
+                    return item.end1.reference._id == objClass._id
+               });
+               
+               console.log("filter-association-"+openAPI.getUMLPackage().name, filterAssociation);
+
+               /* Filter association who is belong to current package */
+               let filter = filterAssociation.filter(item => {
+                    let parent=item.end1.reference._parent;
+                    return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
+               });
+               console.log("filter-"+openAPI.getUMLPackage().name, filterAssociation); 
+               return filter;
+              
+
+
+               
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
      }
+
+     
+     /* TODO : Do not remove getAssociationOfClass function. The function is in progress for experiment 
+     getAssociationOfClass(objClass) {
+          return new Promise((resolve, reject) => {
+
+
+               try {
+                    let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
+                    let filterAssociation = associations.filter(item => {
+                         return item.end1.reference._id == objClass._id
+                    });
+
+                    let arrASS = openAPI.getPackageWiseUMLAssociation();
+                    console.log("arr-assso--", arrASS);
+
+                    resolve(filterAssociation);
+               } catch (error) {
+                    console.error("Found error", error.message);
+                    this.utils.writeErrorToFile(error);
+                    reject(error);
+               }
+          });
+     } */
 
      /**
       * @function writeAssociationProperties
