@@ -23,7 +23,7 @@ class Component {
           this.mainSchemaObj = {};
           this.utils = new Utils();
           this.arrAttr = [];
-          this.arrAssoc = [];
+          /* this.arrAssoc = []; */
           this.required = new Required();
           this.generalization = new Generalization();
           this.association = new Association();
@@ -42,6 +42,7 @@ class Component {
           let flagNoName = false;
           let noNameRel = [];
           this.mainComponentObj.schemas = this.mainSchemaObj;
+          this.duplicatePropertyError=[];
           classes.forEach(objClass => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
@@ -76,52 +77,70 @@ class Component {
                /* Adding Association : Adds Attributes with Multiplicity, without Multiplicity */
                mainPropertiesObj = this.association.addAssociationProperties(assocClassLink, mainPropertiesObj);
 
-               this.arrAssoc = this.association.getAssociations();
-
+               /* this.arrAssoc = this.association.getAssociations();
+               console.log("arrAssoc",this.arrAssoc); */
 
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
                let aggregationClasses = [];
                let classAssociations = this.association.getAssociationOfClass(objClass);
 
+               
+               console.log("classAssociations",classAssociations);
+               console.log("mainPropertiesObj",mainPropertiesObj);
+               
+               
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
-                         let filterAssoc = this.arrAssoc.filter(item => {
+                         /* let filterAssoc = this.arrAssoc.filter(item => {
                               return item.name == assoc.name;
-                         });
-
+                         }); */
+/* 
+                         console.log("filterAssoc",filterAssoc);
                          if (filterAssoc.length == 0 && assoc.name != "") {
+ */
+                              
+
+                              let assocName=assoc.name;
+                              if(assocName==''){
+                                   assocName=assoc.end2.reference.name;
+                              }
+
+                              /* Check for duplicate property */
+                              let propKeys=Object.keys(mainPropertiesObj);
+                              propKeys.forEach(prop=>{
+                                   if(assocName==prop){
+                                        let error="There is duplicate property in class \'"+assoc.end1.reference.name+"\' and property name is \'"+prop+"\'";
+                                        this.duplicatePropertyError.push(error);
+                                        let jsonError = {
+                                             isDuplicateProp: true,
+                                             msg: this.duplicatePropertyError
+                                        };
+                                        openAPI.setError(jsonError);
+                                   }
+                              });
+                              /* for(let prop in propKeys){
+                                   if(assocName==prop){
+                                        let jsonError = {
+                                             isDuplicateProp: true,
+                                             msg: "There is duplicate property in class \'"+assoc.end1.reference.name+"\' named \'"+prop+"\'"
+                                        };
+                                        openAPI.setError(jsonError);
+                                   }
+                              } */
+                              
                               if (assoc.end1.aggregation == constant.shared) {
                                    /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
                                    let aggregation = new Aggregation();
                                    console.log("Classname", objClass.name);
-                                   mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc);
-
-                                   /* aggregationClasses.filter(itemClass => {
-                                        // This will store the attributes of target class of Generalization
-                                        let targetAttribute = itemClass.ownedElements.filter(item => {
-                         
-                                             if(item instanceof type.UMLGeneralization){
-                                                  let generalizationSourceID=item.source._id;
-                                                  return itemClass._id==generalizationSourceID;
-                                             }
-                                             
-                                        });
-                                        if(targetAttribute.length>0){
-                                             targetAttribute.filter((attrib)=>{
-                                                  return attrib.isID && attrib
-                                             });
-                                             arrIsID.push(targetAttribute);
-                                        }
-                                   }); */
-
+                                   mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc,assocName);
 
                               } else {
                                    /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
                                    let composition = new Composition();
-                                   mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc);
+                                   mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc,assocName);
 
                               }
-
+/* 
                               this.arrAssoc.push(assoc);
                          } else {
                               if (assoc.name == "") {
@@ -129,7 +148,7 @@ class Component {
                                    let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
                                    noNameRel.push(str);
                               }
-                         }
+                         } */
                     } else if (assoc instanceof type.UMLGeneralization) {
                          arrGeneral.push(assoc);
                     }

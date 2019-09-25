@@ -162,7 +162,18 @@ class FileGenerator {
                          if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
                               /*  app.dialogs.showErrorDialog(openAPI.getError().msg); */
                               reject(new Error(openAPI.getError().msg));
-                         } else {
+                         } else if (openAPI.getError().hasOwnProperty('isDuplicateProp') && openAPI.getError().isDuplicateProp == true) {
+                              /*  app.dialogs.showErrorDialog(openAPI.getError().msg); */
+                              let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' ;
+                              let errorMsg=openAPI.getError().msg;
+                              let strErrorMsg='';
+                              errorMsg.forEach((error) => {
+                                   strErrorMsg=strErrorMsg+constant.strerror+error+'\n';
+                              });
+                              bindFailureMsg = bindFailureMsg+strErrorMsg;
+                              reject(new Error(bindFailureMsg));
+
+                         }else {
 
                               openAPI.validateSwagger(this.basePath).then(data => {
                                         let bindSuccesMsg = constant.msgsuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n\n' + constant.strpath + this.basePath
@@ -193,7 +204,19 @@ class FileGenerator {
                                    /*  app.dialogs.showErrorDialog(openAPI.getError().msg); */
                                    let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + openAPI.getError().msg;
                                    reject(new Error(bindFailureMsg));
-                              } else {
+
+                              }else if (openAPI.getError().hasOwnProperty('isDuplicateProp') && openAPI.getError().isDuplicateProp == true) {
+                                   /*  app.dialogs.showErrorDialog(openAPI.getError().msg); */
+                                   let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' ;
+                                   let errorMsg=openAPI.getError().msg;
+                                   let strErrorMsg='';
+                                   errorMsg.forEach((error) => {
+                                        strErrorMsg=strErrorMsg+constant.strerror+error+'\n';
+                                   });
+                                   bindFailureMsg = bindFailureMsg+strErrorMsg;
+                                   reject(new Error(bindFailureMsg));
+
+                              }else {
 
 
                                    openAPI.validateSwagger(pathValidator).then(data => {
@@ -214,15 +237,22 @@ class FileGenerator {
                          } else if (openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
 
                               if (openAPI.getError().hasOwnProperty('isWarning') && openAPI.getError().isWarning == true) {
-                                   /*  app.dialogs.showErrorDialog(openAPI.getError().msg); */
-                                   // reject(new Error(openAPI.getError().msg));
-
                                    let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strerror + openAPI.getError().msg;
-
                                    openAPI.addSummery(bindFailureMsg, 'failure');
                                    reject(new Error(openAPI.getError().msg));
 
-                              } else {
+                              } else if (openAPI.getError().hasOwnProperty('isDuplicateProp') && openAPI.getError().isDuplicateProp == true) {
+                                   let bindFailureMsg = constant.msgtesterror + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' ;
+                                   let errorMsg=openAPI.getError().msg;
+                                   let strErrorMsg='';
+                                   errorMsg.forEach((error) => {
+                                        strErrorMsg=strErrorMsg+constant.strerror+error+'\n';
+                                   });
+                                   bindFailureMsg = bindFailureMsg+strErrorMsg;
+                                   openAPI.addSummery(bindFailureMsg, 'failure');
+                                   reject(new Error(bindFailureMsg));
+
+                              }else {
 
                                    openAPI.validateSwagger(pathValidator).then(data => {
                                              let bindSuccesMsg = constant.msgstestuccess + '\'' + openAPI.getUMLPackage().name + '\' {' + openAPI.getPackagePath() + '}' + '\n' + constant.strpath + pathValidator
