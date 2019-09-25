@@ -20,9 +20,10 @@ class Composition {
       * @returns {Object}
       * @memberof Composition
       */
-     addComposition(mainPropertiesObj, assoc) {
+     addComposition(mainPropertiesObj, assoc,assocName) {
           let propertiesObj = {};
-          mainPropertiesObj[assoc.name] = propertiesObj;
+          mainPropertiesObj[assocName] = propertiesObj;
+          /* mainPropertiesObj[assoc.name] = propertiesObj; */
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                let itemsObj = {};
                propertiesObj.items = itemsObj;

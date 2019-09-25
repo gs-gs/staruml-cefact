@@ -52,10 +52,11 @@ class Aggregation {
       * @returns {Object}
       * @memberof Aggregation
       */
-     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc) {
+     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc,assocName) {
           let propertiesObj = {};
           aggregationClasses.push(assoc.end2.reference);
-          mainPropertiesObj[assoc.name] = propertiesObj;
+          mainPropertiesObj[assocName] = propertiesObj;
+          /* mainPropertiesObj[assoc.name] = propertiesObj; */
 
           let arrIsID = [];
           /* To check aggregation has isID attribute or not */
