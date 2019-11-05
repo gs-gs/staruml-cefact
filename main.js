@@ -5,6 +5,7 @@ var path = require('path');
 const title = require('./package.json').title;
 const description = require('./package.json').description;
 let vDialog = null;
+var forEach = require('async-foreach').forEach;
 
 /**
  * @function generateSpecs
@@ -27,12 +28,124 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                     if (buttonId === "ok") {
                          let varSel = returnValue.getClassName();
                          let valPackagename = type.UMLPackage.name;
-                         if (varSel == valPackagename) {
+                         let valClassDiagram = type.UMLClassDiagram.name;
+                         if (varSel == valClassDiagram) {
+                              //app.dialogs.showInfoDialog("Diagram is selected");
+
+
+
+                              let classDiagram = returnValue;
+                              // umlPackage = classDiagram._parent;
+                              let allDiagramView = classDiagram.ownedViews.filter(function (view) {
+                                   return view instanceof type.UMLClassView ||
+                                        view instanceof type.UMLAssociationView ||
+                                        view instanceof type.UMLInterfaceView ||
+                                        view instanceof type.UMLInterfaceRealizationView ||
+                                        view instanceof type.UMLGeneralizationView ||
+                                        view instanceof type.UMLAssociationClassLinkView ||
+                                        view instanceof type.UMLEnumerationView
+                              });
+                              let allDiagramElement = [];
+                              forEach(allDiagramView, function (dView) {
+                                   allDiagramElement.push(dView.model);
+                              });
+
+
+                              let UMLClasses = allDiagramElement.filter(function (dElement) {
+                                   return dElement instanceof type.UMLClass
+                              });
+                              console.log("UMLClasses", UMLClasses);
+
+                              let UMLInterface = allDiagramElement.filter(function (dElement) {
+                                   return dElement instanceof type.UMLInterface
+                              });
+                              console.log("UMLInterface", UMLInterface);
+
+                              let UMLAssociation = allDiagramElement.filter(function (dElement) {
+                                   return dElement instanceof type.UMLAssociation
+                              });
+                              openAPI.setDiagramAssociation(UMLAssociation);
+                              console.log("UMLAssociation", UMLAssociation);
+
+                              let UMLGeneralization = allDiagramElement.filter(function (dElement) {
+                                   return dElement instanceof type.UMLGeneralization
+                              });
+                              console.log("UMLGeneralization", UMLGeneralization);
+
+                              let UMLInterfaceRealization = allDiagramElement.filter(function (dElement) {
+                                   return dElement instanceof type.UMLInterfaceRealization
+                              });
+                              console.log("UMLInterfaceRealization", UMLInterfaceRealization);
+
+                              let UMLEnumeration = allDiagramElement.filter(function (dElement) {
+                                   return dElement instanceof type.UMLEnumeration
+                              });
+                              console.log("UMLEnumeration", UMLEnumeration);
+
+                              let UMLAssociationClassLink = allDiagramElement.filter(function (dElement) {
+                                   return dElement instanceof type.UMLAssociationClassLink
+                              });
+                              console.log("UMLAssociationClassLink", UMLAssociationClassLink);
+
+
+                              let mainOwnedElements = []
+                              let tempPackage = {
+                                   '_type': 'UMLPackage',
+                                   'name': varSel,
+                                   'ownedElements': mainOwnedElements
+                              };
+
+                              forEach(UMLClasses,function(mClass){
+
+                                   let tempOwnedElements=[];
+                                   forEach(mClass.ownedElements,function(element){
+                                        let searchedEle=allDiagramElement.filter(function(mEle){
+                                             return element._id == mEle._id ;
+                                        });
+                                        if(searchedEle.length!=0){
+                                             tempOwnedElements.push(element);
+                                        }
+                                   });
+                                   mClass.ownedElements=tempOwnedElements;
+                                   let wClass=app.repository.writeObject(mClass);
+                                   mainOwnedElements.push(JSON.parse(wClass));
+                              });
+
+                              forEach(UMLInterface,function(mInterface){
+
+                                   let tempOwnedElements=[];
+                                   forEach(mInterface.ownedElements,function(element){
+                                        let searchedEle=allDiagramElement.filter(function(mEle){
+                                             return element._id == mEle._id;
+                                        });
+                                        if(searchedEle.length!=0){
+                                             tempOwnedElements.push(element);
+                                        }
+                                   });
+                                   mInterface.ownedElements=tempOwnedElements;
+
+                                   let wInterface=app.repository.writeObject(mInterface);
+                                   mainOwnedElements.push(JSON.parse(wInterface));
+                              });
+
+                              forEach(UMLEnumeration,function(mEnum){
+                                   let wEnum=app.repository.writeObject(mEnum);
+                                   mainOwnedElements.push(JSON.parse(wEnum));
+                              });
+
+                              openAPI.setModelType(openAPI.APP_IS_DIAGRAM);
+                              umlPackage=app.repository.readObject(tempPackage);
+                              console.log("UMLPackage",umlPackage);
+                              fileTypeSelection(umlPackage, options);
+
+
+                         }  else if (varSel == valPackagename ) {
+                              openAPI.setModelType(openAPI.APP_IS_PACKAGE);
                               umlPackage = returnValue;
                               fileTypeSelection(umlPackage, options);
                          } else {
                               app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
-                         }
+                         } 
                     }
                });
      }
@@ -50,7 +163,16 @@ async function getUMLModel(umlPackage, basePath, options, returnValue) {
           if (resultGen.result == constant.FIELD_SUCCESS) {
                vDialog.close();
                setTimeout(function () {
-                    app.dialogs.showInfoDialog(resultGen.message);
+                    let dType='';
+                    if(openAPI.getModelType()==openAPI.APP_IS_DIAGRAM){
+                         dType="Diagram";
+                         console.log("DiagramPackage",openAPI.getUMLPackage());
+                         app.modelExplorer.remove(openAPI.getUMLPackage());
+                         app.modelExplorer.rebuild();
+                    }else if(openAPI.getModelType()==openAPI.APP_IS_PACKAGE){
+                         dType="Package";
+                    }
+                    app.dialogs.showInfoDialog(dType+" : "+resultGen.message);
 
                }, 10);
                vDialog = null;
