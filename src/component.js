@@ -74,8 +74,8 @@ class Component {
                this.arrAttr = properties.getAttributes();
 
 
-               /* Adding Association : Adds Attributes with Multiplicity, without Multiplicity */
-               mainPropertiesObj = this.association.addAssociationProperties(assocClassLink, mainPropertiesObj);
+               /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
+               mainPropertiesObj = this.association.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj);
 
                /* this.arrAssoc = this.association.getAssociations();
                console.log("arrAssoc",this.arrAssoc); */
