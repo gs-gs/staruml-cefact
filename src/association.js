@@ -3,6 +3,7 @@ const Generalization = require('./generalization');
 const Required = require('./required');
 const constant = require('./constant');
 const openAPI = require('./openapi');
+var diagramEle = require('./diagram/diagramElement');
 /**
  * @class Association
  * @description class returns the API Association 
@@ -142,15 +143,16 @@ class Association {
                /* Filter association whose end1 (Source) Class is current class */
                
                let filterAssociation=null;
-               if(openAPI.getModelType() == openAPI.APP_IS_PACKAGE){
+               if(openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE){
                     
                     let associations = app.repository.select("@UMLAssociation");
                     filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });
-               }else if(openAPI.getModelType() == openAPI.APP_IS_DIAGRAM){
+                    
+               }else if(openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM){
                     let dAssociation=null;
-                    dAssociation = openAPI.getDiagramAssociation();
+                    dAssociation = diagramEle.getUMLAssociation();
                     filterAssociation = dAssociation.filter(item => {
                          return item.end1.reference._id == objClass._id 
                     });
@@ -160,15 +162,15 @@ class Association {
 
                /* Filter association who is belong to current package */
                let filter=null;
-               if(openAPI.getModelType()==openAPI.APP_IS_PACKAGE){
+               if(openAPI.getModelType()==openAPI.APP_MODEL_PACKAGE){
 
                     filter = filterAssociation.filter(item => {
                          let parent=item.end1.reference._parent;
                          return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
                     });
                }
-               else if(openAPI.getModelType()==openAPI.APP_IS_DIAGRAM){
-                    console.log("diagramAsso",openAPI.getDiagramAssociation());
+               else if(openAPI.getModelType()==openAPI.APP_MODEL_DIAGRAM){
+                    console.log("diagramAsso",diagramEle.getUMLAssociation());
                     filter = filterAssociation;/* filterAssociation.filter(item => {
                          let parent=item.end1.reference._parent;
                          return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
