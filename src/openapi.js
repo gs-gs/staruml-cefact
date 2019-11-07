@@ -706,13 +706,6 @@ function findParentPackage(ele,item) {
      }
      // return null;
 }
-let pkgAssociation=[];
-function setDiagramAssociation(pkgAssoc){
-     pkgAssociation=pkgAssoc;
-}
-function getDiagramAssociation(){
-     return pkgAssociation;
-}
 module.exports.getFilePath = OpenApi.getPath;
 module.exports.OpenApi = OpenApi;
 module.exports.getClasses = OpenApi.getUniqueClasses;
@@ -724,8 +717,8 @@ module.exports.setError = OpenApi.setError;
 module.exports.setAppMode = OpenApi.setAppMode;
 module.exports.getAppMode = OpenApi.getAppMode;
 module.exports.APP_MODE_GEN = 1;
-module.exports.APP_IS_PACKAGE = 0;
-module.exports.APP_IS_DIAGRAM = 1;
+module.exports.APP_MODEL_PACKAGE = 0;
+module.exports.APP_MODEL_DIAGRAM = 1;
 module.exports.APP_MODE_TEST = 2;
 module.exports.setModelType = OpenApi.setModelType;
 module.exports.getModelType = OpenApi.getModelType;
@@ -744,5 +737,3 @@ module.exports.getUMLGeneralization = OpenApi.getUMLGeneralization;
 module.exports.findHierarchy = OpenApi.findHierarchy;
 module.exports.reversePkgPath = OpenApi.reversePkgPath;
 module.exports.getPackageWiseUMLAssociation = getPackageWiseUMLAssociation;
-module.exports.setDiagramAssociation = setDiagramAssociation;
-module.exports.getDiagramAssociation = getDiagramAssociation;
