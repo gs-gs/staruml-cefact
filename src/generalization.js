@@ -1,5 +1,7 @@
 const openAPI = require('./openapi');
 const constant = require('./constant');
+const Utils = require ('./utils');
+var diagramEle = require('./diagram/diagramElement');
 
 /**
  * @class Generalization 
@@ -10,7 +12,7 @@ class Generalization {
       * @constructor Creates an instance of Generalization.
       */
      constructor() {
-
+          this.utils=new Utils();
      }
 
 
@@ -78,15 +80,29 @@ class Generalization {
       */
      findGeneralizationOfClass(objClass) {
           try {
-               let generalizeClasses = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLGeneralization");
-               //  let generalizeClasses = app.repository.select("@UMLGeneralization");
-               let filterGeneral = generalizeClasses.filter(item => {
-                    return item.source._id == objClass._id
-               });
+
+               let filterGeneral=null;
+               if(openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE){
+                    
+                    let generalizeClasses = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLGeneralization");
+                    //  let generalizeClasses = app.repository.select("@UMLGeneralization");
+                    filterGeneral = generalizeClasses.filter(item => {
+                         return item.source._id == objClass._id
+                    });
+                    
+               }else if(openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM){
+                    let generalizeClasses = diagramEle.getUMLGeneralization();;
+                    filterGeneral = generalizeClasses.filter(item => {
+                         return item.source._id == objClass._id
+                    });
+
+               }
+
+               
                return filterGeneral;
           } catch (error) {
                console.error("Found error", error.message);
-               this.writeErrorToFile(error);
+               this.utils.writeErrorToFile(error);
           }
      }
 }
