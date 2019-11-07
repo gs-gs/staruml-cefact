@@ -1,6 +1,6 @@
 const Utils = require('./utils');
 const openAPI = require('./openapi');
-const Generalization = require('./generalization');
+// const Generalization = require('./generalization');
 const constant = require('./constant');
 const Operations = require('./operations');
 /**
@@ -13,7 +13,7 @@ class Paths {
       */
      constructor() {
           this.utils = new Utils();
-          this.generalization = new Generalization();
+          // this.generalization = new Generalization();
           this.operations = new Operations();
      }
 
