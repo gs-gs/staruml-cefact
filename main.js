@@ -36,7 +36,6 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
 
 
                               let classDiagram = returnValue;
-                              // umlPackage = classDiagram._parent;
                               let allDiagramView = classDiagram.ownedViews.filter(function (view) {
                                    return view instanceof type.UMLClassView ||
                                         view instanceof type.UMLAssociationView ||
@@ -57,133 +56,151 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                                    return dElement instanceof type.UMLClass
                               });
                               diagramEle.setUMLClass(UMLClasses);
-                              
+
 
                               let UMLInterface = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLInterface
                               });
                               diagramEle.setUMLInterface(UMLInterface);
-                              
+
 
                               let UMLAssociation = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLAssociation
                               });
                               diagramEle.setUMLAssociation(UMLAssociation);
-                              
+
 
                               let UMLGeneralization = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLGeneralization
                               });
                               diagramEle.setUMLGeneralization(UMLGeneralization);
-                              
+
 
                               let UMLInterfaceRealization = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLInterfaceRealization
                               });
                               diagramEle.setUMLInterfaceRealization(UMLInterfaceRealization);
-                              
+
 
                               let UMLEnumeration = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLEnumeration
                               });
                               diagramEle.setUMLEnumeration(UMLEnumeration);
-                              
+
 
                               let UMLAssociationClassLink = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLAssociationClassLink
                               });
                               diagramEle.setUMLAssociationClassLink(UMLAssociationClassLink);
-                              
+
 
 
                               let mainOwnedElements = []
                               let tempPackage = {
-                                   '_type': 'UMLPackage',
                                    'name': classDiagram.name,
-                                   'ownedElements': mainOwnedElements
+                                   'ownedElements': mainOwnedElements,
+                                   'documentation': classDiagram.documentation,
                               };
 
-                              forEach(UMLClasses,function(mClass){
+                              forEach(UMLClasses, function (mClass) {
 
-                                   let tempOwnedElements=[];
-                                   forEach(mClass.ownedElements,function(element){
-                                        let searchedEle=allDiagramElement.filter(function(mEle){
-                                             return element._id == mEle._id ;
-                                        });
-                                        if(searchedEle.length!=0){
-                                             tempOwnedElements.push(element);
-                                        }
-                                   });
-                                   mClass.ownedElements=tempOwnedElements;
-                                   mainOwnedElements.push(mClass);
-                              });
-
-                              forEach(UMLInterface,function(mInterface){
-
-                                   let tempOwnedElements=[];
-                                   forEach(mInterface.ownedElements,function(element){
-                                        let searchedEle=allDiagramElement.filter(function(mEle){
+                                   let tempOwnedElements = [];
+                                   forEach(mClass.ownedElements, function (element) {
+                                        let searchedEle = allDiagramElement.filter(function (mEle) {
                                              return element._id == mEle._id;
                                         });
-                                        if(searchedEle.length!=0){
-                                             tempOwnedElements.push(element);
+                                        if (searchedEle.length != 0) {
+                                             let mJsonRel=app.repository.writeObject(element);
+                                             let mObjRel=JSON.parse(mJsonRel);
+                                             delete mObjRel['_id'];
+                                             tempOwnedElements.push(mObjRel);
                                         }
                                    });
-                                   mInterface.ownedElements=tempOwnedElements;
-                                   mainOwnedElements.push(mInterface);
+                                   let mJson=app.repository.writeObject(mClass);
+                                   let mObj=JSON.parse(mJson);
+                                   delete mObj['_id'];
+                                   mObj.ownedElements = tempOwnedElements;
+                                   mainOwnedElements.push(mObj);
                               });
 
-                              forEach(UMLEnumeration,function(mEnum){
-                                   mainOwnedElements.push(mEnum);
+                              forEach(UMLInterface, function (mInterface) {
+
+                                   let tempOwnedElements = [];
+                                   forEach(mInterface.ownedElements, function (element) {
+                                        let searchedEle = allDiagramElement.filter(function (mEle) {
+                                             return element._id == mEle._id;
+                                        });
+                                        if (searchedEle.length != 0) {
+                                             let mJsonRel=app.repository.writeObject(element);
+                                             let mObjRel=JSON.parse(mJsonRel);
+                                             delete mObjRel['_id'];
+                                             tempOwnedElements.push(mObjRel);
+                                        }
+                                   });
+                                   let mJson=app.repository.writeObject(mInterface);
+                                   let mObj=JSON.parse(mJson);
+                                   delete mObj['_id'];
+                                   mObj.ownedElements = tempOwnedElements;
+                                   mainOwnedElements.push(mObj);
+                              });
+
+                              forEach(UMLEnumeration, function (mEnum) {
+                                   let mJson=app.repository.writeObject(mEnum);
+                                   let mObj=JSON.parse(mJson);
+                                   delete mObj['_id'];
+                                   mainOwnedElements.push(mObj);
                               });
 
                               openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
-                              umlPackage=tempPackage;
+                              console.log(tempPackage);
 
-                              app.dialogs.showSelectDropdownDialog(constant.msg_file_select, constant.fileOptions).then(function ({
-                                   buttonId,
-                                   returnValue
-                              }) {
-                                   if (buttonId === 'ok') {
-                                        const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, null);
-                                        if (basePath != null) {
-                                             setTimeout(function () {
-                                                  const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
-                                                  diagramEle.setUMLPackage(umlPackage);
-                                                  diagramEle.setBasePath(basePath);
-                                                  diagramEle.setOptions(options);
-                                                  diagramEle.setFileType(returnValue);
-                                                  diagramEle.getUMLModel(mOpenApi);
+                              return ;
+                              fileTypeSelection(tempPackage, options);
 
-                                             }, 10);
-                         
-                                        } else {
-                                             console.log("Dialog cancelled : basePath not available")
-                                        }
-                                   } else {
-                                        console.log("Dialog cancelled")
-                                   }
-                              });
-
-                              
-
-
-                         }  else if (varSel == valPackagename ) {
+                         } else if (varSel == valPackagename) {
                               openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                               umlPackage = returnValue;
-                              fileTypeSelection(umlPackage, options);                             
+                              fileTypeSelection(umlPackage, options);
                          } else {
                               app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
-                         } 
+                         }
                     }
                });
      }
 }
-
-async function getUMLModel(umlPackage, basePath, options, returnValue) {
-     const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, returnValue);
+async function getUMLModelForDiagram(tempPackage, basePath, options, returnValue) {
+     
+     const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
+     try {
+          let dm = app.dialogs;
+          let vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + openAPI.getUMLPackage().name + "\' Diagram", [], true);
+          let result = await diagramEle.initUMLDiagram();
+          console.log("initialize", result);
+          let resultElement = await diagramEle.getDiagramElements();
+          console.log("resultElement", resultElement);
+          let resultGen = await diagramEle.generateOpenAPI(mOpenApi);
+          console.log("resultGen", resultGen);
+          if (resultGen.result == constant.FIELD_SUCCESS) {
+               vDialog.close();
+               setTimeout(function () {
+                    app.dialogs.showInfoDialog(resultGen.message);
+               }, 10);
+               vDialog = null;
+          }
+     } catch (err) {
+          //vDialog.close();
+          setTimeout(function () {
+               app.dialogs.showErrorDialog(err.message);
+               console.error("Error getUMLModel", err);
+          }, 10);
+     }
+}
+async function getUMLModelForPackage(tempPackage, basePath, options, returnValue) {
+     const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
 
      try {
+          let dm = app.dialogs;
+          vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + umlPackage.name + "\' package", [], true);
           let result = await mOpenApi.initUMLPackage()
           console.log("initialize", result);
           let resultElement = await mOpenApi.getModelElements();
@@ -193,16 +210,7 @@ async function getUMLModel(umlPackage, basePath, options, returnValue) {
           if (resultGen.result == constant.FIELD_SUCCESS) {
                vDialog.close();
                setTimeout(function () {
-                    let dType='';
-                    if(openAPI.getModelType()==openAPI.APP_MODEL_DIAGRAM){
-                         dType="Diagram";
-                         console.log("DiagramPackage",openAPI.getUMLPackage());
-                         app.modelExplorer.remove(openAPI.getUMLPackage());
-                         app.modelExplorer.rebuild();
-                    }else if(openAPI.getModelType()==openAPI.APP_MODEL_PACKAGE){
-                         dType="Package";
-                    }
-                    app.dialogs.showInfoDialog(dType+" : "+resultGen.message);
+                    app.dialogs.showInfoDialog(resultGen.message);
 
                }, 10);
                vDialog = null;
@@ -210,7 +218,7 @@ async function getUMLModel(umlPackage, basePath, options, returnValue) {
 
 
      } catch (err) {
-          vDialog.close();
+          //vDialog.close();
           setTimeout(function () {
                app.dialogs.showErrorDialog(err.message);
                console.error("Error getUMLModel", err);
@@ -223,7 +231,7 @@ async function getUMLModel(umlPackage, basePath, options, returnValue) {
  * @param {UMLPackage} umljPackage
  * @param {Object} options
  */
-function fileTypeSelection(umlPackage, options) {
+function fileTypeSelection(tempPackage, options) {
 
      app.dialogs.showSelectDropdownDialog(constant.msg_file_select, constant.fileOptions).then(function ({
           buttonId,
@@ -232,10 +240,13 @@ function fileTypeSelection(umlPackage, options) {
           if (buttonId === 'ok') {
                const basePath = app.dialogs.showSaveDialog(constant.msg_file_saveas, null, null);
                if (basePath != null) {
-                    let dm = app.dialogs;
-                    vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + umlPackage.name + "\' package", [], true);
+
                     setTimeout(function () {
-                         getUMLModel(umlPackage, basePath, options, returnValue);
+                         if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+                              getUMLModelForPackage(tempPackage, basePath, options, returnValue);
+                         } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                              getUMLModelForDiagram(tempPackage, basePath, options, returnValue);
+                         }
                     }, 10);
 
                } else {
@@ -364,7 +375,7 @@ async function starTestingAllPackage(pkgList) {
                     let arrPath = openAPI.findHierarchy(umlPackage);
                     let pkgPath = openAPI.reversePkgPath(arrPath);
 
-                    let bindFailureMsg = constant.msgtesterror+strModeType + '\'' + openAPI.getUMLPackage().name + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
+                    let bindFailureMsg = constant.msgtesterror + strModeType + '\'' + openAPI.getUMLPackage().name + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
                     openAPI.addSummery(bindFailureMsg, 'failure');
                }
           }
