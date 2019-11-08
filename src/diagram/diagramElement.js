@@ -1,6 +1,6 @@
 const MainJSONDiagram = require('./mainjsonDiagram');
 const fs = require('fs');
-const InfoDiagram = require('./infoDiagram');
+const Info = require('../info');
 const ComponentDiagram = require('./componentDiagram');
 const Utils = require('../utils');
 const utils = new Utils();
@@ -114,65 +114,22 @@ function setUMLAssociationClassLink(mUMLAssociationClassLink) {
 function getUMLAssociationClassLink() {
     return UMLAssociationClassLink;
 }
-let UMLPackage = null;
-let Basepath = null;
-let Options = null;
-let Filetype = null;
 
-function setUMLPackage(mUMLPackage) {
-    UMLPackage = mUMLPackage;
-}
-
-function getUMLPackage() {
-    return UMLPackage;
-}
-
-function setBasePath(mBasepath) {
-    Basepath = mBasepath;
-}
-
-function getBasePath() {
-    return Basepath;
-}
-
-function setOptions(mOptions) {
-    Options = mOptions;
-}
-
-function getOptions() {
-    return Options;
-}
-
-function setFileType(mFileType) {
-    Filetype = mFileType;
-}
-
-function getFileType() {
-    return Filetype;
-}
-async function getUMLModel(mOpenApi) {
+async function getUMLModelForDiagram() {
 
     try {
-        openAPI.OpenAPI = mOpenApi;
         let dm = app.dialogs;
-        let vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + getUMLPackage().name + "\' Diagram", [], true);
-        let result = await initUMLPackage();
+        let vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + openAPI.getUMLPackage().name + "\' Diagram", [], true);
+        let result = await initUMLDiagram();
         console.log("initialize", result);
-        let resultElement = await getModelElements();
+        let resultElement = await getDiagramElements();
         console.log("resultElement", resultElement);
         let resultGen = await generateOpenAPI();
         console.log("resultGen", resultGen);
         if (resultGen.result == constant.FIELD_SUCCESS) {
             vDialog.close();
             setTimeout(function () {
-                let dType = '';
-                if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-                    dType = "Diagram";
-                } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-                    dType = "Package";
-                }
-                app.dialogs.showInfoDialog(dType + " : " + resultGen.message);
-
+                app.dialogs.showInfoDialog(resultGen.message);
             }, 10);
             vDialog = null;
         }
@@ -187,16 +144,16 @@ async function getUMLModel(mOpenApi) {
     }
 }
 
-function generateOpenAPI() {
+function generateOpenAPI(mOpenApi) {
     return new Promise((resolve, reject) => {
         try {
 
             // let _this = this;
             /* TODO */
-            openAPI.OpenAPI.resetPackagePath();
-            let srcRes = app.repository.search(getUMLPackage().name);
+            mOpenApi.resetPackagePath();
+            let srcRes = app.repository.search(openAPI.getUMLPackage().name);
             let fRes = srcRes.filter(function (item) {
-                return (item instanceof type.UMLClassDiagram && item.name == getUMLPackage().name);
+                return (item instanceof type.UMLClassDiagram && item.name == openAPI.getUMLPackage().name);
             });
             let arrPath = null;
             let rPath = null;
@@ -208,7 +165,7 @@ function generateOpenAPI() {
                 /* TODO  let */
                 rPath = openAPI.reversePkgPath(arrPath);
                 /* TODO */
-                openAPI.OpenApi.setPackagepath(rPath);
+                openAPI.setPackagepath(rPath);
             }
 
 
@@ -217,7 +174,7 @@ function generateOpenAPI() {
             console.log("-----version-generated");
 
             /* Add openapi information */
-            let mInfo = new InfoDiagram();
+            let mInfo = new Info();
             MainJSONDiagram.addInfo(mInfo);
             console.log("-----info-generated");
 
@@ -261,7 +218,7 @@ function generateOpenAPI() {
     });
 }
 
-function getModelElements() {
+function getDiagramElements() {
 
     return new Promise((resolve, reject) => {
         let uniqueClassesArr = [];
@@ -393,15 +350,15 @@ function getModelElements() {
 
 }
 /**
- * @function initUMLPackage
+ * @function initUMLDiagram
  * @description initializes UML Package
  */
-function initUMLPackage() {
+function initUMLDiagram() {
     return new Promise((resolve, reject) => {
         try {
             try {
-                if (!fs.existsSync(getBasePath())) {
-                    fs.mkdirSync(getBasePath());
+                if (!fs.existsSync(openAPI.getFilePath())) {
+                    fs.mkdirSync(openAPI.getFilePath());
                     resolve({
                         result: "success",
                         message: "Package initialize successfully"
@@ -425,6 +382,9 @@ function initUMLPackage() {
     });
 
 }
+/* function initialize(mOpenApi){
+    openAPI.OpenApi = mOpenApi;
+} */
 module.exports.setUMLClass = setUMLClass;
 module.exports.getUMLClass = getUMLClass;
 module.exports.setUMLInterface = setUMLInterface;
@@ -441,12 +401,8 @@ module.exports.setUMLAssociationClassLink = setUMLAssociationClassLink;
 module.exports.getUMLAssociationClassLink = getUMLAssociationClassLink;
 module.exports.setUMLDiagramElement = setUMLDiagramElement;
 module.exports.getUMLDiagramElement = getUMLDiagramElement;
-module.exports.setUMLPackage = setUMLPackage;
-module.exports.getUMLPackage = getUMLPackage;
-module.exports.setBasePath = setBasePath;
-module.exports.getBasePath = getBasePath;
-module.exports.setOptions = setOptions;
-module.exports.getOptions = getOptions;
-module.exports.setFileType = setFileType;
-module.exports.getFileType = getFileType;
-module.exports.getUMLModel = getUMLModel;
+module.exports.getUMLModelForDiagram = getUMLModelForDiagram;
+// module.exports.initialize = initialize;
+module.exports.initUMLDiagram = initUMLDiagram;
+module.exports.getDiagramElements = getDiagramElements;
+module.exports.generateOpenAPI = generateOpenAPI;

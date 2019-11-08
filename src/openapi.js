@@ -737,3 +737,4 @@ module.exports.getUMLGeneralization = OpenApi.getUMLGeneralization;
 module.exports.findHierarchy = OpenApi.findHierarchy;
 module.exports.reversePkgPath = OpenApi.reversePkgPath;
 module.exports.getPackageWiseUMLAssociation = getPackageWiseUMLAssociation;
+module.exports.setPackagepath = OpenApi.setPackagepath;
