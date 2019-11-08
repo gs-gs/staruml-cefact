@@ -36,12 +36,11 @@ class FileGenerator {
                     console.log("file-generate-started");
                     this.basePath = null;
                     let mainJson = null;
+                    this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                     if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-                         this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
                          mainJson = MainJSON.getJSON();
 
                     } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-                         this.basePath = path.join(diagramEle.getBasePath(), diagramEle.getUMLPackage().name + '.json');
                          mainJson = MainJSONDiagram.getJSON();
                     }
 
@@ -70,17 +69,12 @@ class FileGenerator {
           return new Promise((resolve, reject) => {
                try {
                     let mainJson = null
-                    let filepath = null;
-                    let pkgName = '';
+                    let filepath = openAPI.getFilePath();
+                    let pkgName = openAPI.getUMLPackage().name;
                     if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
                          mainJson = MainJSON.getJSON();
-                         filepath = openAPI.getFilePath();
-                         pkgName = openAPI.getUMLPackage().name;
-
                     } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
                          mainJson = MainJSONDiagram.getJSON();
-                         filepath = diagramEle.getBasePath();
-                         pkgName = diagramEle.getUMLPackage().name;
                     }
 
 
@@ -109,12 +103,7 @@ class FileGenerator {
           return new Promise((resolve, reject) => {
                let _this = this;
                try {
-                    let fileType = null;
-                    if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-                         fileType = openAPI.getFileType();
-                    } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-                         fileType = diagramEle.getFileType();
-                    }
+                    let fileType = openAPI.getFileType();
 
                     if (fileType == 1) {
                          console.log("---json-generate-start");
@@ -187,7 +176,6 @@ class FileGenerator {
       */
      validateAndPrompt() {
 
-          let _this = this;
           return new Promise((resolve, reject) => {
 
                try {
