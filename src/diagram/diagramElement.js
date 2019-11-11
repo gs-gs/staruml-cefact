@@ -5,7 +5,7 @@ const ComponentDiagram = require('./componentDiagram');
 const Utils = require('../utils');
 const utils = new Utils();
 const FileGenerator = require('../filegenerator');
-const PathsDiagram = require('./pathsDiagram');
+const Paths = require('../paths');
 const Servers = require('../servers');
 const constant = require('../constant');
 const SwaggerParser = require("swagger-parser");
@@ -184,8 +184,8 @@ function generateOpenAPI(mOpenApi) {
             console.log("-----server-generated");
 
             /* Add openapi paths */
-            let pathsDiagram = new PathsDiagram();
-            MainJSONDiagram.addPaths(pathsDiagram);
+            let paths = new Paths();
+            MainJSONDiagram.addPaths(paths);
             console.log("-----path-generated");
 
             /* Add openapi component */
