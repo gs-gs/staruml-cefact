@@ -382,9 +382,92 @@ function initUMLDiagram() {
     });
 
 }
-/* function initialize(mOpenApi){
-    openAPI.OpenApi = mOpenApi;
-} */
+
+function removeIDFromOwnedElement(UMLEle, allDiagramElement) {
+    let tempOwnedElements = [];
+
+    if(UMLEle.hasOwnProperty('ownedElements')){
+
+        forEach(UMLEle.ownedElements, function (element) {
+            let searchedEle = allDiagramElement.filter(function (mEle) {
+                return element._id == mEle._id;
+            });
+            if (searchedEle.length != 0) {
+                let mJsonRel = app.repository.writeObject(element);
+                let mObjRel = JSON.parse(mJsonRel);
+                delete mObjRel['_id'];
+                tempOwnedElements.push(mObjRel);
+            }
+        });
+    }
+    return tempOwnedElements;
+}
+
+function removeIDFromAttribute(UMLEle) {
+    let tempAttributes = [];
+    if(UMLEle.hasOwnProperty('attributes')){
+
+        forEach(UMLEle.attributes, function (attrib) {
+            
+            let mJsonAttrib = app.repository.writeObject(attrib);
+            let mObjAttrib = JSON.parse(mJsonAttrib);
+            delete mObjAttrib['_id'];
+            tempAttributes.push(mObjAttrib);
+        });
+    }
+    return tempAttributes;
+}
+
+function removeIDFromOperation(UMLEle) {
+    let tempOperation = [];
+    if(UMLEle.hasOwnProperty('operations')){
+
+        forEach(UMLEle.operations, function (operation) {
+            
+            let mJsonOperation = app.repository.writeObject(operation);
+            let mObjOperation = JSON.parse(mJsonOperation);
+            delete mObjOperation['_id'];
+            
+            mObjOperation.parameters=removeIDFromParameter(operation);
+            tempOperation.push(mObjOperation);
+        });
+    }
+    return tempOperation;
+}
+
+function removeIDFromParameter(UMLOperation){
+    let tempParams=[];
+    if(UMLOperation.hasOwnProperty('parameters')){
+
+        forEach(UMLOperation.parameters, function (params) {
+            
+            let mJsonParams = app.repository.writeObject(params);
+            let mObjParams = JSON.parse(mJsonParams);
+            delete mObjParams['_id'];
+            tempParams.push(mObjParams);
+        });
+    }
+    return tempParams;
+}
+
+function removeIDFromLiterals(UMLEle) {
+    let tempLiterals = [];
+    if(UMLEle.hasOwnProperty('literals')){
+
+        forEach(UMLEle.literals, function (literals) {
+            
+            let mJsonLiteral = app.repository.writeObject(literals);
+            let mObjJsonLiteral = JSON.parse(mJsonLiteral);
+            delete mObjJsonLiteral['_id'];
+            tempLiterals.push(mObjJsonLiteral);
+        });
+    }
+    return tempLiterals;
+}
+module.exports.removeIDFromLiterals = removeIDFromLiterals;
+module.exports.removeIDFromOperation = removeIDFromOperation;
+module.exports.removeIDFromAttribute = removeIDFromAttribute;
+module.exports.removeIDFromOwnedElement = removeIDFromOwnedElement;
 module.exports.setUMLClass = setUMLClass;
 module.exports.getUMLClass = getUMLClass;
 module.exports.setUMLInterface = setUMLInterface;

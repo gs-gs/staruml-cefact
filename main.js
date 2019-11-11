@@ -36,6 +36,8 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
 
 
                               let classDiagram = returnValue;
+
+                              /* Filter all diagram views */
                               let allDiagramView = classDiagram.ownedViews.filter(function (view) {
                                    return view instanceof type.UMLClassView ||
                                         view instanceof type.UMLAssociationView ||
@@ -45,117 +47,131 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                                         view instanceof type.UMLAssociationClassLinkView ||
                                         view instanceof type.UMLEnumerationView
                               });
+
+                              /* Filter all model from view */
                               let allDiagramElement = [];
                               forEach(allDiagramView, function (dView) {
                                    allDiagramElement.push(dView.model);
                               });
-
                               diagramEle.setUMLDiagramElement(allDiagramElement);
 
+                              /* Filter UMLClass from model */
                               let UMLClasses = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLClass
                               });
                               diagramEle.setUMLClass(UMLClasses);
 
-
+                              /* Filter UMLInterface from model */
                               let UMLInterface = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLInterface
                               });
                               diagramEle.setUMLInterface(UMLInterface);
 
-
+                              /* Filter UMLAssociation from model */
                               let UMLAssociation = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLAssociation
                               });
                               diagramEle.setUMLAssociation(UMLAssociation);
 
-
+                              /* Filter UMLGeneralization from model */
                               let UMLGeneralization = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLGeneralization
                               });
                               diagramEle.setUMLGeneralization(UMLGeneralization);
 
-
+                              /* Filter UMLInterfaceRealization from model */
                               let UMLInterfaceRealization = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLInterfaceRealization
                               });
                               diagramEle.setUMLInterfaceRealization(UMLInterfaceRealization);
 
-
+                              /* Filter UMLEnumeration from model */
                               let UMLEnumeration = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLEnumeration
                               });
                               diagramEle.setUMLEnumeration(UMLEnumeration);
 
-
+                              /* Filter UMLAssociationClassLink from model */
                               let UMLAssociationClassLink = allDiagramElement.filter(function (dElement) {
                                    return dElement instanceof type.UMLAssociationClassLink
                               });
                               diagramEle.setUMLAssociationClassLink(UMLAssociationClassLink);
 
 
-
+                              /* Process package object of diagram */
                               let mainOwnedElements = []
                               let tempPackage = {
                                    'name': classDiagram.name,
                                    'ownedElements': mainOwnedElements,
                                    'documentation': classDiagram.documentation,
+                                   '_type':'UMLPackage'
                               };
 
+                              /* Process UMLClasses in package */
                               forEach(UMLClasses, function (mClass) {
-
-                                   let tempOwnedElements = [];
-                                   forEach(mClass.ownedElements, function (element) {
-                                        let searchedEle = allDiagramElement.filter(function (mEle) {
-                                             return element._id == mEle._id;
-                                        });
-                                        if (searchedEle.length != 0) {
-                                             let mJsonRel=app.repository.writeObject(element);
-                                             let mObjRel=JSON.parse(mJsonRel);
-                                             delete mObjRel['_id'];
-                                             tempOwnedElements.push(mObjRel);
-                                        }
-                                   });
+                                   
                                    let mJson=app.repository.writeObject(mClass);
                                    let mObj=JSON.parse(mJson);
                                    delete mObj['_id'];
-                                   mObj.ownedElements = tempOwnedElements;
+                                   
+                                   /* Remove '_id' field from UMLAttribute */
+                                   mObj.attributes = diagramEle.removeIDFromAttribute(mClass);
+
+                                   /* Remove '_id' field from UMLOperation */
+                                   mObj.operations = diagramEle.removeIDFromOperation(mClass);
+                                   
+                                   /* Remove '_id' field from Elements available in 'ownedElements' array */
+                                   mObj.ownedElements = diagramEle.removeIDFromOwnedElement(mClass,allDiagramElement);
+                                   
                                    mainOwnedElements.push(mObj);
                               });
 
+                              /* Process UMLInterface in package */
                               forEach(UMLInterface, function (mInterface) {
 
-                                   let tempOwnedElements = [];
-                                   forEach(mInterface.ownedElements, function (element) {
-                                        let searchedEle = allDiagramElement.filter(function (mEle) {
-                                             return element._id == mEle._id;
-                                        });
-                                        if (searchedEle.length != 0) {
-                                             let mJsonRel=app.repository.writeObject(element);
-                                             let mObjRel=JSON.parse(mJsonRel);
-                                             delete mObjRel['_id'];
-                                             tempOwnedElements.push(mObjRel);
-                                        }
-                                   });
                                    let mJson=app.repository.writeObject(mInterface);
                                    let mObj=JSON.parse(mJson);
                                    delete mObj['_id'];
-                                   mObj.ownedElements = tempOwnedElements;
+
+                                   /* Remove '_id' field from UMLAttribute */
+                                   mObj.attributes = diagramEle.removeIDFromAttribute(mInterface);
+
+                                   /* Remove '_id' field from UMLOperation */
+                                   mObj.operations = diagramEle.removeIDFromOperation(mInterface);
+
+                                   /* Remove '_id' field from Elements available in 'ownedElements' array */
+                                   mObj.ownedElements = diagramEle.removeIDFromOwnedElement(mInterface,allDiagramElement);
+                                   
                                    mainOwnedElements.push(mObj);
                               });
 
+                              /* Process UMLEnumeration in package */
                               forEach(UMLEnumeration, function (mEnum) {
                                    let mJson=app.repository.writeObject(mEnum);
                                    let mObj=JSON.parse(mJson);
                                    delete mObj['_id'];
+                                   
+                                   /* Remove '_id' field from UMLAttribute */
+                                   mObj.attributes = diagramEle.removeIDFromAttribute(mEnum);
+                                   
+                                   /* Remove '_id' field from UMLOperation */
+                                   mObj.operations = diagramEle.removeIDFromOperation(mEnum);
+                                   
+                                   /* Remove '_id' field from Elements available in 'ownedElements' array */
+                                   mObj.ownedElements = diagramEle.removeIDFromOwnedElement(mEnum,allDiagramElement);
+                                   
+                                   /* Remove '_id' field from 'literals' array */
+                                   mObj.literals = diagramEle.removeIDFromLiterals(mEnum);
+
                                    mainOwnedElements.push(mObj);
+
                               });
 
                               openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
-                              console.log(tempPackage);
+                              let mNewDiagram=app.repository.readObject(tempPackage);
+                              console.log(mNewDiagram);
 
-                              return ;
-                              fileTypeSelection(tempPackage, options);
+                              fileTypeSelection(mNewDiagram, options);
 
                          } else if (varSel == valPackagename) {
                               openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
@@ -182,7 +198,15 @@ async function getUMLModelForDiagram(tempPackage, basePath, options, returnValue
           console.log("resultGen", resultGen);
           if (resultGen.result == constant.FIELD_SUCCESS) {
                vDialog.close();
+               console.log("mPackage",tempPackage);
                setTimeout(function () {
+                    let operationBuilder = app.repository.getOperationBuilder()
+                    operationBuilder.begin('remove item')
+                    operationBuilder.remove(tempPackage);
+                    operationBuilder.end();
+                    var cmd = operationBuilder.getOperation()
+                    app.repository.doOperation(cmd)
+                    console.log("mPackage",tempPackage);
                     app.dialogs.showInfoDialog(resultGen.message);
                }, 10);
                vDialog = null;
@@ -200,7 +224,7 @@ async function getUMLModelForPackage(tempPackage, basePath, options, returnValue
 
      try {
           let dm = app.dialogs;
-          vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + umlPackage.name + "\' package", [], true);
+          vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' package", [], true);
           let result = await mOpenApi.initUMLPackage()
           console.log("initialize", result);
           let resultElement = await mOpenApi.getModelElements();
