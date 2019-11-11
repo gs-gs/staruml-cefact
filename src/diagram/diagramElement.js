@@ -133,8 +133,6 @@ async function getUMLModelForDiagram() {
             }, 10);
             vDialog = null;
         }
-
-
     } catch (err) {
         //vDialog.close();
         setTimeout(function () {
@@ -485,7 +483,6 @@ module.exports.getUMLAssociationClassLink = getUMLAssociationClassLink;
 module.exports.setUMLDiagramElement = setUMLDiagramElement;
 module.exports.getUMLDiagramElement = getUMLDiagramElement;
 module.exports.getUMLModelForDiagram = getUMLModelForDiagram;
-// module.exports.initialize = initialize;
 module.exports.initUMLDiagram = initUMLDiagram;
 module.exports.getDiagramElements = getDiagramElements;
 module.exports.generateOpenAPI = generateOpenAPI;

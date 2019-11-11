@@ -1,12 +1,13 @@
 const Utils = require('./utils');
+const Generalization = require('./generalization');
 const Properties = require('./properties');
 const Association = require('./association');
 const Aggregation = require('./aggregation');
 const Composition = require('./composition');
-const Generalization = require('./generalization');
 const Required = require('./required');
 const openAPI = require('./openapi');
 const constant = require('./constant');
+const diagramEle = require('./diagram/diagramElement');
 
 /**
  * @class Component 
@@ -36,13 +37,19 @@ class Component {
       * @memberof Component
       */
      getComponent() {
-          let classes = openAPI.getClasses();
-          let classLink = app.repository.select("@UMLAssociationClassLink");
+          let classes, classLink;
+          if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+               classes = openAPI.getClasses();
+               classLink = app.repository.select("@UMLAssociationClassLink");
+          } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+               classes = diagramEle.getUMLClass();
+               classLink = diagramEle.getUMLAssociationClassLink();
+          }
           let arrIdClasses = [];
           let flagNoName = false;
           let noNameRel = [];
           this.mainComponentObj.schemas = this.mainSchemaObj;
-          this.duplicatePropertyError=[];
+          this.duplicatePropertyError = [];
           classes.forEach(objClass => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
@@ -84,71 +91,71 @@ class Component {
                let aggregationClasses = [];
                let classAssociations = this.association.getAssociationOfClass(objClass);
 
-               
-               console.log("classAssociations",classAssociations);
-               console.log("mainPropertiesObj",mainPropertiesObj);
-               
-               
+
+               console.log("classAssociations", classAssociations);
+               console.log("mainPropertiesObj", mainPropertiesObj);
+
+
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
                          /* let filterAssoc = this.arrAssoc.filter(item => {
                               return item.name == assoc.name;
                          }); */
-/* 
-                         console.log("filterAssoc",filterAssoc);
-                         if (filterAssoc.length == 0 && assoc.name != "") {
- */
-                              
+                         /* 
+                                                  console.log("filterAssoc",filterAssoc);
+                                                  if (filterAssoc.length == 0 && assoc.name != "") {
+                          */
 
-                              let assocName=assoc.name;
-                              if(assocName==''){
-                                   assocName=assoc.end2.reference.name;
+
+                         let assocName = assoc.name;
+                         if (assocName == '') {
+                              assocName = assoc.end2.reference.name;
+                         }
+
+                         /* Check for duplicate property */
+                         let propKeys = Object.keys(mainPropertiesObj);
+                         propKeys.forEach(prop => {
+                              if (assocName == prop) {
+                                   let error = "There is duplicate property in class \'" + assoc.end1.reference.name + "\' and property name is \'" + prop + "\'";
+                                   this.duplicatePropertyError.push(error);
+                                   let jsonError = {
+                                        isDuplicateProp: true,
+                                        msg: this.duplicatePropertyError
+                                   };
+                                   openAPI.setError(jsonError);
                               }
-
-                              /* Check for duplicate property */
-                              let propKeys=Object.keys(mainPropertiesObj);
-                              propKeys.forEach(prop=>{
-                                   if(assocName==prop){
-                                        let error="There is duplicate property in class \'"+assoc.end1.reference.name+"\' and property name is \'"+prop+"\'";
-                                        this.duplicatePropertyError.push(error);
-                                        let jsonError = {
-                                             isDuplicateProp: true,
-                                             msg: this.duplicatePropertyError
-                                        };
-                                        openAPI.setError(jsonError);
-                                   }
-                              });
-                              /* for(let prop in propKeys){
-                                   if(assocName==prop){
-                                        let jsonError = {
-                                             isDuplicateProp: true,
-                                             msg: "There is duplicate property in class \'"+assoc.end1.reference.name+"\' named \'"+prop+"\'"
-                                        };
-                                        openAPI.setError(jsonError);
-                                   }
-                              } */
-                              
-                              if (assoc.end1.aggregation == constant.shared) {
-                                   /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
-                                   let aggregation = new Aggregation();
-                                   console.log("Classname", objClass.name);
-                                   mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc,assocName);
-
-                              } else {
-                                   /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
-                                   let composition = new Composition();
-                                   mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc,assocName);
-
-                              }
-/* 
-                              this.arrAssoc.push(assoc);
-                         } else {
-                              if (assoc.name == "") {
-                                   flagNoName = true;
-                                   let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
-                                   noNameRel.push(str);
+                         });
+                         /* for(let prop in propKeys){
+                              if(assocName==prop){
+                                   let jsonError = {
+                                        isDuplicateProp: true,
+                                        msg: "There is duplicate property in class \'"+assoc.end1.reference.name+"\' named \'"+prop+"\'"
+                                   };
+                                   openAPI.setError(jsonError);
                               }
                          } */
+
+                         if (assoc.end1.aggregation == constant.shared) {
+                              /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
+                              let aggregation = new Aggregation();
+                              console.log("Classname", objClass.name);
+                              mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName);
+
+                         } else {
+                              /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
+                              let composition = new Composition();
+                              mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName);
+
+                         }
+                         /* 
+                                                       this.arrAssoc.push(assoc);
+                                                  } else {
+                                                       if (assoc.name == "") {
+                                                            flagNoName = true;
+                                                            let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
+                                                            noNameRel.push(str);
+                                                       }
+                                                  } */
                     } else if (assoc instanceof type.UMLGeneralization) {
                          arrGeneral.push(assoc);
                     }
