@@ -3,7 +3,7 @@ const Generalization = require('./generalization');
 const Required = require('./required');
 const constant = require('./constant');
 const openAPI = require('./openapi');
-var diagramEle = require('./diagram/diagramElement');
+const diagramEle = require('./diagram/diagramElement');
 /**
  * @class Association
  * @description class returns the API Association 
@@ -158,7 +158,7 @@ class Association {
                     });
                }
                
-               console.log("filter-association-"+openAPI.getUMLPackage().name, filterAssociation);
+               // console.log("filter-association-"+openAPI.getUMLPackage().name, filterAssociation);
 
                /* Filter association who is belong to current package */
                let filter=null;
@@ -176,7 +176,7 @@ class Association {
                          return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
                     }); */
                }
-               console.log("filter-"+openAPI.getUMLPackage().name, filterAssociation); 
+               // console.log("filter-"+openAPI.getUMLPackage().name, filterAssociation); 
                return filter;
               
 
