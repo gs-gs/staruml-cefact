@@ -1,3 +1,4 @@
+console.log("---structure : diagramElement.js");
 const MainJSONDiagram = require('./mainjsonDiagram');
 const fs = require('fs');
 const Info = require('../info');
