@@ -33,8 +33,8 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                          if (varSel == valClassDiagram) {
 
                               openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
-                              let tempPackage=diagramEle.filterUMLClassDiagram(returnValue);
-                              let mNewDiagram=app.repository.readObject(tempPackage);
+                              let tempPackage = diagramEle.filterUMLClassDiagram(returnValue);
+                              let mNewDiagram = app.repository.readObject(tempPackage);
                               console.log(mNewDiagram);
 
                               fileTypeSelection(mNewDiagram, options);
@@ -51,7 +51,7 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
      }
 }
 async function getUMLModelForDiagram(tempPackage, basePath, options, returnValue) {
-     
+
      const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
      let dm = app.dialogs;
      let vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + openAPI.getUMLPackage().name + "\' Diagram", [], true);
@@ -64,26 +64,32 @@ async function getUMLModelForDiagram(tempPackage, basePath, options, returnValue
           console.log("resultGen", resultGen);
           if (resultGen.result == constant.FIELD_SUCCESS) {
                vDialog.close();
-               console.log("mPackage",tempPackage);
+               console.log("mPackage", tempPackage);
                setTimeout(function () {
-                    let operationBuilder = app.repository.getOperationBuilder()
-                    operationBuilder.begin('remove item')
-                    operationBuilder.remove(tempPackage);
-                    operationBuilder.end();
-                    var cmd = operationBuilder.getOperation()
-                    app.repository.doOperation(cmd)
-                    console.log("mPackage",tempPackage);
+                    removeDiagram(tempPackage);
                     app.dialogs.showInfoDialog(resultGen.message);
+
                }, 10);
                vDialog = null;
           }
      } catch (err) {
+          removeDiagram(tempPackage);
           vDialog.close();
           setTimeout(function () {
                app.dialogs.showErrorDialog(err.message);
                console.error("Error getUMLModel", err);
           }, 10);
      }
+}
+
+function removeDiagram(tempPackage) {
+     let operationBuilder = app.repository.getOperationBuilder()
+     operationBuilder.begin('remove item')
+     operationBuilder.remove(tempPackage);
+     operationBuilder.end();
+     var cmd = operationBuilder.getOperation()
+     app.repository.doOperation(cmd)
+     console.log("mPackage", tempPackage);
 }
 async function getUMLModelForPackage(tempPackage, basePath, options, returnValue) {
      const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
