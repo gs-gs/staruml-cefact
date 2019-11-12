@@ -1,6 +1,7 @@
 const MainJSONDiagram = require('./mainjsonDiagram');
 const fs = require('fs');
 const Info = require('../info');
+// const Component = require('../component');
 const ComponentDiagram = require('./componentDiagram');
 const Utils = require('../utils');
 const utils = new Utils();
@@ -187,6 +188,7 @@ function generateOpenAPI(mOpenApi) {
             console.log("-----path-generated");
 
             /* Add openapi component */
+            // let componentDiagram = new Component();
             let componentDiagram = new ComponentDiagram();
             MainJSONDiagram.addComponent(componentDiagram);
             console.log("-----component-generated-----");
@@ -462,6 +464,142 @@ function removeIDFromLiterals(UMLEle) {
     }
     return tempLiterals;
 }
+function filterUMLClassDiagram(UMLClassDiagram){
+
+    let classDiagram = UMLClassDiagram;
+
+    /* Filter all diagram views */
+    let allDiagramView = classDiagram.ownedViews.filter(function (view) {
+        return view instanceof type.UMLClassView ||
+             view instanceof type.UMLAssociationView ||
+             view instanceof type.UMLInterfaceView ||
+             view instanceof type.UMLInterfaceRealizationView ||
+             view instanceof type.UMLGeneralizationView ||
+             view instanceof type.UMLAssociationClassLinkView ||
+             view instanceof type.UMLEnumerationView
+   });
+
+   /* Filter all model from view */
+   let allDiagramElement = [];
+   forEach(allDiagramView, function (dView) {
+        allDiagramElement.push(dView.model);
+   });
+   setUMLDiagramElement(allDiagramElement);
+
+   /* Filter UMLClass from model */
+   let UMLClasses = allDiagramElement.filter(function (dElement) {
+        return dElement instanceof type.UMLClass
+   });
+   setUMLClass(UMLClasses);
+
+   /* Filter UMLInterface from model */
+   let UMLInterface = allDiagramElement.filter(function (dElement) {
+        return dElement instanceof type.UMLInterface
+   });
+   setUMLInterface(UMLInterface);
+
+   /* Filter UMLAssociation from model */
+   let UMLAssociation = allDiagramElement.filter(function (dElement) {
+        return dElement instanceof type.UMLAssociation
+   });
+   setUMLAssociation(UMLAssociation);
+
+   /* Filter UMLGeneralization from model */
+   let UMLGeneralization = allDiagramElement.filter(function (dElement) {
+        return dElement instanceof type.UMLGeneralization
+   });
+   setUMLGeneralization(UMLGeneralization);
+
+   /* Filter UMLInterfaceRealization from model */
+   let UMLInterfaceRealization = allDiagramElement.filter(function (dElement) {
+        return dElement instanceof type.UMLInterfaceRealization
+   });
+   setUMLInterfaceRealization(UMLInterfaceRealization);
+
+   /* Filter UMLEnumeration from model */
+   let UMLEnumeration = allDiagramElement.filter(function (dElement) {
+        return dElement instanceof type.UMLEnumeration
+   });
+   setUMLEnumeration(UMLEnumeration);
+
+   /* Filter UMLAssociationClassLink from model */
+   let UMLAssociationClassLink = allDiagramElement.filter(function (dElement) {
+        return dElement instanceof type.UMLAssociationClassLink
+   });
+   setUMLAssociationClassLink(UMLAssociationClassLink);
+
+   /* Process package object of diagram */
+   let mainOwnedElements = []
+   let tempPackage = {
+        'name': classDiagram.name,
+        'ownedElements': mainOwnedElements,
+        'documentation': classDiagram.documentation,
+        '_type':'UMLPackage'
+   };
+
+   /* Process UMLClasses in package */
+   forEach(UMLClasses, function (mClass) {
+        
+        let mJson=app.repository.writeObject(mClass);
+        let mObj=JSON.parse(mJson);
+        delete mObj['_id'];
+        
+        /* Remove '_id' field from UMLAttribute */
+        mObj.attributes = removeIDFromAttribute(mClass);
+
+        /* Remove '_id' field from UMLOperation */
+        mObj.operations = removeIDFromOperation(mClass);
+        
+        /* Remove '_id' field from Elements available in 'ownedElements' array */
+        mObj.ownedElements = removeIDFromOwnedElement(mClass,allDiagramElement);
+        
+        mainOwnedElements.push(mObj);
+   });
+
+   /* Process UMLInterface in package */
+   forEach(UMLInterface, function (mInterface) {
+
+        let mJson=app.repository.writeObject(mInterface);
+        let mObj=JSON.parse(mJson);
+        delete mObj['_id'];
+
+        /* Remove '_id' field from UMLAttribute */
+        mObj.attributes = removeIDFromAttribute(mInterface);
+
+        /* Remove '_id' field from UMLOperation */
+        mObj.operations = removeIDFromOperation(mInterface);
+
+        /* Remove '_id' field from Elements available in 'ownedElements' array */
+        mObj.ownedElements = removeIDFromOwnedElement(mInterface,allDiagramElement);
+        
+        mainOwnedElements.push(mObj);
+   });
+
+   /* Process UMLEnumeration in package */
+   forEach(UMLEnumeration, function (mEnum) {
+        let mJson=app.repository.writeObject(mEnum);
+        let mObj=JSON.parse(mJson);
+        delete mObj['_id'];
+        
+        /* Remove '_id' field from UMLAttribute */
+        mObj.attributes = removeIDFromAttribute(mEnum);
+        
+        /* Remove '_id' field from UMLOperation */
+        mObj.operations = removeIDFromOperation(mEnum);
+        
+        /* Remove '_id' field from Elements available in 'ownedElements' array */
+        mObj.ownedElements = removeIDFromOwnedElement(mEnum,allDiagramElement);
+        
+        /* Remove '_id' field from 'literals' array */
+        mObj.literals = removeIDFromLiterals(mEnum);
+
+        mainOwnedElements.push(mObj);
+
+   });
+
+   return tempPackage;
+}
+module.exports.filterUMLClassDiagram = filterUMLClassDiagram;
 module.exports.removeIDFromLiterals = removeIDFromLiterals;
 module.exports.removeIDFromOperation = removeIDFromOperation;
 module.exports.removeIDFromAttribute = removeIDFromAttribute;
