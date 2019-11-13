@@ -1,6 +1,6 @@
 /**
  * @class MainJSONDiagram 
- * @description class returns the API MainJSONDiagram 
+ * @description class returns the API for UMLClassDiagram
  */
 class MainJSONDiagram {
      /**
@@ -12,7 +12,7 @@ class MainJSONDiagram {
 
      /**
       * @function saveComponent
-      * @description save component object to main json
+      * @description save component object to main json for UMLClassDiagram
       * @static
       * @param {Object} component
       * @memberof MainJSONDiagram
@@ -23,7 +23,7 @@ class MainJSONDiagram {
 
      /**
       * @function saveInfo
-      * @description save Info object to main json
+      * @description save Info object to main json for UMLClassDiagram
       * @static
       * @param {Object} mInfo
       * @memberof MainJSONDiagram
@@ -34,7 +34,7 @@ class MainJSONDiagram {
 
      /**
       * @function saveApiVersion
-      * @description save api version to main json
+      * @description save api version to main json from UMLClassDiagram
       * @static
       * @param {string} version
       * @memberof MainJSONDiagram
@@ -45,7 +45,7 @@ class MainJSONDiagram {
 
      /**
       * @function savePaths
-      * @description save path object to main json
+      * @description save path object to main json for UMLClassDiagram
       * @static
       * @param {object} mPaths
       * @memberof MainJSONDiagram
@@ -56,7 +56,7 @@ class MainJSONDiagram {
 
      /**
       * @function saveServers
-      * @description save server array to main json
+      * @description save server array to main json for UMLClassDiagram
       * @static
       * @param {Array} servers
       * @memberof MainJSONDiagram
@@ -67,7 +67,7 @@ class MainJSONDiagram {
 
      /**
       * @function giveJson
-      * @description give the main json 
+      * @description give the main json for UMLClassDiagram
       * @static
       * @memberof MainJSONDiagram
       */
