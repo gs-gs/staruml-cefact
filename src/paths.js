@@ -1,8 +1,9 @@
 const Utils = require('./utils');
 const openAPI = require('./openapi');
-const Generalization = require('./generalization');
+// const Generalization = require('./generalization');
 const constant = require('./constant');
 const Operations = require('./operations');
+var diagramEle = require('./diagram/diagramElement');
 /**
  * @class Paths
  * @description class returns the Paths
@@ -13,7 +14,7 @@ class Paths {
       */
      constructor() {
           this.utils = new Utils();
-          this.generalization = new Generalization();
+          // this.generalization = new Generalization();
           this.operations = new Operations();
      }
 
@@ -27,8 +28,16 @@ class Paths {
           let mainPathsObject = {};
 
           try {
-               let interReal = app.repository.select("@UMLInterfaceRealization");
-               openAPI.getPaths().forEach(objOperation => {
+               let paths,interReal;
+               if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+                    interReal = app.repository.select("@UMLInterfaceRealization");
+                    paths = openAPI.getPaths();
+               } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                    interReal = diagramEle.getUMLInterfaceRealization();
+                    paths=diagramEle.getUMLInterface();
+               }
+
+               paths.forEach(objOperation => {
 
                     let filterInterface = interReal.filter(itemInterface => {
                          return itemInterface.target.name == objOperation.name;

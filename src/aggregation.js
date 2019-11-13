@@ -52,7 +52,7 @@ class Aggregation {
       * @returns {Object}
       * @memberof Aggregation
       */
-     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc,assocName) {
+     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName) {
           let propertiesObj = {};
           aggregationClasses.push(assoc.end2.reference);
           mainPropertiesObj[assocName] = propertiesObj;
@@ -94,11 +94,23 @@ class Aggregation {
                if (parentGeneralizationClassAttribute.length > 0) {
                     arrIsID.push(parentGeneralizationClassAttribute);
                }
+               let filterAttributes = [];
+               if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
 
-               let filterAttributes = itemClass.attributes.filter(item => {
+                    filterAttributes = itemClass.attributes.filter(item => {
 
-                    return item.isID == true;
-               });
+                         return item.isID == true;
+                    });
+               } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                    if (assoc.end2.reference._id == itemClass._id) {
+
+                         filterAttributes = itemClass.attributes.filter(item => {
+
+                              return item.isID == true;
+                         });
+                    }
+               }
+
 
                if (filterAttributes.length > 0) {
                     arrIsID.push(filterAttributes);

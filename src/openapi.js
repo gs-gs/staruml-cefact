@@ -220,7 +220,25 @@ class OpenApi {
 
 
      }
+     /**
+      * @function setModelType
+      * @description set model type like user want to generate specs from UMLClassDiagram (IS_APP_DIAGRAM) or UMLPackage (IS_APP_PACKAGE)
+      * @static
+      * @memberof OpenApi
+      */
+     static setModelType(modelType) {
+          OpenApi.modelType = modelType;
+     }
 
+     /**
+      * @function getModelType
+      * @description get model type like UMLClassDiagram (IS_APP_DIAGRAM) or UMLPackage (IS_APP_PACKAGE)
+      * @static
+      * @memberof OpenApi
+      */
+     static getModelType() {
+          return OpenApi.modelType;
+     }
 
      /**
       * @function setTestMode
@@ -699,7 +717,11 @@ module.exports.setError = OpenApi.setError;
 module.exports.setAppMode = OpenApi.setAppMode;
 module.exports.getAppMode = OpenApi.getAppMode;
 module.exports.APP_MODE_GEN = 1;
+module.exports.APP_MODEL_PACKAGE = 0;
+module.exports.APP_MODEL_DIAGRAM = 1;
 module.exports.APP_MODE_TEST = 2;
+module.exports.setModelType = OpenApi.setModelType;
+module.exports.getModelType = OpenApi.getModelType;
 module.exports.setTestMode = OpenApi.setTestMode;
 module.exports.getTestMode = OpenApi.getTestMode;
 module.exports.TEST_MODE_SINGLE = 1;
@@ -715,3 +737,4 @@ module.exports.getUMLGeneralization = OpenApi.getUMLGeneralization;
 module.exports.findHierarchy = OpenApi.findHierarchy;
 module.exports.reversePkgPath = OpenApi.reversePkgPath;
 module.exports.getPackageWiseUMLAssociation = getPackageWiseUMLAssociation;
+module.exports.setPackagepath = OpenApi.setPackagepath;

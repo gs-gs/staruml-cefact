@@ -1,15 +1,15 @@
-const openAPI = require('./openapi');
-const constant = require('./constant');
-const Utils = require ('./utils');
-var diagramEle = require('./diagram/diagramElement');
+const openAPI = require('../openapi');
+const constant = require('../constant');
+const Utils = require ('../utils');
+var diagramEle = require('../diagram/diagramElement');
 
 /**
- * @class Generalization 
- * @description class returns the API Generalization 
+ * @class GeneralizationDiagram 
+ * @description class returns the API GeneralizationDiagram 
  */
-class Generalization {
+class GeneralizationDiagram {
      /**
-      * @constructor Creates an instance of Generalization.
+      * @constructor Creates an instance of GeneralizationDiagram.
       */
      constructor() {
           this.utils=new Utils();
@@ -18,15 +18,15 @@ class Generalization {
 
      /**
       * @function addGeneralization
-      * @description add Generalization in mainClassesObj
+      * @description add GeneralizationDiagram in mainClassesObj
       * @param {Array} arrGeneral
       * @param {Object} mainClassesObj
       * @returns {Object}
-      * @memberof Generalization
+      * @memberof GeneralizationDiagram
       */
      addGeneralization(arrGeneral, mainClassesObj) {
           /**
-           * Add Generalization class
+           * Add GeneralizationDiagram class
            * Inherite all properties of parent class
            */
           if (arrGeneral.length > 0) {
@@ -70,13 +70,13 @@ class Generalization {
                     
                });
           }
-          console.log("Generalization classes", parentGeneralizationClassAttribute);
+          console.log("GeneralizationDiagram classes", parentGeneralizationClassAttribute);
      }
      /**
       * @function findGeneralizationOfClass
-      * @description Find all generalization of UMLClass
+      * @description Find all GeneralizationDiagram of UMLClass
       * @param {UMLClass} objClass 
-      * @memberof Generalization
+      * @memberof GeneralizationDiagram
       */
      findGeneralizationOfClass(objClass) {
           try {
@@ -107,4 +107,4 @@ class Generalization {
      }
 }
 
-module.exports = Generalization;
+module.exports = GeneralizationDiagram;

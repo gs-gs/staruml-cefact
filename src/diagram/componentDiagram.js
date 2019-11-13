@@ -1,23 +1,23 @@
-const Utils = require('./utils');
-const Generalization = require('./generalization');
-const Properties = require('./properties');
-const Association = require('./association');
-const Aggregation = require('./aggregation');
-const Composition = require('./composition');
-const Required = require('./required');
-const openAPI = require('./openapi');
-const constant = require('./constant');
-const diagramEle = require('./diagram/diagramElement');
+const Utils = require('../utils');
+const GeneralizationDiagram = require('../diagram/generalizationDiagram');
+const Properties = require('../properties');
+const AssociationDiagram = require('./associationDiagram');
+const Aggregation = require('../aggregation');
+const Composition = require('../composition');
+const Required = require('../required');
+const openAPI = require('../openapi');
+const constant = require('../constant');
+const diagramEle = require('./diagramElement');
 
 /**
- * @class Component 
+ * @class ComponentDiagram 
  * @description class adds all classes from the class diagram
  */
-class Component {
+class ComponentDiagram {
      /**
-      *Creates an instance of Component.
+      *Creates an instance of ComponentDiagram.
       * @param {string} fullPath
-      * @memberof Component
+      * @memberof ComponentDiagram
       */
      constructor() {
           this.mainComponentObj = {};
@@ -25,26 +25,23 @@ class Component {
           this.utils = new Utils();
           this.arrAttr = [];
           /* this.arrAssoc = []; */
+          this.association = new AssociationDiagram();
           this.required = new Required();
-          this.generalization = new Generalization();
-          this.association = new Association();
+          this.generalization = new GeneralizationDiagram();
      }
 
      /**
       * @function getComponent
-      * @description Returns component object 
+      * @description Returns ComponentDiagram object 
       * @returns {Object}
-      * @memberof Component
+      * @memberof ComponentDiagram
       */
      getComponent() {
-          let classes, classLink;
-          if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-               classes = openAPI.getClasses();
-               classLink = app.repository.select("@UMLAssociationClassLink");
-          } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-               classes = diagramEle.getUMLClass();
-               classLink = diagramEle.getUMLAssociationClassLink();
-          }
+          
+          // let classes = openAPI.getClasses();
+          let classes = diagramEle.getUMLClass();
+          // let classLink = app.repository.select("@UMLAssociationClassLink");
+          let classLink = diagramEle.getUMLAssociationClassLink();
           let arrIdClasses = [];
           let flagNoName = false;
           let noNameRel = [];
@@ -125,15 +122,6 @@ class Component {
                                    openAPI.setError(jsonError);
                               }
                          });
-                         /* for(let prop in propKeys){
-                              if(assocName==prop){
-                                   let jsonError = {
-                                        isDuplicateProp: true,
-                                        msg: "There is duplicate property in class \'"+assoc.end1.reference.name+"\' named \'"+prop+"\'"
-                                   };
-                                   openAPI.setError(jsonError);
-                              }
-                         } */
 
                          if (assoc.end1.aggregation == constant.shared) {
                               /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
@@ -212,4 +200,4 @@ class Component {
 
 }
 
-module.exports = Component;
+module.exports = ComponentDiagram;
