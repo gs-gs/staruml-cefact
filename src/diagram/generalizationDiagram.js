@@ -5,7 +5,7 @@ var diagramEle = require('../diagram/diagramElement');
 
 /**
  * @class GeneralizationDiagram 
- * @description class returns the API GeneralizationDiagram 
+ * @description class returns the API Generalization from UMLClassDiagram
  */
 class GeneralizationDiagram {
      /**
@@ -18,7 +18,7 @@ class GeneralizationDiagram {
 
      /**
       * @function addGeneralization
-      * @description add GeneralizationDiagram in mainClassesObj
+      * @description add Generalization in mainClassesObj from UMLClassDiagram
       * @param {Array} arrGeneral
       * @param {Object} mainClassesObj
       * @returns {Object}
@@ -74,7 +74,7 @@ class GeneralizationDiagram {
      }
      /**
       * @function findGeneralizationOfClass
-      * @description Find all GeneralizationDiagram of UMLClass
+      * @description Find all Generalization of UMLClass from UMLClassDiagram
       * @param {UMLClass} objClass 
       * @memberof GeneralizationDiagram
       */

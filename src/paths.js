@@ -28,84 +28,83 @@ class Paths {
           let mainPathsObject = {};
 
           try {
-               let paths,interReal;
+               let paths,interfaceRealalization;
                if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-                    interReal = app.repository.select("@UMLInterfaceRealization");
+                    interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
                     paths = openAPI.getPaths();
                } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-                    interReal = diagramEle.getUMLInterfaceRealization();
+                    interfaceRealalization = diagramEle.getUMLInterfaceRealization();
                     paths=diagramEle.getUMLInterface();
                }
 
                paths.forEach(objOperation => {
 
-                    let filterInterface = interReal.filter(itemInterface => {
+                    let filteredInterfaceRealization = interfaceRealalization.filter(itemInterface => {
                          return itemInterface.target.name == objOperation.name;
                     });
 
-                    if (filterInterface.length > 0) {
+                    if (filteredInterfaceRealization.length > 0) {
 
 
-                         let objInterface = filterInterface[0];
+                         let objInterRealization = filteredInterfaceRealization[0];
 
-                         let interfaceAssociation = app.repository.select(objInterface.target.name + "::@UMLAssociation");
+                         let interfaceAssociation = app.repository.select(objInterRealization.target.name + "::@UMLAssociation");
                          let filterInterfaceAssociation = interfaceAssociation.filter(item => {
                               return item.end2.aggregation == "composite";
                          });
 
                          if (filterInterfaceAssociation.length == 0) {
                               let pathsObject = {};
-                              mainPathsObject["/" + objInterface.target.name] = pathsObject;
+                              mainPathsObject["/" + objInterRealization.target.name] = pathsObject;
 
 
-                              objInterface.target.operations.forEach(objOperation => {
-                                   let wOperationObject = {};
+                              objInterRealization.target.operations.forEach(objOperation => {
 
                                    if (objOperation.name.toUpperCase() == "GET") {
-                                        pathsObject.get = this.operations.get(objInterface, objOperation);
+                                        pathsObject.get = this.operations.get(objInterRealization, objOperation);
 
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
-                                        pathsObject.post = this.operations.post(objInterface, null);
+                                        pathsObject.post = this.operations.post(objInterRealization, null);
 
                                    }
                               });
 
 
 
-                              let checkOperationArr = objInterface.target.operations.filter(item => {
+                              let checkOperationArr = objInterRealization.target.operations.filter(item => {
                                    return item.name == "GET" || item.name == "PUT" || item.name == "DELTE";
                               });
 
                               if (checkOperationArr.length > 0) {
                                    let pathsObject = {};
-                                   let operationAttributes = objInterface.target.attributes.filter(item => {
+                                   let operationAttributes = objInterRealization.target.attributes.filter(item => {
                                         return item.name == "id" || item.name == "identifier";
                                    });
                                    operationAttributes.forEach(operationAttribute => {
-                                        mainPathsObject["/" + objInterface.target.name + '/{' + operationAttribute.name + '}'] = pathsObject
+                                        mainPathsObject["/" + objInterRealization.target.name + '/{' + operationAttribute.name + '}'] = pathsObject
 
 
-                                        objInterface.target.operations.forEach(objOperation => {
+                                        objInterRealization.target.operations.forEach(objOperation => {
                                              let wOperationObject = {};
                                              if (objOperation.name.toUpperCase() == "GET") {
                                                   pathsObject.get = wOperationObject;
-                                                  pathsObject.get = this.operations.getOperationAttribute(objInterface, operationAttribute)
+                                                  pathsObject.get = this.operations.getOperationAttribute(objInterRealization, operationAttribute)
 
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
-                                                  pathsObject.delete = this.operations.delete(objInterface, operationAttribute, null, null);
+                                                  pathsObject.delete = this.operations.delete(objInterRealization, operationAttribute, null, null);
 
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PUT") {
-                                                  pathsObject.put = this.operations.put(objInterface, operationAttribute);
+                                                  pathsObject.put = this.operations.put(objInterRealization, operationAttribute);
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PATCH") {
-                                                  pathsObject.patch = this.operations.patch(objInterface, operationAttribute);
+                                                  pathsObject.patch = this.operations.patch(objInterRealization, operationAttribute);
 
 
                                              }
@@ -136,11 +135,6 @@ class Paths {
 
           return mainPathsObject;
      }
-
-
-
-
-
 
      /**
       * @function writeInterfaceComposite
