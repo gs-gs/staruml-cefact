@@ -127,27 +127,23 @@ class Association {
       */
      getAssociationOfClass(objClass) {
           try {
-               /* let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation"); */
-               /* let associations = app.repository.select("@UMLAssociation"); */
-
-               /* let associations = openAPI.getPackageWiseUMLAssociation(openAPI.getUMLPackage().name); */
-
-               /* 
-               let filterAssociation = associations.filter(item => {
-                    return item.end1.reference._id == objClass._id
-               });
-                */
-
                /* Find the all UMLAssociation of project */
                
                /* Filter association whose end1 (Source) Class is current class */
                
-               let filterAssociation=null;
+               let filterAssociation=[];
+               let filter=[];
                if(openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE){
                     
                     let associations = app.repository.select("@UMLAssociation");
                     filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
+                    });
+
+                    /* Filter association who is belong to current package */
+                    filter = filterAssociation.filter(item => {
+                         let parent=item.end1.reference._parent;
+                         return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
                     });
                     
                }else if(openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM){
@@ -156,27 +152,15 @@ class Association {
                     filterAssociation = dAssociation.filter(item => {
                          return item.end1.reference._id == objClass._id 
                     });
-               }
-               
-               // console.log("filter-association-"+openAPI.getUMLPackage().name, filterAssociation);
 
-               /* Filter association who is belong to current package */
-               let filter=null;
-               if(openAPI.getModelType()==openAPI.APP_MODEL_PACKAGE){
-
-                    filter = filterAssociation.filter(item => {
-                         let parent=item.end1.reference._parent;
-                         return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
-                    });
-               }
-               else if(openAPI.getModelType()==openAPI.APP_MODEL_DIAGRAM){
+                    /* Filter association who is belong to current package */
                     console.log("diagramAsso",diagramEle.getUMLAssociation());
                     filter = filterAssociation;/* filterAssociation.filter(item => {
                          let parent=item.end1.reference._parent;
                          return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
                     }); */
                }
-               // console.log("filter-"+openAPI.getUMLPackage().name, filterAssociation); 
+               
                return filter;
               
 

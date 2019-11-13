@@ -50,6 +50,15 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                });
      }
 }
+/**
+ * @function getUMLModelForDiagram
+ * @description initialize diagram path directory, gets all element from diagram, generate openapi from diagram
+ * @param {string} message
+ * @param {UMLClassDiagram} tempPackage
+ * @param {string} basePath
+ * @param {Object} options
+ * @param {integer} returnValue
+ */
 async function getUMLModelForDiagram(message,tempPackage, basePath, options, returnValue) {
 
      const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
@@ -81,7 +90,11 @@ async function getUMLModelForDiagram(message,tempPackage, basePath, options, ret
           }, 10);
      }
 }
-
+/**
+ * @function removeDiagram
+ * @description delete package from staruml after openapi is generated from diagram
+ * @param {UMLPackage} tempPackage
+ */
 function removeDiagram(tempPackage) {
      let operationBuilder = app.repository.getOperationBuilder()
      operationBuilder.begin('remove item')
@@ -91,6 +104,15 @@ function removeDiagram(tempPackage) {
      app.repository.doOperation(cmd)
      console.log("mPackage", tempPackage);
 }
+/**
+ * @function getUMLModelForPackage
+ * @description initialize package path directory, gets all element from package, generate openapi from package
+ * @param {string} message
+ * @param {UMLClassDiagram} tempPackage
+ * @param {string} basePath
+ * @param {Object} options
+ * @param {integer} returnValue
+ */
 async function getUMLModelForPackage(message,tempPackage, basePath, options, returnValue) {
      const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
      let dm = app.dialogs;
