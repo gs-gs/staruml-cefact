@@ -24,27 +24,47 @@ let UMLInterfaceRealization = null;
 let UMLEnumeration = null;
 let UMLAssociationClassLink = null;
 let AllElement = null;
-
+/**
+ * @function setUMLDiagramElement
+ * @description save & sort all element from UMLClassDiagram 
+ * @param {Array} mAllElement
+ */
 function setUMLDiagramElement(mAllElement) {
     mAllElement.sort(function (a, b) {
         return a.name.localeCompare(b.name);
     });
     AllElement = mAllElement;
 }
-
+/**
+ * @function getUMLDiagramElement
+ * @description returns all element from UMLClasssDiagram
+ * @returns {Array} AllElement
+ */
 function getUMLDiagramElement() {
     return AllElement;
 }
-
+/**
+ * @function setUMLClass
+ * @description save UMLClass from UMLClassDiagram
+ * @param {Array} mUMLClass
+ */
 function setUMLClass(mUMLClass) {
     console.log("UMLClasses", mUMLClass);
     UMLClass = mUMLClass
 }
-
+/**
+ * @function getUMLClass
+ * @description retuns the Array of UMLClass from UMLClassDiagra
+ * @returns {Array} UMLClass
+ */
 function getUMLClass() {
     return UMLClass;
 }
-
+/**
+ * @function setUMLInterface
+ * @description save array of UMLInterface from UMLClassDiagram
+ * @param {Array} mUMLInterface
+ */
 function setUMLInterface(mUMLInterface) {
     mUMLInterface.sort(function (a, b) {
         return a.name.localeCompare(b.name);
@@ -52,11 +72,19 @@ function setUMLInterface(mUMLInterface) {
     console.log("UMLInterface", mUMLInterface);
     UMLInterface = mUMLInterface;
 }
-
+/**
+ * @function getUMLInterface
+ * @description returns array of UMLInterface from UMLClassDiagram
+ * @returns {Array} UMLInterface
+ */
 function getUMLInterface() {
     return UMLInterface;
 }
-
+/**
+ * @function setUMLAssociation
+ * @description save and sort UMLAssociation from UMLClassDiagram
+ * @param {Array} mUMLAssociation
+ */
 function setUMLAssociation(mUMLAssociation) {
     mUMLAssociation.sort(function (a, b) {
         return a.name.localeCompare(b.name);
@@ -64,11 +92,19 @@ function setUMLAssociation(mUMLAssociation) {
     console.log("UMLAssociation", mUMLAssociation);
     UMLAssociation = mUMLAssociation;
 }
-
+/**
+ * @function getUMLAssociation
+ * @description returns array of UMLAssociation from UMLClassDiagram
+ * @returns {Array} UMLAssociation
+ */
 function getUMLAssociation() {
     return UMLAssociation;
 }
-
+/**
+ * @function setUMLGeneralization
+ * @description save and sort UMLGeneralization from UMLClassDiagram
+ * @param {Array} mUMLGeneralization
+ */
 function setUMLGeneralization(mUMLGeneralization) {
     mUMLGeneralization.sort(function (a, b) {
         return a.name.localeCompare(b.name);
@@ -76,11 +112,19 @@ function setUMLGeneralization(mUMLGeneralization) {
     console.log("UMLGeneralization", mUMLGeneralization);
     UMLGeneralization = mUMLGeneralization;
 }
-
+/**
+ * @function getUMLGeneralization
+ * @description returns array of UMLGeneralization from UMLClassDiagram
+ * @returns {Array} UMLGeneralization
+ */
 function getUMLGeneralization() {
     return UMLGeneralization;
 }
-
+/**
+ * @function setUMLInterfaceRealization
+ * @description save and sort UMLInterfaceRealization from UMLClassDiagram
+ * @param {Array} mUMLInterfaceRealization
+ */
 function setUMLInterfaceRealization(mUMLInterfaceRealization) {
     mUMLInterfaceRealization.sort(function (a, b) {
         return a.name.localeCompare(b.name);
@@ -88,11 +132,19 @@ function setUMLInterfaceRealization(mUMLInterfaceRealization) {
     console.log("UMLInterfaceRealization", mUMLInterfaceRealization);
     UMLInterfaceRealization = mUMLInterfaceRealization;
 }
-
+/**
+ * @function getUMLInterfaceRealization
+ * @description returns array of UMLInterfaceRealization from UMLClassDiagram
+ * @returns {Array} UMLInterfaceRealization
+ */
 function getUMLInterfaceRealization() {
     return UMLInterfaceRealization;
 }
-
+/**
+ * @function setUMLEnumeration
+ * @description save and sort UMLEnumeration from UMLClassDiagram
+ * @param {Array} mUMLEnumeration
+ */
 function setUMLEnumeration(mUMLEnumeration) {
     mUMLEnumeration.sort(function (a, b) {
         return a.name.localeCompare(b.name);
@@ -100,11 +152,19 @@ function setUMLEnumeration(mUMLEnumeration) {
     console.log("UMLEnumeration", mUMLEnumeration);
     UMLEnumeration = mUMLEnumeration;
 }
-
+/**
+ * @function getUMLEnumeration
+ * @description returns array of UMLEnumeration from UMLClassDiagram
+ * @returns {Array} UMLEnumeration
+ */
 function getUMLEnumeration() {
     return UMLEnumeration
 }
-
+/**
+ * @function setUMLAssociationClassLink
+ * @description save and sort UMLAssociationClassLink from UMLClassDiagram
+ * @param {Array} mUMLAssociationClassLink
+ */
 function setUMLAssociationClassLink(mUMLAssociationClassLink) {
     mUMLAssociationClassLink.sort(function (a, b) {
         return a.name.localeCompare(b.name);
@@ -112,38 +172,20 @@ function setUMLAssociationClassLink(mUMLAssociationClassLink) {
     console.log("UMLAssociationClassLink", mUMLAssociationClassLink);
     UMLAssociationClassLink = mUMLAssociationClassLink;
 }
-
+/**
+ * @function getUMLAssociationClassLink
+ * @description returns array of UMLAssociationClassLink from UMLClassDiagram
+ * @returns {Array} UMLAssociationClassLink
+ */
 function getUMLAssociationClassLink() {
     return UMLAssociationClassLink;
 }
-
-async function getUMLModelForDiagram() {
-
-    try {
-        let dm = app.dialogs;
-        let vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec generation is being processed for the \'" + openAPI.getUMLPackage().name + "\' Diagram", [], true);
-        let result = await initUMLDiagram();
-        console.log("initialize", result);
-        let resultElement = await getDiagramElements();
-        console.log("resultElement", resultElement);
-        let resultGen = await generateOpenAPI();
-        console.log("resultGen", resultGen);
-        if (resultGen.result == constant.FIELD_SUCCESS) {
-            vDialog.close();
-            setTimeout(function () {
-                app.dialogs.showInfoDialog(resultGen.message);
-            }, 10);
-            vDialog = null;
-        }
-    } catch (err) {
-        //vDialog.close();
-        setTimeout(function () {
-            app.dialogs.showErrorDialog(err.message);
-            console.error("Error getUMLModel", err);
-        }, 10);
-    }
-}
-
+/**
+ * @function generateOpenAPI
+ * @description generate OpenApi from UMLClassDiagram
+ * @param {Object} mOpenApi
+ * @returns {Promise} result
+ */
 function generateOpenAPI(mOpenApi) {
     return new Promise((resolve, reject) => {
         try {
@@ -218,7 +260,11 @@ function generateOpenAPI(mOpenApi) {
         }
     });
 }
-
+/**
+ * @function getDiagramElements
+ * @description returns array of elements from UMLClassDiagram
+ * @returns {Promise} result
+ */
 function getDiagramElements() {
 
     return new Promise((resolve, reject) => {
@@ -353,6 +399,7 @@ function getDiagramElements() {
 /**
  * @function initUMLDiagram
  * @description initializes UML Package
+ * @returns {Promise} result
  */
 function initUMLDiagram() {
     return new Promise((resolve, reject) => {
@@ -383,7 +430,13 @@ function initUMLDiagram() {
     });
 
 }
-
+/**
+ * @function removeIDFromOwnedElement
+ * @description remove '_id' property from element to clone new element and returns array of new cloned elements
+ * @param {*} UMLEle
+ * @param {*} allDiagramElement
+ * @returns {Array} tempOwnedElements
+ */
 function removeIDFromOwnedElement(UMLEle, allDiagramElement) {
     let tempOwnedElements = [];
 
@@ -403,7 +456,12 @@ function removeIDFromOwnedElement(UMLEle, allDiagramElement) {
     }
     return tempOwnedElements;
 }
-
+/**
+ * @function removeIDFromAttribute
+ * @description remove '_id' property from UMLAttribute to clone new UMLAttribute and returns array of new cloned UMLAttributes
+ * @param {*} UMLEle
+ * @returns {Array} tempAttributes
+ */
 function removeIDFromAttribute(UMLEle) {
     let tempAttributes = [];
     if(UMLEle.hasOwnProperty('attributes')){
@@ -418,7 +476,12 @@ function removeIDFromAttribute(UMLEle) {
     }
     return tempAttributes;
 }
-
+/**
+ * @function removeIDFromOperation
+ * @description remove '_id' property from UMLOperation to clone new UMLOperation and returns array of new cloned UMLOperations 
+ * @param {*} UMLEle
+ * @returns {Array} tempOperation
+ */
 function removeIDFromOperation(UMLEle) {
     let tempOperation = [];
     if(UMLEle.hasOwnProperty('operations')){
@@ -435,7 +498,12 @@ function removeIDFromOperation(UMLEle) {
     }
     return tempOperation;
 }
-
+/**
+ * @function removeIDFromParameter
+ * @description remove '_id' property from UMLParameter to clone new UMLParameter and returns array of new cloned UMLParameters 
+ * @param {*} UMLEle
+ * @returns {Array} tempParams
+ */
 function removeIDFromParameter(UMLOperation){
     let tempParams=[];
     if(UMLOperation.hasOwnProperty('parameters')){
@@ -450,7 +518,12 @@ function removeIDFromParameter(UMLOperation){
     }
     return tempParams;
 }
-
+/**
+ * @function removeIDFromLiterals
+ * @description remove '_id' property from UMLEnumerationLiteral to clone new UMLEnumerationLiteral and returns array of new cloned UMLEnumerationLiterals 
+ * @param {*} UMLEle
+ * @returns {Array} tempLiterals
+ */
 function removeIDFromLiterals(UMLEle) {
     let tempLiterals = [];
     if(UMLEle.hasOwnProperty('literals')){
@@ -465,6 +538,12 @@ function removeIDFromLiterals(UMLEle) {
     }
     return tempLiterals;
 }
+/**
+ * @function filterUMLClassDiagram
+ * @description filter class, interface, enumeration, association, generalization, interfacerealization, association class link views from UMLClassDiagram
+ * @param {UMLClassDiagram} UMLClassDiagram
+ * @returns {Array} allDiagramView
+ */
 function filterUMLClassDiagram(UMLClassDiagram){
 
     let classDiagram = UMLClassDiagram;
@@ -621,7 +700,6 @@ module.exports.setUMLAssociationClassLink = setUMLAssociationClassLink;
 module.exports.getUMLAssociationClassLink = getUMLAssociationClassLink;
 module.exports.setUMLDiagramElement = setUMLDiagramElement;
 module.exports.getUMLDiagramElement = getUMLDiagramElement;
-module.exports.getUMLModelForDiagram = getUMLModelForDiagram;
 module.exports.initUMLDiagram = initUMLDiagram;
 module.exports.getDiagramElements = getDiagramElements;
 module.exports.generateOpenAPI = generateOpenAPI;
