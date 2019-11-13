@@ -1,7 +1,9 @@
 const Utils = require('../utils');
 const GeneralizationDiagram = require('../diagram/generalizationDiagram');
+// const Generalization = require('../generalization');
 const Properties = require('../properties');
 const AssociationDiagram = require('./associationDiagram');
+// const Association = require('../association');
 const Aggregation = require('../aggregation');
 const Composition = require('../composition');
 const Required = require('../required');
@@ -11,11 +13,11 @@ const diagramEle = require('./diagramElement');
 
 /**
  * @class ComponentDiagram 
- * @description class adds all classes from the class diagram
+ * @description class adds all classes from UMLClassDiagram
  */
 class ComponentDiagram {
      /**
-      *Creates an instance of ComponentDiagram.
+      * Creates an instance of ComponentDiagram.
       * @param {string} fullPath
       * @memberof ComponentDiagram
       */
@@ -26,13 +28,15 @@ class ComponentDiagram {
           this.arrAttr = [];
           /* this.arrAssoc = []; */
           this.association = new AssociationDiagram();
+          // this.association = new Association();
           this.required = new Required();
           this.generalization = new GeneralizationDiagram();
+          // this.generalization = new Generalization();
      }
 
      /**
       * @function getComponent
-      * @description Returns ComponentDiagram object 
+      * @description Returns Component object from UMLClassDiagram
       * @returns {Object}
       * @memberof ComponentDiagram
       */
