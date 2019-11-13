@@ -138,12 +138,12 @@ function fileTypeSelection(tempPackage, options) {
                if (basePath != null) {
 
                     setTimeout(function () {
-                         
+                         let message='';
                          if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-                              let message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' package";
+                              message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' package";
                               getUMLModelForPackage(message,tempPackage, basePath, options, returnValue);
                          } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-                              let message="Please wait untill OpenAPI spec generation is being processed for the \'" + openAPI.getUMLPackage().name + "\' Diagram";
+                              message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' diagram";
                               getUMLModelForDiagram(message,tempPackage, basePath, options, returnValue);
                          }
                     }, 10);
@@ -198,7 +198,7 @@ function testSinglePackage() {
                          let tempPackage = diagramEle.filterUMLClassDiagram(returnValue);
                          let mNewDiagram = app.repository.readObject(tempPackage);
                          removeOutputFiles();
-                         let message="Please wait untill OpenAPI spec generation is being tested for the \'" + mNewDiagram.name + "\' Diagram";
+                         let message="Please wait untill OpenAPI spec generation is being tested for the \'" + mNewDiagram.name + "\' diagram";
                          setTimeout(function () {
                               testSingleOpenAPI(message,mNewDiagram);
                          }, 10);
