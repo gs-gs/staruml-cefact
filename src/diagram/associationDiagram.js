@@ -6,7 +6,7 @@ const openAPI = require('../openapi');
 var diagramEle = require('./diagramElement');
 /**
  * @class AssociationDiagram
- * @description class returns the API AssociationDiagram 
+ * @description class returns the API Association for UMLClassDiagram 
  */
 class AssociationDiagram {
      /**
@@ -20,7 +20,7 @@ class AssociationDiagram {
 
      /**
       * @function getAssociations
-      * @description returns the array of Associations
+      * @description returns the array of Associations for UMLClassDiagram 
       * @returns
       * @memberof AssociationDiagram
       */
@@ -29,7 +29,7 @@ class AssociationDiagram {
      }
      /**
       * @function addAssociationClassLinkProperties
-      * @description Returns the AssociationDiagram properties object 
+      * @description Returns the Association properties object for UMLClassDiagram  
       * @param {*} assocClassLink
       * @param {*} mainPropertiesObj
       * @returns
@@ -47,7 +47,7 @@ class AssociationDiagram {
      }
      /**
       * @function writeAssociationClassProperties
-      * @description adds property for association class
+      * @description adds property for association class for UMLClassDiagram 
       * @param {Object} main properties json object
       * @param {UMLAssociationClassLink} associationClass 
       */
@@ -122,28 +122,18 @@ class AssociationDiagram {
      }
      /**
       * @function getAssociationOfClass
-      * @description Find all association of UMLClass
+      * @description Find all association of UMLClass for UMLClassDiagram 
       * @param {UMLClass} objClass 
       */
      getAssociationOfClass(objClass) {
           try {
-               /* let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation"); */
-               /* let associations = app.repository.select("@UMLAssociation"); */
-
-               /* let associations = openAPI.getPackageWiseUMLAssociation(openAPI.getUMLPackage().name); */
-
-               /* 
-               let filterAssociation = associations.filter(item => {
-                    return item.end1.reference._id == objClass._id
-               });
-                */
-
+               
                /* Find the all UMLAssociation of project */
                
                /* Filter association whose end1 (Source) Class is current class */
                
-               let filterAssociation=null;
-               let filter=null;
+               let filterAssociation=[];
+               let filter=[];
                if(openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE){
                     
                     let associations = app.repository.select("@UMLAssociation");
@@ -172,24 +162,6 @@ class AssociationDiagram {
                     }); */
                }
                
-               // // console.log("filter-association-"+openAPI.getUMLPackage().name, filterAssociation);
-
-               // /* Filter association who is belong to current package */
-               // if(openAPI.getModelType()==openAPI.APP_MODEL_PACKAGE){
-
-               //      filter = filterAssociation.filter(item => {
-               //           let parent=item.end1.reference._parent;
-               //           return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
-               //      });
-               // }
-               // else if(openAPI.getModelType()==openAPI.APP_MODEL_DIAGRAM){
-               //      console.log("diagramAsso",diagramEle.getUMLAssociation());
-               //      filter = filterAssociation;/* filterAssociation.filter(item => {
-               //           let parent=item.end1.reference._parent;
-               //           return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
-               //      }); */
-               // }
-               // // console.log("filter-"+openAPI.getUMLPackage().name, filterAssociation); 
                return filter;
               
 
@@ -227,7 +199,7 @@ class AssociationDiagram {
 
      /**
       * @function writeAssociationProperties
-      * @description 
+      * @description Adds association property 
       * @param {Object} Main open api json object 
       * @param {UMLClass} assciation 
       */
