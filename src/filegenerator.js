@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const openAPI = require('./openapi');
 const MainJSON = require('./mainjson');
-const MainJSONDiagram = require('./diagram/mainjsonDiagram');
 const constant = require('./constant');
 const SwaggerParser = require("swagger-parser");
 let parser = new SwaggerParser();
@@ -37,12 +36,7 @@ class FileGenerator {
                     this.basePath = null;
                     let mainJson = null;
                     this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
-                    if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-                         mainJson = MainJSON.getJSON();
-
-                    } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-                         mainJson = MainJSONDiagram.getJSON();
-                    }
+                    mainJson = MainJSON.getJSON();
 
                     fs.writeFileSync(this.basePath, JSON.stringify(mainJson, null, 4));
                     console.log("file-generate-ended");
@@ -71,12 +65,7 @@ class FileGenerator {
                     let mainJson = null
                     let filepath = openAPI.getFilePath();
                     let pkgName = openAPI.getUMLPackage().name;
-                    if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-                         mainJson = MainJSON.getJSON();
-                    } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-                         mainJson = MainJSONDiagram.getJSON();
-                    }
-
+                    mainJson = MainJSON.getJSON();
 
                     let ymlText = YAML.stringify(mainJson);
                     this.basePath = path.join(filepath, pkgName + '.yml');

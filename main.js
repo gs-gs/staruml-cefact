@@ -51,6 +51,20 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
      }
 }
 /**
+ * @function removeDiagram
+ * @description delete package from staruml after openapi is generated from diagram
+ * @param {UMLPackage} tempPackage
+ */
+function removeDiagram(tempPackage) {
+     let operationBuilder = app.repository.getOperationBuilder()
+     operationBuilder.begin('remove item')
+     operationBuilder.remove(tempPackage);
+     operationBuilder.end();
+     var cmd = operationBuilder.getOperation()
+     app.repository.doOperation(cmd)
+     console.log("mPackage", tempPackage);
+}
+/**
  * @function getUMLModelForDiagram
  * @description initialize diagram path directory, gets all element from diagram, generate openapi from diagram
  * @param {string} message
@@ -65,15 +79,15 @@ async function getUMLModelForDiagram(message,tempPackage, basePath, options, ret
      let dm = app.dialogs;
      vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
      try {
-          let result = await diagramEle.initUMLDiagram();
-          console.log("initialize", result);
-          let resultElement = await diagramEle.getDiagramElements();
-          console.log("resultElement", resultElement);
-          let resultGen = await diagramEle.generateOpenAPI(mOpenApi);
-          console.log("resultGen", resultGen);
+          let result = await mOpenApi.initUMLPackage();
+          console.log("initializeDiagram", result);
+          let resultElement = await mOpenApi.getModelElements();
+          console.log("resultElementDiagram", resultElement);
+          let resultGen = await mOpenApi.generateOpenAPI();
+          console.log("resultGenDiagram", resultGen);
           if (resultGen.result == constant.FIELD_SUCCESS) {
                vDialog.close();
-               console.log("mPackage", tempPackage);
+               console.log("mPackageDiagram", tempPackage);
                setTimeout(function () {
                     removeDiagram(tempPackage);
                     app.dialogs.showInfoDialog(resultGen.message);
@@ -89,20 +103,6 @@ async function getUMLModelForDiagram(message,tempPackage, basePath, options, ret
                vDialog = null;
           }, 10);
      }
-}
-/**
- * @function removeDiagram
- * @description delete package from staruml after openapi is generated from diagram
- * @param {UMLPackage} tempPackage
- */
-function removeDiagram(tempPackage) {
-     let operationBuilder = app.repository.getOperationBuilder()
-     operationBuilder.begin('remove item')
-     operationBuilder.remove(tempPackage);
-     operationBuilder.end();
-     var cmd = operationBuilder.getOperation()
-     app.repository.doOperation(cmd)
-     console.log("mPackage", tempPackage);
 }
 /**
  * @function getUMLModelForPackage
