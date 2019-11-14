@@ -50,20 +50,7 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                });
      }
 }
-/**
- * @function removeDiagram
- * @description delete package from staruml after openapi is generated from diagram
- * @param {UMLPackage} tempPackage
- */
-function removeDiagram(tempPackage) {
-     let operationBuilder = app.repository.getOperationBuilder()
-     operationBuilder.begin('remove item')
-     operationBuilder.remove(tempPackage);
-     operationBuilder.end();
-     var cmd = operationBuilder.getOperation()
-     app.repository.doOperation(cmd)
-     console.log("mPackage", tempPackage);
-}
+
 /**
  * @function startOpenApiGenerator
  * @description initialize package path directory, gets all element from package, generate openapi from package
@@ -89,6 +76,9 @@ async function startOpenApiGenerator(message,tempPackage, basePath, options, ret
                vDialog.close();
                setTimeout(function () {
                     app.dialogs.showInfoDialog(resultGen.message);
+                    if(openAPI.isModelDiagram()){
+                         diagramEle.removeDiagram(tempPackage);
+                    }
 
                }, 10);
                vDialog = null;
@@ -99,6 +89,9 @@ async function startOpenApiGenerator(message,tempPackage, basePath, options, ret
           vDialog.close();
           setTimeout(function () {
                app.dialogs.showErrorDialog(err.message);
+               if(openAPI.isModelDiagram()){
+                    diagramEle.removeDiagram(tempPackage);
+               }
                console.error("Error getUMLModel", err);
           }, 10);
      }

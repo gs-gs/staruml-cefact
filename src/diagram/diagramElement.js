@@ -415,6 +415,20 @@ function filterUMLClassDiagram(UMLClassDiagram) {
 
     return tempPackage;
 }
+/**
+ * @function removeDiagram
+ * @description delete package from staruml after openapi is generated from diagram
+ * @param {UMLPackage} tempPackage
+ */
+function removeDiagram(tempPackage) {
+    let operationBuilder = app.repository.getOperationBuilder()
+    operationBuilder.begin('remove item')
+    operationBuilder.remove(tempPackage);
+    operationBuilder.end();
+    var cmd = operationBuilder.getOperation()
+    app.repository.doOperation(cmd)
+    console.log("mPackage", tempPackage);
+}
 module.exports.filterUMLClassDiagram = filterUMLClassDiagram;
 module.exports.removeIDFromLiterals = removeIDFromLiterals;
 module.exports.removeIDFromOperation = removeIDFromOperation;
@@ -436,3 +450,4 @@ module.exports.setUMLAssociationClassLink = setUMLAssociationClassLink;
 module.exports.getUMLAssociationClassLink = getUMLAssociationClassLink;
 module.exports.setUMLDiagramElement = setUMLDiagramElement;
 module.exports.getUMLDiagramElement = getUMLDiagramElement;
+module.exports.removeDiagram = removeDiagram;
