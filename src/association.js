@@ -133,7 +133,7 @@ class Association {
 
                let filterAssociation = [];
                let filter = [];
-               if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+               if (openAPI.isModelPackage()) {
 
                     let associations = app.repository.select("@UMLAssociation");
                     filterAssociation = associations.filter(item => {
@@ -146,7 +146,7 @@ class Association {
                          return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
                     });
 
-               } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+               } else if (openAPI.isModelDiagram()) {
                     let dAssociation = null;
                     dAssociation = diagramEle.getUMLAssociation();
                     filterAssociation = dAssociation.filter(item => {

@@ -91,7 +91,7 @@ class OpenApi {
                let assocCurrentPkg = []
                let generaCurrentPkg = [];
 
-               if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+               if (openAPI.isModelPackage()) {
                     /* ------------ 1. UMLClass ------------ */
                     umlClasses = app.repository.select(_pkgName + "::@UMLClass");
 
@@ -99,12 +99,12 @@ class OpenApi {
                     OpenApi.operations = app.repository.select(_pkgName + "::@UMLInterface");
 
                     /* ------------ 3. Association Class------------ */
-                    assocCurrentPkg=await OpenApi.getUMLAssociation();
+                    assocCurrentPkg = await OpenApi.getUMLAssociation();
 
                     /* ------------ 4. Generalization Class ------------ */
-                    generaCurrentPkg= await OpenApi.getUMLGeneralization();
-               
-               } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                    generaCurrentPkg = await OpenApi.getUMLGeneralization();
+
+               } else if (openAPI.isModelDiagram()) {
 
                     umlClasses = diagramEle.getUMLClass();
 
@@ -129,7 +129,7 @@ class OpenApi {
                          }
                     }
                });
-               
+
                let tmpGen = [];
                forEach(generaCurrentPkg, (child, index) => {
                     let filter = umlClasses.filter(subItem => {
@@ -142,18 +142,18 @@ class OpenApi {
                });
 
                /* ------------ 5. Find and sort classes ------------ */
-               let resArr=OpenApi.findAndSort(umlClasses);
+               let resArr = OpenApi.findAndSort(umlClasses);
 
                /* ------------ 5. Check for duplicate classes ------------ */
-               try{
-                    let resultDup=OpenApi.checkForDuplicate(resArr);
+               try {
+                    let resultDup = OpenApi.checkForDuplicate(resArr);
                     resolve(resultDup);
-               }catch(error){
+               } catch (error) {
                     reject(error);
                }
 
 
-               
+
           });
      }
      static checkForDuplicate(resArr) {
@@ -215,11 +215,11 @@ class OpenApi {
                     openAPI.setError(jsonError);
                }
 
-               return new Error(message);
+               throw new Error(message);
 
           }
      }
-     static findAndSort(umlClasses){
+     static findAndSort(umlClasses) {
           /* ------------ 4. Filter unique classes ------------ */
           let resArr = [];
           forEach(umlClasses, (item, index) => {
@@ -258,6 +258,20 @@ class OpenApi {
       */
      static getModelType() {
           return OpenApi.modelType;
+     }
+
+     static isModelPackage(){
+          if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+               return true;
+          }
+          return false;
+     }
+
+     static isModelDiagram(){
+          if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+               return true;
+          }
+          return false;
      }
 
      /**
@@ -555,12 +569,12 @@ class OpenApi {
                     let arrPath = [];
                     let rPath = '';
 
-                    if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+                    if (openAPI.isModelPackage()) {
 
                          arrPath = OpenApi.findHierarchy(OpenApi.getPackage());
                          rPath = OpenApi.reversePkgPath(arrPath);
 
-                    } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                    } else if (openAPI.isModelDiagram()) {
 
                          let srcRes = app.repository.search(openAPI.getUMLPackage().name);
                          let fRes = srcRes.filter(function (item) {
@@ -698,52 +712,55 @@ function validateSwagger(pathValidator) {
  * @memberof OpenApi
  */
 let filteredAssociation = [];
+
 function getPackageWiseUMLAssociation() {
      // new Promise((resolve, reject) => {
 
-          let _this = this;
-          let associations = app.repository.select("@UMLAssociation");
-          filteredAssociation=[];
-          forEach(associations,  (item) => {
-               // var clonedElement = Object.assign(item, item);
-               // var clonedItem = Object.assign(item, item);
+     let _this = this;
+     let associations = app.repository.select("@UMLAssociation");
+     filteredAssociation = [];
+     forEach(associations, (item) => {
+          // var clonedElement = Object.assign(item, item);
+          // var clonedItem = Object.assign(item, item);
 
-               // var copyObject=copy(item);
-               findParentPackage(item,item);
-               // let mItem = findParentPackage(item,item);
-               /* console.log("mItem", mItem);
-               if(mItem!=null){
-                    filteredAssociation.push(mPkg);
-               } */
-               
-          });
-          // resolve(filteredAssociation);
-          return filteredAssociation;
+          // var copyObject=copy(item);
+          findParentPackage(item, item);
+          // let mItem = findParentPackage(item,item);
+          /* console.log("mItem", mItem);
+          if(mItem!=null){
+               filteredAssociation.push(mPkg);
+          } */
+
+     });
+     // resolve(filteredAssociation);
+     return filteredAssociation;
      // });
 }
+
 function copy(mainObj) {
      let objCopy = {}; // objCopy will store a copy of the mainObj
      let key;
-   
+
      for (key in mainObj) {
-       objCopy[key] = mainObj[key]; // copies each property to the objCopy object
+          objCopy[key] = mainObj[key]; // copies each property to the objCopy object
      }
      return objCopy;
-   }
-function findParentPackage(ele,item) {
+}
+
+function findParentPackage(ele, item) {
      // return new Promise((resolve, reject) => {
 
      if (ele instanceof type.UMLPackage) {
-          if (ele != null && ele.name == 'Movements'/* openAPI.getUMLPackage().name */) {
+          if (ele != null && ele.name == 'Movements' /* openAPI.getUMLPackage().name */ ) {
                // console.log("ele",ele);
                // console.log("item",item);
                filteredAssociation.push(item);
                // return item;
           }
-          
+
           // resolve(assocItem);
      } else if (ele.hasOwnProperty('_parent') && ele._parent != null) {
-          findParentPackage(ele._parent,item);
+          findParentPackage(ele._parent, item);
      }
      // return null;
 }
@@ -779,3 +796,5 @@ module.exports.findHierarchy = OpenApi.findHierarchy;
 module.exports.reversePkgPath = OpenApi.reversePkgPath;
 module.exports.getPackageWiseUMLAssociation = getPackageWiseUMLAssociation;
 module.exports.setPackagepath = OpenApi.setPackagepath;
+module.exports.isModelPackage = OpenApi.isModelPackage;
+module.exports.isModelDiagram = OpenApi.isModelDiagram;

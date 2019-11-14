@@ -82,7 +82,7 @@ class Generalization {
           try {
 
                let filterGeneral = null;
-               if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+               if (openAPI.isModelPackage()) {
 
                     let generalizeClasses = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLGeneralization");
                     //  let generalizeClasses = app.repository.select("@UMLGeneralization");
@@ -90,7 +90,7 @@ class Generalization {
                          return item.source._id == objClass._id
                     });
 
-               } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+               } else if (openAPI.isModelDiagram()) {
                     let generalizeClasses = diagramEle.getUMLGeneralization();;
                     filterGeneral = generalizeClasses.filter(item => {
                          return item.source._id == objClass._id

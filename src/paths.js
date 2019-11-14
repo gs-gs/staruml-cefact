@@ -29,10 +29,10 @@ class Paths {
 
           try {
                let paths, interfaceRealalization;
-               if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+               if (openAPI.isModelPackage()) {
                     interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
                     paths = openAPI.getPaths();
-               } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+               } else if (openAPI.isModelDiagram()) {
                     interfaceRealalization = diagramEle.getUMLInterfaceRealization();
                     paths = diagramEle.getUMLInterface();
                }

@@ -121,9 +121,9 @@ function fileTypeSelection(tempPackage, options) {
 
                     setTimeout(function () {
                          let message='';
-                         if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+                         if (openAPI.isModelPackage()) {
                               message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' package";
-                         } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                         } else if (openAPI.isModelDiagram()) {
                               message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' diagram";
                          }
                          startOpenApiGenerator(message,tempPackage, basePath, options, returnValue);
@@ -236,9 +236,9 @@ function removeOutputFiles() {
  */
 async function starTestingAllPackage(pkgList) {
      let strModeType = '';
-     if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+     if (openAPI.isModelPackage()) {
           strModeType = ' for Package : ';
-     } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+     } else if (openAPI.isModelDiagram()) {
           strModeType = ' for Diagram : ';
      }
 

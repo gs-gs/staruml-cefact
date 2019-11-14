@@ -170,9 +170,9 @@ class FileGenerator {
                try {
 
                     let strModeType = '';
-                    if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+                    if (openAPI.isModelPackage()) {
                          strModeType = ' for Package : ';
-                    } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                    } else if (openAPI.isModelDiagram()) {
                          strModeType = ' for Diagram : ';
                     }
                     /* Check for APP Mode (APP_MODE_GEN or APP_MODE_TEST) */
