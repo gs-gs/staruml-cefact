@@ -127,68 +127,53 @@ class Association {
       */
      getAssociationOfClass(objClass) {
           try {
-               /* let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation"); */
-               /* let associations = app.repository.select("@UMLAssociation"); */
-
-               /* let associations = openAPI.getPackageWiseUMLAssociation(openAPI.getUMLPackage().name); */
-
-               /* 
-               let filterAssociation = associations.filter(item => {
-                    return item.end1.reference._id == objClass._id
-               });
-                */
-
                /* Find the all UMLAssociation of project */
-               
+
                /* Filter association whose end1 (Source) Class is current class */
-               
-               let filterAssociation=null;
-               if(openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE){
-                    
+
+               let filterAssociation = [];
+               let filter = [];
+               if (openAPI.isModelPackage()) {
+
                     let associations = app.repository.select("@UMLAssociation");
                     filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });
-                    
-               }else if(openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM){
-                    let dAssociation=null;
-                    dAssociation = diagramEle.getUMLAssociation();
-                    filterAssociation = dAssociation.filter(item => {
-                         return item.end1.reference._id == objClass._id 
-                    });
-               }
-               
-               // console.log("filter-association-"+openAPI.getUMLPackage().name, filterAssociation);
 
-               /* Filter association who is belong to current package */
-               let filter=null;
-               if(openAPI.getModelType()==openAPI.APP_MODEL_PACKAGE){
-
+                    /* Filter association who is belong to current package */
                     filter = filterAssociation.filter(item => {
-                         let parent=item.end1.reference._parent;
+                         let parent = item.end1.reference._parent;
                          return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
                     });
+
+               } else if (openAPI.isModelDiagram()) {
+                    let dAssociation = null;
+                    dAssociation = diagramEle.getUMLAssociation();
+                    filterAssociation = dAssociation.filter(item => {
+                         return item.end1.reference._id == objClass._id
+                    });
+
+                    /* Filter association who is belong to current package */
+                    console.log("diagramAsso", diagramEle.getUMLAssociation());
+                    filter = filterAssociation;
+                    /* filterAssociation.filter(item => {
+                                             let parent=item.end1.reference._parent;
+                                             return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
+                                        }); */
                }
-               else if(openAPI.getModelType()==openAPI.APP_MODEL_DIAGRAM){
-                    console.log("diagramAsso",diagramEle.getUMLAssociation());
-                    filter = filterAssociation;/* filterAssociation.filter(item => {
-                         let parent=item.end1.reference._parent;
-                         return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
-                    }); */
-               }
-               // console.log("filter-"+openAPI.getUMLPackage().name, filterAssociation); 
+
                return filter;
-              
 
 
-               
+
+
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
      }
 
-     
+
      /* TODO : Do not remove getAssociationOfClass function. The function is in progress for experiment 
      getAssociationOfClass(objClass) {
           return new Promise((resolve, reject) => {
@@ -230,7 +215,7 @@ class Association {
 
                let generalization = new Generalization();
                // let generalizeClasses = generalization.findGeneralizationOfClass(tempClass);
-               let generalizeClasses=[];
+               let generalizeClasses = [];
                generalization.findGeneralizationRecursivelyOfClass(tempClass, generalizeClasses);
 
                let filterAttributes = tempClass.attributes.filter(item => {

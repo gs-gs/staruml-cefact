@@ -95,13 +95,13 @@ class Aggregation {
                     arrIsID.push(parentGeneralizationClassAttribute);
                }
                let filterAttributes = [];
-               if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+               if (openAPI.isModelPackage()) {
 
                     filterAttributes = itemClass.attributes.filter(item => {
 
                          return item.isID == true;
                     });
-               } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+               } else if (openAPI.isModelDiagram()) {
                     if (assoc.end2.reference._id == itemClass._id) {
 
                          filterAttributes = itemClass.attributes.filter(item => {

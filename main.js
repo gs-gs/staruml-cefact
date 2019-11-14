@@ -50,48 +50,17 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                });
      }
 }
-async function getUMLModelForDiagram(message,tempPackage, basePath, options, returnValue) {
 
-     const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
-     let dm = app.dialogs;
-     vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
-     try {
-          let result = await diagramEle.initUMLDiagram();
-          console.log("initialize", result);
-          let resultElement = await diagramEle.getDiagramElements();
-          console.log("resultElement", resultElement);
-          let resultGen = await diagramEle.generateOpenAPI(mOpenApi);
-          console.log("resultGen", resultGen);
-          if (resultGen.result == constant.FIELD_SUCCESS) {
-               vDialog.close();
-               console.log("mPackage", tempPackage);
-               setTimeout(function () {
-                    removeDiagram(tempPackage);
-                    app.dialogs.showInfoDialog(resultGen.message);
-                    vDialog = null;
-               }, 10);
-          }
-     } catch (err) {
-          removeDiagram(tempPackage);
-          vDialog.close();
-          setTimeout(function () {
-               app.dialogs.showErrorDialog(err.message);
-               console.error("Error getUMLModel", err);
-               vDialog = null;
-          }, 10);
-     }
-}
-
-function removeDiagram(tempPackage) {
-     let operationBuilder = app.repository.getOperationBuilder()
-     operationBuilder.begin('remove item')
-     operationBuilder.remove(tempPackage);
-     operationBuilder.end();
-     var cmd = operationBuilder.getOperation()
-     app.repository.doOperation(cmd)
-     console.log("mPackage", tempPackage);
-}
-async function getUMLModelForPackage(message,tempPackage, basePath, options, returnValue) {
+/**
+ * @function startOpenApiGenerator
+ * @description initialize package path directory, gets all element from package, generate openapi from package
+ * @param {string} message
+ * @param {UMLClassDiagram} tempPackage
+ * @param {string} basePath
+ * @param {Object} options
+ * @param {integer} returnValue
+ */
+async function startOpenApiGenerator(message,tempPackage, basePath, options, returnValue) {
      const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
      let dm = app.dialogs;
      vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
@@ -107,6 +76,9 @@ async function getUMLModelForPackage(message,tempPackage, basePath, options, ret
                vDialog.close();
                setTimeout(function () {
                     app.dialogs.showInfoDialog(resultGen.message);
+                    if(openAPI.isModelDiagram()){
+                         diagramEle.removeDiagram(tempPackage);
+                    }
 
                }, 10);
                vDialog = null;
@@ -117,6 +89,9 @@ async function getUMLModelForPackage(message,tempPackage, basePath, options, ret
           vDialog.close();
           setTimeout(function () {
                app.dialogs.showErrorDialog(err.message);
+               if(openAPI.isModelDiagram()){
+                    diagramEle.removeDiagram(tempPackage);
+               }
                console.error("Error getUMLModel", err);
           }, 10);
      }
@@ -139,13 +114,12 @@ function fileTypeSelection(tempPackage, options) {
 
                     setTimeout(function () {
                          let message='';
-                         if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+                         if (openAPI.isModelPackage()) {
                               message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' package";
-                              getUMLModelForPackage(message,tempPackage, basePath, options, returnValue);
-                         } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                         } else if (openAPI.isModelDiagram()) {
                               message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' diagram";
-                              getUMLModelForDiagram(message,tempPackage, basePath, options, returnValue);
                          }
+                         startOpenApiGenerator(message,tempPackage, basePath, options, returnValue);
                     }, 10);
 
                } else {
@@ -255,9 +229,9 @@ function removeOutputFiles() {
  */
 async function starTestingAllPackage(pkgList) {
      let strModeType = '';
-     if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+     if (openAPI.isModelPackage()) {
           strModeType = ' for Package : ';
-     } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+     } else if (openAPI.isModelDiagram()) {
           strModeType = ' for Diagram : ';
      }
 
@@ -321,11 +295,7 @@ async function testSingleOpenAPI(message,umlPackage) {
 
      const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
      const options = getGenOptions();
-     if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-          getUMLModelForPackage(message,umlPackage, basePath, options, 1);
-     } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-          getUMLModelForDiagram(message,umlPackage, basePath, options, 1);
-     }
+     startOpenApiGenerator(message,umlPackage, basePath, options, 1);
 }
 
 /**

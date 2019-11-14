@@ -1,6 +1,6 @@
 const openAPI = require('./openapi');
 const constant = require('./constant');
-const Utils = require ('./utils');
+const Utils = require('./utils');
 var diagramEle = require('./diagram/diagramElement');
 
 /**
@@ -12,7 +12,7 @@ class Generalization {
       * @constructor Creates an instance of Generalization.
       */
      constructor() {
-          this.utils=new Utils();
+          this.utils = new Utils();
      }
 
 
@@ -60,14 +60,14 @@ class Generalization {
                itemClass.ownedElements.forEach(item => {
                     if (item instanceof type.UMLGeneralization) {
 
-                         
+
                          let generalizationSourceID = item.source._id;
                          if (itemClass._id == generalizationSourceID) {
                               parentGeneralizationClassAttribute.push(item);
                               this.findGeneralizationRecursivelyOfClass(item.target, parentGeneralizationClassAttribute);
                          }
                     }
-                    
+
                });
           }
           console.log("Generalization classes", parentGeneralizationClassAttribute);
@@ -81,16 +81,16 @@ class Generalization {
      findGeneralizationOfClass(objClass) {
           try {
 
-               let filterGeneral=null;
-               if(openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE){
-                    
+               let filterGeneral = null;
+               if (openAPI.isModelPackage()) {
+
                     let generalizeClasses = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLGeneralization");
                     //  let generalizeClasses = app.repository.select("@UMLGeneralization");
                     filterGeneral = generalizeClasses.filter(item => {
                          return item.source._id == objClass._id
                     });
-                    
-               }else if(openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM){
+
+               } else if (openAPI.isModelDiagram()) {
                     let generalizeClasses = diagramEle.getUMLGeneralization();;
                     filterGeneral = generalizeClasses.filter(item => {
                          return item.source._id == objClass._id
@@ -98,7 +98,7 @@ class Generalization {
 
                }
 
-               
+
                return filterGeneral;
           } catch (error) {
                console.error("Found error", error.message);

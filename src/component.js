@@ -38,10 +38,10 @@ class Component {
       */
      getComponent() {
           let classes, classLink;
-          if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+          if (openAPI.isModelPackage()) {
                classes = openAPI.getClasses();
                classLink = app.repository.select("@UMLAssociationClassLink");
-          } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+          } else if (openAPI.isModelDiagram()) {
                classes = diagramEle.getUMLClass();
                classLink = diagramEle.getUMLAssociationClassLink();
           }

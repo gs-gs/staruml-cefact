@@ -20,7 +20,7 @@ class Composition {
       * @returns {Object}
       * @memberof Composition
       */
-     addComposition(mainPropertiesObj, assoc,assocName) {
+     addComposition(mainPropertiesObj, assoc, assocName) {
           let propertiesObj = {};
           mainPropertiesObj[assocName] = propertiesObj;
           /* mainPropertiesObj[assoc.name] = propertiesObj; */
