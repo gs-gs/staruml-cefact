@@ -65,47 +65,7 @@ function removeDiagram(tempPackage) {
      console.log("mPackage", tempPackage);
 }
 /**
- * @function getUMLModelForDiagram
- * @description initialize diagram path directory, gets all element from diagram, generate openapi from diagram
- * @param {string} message
- * @param {UMLClassDiagram} tempPackage
- * @param {string} basePath
- * @param {Object} options
- * @param {integer} returnValue
- */
-async function getUMLModelForDiagram(message,tempPackage, basePath, options, returnValue) {
-
-     const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
-     let dm = app.dialogs;
-     vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
-     try {
-          let result = await mOpenApi.initUMLPackage();
-          console.log("initializeDiagram", result);
-          let resultElement = await mOpenApi.getModelElements();
-          console.log("resultElementDiagram", resultElement);
-          let resultGen = await mOpenApi.generateOpenAPI();
-          console.log("resultGenDiagram", resultGen);
-          if (resultGen.result == constant.FIELD_SUCCESS) {
-               vDialog.close();
-               console.log("mPackageDiagram", tempPackage);
-               setTimeout(function () {
-                    removeDiagram(tempPackage);
-                    app.dialogs.showInfoDialog(resultGen.message);
-                    vDialog = null;
-               }, 10);
-          }
-     } catch (err) {
-          removeDiagram(tempPackage);
-          vDialog.close();
-          setTimeout(function () {
-               app.dialogs.showErrorDialog(err.message);
-               console.error("Error getUMLModel", err);
-               vDialog = null;
-          }, 10);
-     }
-}
-/**
- * @function getUMLModelForPackage
+ * @function startOpenApiGenerator
  * @description initialize package path directory, gets all element from package, generate openapi from package
  * @param {string} message
  * @param {UMLClassDiagram} tempPackage
@@ -113,7 +73,7 @@ async function getUMLModelForDiagram(message,tempPackage, basePath, options, ret
  * @param {Object} options
  * @param {integer} returnValue
  */
-async function getUMLModelForPackage(message,tempPackage, basePath, options, returnValue) {
+async function startOpenApiGenerator(message,tempPackage, basePath, options, returnValue) {
      const mOpenApi = new openAPI.OpenApi(tempPackage, basePath, options, returnValue);
      let dm = app.dialogs;
      vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
@@ -163,11 +123,10 @@ function fileTypeSelection(tempPackage, options) {
                          let message='';
                          if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
                               message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' package";
-                              getUMLModelForPackage(message,tempPackage, basePath, options, returnValue);
                          } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
                               message="Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' diagram";
-                              getUMLModelForDiagram(message,tempPackage, basePath, options, returnValue);
                          }
+                         startOpenApiGenerator(message,tempPackage, basePath, options, returnValue);
                     }, 10);
 
                } else {
@@ -343,11 +302,7 @@ async function testSingleOpenAPI(message,umlPackage) {
 
      const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
      const options = getGenOptions();
-     if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-          getUMLModelForPackage(message,umlPackage, basePath, options, 1);
-     } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
-          getUMLModelForDiagram(message,umlPackage, basePath, options, 1);
-     }
+     startOpenApiGenerator(message,umlPackage, basePath, options, 1);
 }
 
 /**

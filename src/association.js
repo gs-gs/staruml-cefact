@@ -128,13 +128,13 @@ class Association {
      getAssociationOfClass(objClass) {
           try {
                /* Find the all UMLAssociation of project */
-               
+
                /* Filter association whose end1 (Source) Class is current class */
-               
-               let filterAssociation=[];
-               let filter=[];
-               if(openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE){
-                    
+
+               let filterAssociation = [];
+               let filter = [];
+               if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+
                     let associations = app.repository.select("@UMLAssociation");
                     filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
@@ -142,37 +142,38 @@ class Association {
 
                     /* Filter association who is belong to current package */
                     filter = filterAssociation.filter(item => {
-                         let parent=item.end1.reference._parent;
+                         let parent = item.end1.reference._parent;
                          return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
                     });
-                    
-               }else if(openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM){
-                    let dAssociation=null;
+
+               } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
+                    let dAssociation = null;
                     dAssociation = diagramEle.getUMLAssociation();
                     filterAssociation = dAssociation.filter(item => {
-                         return item.end1.reference._id == objClass._id 
+                         return item.end1.reference._id == objClass._id
                     });
 
                     /* Filter association who is belong to current package */
-                    console.log("diagramAsso",diagramEle.getUMLAssociation());
-                    filter = filterAssociation;/* filterAssociation.filter(item => {
-                         let parent=item.end1.reference._parent;
-                         return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
-                    }); */
+                    console.log("diagramAsso", diagramEle.getUMLAssociation());
+                    filter = filterAssociation;
+                    /* filterAssociation.filter(item => {
+                                             let parent=item.end1.reference._parent;
+                                             return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
+                                        }); */
                }
-               
+
                return filter;
-              
 
 
-               
+
+
           } catch (error) {
                console.error("Found error", error.message);
                this.utils.writeErrorToFile(error);
           }
      }
 
-     
+
      /* TODO : Do not remove getAssociationOfClass function. The function is in progress for experiment 
      getAssociationOfClass(objClass) {
           return new Promise((resolve, reject) => {
@@ -214,7 +215,7 @@ class Association {
 
                let generalization = new Generalization();
                // let generalizeClasses = generalization.findGeneralizationOfClass(tempClass);
-               let generalizeClasses=[];
+               let generalizeClasses = [];
                generalization.findGeneralizationRecursivelyOfClass(tempClass, generalizeClasses);
 
                let filterAttributes = tempClass.attributes.filter(item => {

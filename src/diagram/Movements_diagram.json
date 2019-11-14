@@ -1,0 +1,1028 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "description": "",
+        "title": "Movements",
+        "version": ""
+    },
+    "servers": [],
+    "paths": {
+        "/Journeys": {
+            "get": {
+                "tags": [
+                    "Journeys"
+                ],
+                "description": "Get a list of Journey",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Journey"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Journeys/{id}": {
+            "get": {
+                "tags": [
+                    "Journeys"
+                ],
+                "description": "Get single Journey by id",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "missing description",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Journey"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Journeys/{id}/TransportEvents": {
+            "post": {
+                "tags": [
+                    "TransportEvents"
+                ],
+                "description": "Create a new TransportEvent",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "missing description",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransportEvent"
+                            }
+                        }
+                    },
+                    "description": "",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransportEvent"
+                                }
+                            }
+                        },
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/Voyages/{id}/TransportEvents": {
+            "post": {
+                "tags": [
+                    "TransportEvents"
+                ],
+                "description": "Create a new TransportEvent",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "missing description",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransportEvent"
+                            }
+                        }
+                    },
+                    "description": "",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransportEvent"
+                                }
+                            }
+                        },
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/Vehicles": {
+            "get": {
+                "tags": [
+                    "Vehicles"
+                ],
+                "description": "Get a list of Vehicle",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Vehicle"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Vehicles/{id}": {
+            "get": {
+                "tags": [
+                    "Vehicles"
+                ],
+                "description": "Get single Vehicle by id",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "missing description",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Vehicle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Vessels": {
+            "get": {
+                "tags": [
+                    "Vessels"
+                ],
+                "description": "Get a list of Vessel",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Vessel"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Vessels/{id}": {
+            "get": {
+                "tags": [
+                    "Vessels"
+                ],
+                "description": "Get single Vessel by id",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "missing description",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Status",
+                        "in": "query",
+                        "description": "missing description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Vessel"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Voyages": {
+            "post": {
+                "tags": [
+                    "Voyages"
+                ],
+                "description": "Create a new Voyage",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Voyage"
+                            }
+                        }
+                    },
+                    "description": "",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Voyage"
+                                }
+                            }
+                        },
+                        "description": "Created"
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Voyages"
+                ],
+                "description": "Get a list of Voyage",
+                "parameters": [{
+                        "name": "LogisticsLocation.unlocode",
+                        "in": "query",
+                        "description": "missing description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "TransportEvent.OccurrenceTime",
+                        "in": "query",
+                        "description": "missing description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Vessel.Name",
+                        "in": "query",
+                        "description": "missing description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/Voyage"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Voyages/{id}": {
+            "get": {
+                "tags": [
+                    "Voyages"
+                ],
+                "description": "Get single Voyage by id",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "missing description",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Voyage"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Voyages"
+                ],
+                "description": "Update Voyage",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "missing description",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Voyage"
+                            }
+                        }
+                    },
+                    "description": "",
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Journey": {
+                "type": "object",
+                "properties": {},
+                "allOf": [{
+                        "$ref": "#/components/schemas/TransportMovement"
+                    },
+                    {
+                        "type": "object"
+                    }
+                ]
+            },
+            "LogisticsLocation": {
+                "type": "object",
+                "properties": {
+                    "Unlocode": {
+                        "description": "missing description",
+                        "type": "string"
+                    },
+                    "OtherIdentification": {
+                        "items": {
+                            "description": "A unique identifier for this logistics related location, such as a United Nations Location Code (UNLOCODE) or GS1 Global Location Number (GLN).",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "Name": {
+                        "description": "A name, expressed as text, of this logistics related location.",
+                        "type": "string"
+                    },
+                    "Description": {
+                        "description": "A textual description of this logistics related location.",
+                        "type": "string"
+                    },
+                    "Country": {
+                        "description": "The unique identifier of a country for this logistics location.",
+                        "type": "string"
+                    },
+                    "Type": {
+                        "description": "A code specifying the type of this logistics related location.",
+                        "type": "string"
+                    },
+                    "Latitude": {
+                        "description": "missing description",
+                        "type": "number"
+                    },
+                    "Longditude": {
+                        "description": "missing description",
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "Unlocode"
+                ]
+            },
+            "TransportEvent": {
+                "type": "object",
+                "properties": {
+                    "Type": {
+                        "description": "The code specifying the type of transport event.",
+                        "type": "string",
+                        "enum": [
+                            "Call",
+                            "Arrival",
+                            "Departure",
+                            "Loading",
+                            "UnLoading",
+                            "BorderCrossing",
+                            "TransShipment",
+                            "Stop"
+                        ]
+                    },
+                    "OccurrenceTime": {
+                        "description": "The actual date, time, date time, or other date time value of the occurrence of this transport event.",
+                        "type": "string"
+                    },
+                    "ReportedTime": {
+                        "description": "The date, time, date time or other date time value of the actual arrival related to this transport event.",
+                        "type": "string"
+                    },
+                    "Description": {
+                        "description": "The textual description of this transport event.",
+                        "type": "string"
+                    },
+                    "CertifyingTradeParty": {
+                        "items": {
+                            "allOf": [{
+                                    "$ref": "#/components/schemas/TransportPartyIds"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "type": "array"
+                    },
+                    "EventLocation": {
+                        "$ref": "#/components/schemas/LogisticsLocation"
+                    },
+                    "RelatedLocation": {
+                        "items": {
+                            "$ref": "#/components/schemas/LogisticsLocation"
+                        },
+                        "type": "array"
+                    }
+                },
+                "required": [
+                    "Type",
+                    "OccurrenceTime"
+                ]
+            },
+            "TransportPartyIds": {
+                "type": "object",
+                "properties": {
+                    "Identification": {
+                        "items": {
+                            "description": "A unique identifier of this trade party.",
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "minItems": 1
+                    },
+                    "Name": {
+                        "items": {
+                            "description": "The name, expressed as text, for this trade party.",
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "minItems": 1
+                    }
+                },
+                "required": [
+                    "Identification",
+                    "Name"
+                ]
+            },
+            "TransportMeans": {
+                "type": "object",
+                "properties": {
+                    "Identification": {
+                        "items": {
+                            "description": "An identifier of this logistics means of transport, such as the International Maritime Organization number of a vessel.",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "Name": {
+                        "description": "The name, expressed as text, of this logistics means of transport.",
+                        "type": "string"
+                    },
+                    "CargoGrossWeight": {
+                        "description": "The measure of the total gross weight (mass) of all cargo loaded onto this logistics means of transport, including packaging but excluding any associated transport equipment.",
+                        "type": "string"
+                    },
+                    "Conference": {
+                        "description": "The code specifying the conference for this logistics means of transport.",
+                        "type": "string"
+                    },
+                    "GrossWeight": {
+                        "description": "The measure of the gross weight (mass) of this logistics means of transport including cargo, such as the measure of the overall size of a vessel determined in accordance with the provisions of the International Convention on Tonnage Measurement of Ships, 1969.",
+                        "type": "string"
+                    },
+                    "ISPSSecurityLevel": {
+                        "description": "The code specifying the International Ship and Port facility Security (ISPS) level assigned to this logistics means of transport.",
+                        "type": "string"
+                    },
+                    "Length": {
+                        "description": "The measure of the length of this logistics means of transport.",
+                        "type": "string"
+                    },
+                    "LoadedCargo": {
+                        "description": "The measure of the cargo loaded onto this logistics means of transport, such as the number of barrels of oil or other quantity of breakbulk cargo.",
+                        "type": "string"
+                    },
+                    "NetWeight": {
+                        "description": "The measure of the net weight (mass) of this logistics means of transport, such as the net tonnage of a vessel determined in accordance with the provisions of the International Convention on Tonnage Measurement of Ships, 1969.",
+                        "type": "string"
+                    },
+                    "RequiredLaneLength": {
+                        "description": "The measure of the external length required in a lane for this logistics transport means.",
+                        "type": "string"
+                    },
+                    "Sequence": {
+                        "description": "The sequence number differentiating this logistics transport means from others.",
+                        "type": "number"
+                    },
+                    "Type": {
+                        "description": "The code specifying the type of logistics means of transport (Reference UNECE Recommendation 28).",
+                        "type": "string"
+                    },
+                    "TypeText": {
+                        "description": "The type, expressed as text, of this logistics means of transport.",
+                        "type": "string"
+                    },
+                    "WasteReportingExemption": {
+                        "description": "The indication of whether or not there is a waste reporting exemption for this logistics means of transport.",
+                        "type": "boolean"
+                    },
+                    "RegistrationCountry": {
+                        "description": "missing description",
+                        "type": "string"
+                    },
+                    "OperatorNationality": {
+                        "description": "missing description",
+                        "type": "string"
+                    },
+                    "TransportMeansParty": {
+                        "items": {
+                            "allOf": [{
+                                    "$ref": "#/components/schemas/TransportPartyIds"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/TransportMeansParty"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "type": "array"
+                    },
+                    "MeansParty": {
+                        "items": {
+                            "allOf": [{
+                                    "$ref": "#/components/schemas/TransportPartyIds"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "type": "array"
+                    }
+                }
+            },
+            "TransportMeansParty": {
+                "type": "object",
+                "properties": {
+                    "Role": {
+                        "description": "missing description",
+                        "type": "string"
+                    }
+                }
+            },
+            "TransportMovement": {
+                "type": "object",
+                "properties": {
+                    "Identification": {
+                        "items": {
+                            "description": "The unique identifier for this logistics transport movement, such as a voyage number, flight number, or trip number.",
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "minItems": 1
+                    },
+                    "TerminalOperatorAssignedIdentification": {
+                        "items": {
+                            "description": "A unique identifier for this logistics transport movement as assigned by a terminal operator.",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "Stay": {
+                        "description": "The unique identifier of a stay in a port, airport or other place of service for this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "Status": {
+                        "description": "The code specifying a status for the logistics transport movement, such as estimated or final.",
+                        "type": "string"
+                    },
+                    "Mode": {
+                        "description": "The code specifying the mode, such as by air, sea, rail, road or inland waterway, for this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "Stage": {
+                        "description": "The code specifying the stage of this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "CargoDescription": {
+                        "description": "The textual description of the cargo for this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "Closing": {
+                        "description": "The date, time, date time, or other date time value by which cargo should be loaded onto the means of transport for the departure of this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "Information": {
+                        "description": "Information, expressed as text, for this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "DangerousGoods": {
+                        "description": "The indication of whether or not dangerous goods are carried for this logistics transport movement.",
+                        "type": "boolean"
+                    },
+                    "ManifestOnboard": {
+                        "description": "The indication of whether or not the manifest for this logistics transport movement is onboard.",
+                        "type": "boolean"
+                    },
+                    "TransitDirection": {
+                        "description": "The code specifying the transit direction of this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "TransportEquipment": {
+                        "description": "The number of pieces of transport equipment for this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "Package": {
+                        "description": "The number of packages in this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "Consignment": {
+                        "description": "The number of consignments in this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "Crew": {
+                        "description": "The number of crew members for this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "Crewnationality": {
+                        "items": {
+                            "description": "missing description",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "Passenger": {
+                        "description": "The number of passengers for this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "PassengerNationality": {
+                        "items": {
+                            "description": "missing description",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "TransportMovementParty": {
+                        "items": {
+                            "allOf": [{
+                                    "$ref": "#/components/schemas/TransportPartyIds"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/TransportMovementParty"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "type": "array"
+                    },
+                    "ActualEvent": {
+                        "items": {
+                            "$ref": "#/components/schemas/TransportEvent"
+                        },
+                        "type": "array"
+                    },
+                    "EstimatedEvent": {
+                        "items": {
+                            "$ref": "#/components/schemas/TransportEvent"
+                        },
+                        "type": "array"
+                    },
+                    "MovementParty": {
+                        "items": {
+                            "allOf": [{
+                                    "$ref": "#/components/schemas/TransportPartyIds"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "type": "array"
+                    },
+                    "RelatedTransportRoute": {
+                        "allOf": [{
+                                "$ref": "#/components/schemas/TransportRouteIds"
+                            },
+                            {
+                                "type": "object"
+                            }
+                        ]
+                    },
+                    "ScheduledEvent": {
+                        "items": {
+                            "$ref": "#/components/schemas/TransportEvent"
+                        },
+                        "type": "array"
+                    },
+                    "UsedTransportMeans": {
+                        "allOf": [{
+                                "$ref": "#/components/schemas/TransportMeansIds"
+                            },
+                            {
+                                "type": "object"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "Identification"
+                ]
+            },
+            "TransportRouteIds": {
+                "type": "object",
+                "properties": {
+                    "Identification": {
+                        "description": "The unique identifier of this transport route.",
+                        "type": "string"
+                    }
+                }
+            },
+            "TransportMeansIds": {
+                "type": "object",
+                "properties": {
+                    "Identification": {
+                        "items": {
+                            "description": "An identifier of this logistics means of transport, such as the International Maritime Organization number of a vessel.",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "Name": {
+                        "description": "The name, expressed as text, of this logistics means of transport.",
+                        "type": "string"
+                    }
+                }
+            },
+            "TransportMovementParty": {
+                "type": "object",
+                "properties": {
+                    "Role": {
+                        "description": "missing description",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "Role"
+                ]
+            },
+            "TransportParty": {
+                "type": "object",
+                "properties": {
+                    "QualityAssurance": {
+                        "description": "The indication of whether or not this trade party is quality assured.",
+                        "type": "boolean"
+                    }
+                },
+                "allOf": [{
+                        "$ref": "#/components/schemas/TransportPartyIds"
+                    },
+                    {
+                        "type": "object"
+                    }
+                ],
+                "required": [
+                    "Identification",
+                    "Name"
+                ]
+            },
+            "TransportRoute": {
+                "type": "object",
+                "properties": {
+                    "Identification": {
+                        "description": "The unique identifier of this transport route.",
+                        "type": "string"
+                    },
+                    "DeparturePoint": {
+                        "description": "A departure point, expressed as text, for this transport route.",
+                        "type": "string"
+                    },
+                    "Description": {
+                        "description": "The textual description of this transport route.",
+                        "type": "string"
+                    },
+                    "FrequencyType": {
+                        "description": "The code specifying the type of frequency for this transport route, such as weekly, bi-monthly or daily.",
+                        "type": "string"
+                    },
+                    "Map": {
+                        "description": "Binary object data that is the map of this transport route.",
+                        "type": "string"
+                    },
+                    "Status": {
+                        "description": "The code specifying a status for a transport route, such as planned or actual.",
+                        "type": "string"
+                    },
+                    "TransportMeans": {
+                        "description": "A means of transport, expressed as text, for this transport route.",
+                        "type": "string"
+                    },
+                    "ItineraryStopLocation": {
+                        "items": {
+                            "$ref": "#/components/schemas/LogisticsLocation"
+                        },
+                        "type": "array"
+                    }
+                }
+            },
+            "Vehicle": {
+                "type": "object",
+                "properties": {
+                    "DriverAccompanied": {
+                        "description": "The indication of whether or not this logistics means of transport is accompanied by a driver.",
+                        "type": "boolean"
+                    },
+                    "AxleLoad": {
+                        "description": "missing description",
+                        "type": "string"
+                    }
+                },
+                "allOf": [{
+                        "$ref": "#/components/schemas/TransportMeans"
+                    },
+                    {
+                        "type": "object"
+                    }
+                ]
+            },
+            "Vessel": {
+                "type": "object",
+                "properties": {
+                    "DraughtLevel": {
+                        "description": "The measure of the draught level of this logistics means of transport.",
+                        "type": "string"
+                    },
+                    "ForwardDraughtLevel": {
+                        "description": "The draught level measured at the fore end of this transport means.",
+                        "type": "string"
+                    },
+                    "AftDraughtLevel": {
+                        "description": "The draught level measured at the aft end of this transport means.",
+                        "type": "string"
+                    },
+                    "Helipad": {
+                        "description": "The indication of whether or not there is a helipad on this logistics means of transport.",
+                        "type": "boolean"
+                    },
+                    "ManoeuvringSpeed": {
+                        "description": "The manoeuvring speed measured for this logistics means of transport.",
+                        "type": "string"
+                    }
+                },
+                "allOf": [{
+                        "$ref": "#/components/schemas/TransportMeans"
+                    },
+                    {
+                        "type": "object"
+                    }
+                ]
+            },
+            "Voyage": {
+                "type": "object",
+                "properties": {
+                    "PilotageExemption": {
+                        "description": "The identifier of a pilotage exemption for this logistics transport movement.",
+                        "type": "string"
+                    },
+                    "SailingAdviceNotificationInformation": {
+                        "description": "Sailing advice notification information, expressed as text, for this logistics transport movement.",
+                        "type": "string"
+                    }
+                },
+                "allOf": [{
+                        "$ref": "#/components/schemas/TransportMovement"
+                    },
+                    {
+                        "type": "object"
+                    }
+                ]
+            },
+            "Vehicles": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "missing description",
+                        "type": "string"
+                    }
+                }
+            },
+            "Journeys": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "missing description",
+                        "type": "string"
+                    },
+                    "Vehicles": {
+                        "$ref": "#/components/schemas/Vehicles"
+                    }
+                }
+            },
+            "Vessels": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "missing description",
+                        "type": "string"
+                    },
+                    "Status": {
+                        "description": "missing description",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "Status"
+                ]
+            },
+            "Voyages": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "missing description",
+                        "type": "string"
+                    },
+                    "Vessels": {
+                        "$ref": "#/components/schemas/Vessels"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            }
+        }
+    }
+}

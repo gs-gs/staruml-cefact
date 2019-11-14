@@ -28,13 +28,13 @@ class Paths {
           let mainPathsObject = {};
 
           try {
-               let paths,interfaceRealalization;
+               let paths, interfaceRealalization;
                if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
                     interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
                     paths = openAPI.getPaths();
                } else if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
                     interfaceRealalization = diagramEle.getUMLInterfaceRealization();
-                    paths=diagramEle.getUMLInterface();
+                    paths = diagramEle.getUMLInterface();
                }
 
                paths.forEach(objOperation => {
