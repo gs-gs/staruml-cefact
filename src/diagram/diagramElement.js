@@ -186,6 +186,25 @@ function removeIDFromOwnedElement(UMLEle, allDiagramElement) {
                 let mJsonRel = app.repository.writeObject(element);
                 let mObjRel = JSON.parse(mJsonRel);
                 delete mObjRel['_id'];
+                if(element instanceof type.UMLAssociation){
+                    let end1,end2;
+                    end1=app.repository.writeObject(element.end1);
+                    end1=JSON.parse(end1);
+                    delete end1['_id'];
+                    end1=app.repository.readObject(end1);
+                    end1=app.repository.writeObject(end1);
+                    end1=JSON.parse(end1);
+
+                    end2=app.repository.writeObject(element.end2);
+                    end2=JSON.parse(end2);
+                    delete end2['_id'];
+                    end2=app.repository.readObject(end2);
+                    end2=app.repository.writeObject(end2);
+                    end2=JSON.parse(end2);
+
+                    mObjRel.end1=end1;
+                    mObjRel.end2=end2;
+                }
                 tempOwnedElements.push(mObjRel);
             }
         });
@@ -296,10 +315,21 @@ function filterUMLClassDiagram(UMLClassDiagram) {
     });
 
     /* Filter all model from view */
-    let allDiagramElement = [];
+    let allDiagramViewNew = [];
     forEach(allDiagramView, function (dView) {
+        let mView=app.repository.writeObject(dView);
+        mView=JSON.parse(mView);
+        delete mView['_id'];
+        let newView=app.repository.readObject(mView);
+        allDiagramViewNew.push(newView);
+    });
+
+    let allDiagramElement = [];
+    forEach(allDiagramViewNew, function (dView) {
         allDiagramElement.push(dView.model);
     });
+
+    console.log("------DElement",allDiagramElement);
     setUMLDiagramElement(allDiagramElement);
 
     /* Filter UMLClass from model */
