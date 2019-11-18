@@ -226,6 +226,7 @@ function removeIDFromAttribute(UMLEle) {
             let mJsonAttrib = app.repository.writeObject(attrib);
             let mObjAttrib = JSON.parse(mJsonAttrib);
             delete mObjAttrib['_id'];
+            delete mObjAttrib['tags'];
             tempAttributes.push(mObjAttrib);
         });
     }
@@ -301,10 +302,14 @@ function removeIDFromLiterals(UMLEle) {
  */
 function filterUMLClassDiagram(UMLClassDiagram) {
 
-    let classDiagram = UMLClassDiagram;
-
+    // let classDiagram = app.repository.writeObject(UMLClassDiagram);
+    // classDiagram = JSON.parse(classDiagram);
+    // delete classDiagram['_id'];
+    // return;
+    // classDiagram = app.repository.readObject(classDiagram);
+    // console.log('classDiagram',classDiagram);
     /* Filter all diagram views */
-    let allDiagramView = classDiagram.ownedViews.filter(function (view) {
+    let allDiagramView = UMLClassDiagram.ownedViews.filter(function (view) {
         return view instanceof type.UMLClassView ||
             view instanceof type.UMLAssociationView ||
             view instanceof type.UMLInterfaceView ||
@@ -313,19 +318,18 @@ function filterUMLClassDiagram(UMLClassDiagram) {
             view instanceof type.UMLAssociationClassLinkView ||
             view instanceof type.UMLEnumerationView
     });
-
     /* Filter all model from view */
-    let allDiagramViewNew = [];
+    /* let allDiagramViewNew = [];
     forEach(allDiagramView, function (dView) {
         let mView=app.repository.writeObject(dView);
         mView=JSON.parse(mView);
         delete mView['_id'];
         let newView=app.repository.readObject(mView);
         allDiagramViewNew.push(newView);
-    });
-
+    }); */
+    
     let allDiagramElement = [];
-    forEach(allDiagramViewNew, function (dView) {
+    forEach(allDiagramView, function (dView) {
         allDiagramElement.push(dView.model);
     });
 
@@ -377,9 +381,9 @@ function filterUMLClassDiagram(UMLClassDiagram) {
     /* Process package object of diagram */
     let mainOwnedElements = []
     let tempPackage = {
-        'name': classDiagram.name,
+        'name': UMLClassDiagram.name,
         'ownedElements': mainOwnedElements,
-        'documentation': classDiagram.documentation,
+        'documentation': UMLClassDiagram.documentation,
         '_type': 'UMLPackage'
     };
 
