@@ -18,6 +18,7 @@ const Constant = {
      strend: '     ',
      msgpackage: 'Package not available',
      msg_file_select: 'Select one of the following type.',
+     msg_pkg_diagram_select: 'Select \'Package\' or \'Diagram\' to test entire project.',
      msg_file_saveas: 'Save File as...',
      PREF_DEBUG_KEY: 'openapi:debug.status',
      PREF_GENDOC: 'openapi.gen.idlDoc',
@@ -33,6 +34,7 @@ const Constant = {
      DIALOG_MSG_PICKERDIALOG: "Select package or diagram to generate OpenAPI Specs.",
      DIALOG_MSG_ERRORDIALOG: "Please select the project or a package",
      DIALOG_MSG_ERROR_SELECT_PACKAGE: "Please select a package or diagram to generate OpenAPI Specification.",
+     PACKAGE_SELECTION_ERROR: "No elements found in selected package. Please select other package.",
      DIALOG_MSG_TEST_PICKERDIALOG: "Select package or diagram to test OpenAPI Specs.",
      msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
      fileOptions: [{
@@ -46,7 +48,14 @@ const Constant = {
                text: "YML",
                value: 2
           },
-     ]
+     ],
+     pkgOptions: [{
+          text: "Package",
+          value: 1
+     }, {
+          text: "Diagram",
+          value: 2
+     }]
 
 }
 
