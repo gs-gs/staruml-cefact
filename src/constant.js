@@ -18,6 +18,7 @@ const Constant = {
      strend: '     ',
      msgpackage: 'Package not available',
      msg_file_select: 'Select one of the following type.',
+     msg_pkg_diagram_select: 'Select \'Package\' or \'Diagram\' to test entire project.',
      msg_file_saveas: 'Save File as...',
      PREF_DEBUG_KEY: 'openapi:debug.status',
      PREF_GENDOC: 'openapi.gen.idlDoc',
@@ -46,7 +47,14 @@ const Constant = {
                text: "YML",
                value: 2
           },
-     ]
+     ],
+     pkgOptions: [{
+          text: "Package",
+          value: 1
+     }, {
+          text: "Diagram",
+          value: 2
+     }]
 
 }
 
