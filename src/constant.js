@@ -34,6 +34,7 @@ const Constant = {
      DIALOG_MSG_PICKERDIALOG: "Select package or diagram to generate OpenAPI Specs.",
      DIALOG_MSG_ERRORDIALOG: "Please select the project or a package",
      DIALOG_MSG_ERROR_SELECT_PACKAGE: "Please select a package or diagram to generate OpenAPI Specification.",
+     PACKAGE_SELECTION_ERROR: "No elements found in selected package. Please select other package.",
      DIALOG_MSG_TEST_PICKERDIALOG: "Select package or diagram to test OpenAPI Specs.",
      msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
      fileOptions: [{

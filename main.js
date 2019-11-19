@@ -40,9 +40,24 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                               fileTypeSelection(mNewDiagram, options);
 
                          } else if (varSel == valPackagename) {
+
                               openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                               umlPackage = returnValue;
-                              fileTypeSelection(umlPackage, options);
+                              let ownedElements=[];
+                              umlPackage.ownedElements.filter(function(item){
+                                   if(item instanceof type.UMLClass ||
+                                        item instanceof type.UMLInterface ||
+                                        item instanceof type.UMLEnumeration){
+
+                                        ownedElements.push(item);
+                                   }
+                              });
+                              if(ownedElements.length>0){
+                                   fileTypeSelection(umlPackage, options);
+                              }else{
+                                   app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
+                              }
+
                          } else {
                               app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
                          }
@@ -203,15 +218,27 @@ function testSinglePackage() {
                     } else if (varSel == valPackagename) {
                          openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                          umlPackage = returnValue;
-                         /* let result=await removeOutputFiles(); */
-                         removeOutputFiles();
-                         /*  console.log("Result",result); */
+                         let ownedElements=[];
+                         umlPackage.ownedElements.filter(function(item){
+                              if(item instanceof type.UMLClass ||
+                                   item instanceof type.UMLInterface ||
+                                   item instanceof type.UMLEnumeration){
 
-                         let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package";
-                         setTimeout(function () {
-                              testSingleOpenAPI(message, umlPackage);
-                         }, 10);
+                                   ownedElements.push(item);
+                              }
+                         });
+                         if(ownedElements.length>0){
+                              removeOutputFiles();
+                              /*  console.log("Result",result); */
 
+                              let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package";
+                              setTimeout(function () {
+                                   testSingleOpenAPI(message, umlPackage);
+                              }, 10);
+                         }else{
+                              app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
+                         }
+                         
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
                     }
