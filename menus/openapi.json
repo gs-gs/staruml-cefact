@@ -9,7 +9,7 @@
                     "id": "tools.openapi.generate",
                     "command": "openapi:generate-specs"
                }, {
-                    "label": "Test Package",
+                    "label": "Test 'Package' or 'Diagram'",
                     "id": "tools.openapi.testextension",
                     "command": "openapi:test-single-package"
                }, {

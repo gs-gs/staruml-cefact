@@ -188,7 +188,6 @@ function getGenOptions() {
  */
 function testSinglePackage() {
 
-     let _this = this;
      /* There are two modes of extension, TEST & GENERATE. Here we set TEST mode. */
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
      /* There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_SINGLE) */
@@ -229,7 +228,6 @@ function testSinglePackage() {
                          });
                          if(ownedElements.length>0){
                               removeOutputFiles();
-                              /*  console.log("Result",result); */
 
                               let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package";
                               setTimeout(function () {
