@@ -15,7 +15,7 @@ const diagramEle = require('./diagram/diagramElement');
  */
 class Component {
      /**
-      *Creates an instance of Component.
+      * Creates an instance of Component.
       * @param {string} fullPath
       * @memberof Component
       */

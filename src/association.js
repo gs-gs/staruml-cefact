@@ -27,6 +27,7 @@ class Association {
      getAssociations() {
           return this.arrAssoc;
      }
+
      /**
       * @function addAssociationClassLinkProperties
       * @description Returns the association properties object 
@@ -45,6 +46,7 @@ class Association {
           }
           return mainPropertiesObj;
      }
+
      /**
       * @function writeAssociationClassProperties
       * @description adds property for association class
@@ -120,6 +122,7 @@ class Association {
           }
 
      }
+
      /**
       * @function getAssociationOfClass
       * @description Find all association of UMLClass

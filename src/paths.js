@@ -144,7 +144,6 @@ class Paths {
       * @param {Object} mainPathsObject
       * @memberof Paths 
       */
-
      writeInterfaceComposite(interfaceRealization, interfaceAssociation, mainPathsObject) {
           try {
 

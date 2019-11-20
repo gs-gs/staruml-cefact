@@ -4,6 +4,7 @@ const Utils = require('./utils');
  * @class Properties
  */
 class Properties {
+
      /**
       * @constructor Creates an instance of Properties.
       */

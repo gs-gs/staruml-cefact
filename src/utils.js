@@ -13,6 +13,7 @@ class Utils {
           this.errorContent = [];
           this.mFileName = '/error.txt';
      }
+
      /**
       * @function writeErrorToFile
       * @description Catch the error and write it to file
@@ -60,6 +61,7 @@ class Utils {
           paramsObject.schema = schema;
 
      }
+
      /**
       * @function getType
       * @description Returns type of attribute in string, Get attribute type number,boolean,string 
@@ -135,6 +137,7 @@ class Utils {
                this.writeErrorToFile(error);
           }
      }
+
      /**
       * @function getEnumerationLiteral
       * @description return Enumeratoin literals

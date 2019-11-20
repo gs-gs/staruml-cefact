@@ -72,6 +72,7 @@ class Generalization {
           }
           console.log("Generalization classes", parentGeneralizationClassAttribute);
      }
+
      /**
       * @function findGeneralizationOfClass
       * @description Find all generalization of UMLClass

@@ -237,6 +237,7 @@ class Operations {
 
           return wOperationObject;
      }
+
      /**
       * @function delete
       * @description Returns the object of delete method
@@ -298,6 +299,7 @@ class Operations {
 
           return wOperationObject;
      }
+
      /**
       * @function getOperationAttribute
       * @description returns the attributes object of Operation object
