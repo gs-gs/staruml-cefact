@@ -81,6 +81,12 @@ class OpenApi {
 
      }
 
+     /**
+      * @function getModelElements
+      * @description returns all model element from Package or Diagram
+      * @returns {Promise}
+      * @memberof OpenApi
+      */
      getModelElements() {
 
           return new Promise(async (resolve, reject) => {
@@ -92,26 +98,29 @@ class OpenApi {
                let generaCurrentPkg = [];
 
                if (openAPI.isModelPackage()) {
-                    /* ------------ 1. UMLClass ------------ */
+                    /* ------------ 1. UMLClass from Package ------------ */
                     umlClasses = app.repository.select(_pkgName + "::@UMLClass");
 
-                    /* ------------ 2. UMLInterface ------------ */
+                    /* ------------ 2. UMLInterface from Package ------------ */
                     OpenApi.operations = app.repository.select(_pkgName + "::@UMLInterface");
 
-                    /* ------------ 3. Association Class------------ */
+                    /* ------------ 3. Association Class from Package ------------ */
                     assocCurrentPkg = await OpenApi.getUMLAssociation();
 
-                    /* ------------ 4. Generalization Class ------------ */
+                    /* ------------ 4. Generalization Class from Package ------------ */
                     generaCurrentPkg = await OpenApi.getUMLGeneralization();
 
                } else if (openAPI.isModelDiagram()) {
-
+                    /* ------------ 1. UMLClass from Diagram ------------ */
                     umlClasses = diagramEle.getUMLClass();
 
+                    /* ------------ 2. UMLInterface from Diagram ------------ */
                     OpenApi.operations = diagramEle.getUMLInterface();
 
+                    /* ------------ 3. Association Class from Diagram ------------ */
                     assocCurrentPkg = diagramEle.getUMLAssociation();
 
+                    /* ------------ 4. Generalization Class from Diagram ------------ */
                     generaCurrentPkg = diagramEle.getUMLGeneralization();
                }
 
@@ -156,6 +165,15 @@ class OpenApi {
 
           });
      }
+
+     /**
+      * @function checkForDuplicate
+      * @description check duplicate elements and returns error 
+      * @static
+      * @param {*} resArr
+      * @returns {result}
+      * @memberof OpenApi
+      */
      static checkForDuplicate(resArr) {
           let uniqueArr = [];
           let duplicateClasses = [];
@@ -219,6 +237,15 @@ class OpenApi {
 
           }
      }
+
+     /**
+      * @function findAndSort
+      * @description sort element and returns array
+      * @static
+      * @param {*} umlClasses
+      * @returns {Array}
+      * @memberof OpenApi
+      */
      static findAndSort(umlClasses) {
           /* ------------ 4. Filter unique classes ------------ */
           let resArr = [];
@@ -240,6 +267,7 @@ class OpenApi {
           console.log("Sort class done");
           return resArr;
      }
+
      /**
       * @function setModelType
       * @description set model type like user want to generate specs from UMLClassDiagram (IS_APP_DIAGRAM) or UMLPackage (IS_APP_PACKAGE)
@@ -260,14 +288,28 @@ class OpenApi {
           return OpenApi.modelType;
      }
 
-     static isModelPackage(){
+     /**
+      * @function isModelPackage
+      * @description check and retuns that user have selected Package to generate OpenApi Specification
+      * @static
+      * @returns {Boolean} 
+      * @memberof OpenApi
+      */
+     static isModelPackage() {
           if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
                return true;
           }
           return false;
      }
 
-     static isModelDiagram(){
+     /**
+      * @function isModelDiagram
+      * @description check and retuns that user have selected Diagram to generate OpenApi Specification
+      * @static
+      * @returns {Boolean} 
+      * @memberof OpenApi
+      */
+     static isModelDiagram() {
           if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM) {
                return true;
           }
@@ -408,6 +450,7 @@ class OpenApi {
      static getPackagePath() {
           return OpenApi.strPackagePath;
      }
+
      /**
       * @function setPackagepath
       * @description stores package path 
@@ -418,11 +461,12 @@ class OpenApi {
      static setPackagepath(strPackagePath) {
           OpenApi.strPackagePath = strPackagePath;
      }
+
      /**
       * @function getUMLAssociation
       * @description Returns the promise of class wise Association
       * @static
-      * @returns
+      * @returns {Promise}
       * @memberof OpenApi
       */
      static async getUMLAssociation() {
@@ -452,6 +496,7 @@ class OpenApi {
 
           });
      }
+
      /**
       * @function getUMLGeneralization
       * @description returns the promise of class wise generalization
@@ -482,6 +527,7 @@ class OpenApi {
                }
           });
      }
+
      /**
       * @function getparentPkg
       * @description Finds the parent package of element from UMLModel
@@ -499,6 +545,7 @@ class OpenApi {
                }
           });
      }
+
      /**
       * @function getElementPackage
       * @description finds package of element
@@ -520,6 +567,7 @@ class OpenApi {
           }
 
      }
+
      /**
       * @function findHierarchy
       * @description finds the package hierarchy recursively
@@ -535,6 +583,7 @@ class OpenApi {
           }
           return OpenApi.pkgPath;
      }
+
      /**
       * @function reversePkgPath
       * @description returns the package path recursively
@@ -660,7 +709,6 @@ function getSummery() {
      return summeryMessages;
 }
 
-
 /**
  * @function resetSummery
  * @description reset all stored summery
@@ -668,6 +716,7 @@ function getSummery() {
 function resetSummery() {
      summeryMessages = [];
 }
+
 /**
  * @function validateSwagger
  * @description Validate OpenAPI Specs from the file with swagger-parser
@@ -704,6 +753,7 @@ function validateSwagger(pathValidator) {
 
      });
 }
+
 /**
  * @function findPackageWiseUMLAssociation
  * @description finds package wise UMLAssociation hierarchy recursively
@@ -711,8 +761,13 @@ function validateSwagger(pathValidator) {
  * @returns {Array}
  * @memberof OpenApi
  */
-let filteredAssociation = [];
 
+let filteredAssociation = [];
+/**
+ * @function getPackageWiseUMLAssociation
+ * @description returns the all association package wise
+ * @returns {Array}
+ */
 function getPackageWiseUMLAssociation() {
      // new Promise((resolve, reject) => {
 
@@ -737,16 +792,12 @@ function getPackageWiseUMLAssociation() {
      // });
 }
 
-function copy(mainObj) {
-     let objCopy = {}; // objCopy will store a copy of the mainObj
-     let key;
-
-     for (key in mainObj) {
-          objCopy[key] = mainObj[key]; // copies each property to the objCopy object
-     }
-     return objCopy;
-}
-
+/**
+ * @function findParentPackage
+ * @description returns the list of parent package
+ * @param {*} ele
+ * @param {*} item
+ */
 function findParentPackage(ele, item) {
      // return new Promise((resolve, reject) => {
 

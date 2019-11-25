@@ -20,6 +20,7 @@ function setUMLDiagramElement(mAllElement) {
     });
     AllElement = mAllElement;
 }
+
 /**
  * @function getUMLDiagramElement
  * @description returns all element from UMLClasssDiagram
@@ -28,6 +29,7 @@ function setUMLDiagramElement(mAllElement) {
 function getUMLDiagramElement() {
     return AllElement;
 }
+
 /**
  * @function setUMLClass
  * @description save UMLClass from UMLClassDiagram
@@ -37,6 +39,7 @@ function setUMLClass(mUMLClass) {
     console.log("UMLClasses", mUMLClass);
     UMLClass = mUMLClass
 }
+
 /**
  * @function getUMLClass
  * @description retuns the Array of UMLClass from UMLClassDiagra
@@ -45,6 +48,7 @@ function setUMLClass(mUMLClass) {
 function getUMLClass() {
     return UMLClass;
 }
+
 /**
  * @function setUMLInterface
  * @description save array of UMLInterface from UMLClassDiagram
@@ -57,6 +61,7 @@ function setUMLInterface(mUMLInterface) {
     console.log("UMLInterface", mUMLInterface);
     UMLInterface = mUMLInterface;
 }
+
 /**
  * @function getUMLInterface
  * @description returns array of UMLInterface from UMLClassDiagram
@@ -65,6 +70,7 @@ function setUMLInterface(mUMLInterface) {
 function getUMLInterface() {
     return UMLInterface;
 }
+
 /**
  * @function setUMLAssociation
  * @description save and sort UMLAssociation from UMLClassDiagram
@@ -77,6 +83,7 @@ function setUMLAssociation(mUMLAssociation) {
     console.log("UMLAssociation", mUMLAssociation);
     UMLAssociation = mUMLAssociation;
 }
+
 /**
  * @function getUMLAssociation
  * @description returns array of UMLAssociation from UMLClassDiagram
@@ -85,6 +92,7 @@ function setUMLAssociation(mUMLAssociation) {
 function getUMLAssociation() {
     return UMLAssociation;
 }
+
 /**
  * @function setUMLGeneralization
  * @description save and sort UMLGeneralization from UMLClassDiagram
@@ -97,6 +105,7 @@ function setUMLGeneralization(mUMLGeneralization) {
     console.log("UMLGeneralization", mUMLGeneralization);
     UMLGeneralization = mUMLGeneralization;
 }
+
 /**
  * @function getUMLGeneralization
  * @description returns array of UMLGeneralization from UMLClassDiagram
@@ -105,6 +114,7 @@ function setUMLGeneralization(mUMLGeneralization) {
 function getUMLGeneralization() {
     return UMLGeneralization;
 }
+
 /**
  * @function setUMLInterfaceRealization
  * @description save and sort UMLInterfaceRealization from UMLClassDiagram
@@ -117,6 +127,7 @@ function setUMLInterfaceRealization(mUMLInterfaceRealization) {
     console.log("UMLInterfaceRealization", mUMLInterfaceRealization);
     UMLInterfaceRealization = mUMLInterfaceRealization;
 }
+
 /**
  * @function getUMLInterfaceRealization
  * @description returns array of UMLInterfaceRealization from UMLClassDiagram
@@ -125,6 +136,7 @@ function setUMLInterfaceRealization(mUMLInterfaceRealization) {
 function getUMLInterfaceRealization() {
     return UMLInterfaceRealization;
 }
+
 /**
  * @function setUMLEnumeration
  * @description save and sort UMLEnumeration from UMLClassDiagram
@@ -137,6 +149,7 @@ function setUMLEnumeration(mUMLEnumeration) {
     console.log("UMLEnumeration", mUMLEnumeration);
     UMLEnumeration = mUMLEnumeration;
 }
+
 /**
  * @function getUMLEnumeration
  * @description returns array of UMLEnumeration from UMLClassDiagram
@@ -145,6 +158,7 @@ function setUMLEnumeration(mUMLEnumeration) {
 function getUMLEnumeration() {
     return UMLEnumeration
 }
+
 /**
  * @function setUMLAssociationClassLink
  * @description save and sort UMLAssociationClassLink from UMLClassDiagram
@@ -157,6 +171,7 @@ function setUMLAssociationClassLink(mUMLAssociationClassLink) {
     console.log("UMLAssociationClassLink", mUMLAssociationClassLink);
     UMLAssociationClassLink = mUMLAssociationClassLink;
 }
+
 /**
  * @function getUMLAssociationClassLink
  * @description returns array of UMLAssociationClassLink from UMLClassDiagram
@@ -186,24 +201,24 @@ function removeIDFromOwnedElement(UMLEle, allDiagramElement) {
                 let mJsonRel = app.repository.writeObject(element);
                 let mObjRel = JSON.parse(mJsonRel);
                 delete mObjRel['_id'];
-                if(element instanceof type.UMLAssociation){
-                    let end1,end2;
-                    end1=app.repository.writeObject(element.end1);
-                    end1=JSON.parse(end1);
+                if (element instanceof type.UMLAssociation) {
+                    let end1, end2;
+                    end1 = app.repository.writeObject(element.end1);
+                    end1 = JSON.parse(end1);
                     delete end1['_id'];
-                    end1=app.repository.readObject(end1);
-                    end1=app.repository.writeObject(end1);
-                    end1=JSON.parse(end1);
+                    end1 = app.repository.readObject(end1);
+                    end1 = app.repository.writeObject(end1);
+                    end1 = JSON.parse(end1);
 
-                    end2=app.repository.writeObject(element.end2);
-                    end2=JSON.parse(end2);
+                    end2 = app.repository.writeObject(element.end2);
+                    end2 = JSON.parse(end2);
                     delete end2['_id'];
-                    end2=app.repository.readObject(end2);
-                    end2=app.repository.writeObject(end2);
-                    end2=JSON.parse(end2);
+                    end2 = app.repository.readObject(end2);
+                    end2 = app.repository.writeObject(end2);
+                    end2 = JSON.parse(end2);
 
-                    mObjRel.end1=end1;
-                    mObjRel.end2=end2;
+                    mObjRel.end1 = end1;
+                    mObjRel.end2 = end2;
                 }
                 tempOwnedElements.push(mObjRel);
             }
@@ -211,6 +226,7 @@ function removeIDFromOwnedElement(UMLEle, allDiagramElement) {
     }
     return tempOwnedElements;
 }
+
 /**
  * @function removeIDFromAttribute
  * @description remove '_id' property from UMLAttribute to clone new UMLAttribute and returns array of new cloned UMLAttributes
@@ -232,6 +248,7 @@ function removeIDFromAttribute(UMLEle) {
     }
     return tempAttributes;
 }
+
 /**
  * @function removeIDFromOperation
  * @description remove '_id' property from UMLOperation to clone new UMLOperation and returns array of new cloned UMLOperations 
@@ -254,6 +271,7 @@ function removeIDFromOperation(UMLEle) {
     }
     return tempOperation;
 }
+
 /**
  * @function removeIDFromParameter
  * @description remove '_id' property from UMLParameter to clone new UMLParameter and returns array of new cloned UMLParameters 
@@ -274,6 +292,7 @@ function removeIDFromParameter(UMLOperation) {
     }
     return tempParams;
 }
+
 /**
  * @function removeIDFromLiterals
  * @description remove '_id' property from UMLEnumerationLiteral to clone new UMLEnumerationLiteral and returns array of new cloned UMLEnumerationLiterals 
@@ -294,6 +313,7 @@ function removeIDFromLiterals(UMLEle) {
     }
     return tempLiterals;
 }
+
 /**
  * @function filterUMLClassDiagram
  * @description filter class, interface, enumeration, association, generalization, interfacerealization, association class link views from UMLClassDiagram
@@ -327,13 +347,13 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         let newView=app.repository.readObject(mView);
         allDiagramViewNew.push(newView);
     }); */
-    
+
     let allDiagramElement = [];
     forEach(allDiagramView, function (dView) {
         allDiagramElement.push(dView.model);
     });
 
-    console.log("------DElement",allDiagramElement);
+    console.log("------DElement", allDiagramElement);
     setUMLDiagramElement(allDiagramElement);
 
     /* Filter UMLClass from model */
@@ -449,6 +469,7 @@ function filterUMLClassDiagram(UMLClassDiagram) {
 
     return tempPackage;
 }
+
 /**
  * @function removeDiagram
  * @description delete package from staruml after openapi is generated from diagram

@@ -111,6 +111,7 @@ async function startOpenApiGenerator(message, tempPackage, basePath, options, re
           }, 10);
      }
 }
+
 /**
  * @function fileTypeSelection
  * @description Display dropdown dialog and allow user to select file type from dropdown dailog like (JSON & YAML, JSON, YAML)
@@ -145,6 +146,7 @@ function fileTypeSelection(tempPackage, options) {
           }
      });
 }
+
 /**
  * @function selectPkgDiagram
  * @description Display dropdown dialog and allow user to select 'Diagram or Package'
@@ -188,7 +190,6 @@ function getGenOptions() {
  */
 function testSinglePackage() {
 
-     let _this = this;
      /* There are two modes of extension, TEST & GENERATE. Here we set TEST mode. */
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
      /* There are two modes of TEST, TEST_MODE_SINGLE & TEST_MODE_ALL. Here we set TEST_MODE_SINGLE) */
@@ -229,7 +230,6 @@ function testSinglePackage() {
                          });
                          if(ownedElements.length>0){
                               removeOutputFiles();
-                              /*  console.log("Result",result); */
 
                               let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package";
                               setTimeout(function () {
@@ -246,6 +246,7 @@ function testSinglePackage() {
           });
 
 }
+
 /**
  * @function removeOutputFiles
  * @description Remove previously test generated .json files from the output folder
@@ -271,6 +272,7 @@ function removeOutputFiles() {
      });
 
 }
+
 /**
  * @function starTestingAllPackage
  * @description Start testing all packages one by one of the project
@@ -323,6 +325,7 @@ async function starTestingAllDiagram(diagramList) {
           }
      }, 10);
 }
+
 /**
  * @function starTestingAllPackage
  * @description Start testing all packages one by one of the project
@@ -396,7 +399,7 @@ async function testSingleOpenAPI(message, umlPackage) {
 
 /**
  * @function testEntirePackage
- * @description Test Entire Project for valid OpenApi Specifications
+ * @description Test Entire Project for all packages available in model for valid OpenApi Specifications
  */
 function testEntirePackage() {
 
@@ -423,14 +426,11 @@ function testEntirePackage() {
           starTestingAllPackage(mPackages);
      }, 10);
 }
-/* openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
-let tempPackage = diagramEle.filterUMLClassDiagram(mUMLDiagram);
-let mNewDiagram = app.repository.readObject(tempPackage);
-removeOutputFiles();
-let message="Please wait untill OpenAPI spec generation is being tested for the \'" + mNewDiagram.name + "\' diagram";
-setTimeout(function () {
-     testSingleOpenAPI(message,mNewDiagram);
-}, 10); */
+
+/**
+ * @function testEntireDiagram
+ * @description Test Entire Project for all diagrams available in model for valid OpenApi Specifications
+ */
 function testEntireDiagram() {
 
      openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
@@ -456,11 +456,11 @@ function testEntireDiagram() {
           starTestingAllDiagram(mUMLDiagrams);
      }, 10);
 }
+
 /**
  * @function aboutUsExtension
  * @description Display Information about Extension like the title and description of OpenAPI Specification.
  */
-
 function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
 }
