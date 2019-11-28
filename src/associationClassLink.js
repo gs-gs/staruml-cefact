@@ -5,12 +5,12 @@ const constant = require('./constant');
 const openAPI = require('./openapi');
 const diagramEle = require('./diagram/diagramElement');
 /**
- * @class Association
- * @description class returns the API Association 
+ * @class AssociationClassLink
+ * @description class returns the API AssociationClassLink 
  */
-class Association {
+class AssociationClassLink {
      /**
-      * @constructor Creates an instance of Association.
+      * @constructor Creates an instance of AssociationClassLink.
       */
      constructor() {
           this.utils = new Utils();
@@ -22,7 +22,7 @@ class Association {
       * @function getAssociations
       * @description returns the array of Associations
       * @returns
-      * @memberof Association
+      * @memberof AssociationClassLink
       */
      getAssociations() {
           return this.arrAssoc;
@@ -34,7 +34,7 @@ class Association {
       * @param {*} assocClassLink
       * @param {*} mainPropertiesObj
       * @returns
-      * @memberof Association
+      * @memberof AssociationClassLink
       */
      addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj,compositionRef) {
 
@@ -161,11 +161,11 @@ class Association {
      }
 
      /**
-      * @function getAssociationOfClass
+      * @function getAssociationOfAssociationClassLink
       * @description Find all association of UMLClass
       * @param {UMLClass} objClass 
       */
-     getAssociationOfClass(objClass) {
+     getAssociationOfAssociationClassLink(objClass) {
           try {
                /* Find the all UMLAssociation of project */
 
@@ -214,8 +214,8 @@ class Association {
      }
 
 
-     /* TODO : Do not remove getAssociationOfClass function. The function is in progress for experiment 
-     getAssociationOfClass(objClass) {
+     /* TODO : Do not remove getAssociationOfAssociationClassLink function. The function is in progress for experiment 
+     getAssociationOfAssociationClassLink(objClass) {
           return new Promise((resolve, reject) => {
 
 
@@ -330,4 +330,4 @@ class Association {
      }
 }
 
-module.exports = Association;
+module.exports = AssociationClassLink;

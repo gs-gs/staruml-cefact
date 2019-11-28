@@ -1,7 +1,7 @@
 const Utils = require('./utils');
 const Generalization = require('./generalization');
 const Properties = require('./properties');
-const Association = require('./association');
+const AssociationClassLink = require('./associationClassLink');
 const Aggregation = require('./aggregation');
 const Composition = require('./composition');
 const Required = require('./required');
@@ -27,7 +27,7 @@ class Component {
           /* this.arrAssoc = []; */
           this.required = new Required();
           this.generalization = new Generalization();
-          this.association = new Association();
+          this.associationClassLink = new AssociationClassLink();
      }
 
      /**
@@ -50,6 +50,7 @@ class Component {
           let noNameRel = [];
           this.mainComponentObj.schemas = this.mainSchemaObj;
           this.duplicatePropertyError = [];
+          let duplicateDeletedReference=[];
           classes.forEach(objClass => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
@@ -83,14 +84,14 @@ class Component {
 
 
                /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
-               mainPropertiesObj = this.association.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj,compositionRef);
+               mainPropertiesObj = this.associationClassLink.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj,compositionRef);
 
                
 
                /* Get generalization of class */
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
                let aggregationClasses = [];
-               let classAssociations = this.association.getAssociationOfClass(objClass);
+               let classAssociations = this.associationClassLink.getAssociationOfAssociationClassLink(objClass);
 
 
                console.log("classAssociations", classAssociations);
@@ -155,14 +156,14 @@ class Component {
 
                          }
                          /* 
-                                                       this.arrAssoc.push(assoc);
-                                                  } else {
-                                                       if (assoc.name == "") {
-                                                            flagNoName = true;
-                                                            let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
-                                                            noNameRel.push(str);
-                                                       }
-                                                  } */
+                              this.arrAssoc.push(assoc);
+                         } else {
+                              if (assoc.name == "") {
+                                   flagNoName = true;
+                                   let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
+                                   noNameRel.push(str);
+                              }
+                         } */
                     } else if (assoc instanceof type.UMLGeneralization) {
                          arrGeneral.push(assoc);
                     }
@@ -208,13 +209,14 @@ class Component {
                     });
 
                     if (filter.length == 0) {
-                         this.association.writeAssociationProperties(mainClassesObj, itemClass, this.mainSchemaObj);
+                         this.associationClassLink.writeAssociationProperties(mainClassesObj, itemClass, this.mainSchemaObj);
                          arrIdClasses.push(itemClass)
                     }
                });
                // if(objClass.name == 'Logistics_TransportMovement' ){
                     console.log("compositionRef",compositionRef);
 
+                    /* Find duplicate properties */
                     let tempDupliCheck=[];
                     let uniqueArray=[];
                     compositionRef.forEach(function(comp){
@@ -228,16 +230,32 @@ class Component {
                          }
                     });
                     console.log("Duplicate reference ",uniqueArray);
-                    uniqueArray.forEach(function(comp){
+
+                    /* Remove 'Ids' character from Schema name so we can delete it from duplicate property */
+                    let newUniqueArray=[];
+                    uniqueArray.forEach(function(item){
+                         if(item.sName.endsWith("Ids")){
+                              item.sName=item.sName.replace('Ids','');
+                         }
+                         newUniqueArray.push(item);
+                    });
+                    console.log("Duplicate reference : New",newUniqueArray);
+
+                    /* Remove duplicate property */
+                    newUniqueArray.forEach(function(comp){
                          if(mainPropertiesObj.hasOwnProperty(comp.sName)){
                               delete mainPropertiesObj[comp.sName];
                               console.log("deleted duplicate attributes",comp.ref);
+
+                              let objTemp={};
+                              objTemp[objClass.name]=comp
+                              duplicateDeletedReference.push(objTemp);
                          }
                     });
 
                // }
           });
-
+          console.log("Total duplicate deleted reference",duplicateDeletedReference);
           return this.mainComponentObj;
      }
 
