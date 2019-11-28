@@ -20,14 +20,18 @@ class Composition {
       * @returns {Object}
       * @memberof Composition
       */
-     addComposition(mainPropertiesObj, assoc, assocName) {
+     addComposition(mainPropertiesObj, assoc, assocName,compositionRef) {
           let propertiesObj = {};
           mainPropertiesObj[assocName] = propertiesObj;
+          let ref='';
+          let sName='';
           /* mainPropertiesObj[assoc.name] = propertiesObj; */
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                let itemsObj = {};
                propertiesObj.items = itemsObj;
-               itemsObj['$ref'] = constant.getReference() + assoc.end2.reference.name;
+               sName=assoc.end2.reference.name;
+               ref=constant.getReference() + sName;
+               itemsObj['$ref'] = ref;
                propertiesObj.type = 'array';
                /**
                 * Add MinItems of multiplicity is 1..*
@@ -36,8 +40,15 @@ class Composition {
                     propertiesObj.minItems = 1;
                }
           } else {
-               propertiesObj['$ref'] = constant.getReference() + assoc.end2.reference.name;
+               sName=assoc.end2.reference.name;
+               ref=constant.getReference() + sName;
+               propertiesObj['$ref'] = ref;
           }
+          let temp={};
+          temp['ref']=propertiesObj;
+          temp['sName']=sName;
+          // compositionRef.push('6. composition : '+ref,temp);
+          compositionRef.push(temp);
           return mainPropertiesObj;
      }
 }

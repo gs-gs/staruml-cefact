@@ -24,7 +24,7 @@ class Generalization {
       * @returns {Object}
       * @memberof Generalization
       */
-     addGeneralization(arrGeneral, mainClassesObj) {
+     addGeneralization(arrGeneral, mainClassesObj,compositionRef) {
           /**
            * Add Generalization class
            * Inherite all properties of parent class
@@ -34,13 +34,22 @@ class Generalization {
                mainClassesObj.allOf = allOfArray;
                arrGeneral.forEach(generalizeClass => {
                     let allOfObj = {};
-                    allOfObj['$ref'] = constant.getReference() + generalizeClass.target.name;
+                    let sName='';
+                    sName=generalizeClass.target.name;
+                    let ref=constant.getReference() + sName;
+                    allOfObj['$ref'] = ref;
                     allOfArray.push(allOfObj);
 
 
                     allOfObj = {};
                     allOfObj['type'] = 'object';
                     allOfArray.push(allOfObj);
+
+                    let temp={};
+                    temp['ref']=mainClassesObj;
+                    temp['sName']=sName;
+                    // compositionRef.push('7. generalization : '+ref,temp);
+                    compositionRef.push(temp);
                });
 
           }

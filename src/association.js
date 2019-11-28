@@ -36,11 +36,11 @@ class Association {
       * @returns
       * @memberof Association
       */
-     addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj) {
+     addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj,compositionRef) {
 
           if (assocClassLink.length > 0) {
                assocClassLink.forEach(item => {
-                    this.writeAssociationClassProperties(mainPropertiesObj, item);
+                    this.writeAssociationClassProperties(mainPropertiesObj, item,compositionRef);
                     this.arrAssoc.push(item.classSide);
                })
           }
@@ -53,7 +53,7 @@ class Association {
       * @param {Object} main properties json object
       * @param {UMLAssociationClassLink} associationClass 
       */
-     writeAssociationClassProperties(mainPropertiesObj, associationClass) {
+     writeAssociationClassProperties(mainPropertiesObj, associationClass,compositionRef) {
           let propertiesObj = {};
 
 
@@ -71,19 +71,38 @@ class Association {
                     let allOfArray = [];
                     itemsObj.allOf = allOfArray;
 
+                    let ref='';
+                    let sName='';
                     let objAllOfArry = {};
                     if (associationSide.end1.aggregation == constant.shared) {
-                         objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name + 'Ids';
+                         sName=associationSide.end2.reference.name + 'Ids';
+                         ref=constant.getReference() + sName;
+                         objAllOfArry['$ref'] = ref;
                     } else {
-                         objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name;
+                         sName=associationSide.end2.reference.name;
+                         ref=constant.getReference() + sName;
+                         objAllOfArry['$ref'] = ref;
                     }
-
                     allOfArray.push(objAllOfArry);
+
+                    let temp={};
+                    temp['ref']=propertiesObj;
+                    temp['sName']=sName;
+                    // compositionRef.push('2. association 1: '+ref,temp);
+                    compositionRef.push(temp);
 
                     objAllOfArry = {};
-                    objAllOfArry['$ref'] = constant.getReference() + associationClass.classSide.name;
-                    allOfArray.push(objAllOfArry);
+                    sName=associationClass.classSide.name;
+                    ref=constant.getReference() + sName;
 
+                    objAllOfArry['$ref'] = ref;
+                    allOfArray.push(objAllOfArry);
+                    
+                    temp={};
+                    temp['ref']=propertiesObj;
+                    temp['sName']=sName
+                    // compositionRef.push('3. association 2: '+ref,temp);
+                    compositionRef.push(temp);
                     objAllOfArry = {};
                     objAllOfArry['type'] = 'object';
                     allOfArray.push(objAllOfArry);
@@ -94,30 +113,48 @@ class Association {
                     if (associationSide.end2.multiplicity == "1..*") {
                          propertiesObj.minItems = 1;
                     }
-
                } else {
                     /* Add reference of Schema */
                     let allOfArray = [];
                     let objAllOfArry = {};
                     propertiesObj.allOf = allOfArray;
 
+                    let ref='';
+                    let sName='';
                     if (associationSide.end1.aggregation == constant.shared) {
-                         objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name + 'Ids';
+                         sName=associationSide.end2.reference.name + 'Ids';
+                         ref=constant.getReference() + sName;
+                         objAllOfArry['$ref'] =ref ;
                     } else {
-                         objAllOfArry['$ref'] = constant.getReference() + associationSide.end2.reference.name;
+                         sName=associationSide.end2.reference.name;
+                         ref=constant.getReference() + sName;
+                         objAllOfArry['$ref'] =ref ;
                     }
+
                     allOfArray.push(objAllOfArry);
+                    let temp={};
+                    temp['ref']=propertiesObj;
+                    temp['sName']=sName
+                    // compositionRef.push('4. association 3: '+ref,temp);
+                    compositionRef.push(temp);
 
                     objAllOfArry = {};
-                    objAllOfArry['$ref'] = constant.getReference() + associationClass.classSide.name;
+                    sName=associationClass.classSide.name;
+                    ref=constant.getReference() + sName;
+                    objAllOfArry['$ref'] = ref;
                     allOfArray.push(objAllOfArry);
+
+                    temp={};
+                    temp['ref']=propertiesObj;
+                    temp['sName']=sName;
+                    // compositionRef.push('5. association 4: '+ref,temp);
+                    compositionRef.push(temp);
 
                     objAllOfArry = {};
                     objAllOfArry['type'] = 'object';
                     allOfArray.push(objAllOfArry);
 
                }
-
 
           }
 

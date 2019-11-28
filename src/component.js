@@ -62,6 +62,7 @@ class Component {
                     return item.associationSide.end2.reference._id == objClass._id;
                });
 
+               /* Filter Association Class Link of Current Class */
                let assocClassLink = classLink.filter(item => {
                     return item.associationSide.end1.reference._id == objClass._id;
                });
@@ -76,17 +77,17 @@ class Component {
                mainPropertiesObj = properties.addProperties();
                mainClassesObj.properties = mainPropertiesObj;
 
-
+               let compositionRef=[];
 
                this.arrAttr = properties.getAttributes();
 
 
                /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
-               mainPropertiesObj = this.association.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj);
+               mainPropertiesObj = this.association.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj,compositionRef);
 
-               /* this.arrAssoc = this.association.getAssociations();
-               console.log("arrAssoc",this.arrAssoc); */
+               
 
+               /* Get generalization of class */
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
                let aggregationClasses = [];
                let classAssociations = this.association.getAssociationOfClass(objClass);
@@ -96,6 +97,7 @@ class Component {
                console.log("mainPropertiesObj", mainPropertiesObj);
 
 
+               
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
                          /* let filterAssoc = this.arrAssoc.filter(item => {
@@ -135,16 +137,21 @@ class Component {
                               }
                          } */
 
+                         
                          if (assoc.end1.aggregation == constant.shared) {
                               /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
                               let aggregation = new Aggregation();
                               console.log("Classname", objClass.name);
-                              mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName);
+                              mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName,compositionRef);
 
                          } else {
                               /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
                               let composition = new Composition();
-                              mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName);
+                              console.log("Classname", objClass.name);
+                              mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName,compositionRef);
+                              // if(objClass.name == 'Logistics_TransportMovement' ){
+                              //      console.log("inner");
+                              // }
 
                          }
                          /* 
@@ -160,9 +167,9 @@ class Component {
                          arrGeneral.push(assoc);
                     }
                });
-
+               
                /* Adding Generalization : Adds refs of Class in 'allOf' object */
-               mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj);
+               mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj,compositionRef);
 
 
                let filterAttributes = this.arrAttr.filter(item => {
@@ -205,6 +212,30 @@ class Component {
                          arrIdClasses.push(itemClass)
                     }
                });
+               // if(objClass.name == 'Logistics_TransportMovement' ){
+                    console.log("compositionRef",compositionRef);
+
+                    let tempDupliCheck=[];
+                    let uniqueArray=[];
+                    compositionRef.forEach(function(comp){
+                         let result=tempDupliCheck.filter(function(item){
+                              return item.sName == comp.sName;
+                         });
+                         if(result.length==0){
+                              tempDupliCheck.push(comp);
+                         }else{
+                              uniqueArray.push(comp);
+                         }
+                    });
+                    console.log("Duplicate reference ",uniqueArray);
+                    uniqueArray.forEach(function(comp){
+                         if(mainPropertiesObj.hasOwnProperty(comp.sName)){
+                              delete mainPropertiesObj[comp.sName];
+                              console.log("deleted duplicate attributes",comp.ref);
+                         }
+                    });
+
+               // }
           });
 
           return this.mainComponentObj;
@@ -213,3 +244,27 @@ class Component {
 }
 
 module.exports = Component;
+/* 
+1.
+items:
+     allOf:
+          - $ref: '#/components/schemas/Specified_Period'
+          - $ref: '#/components/schemas/EventPeriod'
+          - type: object
+type: array
+
+
+2.
+allOf:
+     - $ref: '#/components/schemas/Logistics_LocationIds'
+     - type: object
+
+
+3.
+$ref: '#/components/schemas/Specified_Period'
+
+4. 
+items:
+     $ref: '#/components/schemas/Transport_Event'
+type: array */
+
