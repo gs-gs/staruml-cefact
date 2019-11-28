@@ -53,7 +53,7 @@ class Aggregation {
       * @returns {Object}
       * @memberof Aggregation
       */
-     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName) {
+     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName,compositionRef) {
           let propertiesObj = {};
           aggregationClasses.push(assoc.end2.reference);
           mainPropertiesObj[assocName] = propertiesObj;
@@ -126,6 +126,8 @@ class Aggregation {
                };
                openAPI.setError(jsonError);
           }
+          let ref='';
+          let sName='';
           /* Check and add multiplicity */
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
@@ -135,7 +137,9 @@ class Aggregation {
                itemsObj.allOf = allOfArray;
 
                let objAllOfArry = {};
-               objAllOfArry['$ref'] = constant.getReference() + assoc.end2.reference.name + 'Ids';
+               sName=assoc.end2.reference.name + 'Ids';
+               ref=constant.getReference() + sName;
+               objAllOfArry['$ref'] = ref;
                allOfArray.push(objAllOfArry);
 
                objAllOfArry = {};
@@ -153,13 +157,20 @@ class Aggregation {
 
 
                let allOfObj = {};
-               allOfObj['$ref'] = constant.getReference() + assoc.end2.reference.name + 'Ids';
+               sName=assoc.end2.reference.name + 'Ids';
+               ref=constant.getReference() + sName;
+               allOfObj['$ref'] = ref;
                allOfArray.push(allOfObj);
 
                allOfObj = {};
                allOfObj['type'] = 'object';
                allOfArray.push(allOfObj);
           }
+          let temp={};
+          temp['ref']=propertiesObj;
+          temp['sName']=sName
+          // compositionRef.push('1. aggregation : '+ref,temp);
+          compositionRef.push(temp);
           return mainPropertiesObj;
      }
 }
