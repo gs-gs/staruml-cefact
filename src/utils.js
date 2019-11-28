@@ -78,6 +78,29 @@ class Utils {
      }
 
      /**
+      * @function addAttributeType
+      * @description add attribute type based on openapi spefication datatype
+      * @param {Object} itemsObj 
+      * @memberof Utils
+      */
+     addAttributeType(itemsObj,attr) {
+          let starUMLType=attr.type;
+          if (starUMLType === "Numeric") {
+               itemsObj.type="number";
+          } else if (starUMLType === "Indicator") {
+               itemsObj.type="boolean";
+          } else if(starUMLType === "Date"){
+               itemsObj.type="string";
+               itemsObj.format="date";
+          } else if(starUMLType === "DateTime"){
+               itemsObj.type="string";
+               itemsObj.format="date-time";
+          } else {
+               itemsObj.type="string";
+          }
+     }
+
+     /**
       * @function buildRequestBody
       * @description Adds request body to requestBodyObj
       * @param {UMLInterfaceRealization} objInterface
@@ -151,6 +174,8 @@ class Utils {
                return (result);
           }
      }
+
+     
 }
 
 module.exports = Utils;

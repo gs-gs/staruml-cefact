@@ -294,7 +294,8 @@ class AssociationClassLink {
 
 
                               itemsObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-                              itemsObj.type = this.utils.getType(attr.type);
+                              this.utils.addAttributeType(itemsObj,attr);                              
+                              // itemsObj.type = this.utils.getType(attr.type);
 
                               propertiesObj.type = 'array';
                               /**
@@ -307,7 +308,8 @@ class AssociationClassLink {
                          } else {
                               propertiesObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
 
-                              propertiesObj.type = this.utils.getType(attr.type);
+                              // propertiesObj.type = this.utils.getType(attr.type);
+                              this.utils.addAttributeType(propertiesObj,attr);
                               if (attr.type instanceof type.UMLEnumeration) {
                                    propertiesObj.enum = this.utils.getEnumerationLiteral(attr.type);
                               }
