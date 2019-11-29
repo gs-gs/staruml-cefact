@@ -50,19 +50,16 @@ class Component {
           let noNameRel = [];
           this.mainComponentObj.schemas = this.mainSchemaObj;
           this.duplicatePropertyError = [];
-          let duplicateDeletedReference=[];
+          let duplicateDeletedReference = [];
           classes.forEach(objClass => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
-
-               let accosElems = objClass.ownedElements.filter(item => {
-                    return item instanceof type.UMLAssociation;
-               });
 
                let assocSideClassLink = classLink.filter(item => {
                     return item.associationSide.end2.reference._id == objClass._id;
                });
 
+               console.log("-----track", assocSideClassLink);
                /* Filter Association Class Link of Current Class */
                let assocClassLink = classLink.filter(item => {
                     return item.associationSide.end1.reference._id == objClass._id;
@@ -78,15 +75,15 @@ class Component {
                mainPropertiesObj = properties.addProperties();
                mainClassesObj.properties = mainPropertiesObj;
 
-               let compositionRef=[];
+               let compositionRef = [];
 
                this.arrAttr = properties.getAttributes();
 
 
                /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
-               mainPropertiesObj = this.associationClassLink.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj,compositionRef);
+               mainPropertiesObj = this.associationClassLink.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef);
 
-               
+
 
                /* Get generalization of class */
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
@@ -98,7 +95,7 @@ class Component {
                console.log("mainPropertiesObj", mainPropertiesObj);
 
 
-               
+
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
                          /* let filterAssoc = this.arrAssoc.filter(item => {
@@ -138,18 +135,18 @@ class Component {
                               }
                          } */
 
-                         
+
                          if (assoc.end1.aggregation == constant.shared) {
                               /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
                               let aggregation = new Aggregation();
                               console.log("Classname", objClass.name);
-                              mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName,compositionRef);
+                              mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
 
                          } else {
                               /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
                               let composition = new Composition();
                               console.log("Classname", objClass.name);
-                              mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName,compositionRef);
+                              mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
                               // if(objClass.name == 'Logistics_TransportMovement' ){
                               //      console.log("inner");
                               // }
@@ -168,9 +165,9 @@ class Component {
                          arrGeneral.push(assoc);
                     }
                });
-               
+
                /* Adding Generalization : Adds refs of Class in 'allOf' object */
-               mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj,compositionRef);
+               mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj, compositionRef);
 
 
                let filterAttributes = this.arrAttr.filter(item => {
@@ -214,75 +211,56 @@ class Component {
                     }
                });
                // if(objClass.name == 'Logistics_TransportMovement' ){
-                    console.log("compositionRef",compositionRef);
-
-                    /* Find duplicate properties */
-                    let tempDupliCheck=[];
-                    let uniqueArray=[];
-                    compositionRef.forEach(function(comp){
-                         let result=tempDupliCheck.filter(function(item){
-                              return item.sName == comp.sName;
-                         });
-                         if(result.length==0){
-                              tempDupliCheck.push(comp);
-                         }else{
-                              uniqueArray.push(comp);
-                         }
-                    });
-                    console.log("Duplicate reference ",uniqueArray);
-
-                    /* Remove 'Ids' character from Schema name so we can delete it from duplicate property */
-                    let newUniqueArray=[];
-                    uniqueArray.forEach(function(item){
-                         if(item.sName.endsWith("Ids")){
-                              item.sName=item.sName.replace('Ids','');
-                         }
-                         newUniqueArray.push(item);
-                    });
-                    console.log("Duplicate reference : New",newUniqueArray);
-
-                    /* Remove duplicate property */
-                    newUniqueArray.forEach(function(comp){
-                         if(mainPropertiesObj.hasOwnProperty(comp.sName)){
-                              delete mainPropertiesObj[comp.sName];
-                              console.log("deleted duplicate attributes",comp.ref);
-
-                              let objTemp={};
-                              objTemp[objClass.name]=comp
-                              duplicateDeletedReference.push(objTemp);
-                         }
-                    });
+               console.log("compositionRef", compositionRef);
+               /* Remove property which is already in ref of other property in the same schema */
+               this.removeDuplicatePropertyOfRefs(compositionRef,mainPropertiesObj,objClass,duplicateDeletedReference);
 
                // }
           });
-          console.log("Total duplicate deleted reference",duplicateDeletedReference);
+          console.log("Total duplicate deleted reference", duplicateDeletedReference);
           return this.mainComponentObj;
+     }
+
+     removeDuplicatePropertyOfRefs(compositionRef,mainPropertiesObj,objClass,duplicateDeletedReference) {
+
+          /* Find duplicate properties */
+          let tempDupliCheck = [];
+          let uniqueArray = [];
+          compositionRef.forEach(function (comp) {
+               let result = tempDupliCheck.filter(function (item) {
+                    return item.sName == comp.sName;
+               });
+               if (result.length == 0) {
+                    tempDupliCheck.push(comp);
+               } else {
+                    uniqueArray.push(comp);
+               }
+          });
+          console.log("Duplicate reference ", uniqueArray);
+
+          /* Remove 'Ids' character from Schema name so we can delete it from duplicate property */
+          let newUniqueArray = [];
+          uniqueArray.forEach(function (item) {
+               if (item.sName.endsWith("Ids")) {
+                    item.sName = item.sName.replace('Ids', '');
+               }
+               newUniqueArray.push(item);
+          });
+          console.log("Duplicate reference : New", newUniqueArray);
+
+          /* Remove duplicate property */
+          newUniqueArray.forEach(function (comp) {
+               if (mainPropertiesObj.hasOwnProperty(comp.sName)) {
+                    delete mainPropertiesObj[comp.sName];
+                    console.log("deleted duplicate attributes", comp.ref);
+
+                    let objTemp = {};
+                    objTemp[objClass.name] = comp
+                    duplicateDeletedReference.push(objTemp);
+               }
+          });
      }
 
 }
 
 module.exports = Component;
-/* 
-1.
-items:
-     allOf:
-          - $ref: '#/components/schemas/Specified_Period'
-          - $ref: '#/components/schemas/EventPeriod'
-          - type: object
-type: array
-
-
-2.
-allOf:
-     - $ref: '#/components/schemas/Logistics_LocationIds'
-     - type: object
-
-
-3.
-$ref: '#/components/schemas/Specified_Period'
-
-4. 
-items:
-     $ref: '#/components/schemas/Transport_Event'
-type: array */
-
