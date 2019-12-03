@@ -8,6 +8,7 @@ class MainJSON {
       */
      constructor() {
           MainJSON.mainOpenApiObj = {};
+          MainJSON.mainJSONSchemaObject = {};
      }
 
      /**
@@ -19,6 +20,17 @@ class MainJSON {
       */
      static saveComponent(component) {
           MainJSON.mainOpenApiObj.components = component.getComponent();
+     }
+
+     /**
+      * @function addJSONSchema
+      * @description save JSONSchema
+      * @static
+      * @param {Object} component
+      * @memberof MainJSON
+      */
+     static addJSONSchema(component) {
+          MainJSON.mainJSONSchemaObject.schema = component.getJSONSchema();
      }
 
      /**
@@ -74,6 +86,16 @@ class MainJSON {
      static giveJson() {
           return MainJSON.mainOpenApiObj;
      }
+
+     /**
+      * @function giveJSONSchema
+      * @description give the main json 
+      * @static
+      * @memberof MainJSON
+      */
+     static giveJSONSchema() {
+          return MainJSON.mainJSONSchemaObject;
+     }
 }
 module.exports.MainJSON = new MainJSON();
 module.exports.addComponent = MainJSON.saveComponent;
@@ -82,3 +104,5 @@ module.exports.addApiVersion = MainJSON.saveApiVersion;
 module.exports.addPaths = MainJSON.savePaths;
 module.exports.addServers = MainJSON.saveServers;
 module.exports.getJSON = MainJSON.giveJson;
+module.exports.addJSONSchema = MainJSON.addJSONSchema;
+module.exports.getJSONSchema = MainJSON.giveJSONSchema;

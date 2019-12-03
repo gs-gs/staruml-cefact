@@ -63,21 +63,6 @@ class Utils {
      }
 
      /**
-      * @function getType
-      * @description Returns type of attribute in string, Get attribute type number,boolean,string 
-      * @returns {string} 
-      * @param {string} starUMLType 
-      * @memberof Utils
-      */
-     getType(starUMLType) {
-          if (starUMLType === "Numeric") {
-               return "number";
-          } else if (starUMLType === "Indicator") {
-               return "boolean";
-          } else return "string";
-     }
-
-     /**
       * @function addAttributeType
       * @description add attribute type based on openapi spefication datatype
       * @param {Object} itemsObj 

@@ -1,11 +1,13 @@
 const version = require('../package.json').version
 const reponame = require('../package.json').name
+const openAPI = require('./openapi');
 const Constant = {
      entry: '#',
      components: 'components',
      schemas: 'schemas',
      path: '/',
      shared: 'shared',
+     properties:'properties',
      msgsuccess: 'OpenAPI Specs generated',
      msgstestuccess: 'OpenAPI Specs Tested Successfully',
      msgerror: 'OpenAPI Specs generation failure',
@@ -37,6 +39,10 @@ const Constant = {
      PACKAGE_SELECTION_ERROR: "No elements found in selected package. Please select other package.",
      DIALOG_MSG_TEST_PICKERDIALOG: "Select package or diagram to test OpenAPI Specs.",
      msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
+     FILE_TYPE_JSON:1,
+     FILE_TYPE_YML:2,
+     FILE_TYPE_JSON_YML:3,
+     FILE_TYPE_JSON_SCHEMA:4,
      fileOptions: [{
                text: "JSON & YML",
                value: 3
@@ -47,6 +53,10 @@ const Constant = {
           {
                text: "YML",
                value: 2
+          },
+          {
+               text: "JSON Schema",
+               value: 4
           },
      ],
      pkgOptions: [{
@@ -65,7 +75,11 @@ const Constant = {
  * @returns {string}
  */
 function getRef() {
-     return Constant.entry + Constant.path + Constant.components + Constant.path + Constant.schemas + Constant.path;
+     if(openAPI.getFileType() == Constant.FILE_TYPE_JSON_SCHEMA){
+          return Constant.entry + Constant.path + Constant.properties + Constant.path;
+     }else{
+          return Constant.entry + Constant.path + Constant.components + Constant.path + Constant.schemas + Constant.path;
+     }
 }
 module.exports = Constant
 module.exports.getReference = getRef;
