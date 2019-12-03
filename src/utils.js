@@ -95,7 +95,35 @@ class Utils {
           } else if(starUMLType === "DateTime"){
                itemsObj.type="string";
                itemsObj.format="date-time";
-          } else {
+          } else if(starUMLType === 'integer'){
+               itemsObj.type="integer";
+          } else if(starUMLType === 'int32'){
+               itemsObj.type="integer";
+               itemsObj.format="int32";
+          } else if(starUMLType === 'int64'){
+               itemsObj.type="integer";
+               itemsObj.format="int64";
+          } else if(starUMLType === 'number'){
+               itemsObj.type="number";
+          } else if(starUMLType === 'float'){
+               itemsObj.type="number";
+               itemsObj.format="float";
+          } else if(starUMLType === 'double'){
+               itemsObj.type="number";
+               itemsObj.format="double";
+          } else if(starUMLType === 'boolean'){
+               itemsObj.type="boolean";
+          } else if(starUMLType === 'password'){
+               itemsObj.type="string";
+               itemsObj.format="password";
+          } else if(starUMLType === 'byte'){
+               itemsObj.type="string";
+               itemsObj.format="byte";
+          } else if(starUMLType === 'binary'){
+               itemsObj.type="string";
+               itemsObj.format="binary";
+          } 
+          else {
                itemsObj.type="string";
           }
      }

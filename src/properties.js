@@ -57,7 +57,6 @@ class Properties {
                               propertiesObj.items = itemsObj;
                               itemsObj.description = (attribute.documentation ? _this.utils.buildDescription(attribute.documentation) : "missing description");
 
-                              // itemsObj.type = _this.utils.getType(attribute.type);
                               _this.utils.addAttributeType(itemsObj, attribute);
 
                               propertiesObj.type = 'array';
@@ -70,7 +69,6 @@ class Properties {
                          } else {
                               propertiesObj.description = (attribute.documentation ? _this.utils.buildDescription(attribute.documentation) : "missing description");
 
-                              // propertiesObj.type = _this.utils.getType(attribute.type);
                               _this.utils.addAttributeType(propertiesObj, attribute);
 
                               if (attribute.type instanceof type.UMLEnumeration) {
