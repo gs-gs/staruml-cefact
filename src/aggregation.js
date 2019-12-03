@@ -8,8 +8,8 @@ class Aggregation {
      /**
       * @constructor Creates an instance of Aggregation.
       */
-     constructor() {
-
+     constructor(reqAttr) {
+          this.arrAttRequired=reqAttr;
      }
 
      /**
@@ -55,7 +55,12 @@ class Aggregation {
       */
      addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName,compositionRef) {
           let propertiesObj = {};
+          let objAttrRe={
+               name:assocName,
+               multiplicity:assoc.end2.multiplicity
+          };
           aggregationClasses.push(assoc.end2.reference);
+          this.arrAttRequired.push(objAttrRe);
           mainPropertiesObj[assocName] = propertiesObj;
           /* mainPropertiesObj[assoc.name] = propertiesObj; */
 

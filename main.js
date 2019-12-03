@@ -43,18 +43,18 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
 
                               openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                               umlPackage = returnValue;
-                              let ownedElements=[];
-                              umlPackage.ownedElements.filter(function(item){
-                                   if(item instanceof type.UMLClass ||
+                              let ownedElements = [];
+                              umlPackage.ownedElements.filter(function (item) {
+                                   if (item instanceof type.UMLClass ||
                                         item instanceof type.UMLInterface ||
-                                        item instanceof type.UMLEnumeration){
+                                        item instanceof type.UMLEnumeration) {
 
                                         ownedElements.push(item);
                                    }
                               });
-                              if(ownedElements.length>0){
+                              if (ownedElements.length > 0) {
                                    fileTypeSelection(umlPackage, options);
-                              }else{
+                              } else {
                                    app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
                               }
 
@@ -219,26 +219,26 @@ function testSinglePackage() {
                     } else if (varSel == valPackagename) {
                          openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                          umlPackage = returnValue;
-                         let ownedElements=[];
-                         umlPackage.ownedElements.filter(function(item){
-                              if(item instanceof type.UMLClass ||
+                         let ownedElements = [];
+                         umlPackage.ownedElements.filter(function (item) {
+                              if (item instanceof type.UMLClass ||
                                    item instanceof type.UMLInterface ||
-                                   item instanceof type.UMLEnumeration){
+                                   item instanceof type.UMLEnumeration) {
 
                                    ownedElements.push(item);
                               }
                          });
-                         if(ownedElements.length>0){
+                         if (ownedElements.length > 0) {
                               removeOutputFiles();
 
                               let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package";
                               setTimeout(function () {
                                    testSingleOpenAPI(message, umlPackage);
                               }, 10);
-                         }else{
+                         } else {
                               app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
                          }
-                         
+
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
                     }
@@ -296,6 +296,9 @@ async function starTestingAllDiagram(diagramList) {
                console.log("resultElement", resultElement);
                let resultGen = await mOpenApi.generateOpenAPI();
                console.log("resultGen", resultGen);
+               if (resultGen.result == constant.FIELD_SUCCESS) {
+                    diagramEle.removeDiagram(mNewDiagram);
+               }
           } catch (err) {
                console.error("Error startTestingAllPackage", err);
                if (openAPI.getError().hasOwnProperty('isDuplicate') && openAPI.getError().isDuplicate == true) {
@@ -304,6 +307,7 @@ async function starTestingAllDiagram(diagramList) {
                     let bindFailureMsg = constant.msgtesterror + strModeType + '\'' + openAPI.getUMLPackage().name + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
                     openAPI.addSummery(bindFailureMsg, 'failure');
                }
+               diagramEle.removeDiagram(mNewDiagram);
           }
      }
      vDialog.close();

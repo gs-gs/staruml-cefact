@@ -1,4 +1,5 @@
 const Utils = require('./utils');
+var forEach = require('async-foreach').forEach;
 /**
  * @description class returns the Attributes available in class  
  * @class Properties
@@ -11,7 +12,7 @@ class Properties {
      constructor(objClass, assocSideClassLink) {
           this.objClass = objClass;
           this.assocSideClassLink = assocSideClassLink;
-          this.arrAttr = [];
+          this.arrAttRequired = [];
           this.utils = new Utils();
      }
 
@@ -22,7 +23,7 @@ class Properties {
       * @memberof Properties
       */
      getAttributes() {
-          return this.arrAttr;
+          return this.arrAttRequired;
      }
 
      /**
@@ -32,60 +33,58 @@ class Properties {
       */
      addProperties() {
           let mainPropertiesObj = {};
-          this.arrAttr = [];
-
-          let i, len;
+          let _this=this;
+          _this.arrAttRequired=[];
           let propertiesObj = {};
-          for (i = 0, len = this.objClass.attributes.length; i < len; i++) {
+          let attributes = this.objClass.attributes;
+          forEach(attributes, function (attribute) {
+               
                propertiesObj = {};
-               let attr = this.objClass.attributes[i];
-               let filterAttr = this.arrAttr.filter(item => {
-                    return item.name == attr.name;
+               let filterAttr = _this.arrAttRequired.filter(item => {
+                    return item.name == attribute.name;
                });
                if (filterAttr.length == 0) {
-                    this.arrAttr.push(attr);
-                    if (this.assocSideClassLink.length > 0 && attr.isID) {
-                         continue;
-                    }
-                    /* if(!attr.isID ){ */
-                    mainPropertiesObj[attr.name] = propertiesObj;
-                    /* Add Multiplicity */
-                    if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
-                         let itemsObj = {};
-                         propertiesObj.items = itemsObj;
-                         itemsObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-
-                         // itemsObj.type = this.utils.getType(attr.type);
-                         this.utils.addAttributeType(itemsObj,attr);
-
-
-
-                         propertiesObj.type = 'array';
-                         /**
-                          * Add MinItems of multiplicity is 1..*
-                          */
-                         if (attr.multiplicity === "1..*") {
-                              propertiesObj.minItems = 1;
-                         }
+                    _this.arrAttRequired.push(attribute);
+                    if (_this.assocSideClassLink.length > 0 && attribute.isID) {
+                         console.log("Skipped classlink : "+_this.objClass.name+" : "+attribute.name);
                     } else {
-                         propertiesObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
 
-                         // propertiesObj.type = this.utils.getType(attr.type);
-                         this.utils.addAttributeType(propertiesObj,attr);
+                         /* if(!attribute.isID ){ */
+                         mainPropertiesObj[attribute.name] = propertiesObj;
+                         /* Add Multiplicity */
+                         if (attribute.multiplicity === "1..*" || attribute.multiplicity === "0..*") {
+                              let itemsObj = {};
+                              propertiesObj.items = itemsObj;
+                              itemsObj.description = (attribute.documentation ? _this.utils.buildDescription(attribute.documentation) : "missing description");
 
-                         if (attr.type instanceof type.UMLEnumeration) {
-                              /* Add Enumeration */
-                              propertiesObj.enum = this.utils.getEnumerationLiteral(attr.type);
+                              _this.utils.addAttributeType(itemsObj, attribute);
+
+                              propertiesObj.type = 'array';
+                              /**
+                               * Add MinItems of multiplicity is 1..*
+                               */
+                              if (attribute.multiplicity === "1..*") {
+                                   propertiesObj.minItems = 1;
+                              }
+                         } else {
+                              propertiesObj.description = (attribute.documentation ? _this.utils.buildDescription(attribute.documentation) : "missing description");
+
+                              _this.utils.addAttributeType(propertiesObj, attribute);
+
+                              if (attribute.type instanceof type.UMLEnumeration) {
+                                   /* Add Enumeration */
+                                   propertiesObj.enum = _this.utils.getEnumerationLiteral(attribute.type);
+                              }
                          }
-                    }
-                    if (attr.defaultValue != "") {
-                         /* Add default field */
-                         propertiesObj.default = attr.defaultValue;
-                    }
-                    /* } */
+                         if (attribute.defaultValue != "") {
+                              /* Add default field */
+                              propertiesObj.default = attribute.defaultValue;
+                         }
+                         /* } */
 
+                    }
                }
-          }
+          });
           return mainPropertiesObj;
      }
 

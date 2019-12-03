@@ -242,7 +242,7 @@ function removeIDFromAttribute(UMLEle) {
             let mJsonAttrib = app.repository.writeObject(attrib);
             let mObjAttrib = JSON.parse(mJsonAttrib);
             delete mObjAttrib['_id'];
-            delete mObjAttrib['tags'];
+            // delete mObjAttrib['tags'];
             tempAttributes.push(mObjAttrib);
         });
     }
@@ -308,6 +308,18 @@ function removeIDFromLiterals(UMLEle) {
             let mJsonLiteral = app.repository.writeObject(literals);
             let mObjJsonLiteral = JSON.parse(mJsonLiteral);
             delete mObjJsonLiteral['_id'];
+
+            let tags = mObjJsonLiteral.tags;
+            /* remove ID from Tags from literal */
+            if (tags != null && tags.length > 0) {
+
+                let tempTags = [];
+                forEach(tags, function (tag) {
+                    delete tag['_id'];
+                    tempTags.push(tag);
+                });
+                mObjJsonLiteral.tags = tempTags;
+            }
             tempLiterals.push(mObjJsonLiteral);
         });
     }

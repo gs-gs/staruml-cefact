@@ -7,8 +7,8 @@ class Composition {
      /**
       * @constructor Creates an instance of Composition.
       */
-     constructor() {
-
+     constructor(reqAttr) {
+          this.arrAttRequired=reqAttr;
      }
 
 
@@ -25,6 +25,11 @@ class Composition {
           mainPropertiesObj[assocName] = propertiesObj;
           let ref='';
           let sName='';
+          let objAttrRe={
+               name:assocName,
+               multiplicity:assoc.end2.multiplicity
+          };
+          this.arrAttRequired.push(objAttrRe);
           /* mainPropertiesObj[assoc.name] = propertiesObj; */
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                let itemsObj = {};
