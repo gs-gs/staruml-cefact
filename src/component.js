@@ -23,7 +23,7 @@ class Component {
           this.mainComponentObj = {};
           this.mainSchemaObj = {};
           this.utils = new Utils();
-          this.arrAttr = [];
+          this.arrAttRequired = [];
           /* this.arrAssoc = []; */
           this.required = new Required();
           this.generalization = new Generalization();
@@ -77,7 +77,7 @@ class Component {
 
                let compositionRef = [];
 
-               this.arrAttr = properties.getAttributes();
+               this.arrAttRequired = properties.getAttributes();
 
 
                /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
@@ -98,13 +98,6 @@ class Component {
 
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
-                         /* let filterAssoc = this.arrAssoc.filter(item => {
-                              return item.name == assoc.name;
-                         }); */
-                         /* 
-                                                  console.log("filterAssoc",filterAssoc);
-                                                  if (filterAssoc.length == 0 && assoc.name != "") {
-                          */
 
 
                          let assocName = assoc.name;
@@ -125,26 +118,16 @@ class Component {
                                    openAPI.setError(jsonError);
                               }
                          });
-                         /* for(let prop in propKeys){
-                              if(assocName==prop){
-                                   let jsonError = {
-                                        isDuplicateProp: true,
-                                        msg: "There is duplicate property in class \'"+assoc.end1.reference.name+"\' named \'"+prop+"\'"
-                                   };
-                                   openAPI.setError(jsonError);
-                              }
-                         } */
-
 
                          if (assoc.end1.aggregation == constant.shared) {
                               /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
-                              let aggregation = new Aggregation();
+                              let aggregation = new Aggregation(this.arrAttRequired);
                               console.log("Classname", objClass.name);
                               mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
 
                          } else {
                               /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
-                              let composition = new Composition();
+                              let composition = new Composition(this.arrAttRequired);
                               console.log("Classname", objClass.name);
                               mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
                               // if(objClass.name == 'Logistics_TransportMovement' ){
@@ -152,15 +135,6 @@ class Component {
                               // }
 
                          }
-                         /* 
-                              this.arrAssoc.push(assoc);
-                         } else {
-                              if (assoc.name == "") {
-                                   flagNoName = true;
-                                   let str = assoc.end1.reference.name + "-" + assoc.end2.reference.name;
-                                   noNameRel.push(str);
-                              }
-                         } */
                     } else if (assoc instanceof type.UMLGeneralization) {
                          arrGeneral.push(assoc);
                     }
@@ -170,7 +144,7 @@ class Component {
                mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj, compositionRef);
 
 
-               let filterAttributes = this.arrAttr.filter(item => {
+               let filterAttributes = this.arrAttRequired.filter(item => {
                     return item.isID;
                });
 
@@ -188,9 +162,9 @@ class Component {
 
                }
 
-               /* Adding Required */
-               if (this.required.getRequiredAttributes(this.arrAttr).length > 0) {
-                    mainClassesObj.required = this.required.addRequiredAttributes(this.arrAttr);
+               /* Adding Required (Mandatory fields) */
+               if (this.required.getRequiredAttributes(this.arrAttRequired).length > 0) {
+                    mainClassesObj.required = this.required.addRequiredAttributes(this.arrAttRequired);
                }
 
                /**

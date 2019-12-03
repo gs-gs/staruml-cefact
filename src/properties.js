@@ -12,7 +12,7 @@ class Properties {
      constructor(objClass, assocSideClassLink) {
           this.objClass = objClass;
           this.assocSideClassLink = assocSideClassLink;
-          this.arrAttr = [];
+          this.arrAttRequired = [];
           this.utils = new Utils();
      }
 
@@ -23,7 +23,7 @@ class Properties {
       * @memberof Properties
       */
      getAttributes() {
-          return this.arrAttr;
+          return this.arrAttRequired;
      }
 
      /**
@@ -34,17 +34,17 @@ class Properties {
      addProperties() {
           let mainPropertiesObj = {};
           let _this=this;
-          _this.arrAttr=[];
+          _this.arrAttRequired=[];
           let propertiesObj = {};
           let attributes = this.objClass.attributes;
           forEach(attributes, function (attribute) {
                
                propertiesObj = {};
-               let filterAttr = _this.arrAttr.filter(item => {
+               let filterAttr = _this.arrAttRequired.filter(item => {
                     return item.name == attribute.name;
                });
                if (filterAttr.length == 0) {
-                    _this.arrAttr.push(attribute);
+                    _this.arrAttRequired.push(attribute);
                     if (_this.assocSideClassLink.length > 0 && attribute.isID) {
                          console.log("Skipped classlink : "+_this.objClass.name+" : "+attribute.name);
                     } else {
