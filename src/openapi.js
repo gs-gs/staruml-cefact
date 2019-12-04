@@ -421,13 +421,13 @@ class OpenApi {
      }
 
      /**
-      * @function getType
+      * @function getFileType
       * @description returns fileType
       * @static
       * @returns {integer}
       * @memberof OpenApi
       */
-     static getType() {
+     static getFileType() {
           return OpenApi.fileType;
      }
 
@@ -636,47 +636,71 @@ class OpenApi {
                     }
                     OpenApi.setPackagepath(rPath);
 
+                    if (OpenApi.getFileType() == constant.FILE_TYPE_JSON_SCHEMA) {
 
-                    /*  Add openapi version */
-                    MainJSON.addApiVersion('3.0.0');
-                    console.log("-----version-generated");
+                         let component = new Component();
+                         console.log("-----json-schema-generated-----");
+                         MainJSON.addJSONSchema(component);
+                         console.log(MainJSON.getJSONSchema());
 
-                    /* Add openapi information */
-                    let mInfo = new Info();
-                    MainJSON.addInfo(mInfo);
-                    console.log("-----info-generated");
+                         let generator = new FileGenerator();
+                         generator.generate().then(function (fileGenerate) {
+                              console.log("-----file-generated-----");
+                              console.log("result-file-generated", fileGenerate);
+                              resolve(fileGenerate);
 
-                    /* Add openapi servers */
-                    let server = new Servers();
-                    MainJSON.addServers(server);
-                    console.log("-----server-generated");
-
-                    /* Add openapi paths */
-                    let paths = new Paths();
-                    MainJSON.addPaths(paths);
-                    console.log("-----path-generated");
-
-                    /* Add openapi component */
-                    let component = new Component();
-                    MainJSON.addComponent(component);
-                    console.log("-----component-generated-----");
-                    console.log(MainJSON.getJSON());
-                    let generator = new FileGenerator();
-                    generator.generate().then(function (fileGenerate) {
-                         console.log("-----file-generated-----");
-                         console.log("result-file-generated", fileGenerate);
-                         generator.validateAndPrompt().then(function (result) {
-                              console.log("-----validate & prompt-----");
-                              console.log("result-validate & prompt", result);
-                              resolve(result);
                          }).catch(function (err) {
                               reject(err);
                          });
 
-                    }).catch(function (err) {
-                         reject(err);
-                    });
 
+                    } else {
+
+
+                         /*  Add openapi version */
+                         MainJSON.addApiVersion('3.0.0');
+                         console.log("-----version-generated");
+
+                         /* Add openapi information */
+                         let mInfo = new Info();
+                         MainJSON.addInfo(mInfo);
+                         console.log("-----info-generated");
+
+                         /* Add openapi servers */
+                         let server = new Servers();
+                         MainJSON.addServers(server);
+                         console.log("-----server-generated");
+
+                         /* Add openapi paths */
+                         let paths = new Paths();
+                         MainJSON.addPaths(paths);
+                         console.log("-----path-generated");
+
+                         /* Add openapi component */
+                         let component = new Component();
+                         MainJSON.addComponent(component);
+
+                         console.log("-----component-generated-----");
+                         console.log(MainJSON.getJSON());
+                         MainJSON.addJSONSchema(component);
+
+                         let generator = new FileGenerator();
+                         generator.generate().then(function (fileGenerate) {
+                              console.log("-----file-generated-----");
+                              console.log("result-file-generated", fileGenerate);
+                              generator.validateAndPrompt().then(function (result) {
+                                   console.log("-----validate & prompt-----");
+                                   console.log("result-validate & prompt", result);
+                                   resolve(result);
+                              }).catch(function (err) {
+                                   reject(err);
+                              });
+
+                         }).catch(function (err) {
+                              reject(err);
+                         });
+
+                    }
                } catch (error) {
 
                     console.error("generateOpenAPI", error);
@@ -820,7 +844,7 @@ module.exports.OpenApi = OpenApi;
 module.exports.getClasses = OpenApi.getUniqueClasses;
 module.exports.getUMLPackage = OpenApi.getPackage;
 module.exports.getPaths = OpenApi.getOperations;
-module.exports.getFileType = OpenApi.getType;
+module.exports.getFileType = OpenApi.getFileType;
 module.exports.getError = OpenApi.getError;
 module.exports.setError = OpenApi.setError;
 module.exports.setAppMode = OpenApi.setAppMode;

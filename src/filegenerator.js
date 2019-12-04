@@ -83,6 +83,37 @@ class FileGenerator {
           });
      }
 
+
+     /**
+      * @function createJSONSchema 
+      * @description Generate OpenAPI JSON Schema
+      * @memberof FileGenerator
+      */
+     createJSONSchema() {
+          return new Promise((resolve, reject) => {
+               try {
+                     /* Direct json from JsonOject */
+                     console.log("file-generate-started");
+                     this.basePath = null;
+                     let mainJson = null;
+                     this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
+                     mainJson = MainJSON.getJSONSchema();
+ 
+                     fs.writeFileSync(this.basePath, JSON.stringify(mainJson, null, 4));
+                     console.log("file-generate-ended");
+                     resolve({
+                          result: constant.FIELD_SUCCESS,
+                          message: 'JSON file generated successfully'
+                     });
+               } catch (error) {
+
+                    console.error("Error generating JSON file", error);
+                    this.utils.writeErrorToFile(error);
+                    reject(error);
+               }
+          });
+     }
+
      /**
       * @function generate
       * @description Generate OpenAPI Specs in JSON & YAML, JSON or YAML
@@ -94,7 +125,7 @@ class FileGenerator {
                try {
                     let fileType = openAPI.getFileType();
 
-                    if (fileType == 1) {
+                    if (fileType == constant.FILE_TYPE_JSON) {
                          console.log("---json-generate-start");
                          this.createJSON().then(function (result) {
                               console.log("---json-generate-end");
@@ -107,7 +138,7 @@ class FileGenerator {
 
 
 
-                    } else if (fileType == 2) {
+                    } else if (fileType == constant.FILE_TYPE_YML) {
                          /* Convert JSON object to YAML using j2yaml and save the file */
                          console.log("---yaml-generate-start");
                          this.createYAML().then(function (result) {
@@ -119,7 +150,7 @@ class FileGenerator {
                               reject(error);
                          });
 
-                    } else {
+                    } else if (fileType == constant.FILE_TYPE_JSON_YML) {
 
                          /* Direct conversion from JsonObject to JSON/YAML */
 
@@ -146,6 +177,17 @@ class FileGenerator {
 
                          });
 
+                    } else if (fileType == constant.FILE_TYPE_JSON_SCHEMA) {
+                         /* Direct json from JsonOject */
+                         console.log("---jsonschema-generate-start");
+                         this.createJSONSchema().then(function (result) {
+                              console.log("Result", result);
+                              console.log("---json-generate-end");
+                              resolve(result);
+                         }).catch(function (error) {
+                              console.error(error);
+                              reject(error);
+                         });
                     }
 
 

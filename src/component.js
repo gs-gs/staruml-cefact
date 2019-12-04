@@ -195,6 +195,177 @@ class Component {
           return this.mainComponentObj;
      }
 
+     /**
+      * @function getJSONSchema
+      * @description Returns component object 
+      * @returns {Object}
+      * @memberof Component
+      */
+     getJSONSchema() {
+          let classes, classLink;
+          if (openAPI.isModelPackage()) {
+               classes = openAPI.getClasses();
+               classLink = app.repository.select("@UMLAssociationClassLink");
+          } else if (openAPI.isModelDiagram()) {
+               classes = diagramEle.getUMLClass();
+               classLink = diagramEle.getUMLAssociationClassLink();
+          }
+          let arrIdClasses = [];
+          let flagNoName = false;
+          let noNameRel = [];
+          let schemaModel={};
+          this.mainSchemaObj = schemaModel;
+          schemaModel['model']=openAPI.getUMLPackage().name;
+          schemaModel['type']='object';
+          let schemaModelPropertyObj={};
+          schemaModel['properties']=schemaModelPropertyObj;
+          
+          this.duplicatePropertyError = [];
+          let duplicateDeletedReference = [];
+          classes.forEach(objClass => {
+               let mainClassesObj = {};
+               let mainPropertiesObj = {};
+
+               let assocSideClassLink = classLink.filter(item => {
+                    return item.associationSide.end2.reference._id == objClass._id;
+               });
+
+               console.log("-----track", assocSideClassLink);
+               /* Filter Association Class Link of Current Class */
+               let assocClassLink = classLink.filter(item => {
+                    return item.associationSide.end1.reference._id == objClass._id;
+               });
+
+               schemaModelPropertyObj[objClass.name] = mainClassesObj
+
+               mainClassesObj.type = 'object';
+
+               /* Adding Properties */
+               let properties = new Properties(objClass, assocSideClassLink);
+               /* Adds Attributes, With Enum, With Multiplicity */
+               mainPropertiesObj = properties.addProperties();
+               mainClassesObj.properties = mainPropertiesObj;
+
+               let compositionRef = [];
+
+               this.arrAttRequired = properties.getAttributes();
+
+
+               /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
+               mainPropertiesObj = this.associationClassLink.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef);
+
+
+
+               /* Get generalization of class */
+               let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
+               let aggregationClasses = [];
+               let classAssociations = this.associationClassLink.getAssociationOfAssociationClassLink(objClass);
+
+
+               console.log("classAssociations", classAssociations);
+               console.log("mainPropertiesObj", mainPropertiesObj);
+
+
+
+               classAssociations.forEach(assoc => {
+                    if (assoc instanceof type.UMLAssociation) {
+
+
+                         let assocName = assoc.name;
+                         if (assocName == '') {
+                              assocName = assoc.end2.reference.name;
+                         }
+
+                         /* Check for duplicate property */
+                         let propKeys = Object.keys(mainPropertiesObj);
+                         propKeys.forEach(prop => {
+                              if (assocName == prop) {
+                                   let error = "There is duplicate property in class \'" + assoc.end1.reference.name + "\' and property name is \'" + prop + "\'";
+                                   this.duplicatePropertyError.push(error);
+                                   let jsonError = {
+                                        isDuplicateProp: true,
+                                        msg: this.duplicatePropertyError
+                                   };
+                                   openAPI.setError(jsonError);
+                              }
+                         });
+
+                         if (assoc.end1.aggregation == constant.shared) {
+                              /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
+                              let aggregation = new Aggregation(this.arrAttRequired);
+                              console.log("Classname", objClass.name);
+                              mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
+
+                         } else {
+                              /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
+                              let composition = new Composition(this.arrAttRequired);
+                              console.log("Classname", objClass.name);
+                              mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
+                              // if(objClass.name == 'Logistics_TransportMovement' ){
+                              //      console.log("inner");
+                              // }
+
+                         }
+                    } else if (assoc instanceof type.UMLGeneralization) {
+                         arrGeneral.push(assoc);
+                    }
+               });
+
+               /* Adding Generalization : Adds refs of Class in 'allOf' object */
+               mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj, compositionRef);
+
+
+               let filterAttributes = this.arrAttRequired.filter(item => {
+                    return item.isID;
+               });
+
+               /* Generate Ids Class if needed */
+               if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
+                    let allOfArray = [];
+                    mainClassesObj.allOf = allOfArray;
+                    let allOfObj = {};
+                    allOfObj['$ref'] = constant.getReference() + objClass.name + 'Ids';
+                    allOfArray.push(allOfObj);
+
+                    allOfObj = {};
+                    allOfObj['type'] = 'object';
+                    allOfArray.push(allOfObj);
+
+               }
+
+               /* Adding Required (Mandatory fields) */
+               if (this.required.getRequiredAttributes(this.arrAttRequired).length > 0) {
+                    mainClassesObj.required = this.required.addRequiredAttributes(this.arrAttRequired);
+               }
+
+               /**
+                * Write sceparate schema for isID property of aggregation and relationship class
+                **/
+               if (assocSideClassLink.length > 0) {
+                    aggregationClasses.push(objClass);
+               }
+
+               aggregationClasses.forEach(itemClass => {
+                    let filter = arrIdClasses.filter(subItem => {
+                         return itemClass.name == subItem.name;
+                    });
+
+                    if (filter.length == 0) {
+                         this.associationClassLink.writeAssociationProperties(mainClassesObj, itemClass, schemaModelPropertyObj);
+                         arrIdClasses.push(itemClass)
+                    }
+               });
+               // if(objClass.name == 'Logistics_TransportMovement' ){
+               console.log("compositionRef", compositionRef);
+               /* Remove property which is already in ref of other property in the same schema */
+               this.removeDuplicatePropertyOfRefs(compositionRef,mainPropertiesObj,objClass,duplicateDeletedReference);
+
+               // }
+          });
+          console.log("Total duplicate deleted reference", duplicateDeletedReference);
+          return this.mainSchemaObj;
+     }
+
      removeDuplicatePropertyOfRefs(compositionRef,mainPropertiesObj,objClass,duplicateDeletedReference) {
 
           /* Find duplicate properties */
