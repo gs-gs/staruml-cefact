@@ -70,46 +70,46 @@ class Utils {
       */
      addAttributeType(itemsObj,attr) {
           let starUMLType=attr.type;
-          if (starUMLType === "Numeric") {
-               itemsObj.type="number";
-          } else if (starUMLType === "Indicator") {
-               itemsObj.type="boolean";
-          } else if(starUMLType === "Date"){
-               itemsObj.type="string";
-               itemsObj.format="date";
-          } else if(starUMLType === "DateTime"){
-               itemsObj.type="string";
-               itemsObj.format="date-time";
-          } else if(starUMLType === 'integer'){
-               itemsObj.type="integer";
-          } else if(starUMLType === 'int32'){
-               itemsObj.type="integer";
-               itemsObj.format="int32";
-          } else if(starUMLType === 'int64'){
-               itemsObj.type="integer";
-               itemsObj.format="int64";
-          } else if(starUMLType === 'number'){
-               itemsObj.type="number";
-          } else if(starUMLType === 'float'){
-               itemsObj.type="number";
-               itemsObj.format="float";
-          } else if(starUMLType === 'double'){
-               itemsObj.type="number";
-               itemsObj.format="double";
-          } else if(starUMLType === 'boolean'){
-               itemsObj.type="boolean";
-          } else if(starUMLType === 'password'){
-               itemsObj.type="string";
+          if (starUMLType === 'Numeric') {
+               itemsObj.type='number';
+          } else if (starUMLType === 'Indicator') {
+               itemsObj.type='boolean';
+          } else if(starUMLType === 'Date'){
+               itemsObj.type='string';
+               itemsObj.format='date';
+          } else if(starUMLType === 'DateTime'){
+               itemsObj.type='string';
+               itemsObj.format='date-time';
+          } else if(starUMLType === 'Integer'){
+               itemsObj.type='integer';
+          } else if(starUMLType === 'Int32'){
+               itemsObj.type='integer';
+               itemsObj.format='int32';
+          } else if(starUMLType === 'Int64'){
+               itemsObj.type='integer';
+               itemsObj.format='int64';
+          } else if(starUMLType === 'Number'){
+               itemsObj.type='number';
+          } else if(starUMLType === 'Float'){
+               itemsObj.type='number';
+               itemsObj.format='float';
+          } else if(starUMLType === 'Double'){
+               itemsObj.type='number';
+               itemsObj.format='double';
+          } else if(starUMLType === 'Boolean'){
+               itemsObj.type='boolean';
+          } else if(starUMLType === 'Password'){
+               itemsObj.type='string';
                itemsObj.format="password";
-          } else if(starUMLType === 'byte'){
-               itemsObj.type="string";
-               itemsObj.format="byte";
-          } else if(starUMLType === 'binary'){
-               itemsObj.type="string";
-               itemsObj.format="binary";
+          } else if(starUMLType === 'Byte'){
+               itemsObj.type='string';
+               itemsObj.format='byte';
+          } else if(starUMLType === 'Binary'){
+               itemsObj.type='string';
+               itemsObj.format='binary';
           } 
           else {
-               itemsObj.type="string";
+               itemsObj.type='string';
           }
      }
 
