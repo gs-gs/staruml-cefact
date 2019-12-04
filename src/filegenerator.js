@@ -103,7 +103,7 @@ class FileGenerator {
                      console.log("file-generate-ended");
                      resolve({
                           result: constant.FIELD_SUCCESS,
-                          message: 'JSON file generated successfully'
+                          message: 'JSON Schema is generated successfully at path : '+this.basePath
                      });
                } catch (error) {
 
