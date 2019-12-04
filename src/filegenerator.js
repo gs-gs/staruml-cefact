@@ -86,7 +86,7 @@ class FileGenerator {
 
      /**
       * @function createJSONSchema 
-      * @description Generate OpenAPI JSON Schema
+      * @description Generate JSON Schema from ClassDiagra,
       * @memberof FileGenerator
       */
      createJSONSchema() {
