@@ -78,7 +78,7 @@ class Properties {
                          }
                          if (attribute.defaultValue != "") {
                               /* Add default field */
-                              propertiesObj.default = attribute.defaultValue;
+                              propertiesObj.example = attribute.defaultValue;
                          }
                          /* } */
 
