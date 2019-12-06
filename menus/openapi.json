@@ -2,29 +2,39 @@
      "menu": [{
           "id": "tools",
           "submenu": [{
-               "label": "OpenAPI",
-               "id": "tool.openapi",
-               "submenu": [{
-                    "label": "Generate Specs",
-                    "id": "tools.openapi.generate",
-                    "command": "openapi:generate-specs"
-               }, {
-                    "label": "Test 'Package' or 'Diagram'",
-                    "id": "tools.openapi.testextension",
-                    "command": "openapi:test-single-package"
-               }, {
-                    "label": "Test Entire Project",
-                    "id": "tools.openapi.testallextension",
-                    "command": "openapi:test-entire-package"
-               }, {
-                    "label": "Extension version : 0.2.5",
-                    "id": "tools.openapi.version",
-                    "command": "generate:show-version-dialog"
-               }, {
-                    "label": "About Extension",
-                    "id": "tools.openapi.aboutext",
-                    "command": "openapi:about-us"
-               }]
-          }]
+                    "label": "OpenAPI",
+                    "id": "tool.openapi",
+                    "submenu": [{
+                         "label": "Generate Specs",
+                         "id": "tools.openapi.generate",
+                         "command": "openapi:generate-specs"
+                    }, {
+                         "label": "Test 'Package' or 'Diagram'",
+                         "id": "tools.openapi.testextension",
+                         "command": "openapi:test-single-package"
+                    }, {
+                         "label": "Test Entire Project",
+                         "id": "tools.openapi.testallextension",
+                         "command": "openapi:test-entire-package"
+                    }, {
+                         "label": "Extension version : 0.2.5",
+                         "id": "tools.openapi.version",
+                         "command": "generate:show-version-dialog"
+                    }, {
+                         "label": "About Extension",
+                         "id": "tools.openapi.aboutext",
+                         "command": "openapi:about-us"
+                    }]
+               },
+               {
+                    "label": "JSON-LD",
+                    "id": "tool.jsonld",
+                    "submenu": [{
+                         "label": "Generate",
+                         "id": "tools.jsold.generate",
+                         "command": "jsonld:generate"
+                    }]
+               }
+          ]
      }]
 }

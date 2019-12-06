@@ -1,5 +1,6 @@
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
+const jsonld = require('./src/schema/jsonld');
 var fs = require('fs');
 var path = require('path');
 const title = require('./package.json').title;
@@ -468,7 +469,15 @@ function testEntireDiagram() {
 function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
 }
+/**
+ * @function aboutUsExtension
+ * @description Display Information about Extension like the title and description of OpenAPI Specification.
+ */
+function generateJSONLD() {
+     console.log("generateJSONLD");
+     console.log(jsonld.generateJSONLD());
 
+}
 /**
  * @function init
  * @description function will be called when the extension is loaded
@@ -482,6 +491,8 @@ function init() {
      app.commands.register('openapi:test-entire-package', selectPkgDiagram);
      /* Register command to Display Extension information in dialog */
      app.commands.register('openapi:about-us', aboutUsExtension);
+     /* Register command to Generate Generate JSON-LD Specification */
+     app.commands.register('jsonld:generate', generateJSONLD);
 
 }
 
