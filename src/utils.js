@@ -68,48 +68,47 @@ class Utils {
       * @param {Object} itemsObj 
       * @memberof Utils
       */
-     addAttributeType(itemsObj,attr) {
-          let starUMLType=attr.type;
+     addAttributeType(itemsObj, attr) {
+          let starUMLType = attr.type;
           if (starUMLType === 'Numeric') {
-               itemsObj.type='number';
+               itemsObj.type = 'number';
           } else if (starUMLType === 'Indicator') {
-               itemsObj.type='boolean';
-          } else if(starUMLType === 'Date'){
-               itemsObj.type='string';
-               itemsObj.format='date';
-          } else if(starUMLType === 'DateTime'){
-               itemsObj.type='string';
-               itemsObj.format='date-time';
-          } else if(starUMLType === 'Integer'){
-               itemsObj.type='integer';
-          } else if(starUMLType === 'Int32'){
-               itemsObj.type='integer';
-               itemsObj.format='int32';
-          } else if(starUMLType === 'Int64'){
-               itemsObj.type='integer';
-               itemsObj.format='int64';
-          } else if(starUMLType === 'Number'){
-               itemsObj.type='number';
-          } else if(starUMLType === 'Float'){
-               itemsObj.type='number';
-               itemsObj.format='float';
-          } else if(starUMLType === 'Double'){
-               itemsObj.type='number';
-               itemsObj.format='double';
-          } else if(starUMLType === 'Boolean'){
-               itemsObj.type='boolean';
-          } else if(starUMLType === 'Password'){
-               itemsObj.type='string';
-               itemsObj.format="password";
-          } else if(starUMLType === 'Byte'){
-               itemsObj.type='string';
-               itemsObj.format='byte';
-          } else if(starUMLType === 'Binary'){
-               itemsObj.type='string';
-               itemsObj.format='binary';
-          } 
-          else {
-               itemsObj.type='string';
+               itemsObj.type = 'boolean';
+          } else if (starUMLType === 'Date') {
+               itemsObj.type = 'string';
+               itemsObj.format = 'date';
+          } else if (starUMLType === 'DateTime') {
+               itemsObj.type = 'string';
+               itemsObj.format = 'date-time';
+          } else if (starUMLType === 'Integer') {
+               itemsObj.type = 'integer';
+          } else if (starUMLType === 'Int32') {
+               itemsObj.type = 'integer';
+               itemsObj.format = 'int32';
+          } else if (starUMLType === 'Int64') {
+               itemsObj.type = 'integer';
+               itemsObj.format = 'int64';
+          } else if (starUMLType === 'Number') {
+               itemsObj.type = 'number';
+          } else if (starUMLType === 'Float') {
+               itemsObj.type = 'number';
+               itemsObj.format = 'float';
+          } else if (starUMLType === 'Double') {
+               itemsObj.type = 'number';
+               itemsObj.format = 'double';
+          } else if (starUMLType === 'Boolean') {
+               itemsObj.type = 'boolean';
+          } else if (starUMLType === 'Password') {
+               itemsObj.type = 'string';
+               itemsObj.format = "password";
+          } else if (starUMLType === 'Byte') {
+               itemsObj.type = 'string';
+               itemsObj.format = 'byte';
+          } else if (starUMLType === 'Binary') {
+               itemsObj.type = 'string';
+               itemsObj.format = 'binary';
+          } else {
+               itemsObj.type = 'string';
           }
      }
 
@@ -188,7 +187,23 @@ class Utils {
           }
      }
 
-     
+
+}
+function isEmpty(umlPackage) {
+     let ownedElements = [];
+     umlPackage.ownedElements.filter(function (item) {
+          if (item instanceof type.UMLClass ||
+               item instanceof type.UMLInterface ||
+               item instanceof type.UMLEnumeration) {
+
+               ownedElements.push(item);
+          }
+     });
+     if (ownedElements.length > 0) {
+          return false;
+     } 
+     return true;
 }
 
 module.exports = Utils;
+module.exports.isEmpty = isEmpty;

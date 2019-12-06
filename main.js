@@ -1,5 +1,7 @@
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
+const jsonld = require('./src/schema/jsonld');
+const FileGenerator = require('./src/filegenerator');
 var fs = require('fs');
 var path = require('path');
 const title = require('./package.json').title;
@@ -7,6 +9,12 @@ const description = require('./package.json').description;
 let vDialog = null;
 var forEach = require('async-foreach').forEach;
 var diagramEle = require('./src/diagram/diagramElement');
+var utils = require('./src/utils');
+const JSON_FILE_FILTERS = [{
+     name: 'JSON File',
+     extensions: ['json']
+ }]
+
 
 /**
  * @function generateSpecs
@@ -43,16 +51,8 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
 
                               openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                               umlPackage = returnValue;
-                              let ownedElements = [];
-                              umlPackage.ownedElements.filter(function (item) {
-                                   if (item instanceof type.UMLClass ||
-                                        item instanceof type.UMLInterface ||
-                                        item instanceof type.UMLEnumeration) {
 
-                                        ownedElements.push(item);
-                                   }
-                              });
-                              if (ownedElements.length > 0) {
+                              if (!utils.isEmpty(umlPackage)) {
                                    fileTypeSelection(umlPackage, options);
                               } else {
                                    app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
@@ -468,7 +468,63 @@ function testEntireDiagram() {
 function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
 }
+/**
+ * @function aboutUsExtension
+ * @description Display Information about Extension like the title and description of OpenAPI Specification.
+ */
+function generateJSONLD() {
 
+     /* Open element picker dialog to pick package */
+     app.elementPickerDialog
+          .showDialog(constant.JSONLD_MSG_PICKERDIALOG, null, null) /* type.UMLPackage */
+          .then(function ({
+               buttonId,
+               returnValue
+          }) {
+               if (buttonId === "ok") {
+
+                    
+                    
+
+
+
+                    let varSel = returnValue.getClassName();
+                    let valPackagename = type.UMLPackage.name;
+                    if (varSel == valPackagename) {
+
+                         if (!utils.isEmpty(returnValue)) {
+
+
+
+                              var _filename = returnValue.name;
+                              var basePath = app.dialogs.showSaveDialog('Export JSON-LD As JSON', _filename+'-jsonld' + '.json', JSON_FILE_FILTERS);
+                              if (basePath == null) {
+                                   console.log("Dialog cancelled : basePath not available")
+                                   return;
+                              }
+
+                              console.log("generateJSONLD");
+                              jsonld.setUMLPackage(returnValue);
+                              let objJSONLd = jsonld.generateJSONLD();
+                              let generator = new FileGenerator();
+                              generator.createJSONLD(basePath,objJSONLd).then(function(res){
+                                   if(res.result==constant.FIELD_SUCCESS){
+                                        app.dialogs.showInfoDialog(res.message);
+                                   }
+                              }).catch(function (err) {
+                                   app.dialogs.showErrorDialog(err.message);
+                              });;
+                              console.log(objJSONLd);
+                         } else {
+                              app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
+                         }
+                    } else {
+                         app.dialogs.showErrorDialog(constant.JSONLD_MSG_PICKERDIALOG);
+                    }
+               }
+          });
+
+}
 /**
  * @function init
  * @description function will be called when the extension is loaded
@@ -482,6 +538,8 @@ function init() {
      app.commands.register('openapi:test-entire-package', selectPkgDiagram);
      /* Register command to Display Extension information in dialog */
      app.commands.register('openapi:about-us', aboutUsExtension);
+     /* Register command to Generate Generate JSON-LD Specification */
+     app.commands.register('jsonld:generate', generateJSONLD);
 
 }
 
