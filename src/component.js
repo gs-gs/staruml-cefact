@@ -211,8 +211,6 @@ class Component {
                classLink = diagramEle.getUMLAssociationClassLink();
           }
           let arrIdClasses = [];
-          let flagNoName = false;
-          let noNameRel = [];
           let schemaModel={};
           this.mainSchemaObj = schemaModel;
           schemaModel['model']=openAPI.getUMLPackage().name;
