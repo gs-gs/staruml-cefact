@@ -1,6 +1,7 @@
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
 const jsonld = require('./src/schema/jsonld');
+const FileGenerator = require('./src/filegenerator');
 var fs = require('fs');
 var path = require('path');
 const title = require('./package.json').title;
@@ -9,6 +10,10 @@ let vDialog = null;
 var forEach = require('async-foreach').forEach;
 var diagramEle = require('./src/diagram/diagramElement');
 var utils = require('./src/utils');
+const JSON_FILE_FILTERS = [{
+     name: 'JSON File',
+     extensions: ['json']
+ }]
 
 
 /**
@@ -477,16 +482,39 @@ function generateJSONLD() {
                returnValue
           }) {
                if (buttonId === "ok") {
+
+                    
+                    
+
+
+
                     let varSel = returnValue.getClassName();
                     let valPackagename = type.UMLPackage.name;
                     if (varSel == valPackagename) {
 
                          if (!utils.isEmpty(returnValue)) {
+
+
+
+                              var _filename = returnValue.name;
+                              var basePath = app.dialogs.showSaveDialog('Export JSON-LD As JSON', _filename+'-jsonld' + '.json', JSON_FILE_FILTERS);
+                              if (basePath == null) {
+                                   console.log("Dialog cancelled : basePath not available")
+                                   return;
+                              }
+
                               console.log("generateJSONLD");
                               jsonld.setUMLPackage(returnValue);
                               let objJSONLd = jsonld.generateJSONLD();
+                              let generator = new FileGenerator();
+                              generator.createJSONLD(basePath,objJSONLd).then(function(res){
+                                   if(res.result==constant.FIELD_SUCCESS){
+                                        app.dialogs.showInfoDialog(res.message);
+                                   }
+                              }).catch(function (err) {
+                                   app.dialogs.showErrorDialog(err.message);
+                              });;
                               console.log(objJSONLd);
-                              app.dialogs.showInfoDialog(constant.JSON_LD_SUCCESS_MSG);
                          } else {
                               app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
                          }

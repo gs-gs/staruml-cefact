@@ -38,7 +38,7 @@ const Constant = {
      DIALOG_MSG_ERRORDIALOG: "Please select the project or a package",
      DIALOG_MSG_ERROR_SELECT_PACKAGE: "Please select a package or diagram to generate OpenAPI Specification.",
      PACKAGE_SELECTION_ERROR: "No elements found in selected package. Please select other package.",
-     JSON_LD_SUCCESS_MSG: "JSON-LD generated successfully.",
+     JSON_LD_SUCCESS_MSG: "JSON-LD generated successfully at : ",
      DIALOG_MSG_TEST_PICKERDIALOG: "Select package or diagram to test OpenAPI Specs.",
      msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
      FILE_TYPE_JSON:1,

@@ -92,19 +92,19 @@ class FileGenerator {
      createJSONSchema() {
           return new Promise((resolve, reject) => {
                try {
-                     /* Direct json from JsonOject */
-                     console.log("file-generate-started");
-                     this.basePath = null;
-                     let mainJson = null;
-                     this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
-                     mainJson = MainJSON.getJSONSchema();
- 
-                     fs.writeFileSync(this.basePath, JSON.stringify(mainJson, null, 4));
-                     console.log("file-generate-ended");
-                     resolve({
-                          result: constant.FIELD_SUCCESS,
-                          message: 'JSON Schema is generated successfully at path : '+this.basePath
-                     });
+                    /* Direct json from JsonOject */
+                    console.log("file-generate-started");
+                    this.basePath = null;
+                    let mainJson = null;
+                    this.basePath = path.join(openAPI.getFilePath(), openAPI.getUMLPackage().name + '.json');
+                    mainJson = MainJSON.getJSONSchema();
+
+                    fs.writeFileSync(this.basePath, JSON.stringify(mainJson, null, 4));
+                    console.log("file-generate-ended");
+                    resolve({
+                         result: constant.FIELD_SUCCESS,
+                         message: 'JSON Schema is generated successfully at path : ' + this.basePath
+                    });
                } catch (error) {
 
                     console.error("Error generating JSON file", error);
@@ -333,6 +333,30 @@ class FileGenerator {
                          }
                     }
                } catch (error) {
+                    reject(error);
+               }
+          });
+     }
+
+     /**
+      * @function createJSONLD
+      * @description Generate OpenAPI Specs & Writes it in JSON file
+      * @memberof FileGenerator
+      */
+     createJSONLD(basePath, jsonLD) {
+          return new Promise((resolve, reject) => {
+               try {
+
+                    fs.writeFileSync(basePath, JSON.stringify(jsonLD, null, 4));
+                    resolve({
+                         result: constant.FIELD_SUCCESS,
+                         message: constant.JSON_LD_SUCCESS_MSG + basePath
+                    });
+
+               } catch (error) {
+
+                    console.error("Error generating JSON file", error);
+                    this.utils.writeErrorToFile(error);
                     reject(error);
                }
           });
