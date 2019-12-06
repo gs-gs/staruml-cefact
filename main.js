@@ -486,6 +486,7 @@ function generateJSONLD() {
                               jsonld.setUMLPackage(returnValue);
                               let objJSONLd = jsonld.generateJSONLD();
                               console.log(objJSONLd);
+                              app.dialogs.showInfoDialog(constant.JSON_LD_SUCCESS_MSG);
                          } else {
                               app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
                          }

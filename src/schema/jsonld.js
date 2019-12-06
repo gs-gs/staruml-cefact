@@ -120,8 +120,7 @@ function getRdfsClassesArr() {
         let tClass = {};
         tClass['@id'] = mClass.name;
         tClass['@type'] = 'rdfs:Class';
-        let mSubClasses = [];
-        tClass['rdfs:subClassOf'] = getSubClasses(mSubClasses, mClass);
+        tClass['rdfs:subClassOf'] = getParentClasses(mClass);
 
         rdfsClassArr.push(tClass);
 
@@ -142,8 +141,6 @@ function getRdfsClassesArr() {
         let tClass = {};
         tClass['@id'] = mEnum.name;
         tClass['@type'] = 'rdfs:Class';
-        let mSubEnums = [];
-        tClass['rdfs:subClassOf'] = getSubClasses(mSubEnums, mEnum);
         rdfsClassArr.push(tClass);
 
         forEach(mEnum.literals, function (literal) {
@@ -161,6 +158,16 @@ function getRdfsClassesArr() {
     return rdfsClassArr;
 }
 
+function getParentClasses(mElement) {
+    let parentClasses=[];
+    let generalization=app.repository.select("@UMLGeneralization");
+    forEach(generalization,function(gen){
+        if(gen.source._id==mElement._id){
+            parentClasses.push(gen.target.name);
+        }
+    });
+    return parentClasses;
+}
 function getSubClasses(subElements, mElement) {
     if (mElement.hasOwnProperty('_parent') && mElement._parent != null) {
         let mNElement = mElement._parent;
