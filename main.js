@@ -8,6 +8,8 @@ const description = require('./package.json').description;
 let vDialog = null;
 var forEach = require('async-foreach').forEach;
 var diagramEle = require('./src/diagram/diagramElement');
+var utils = require('./src/utils');
+
 
 /**
  * @function generateSpecs
@@ -44,16 +46,8 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
 
                               openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                               umlPackage = returnValue;
-                              let ownedElements = [];
-                              umlPackage.ownedElements.filter(function (item) {
-                                   if (item instanceof type.UMLClass ||
-                                        item instanceof type.UMLInterface ||
-                                        item instanceof type.UMLEnumeration) {
 
-                                        ownedElements.push(item);
-                                   }
-                              });
-                              if (ownedElements.length > 0) {
+                              if (!utils.isEmpty(umlPackage)) {
                                    fileTypeSelection(umlPackage, options);
                               } else {
                                    app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
@@ -474,8 +468,32 @@ function aboutUsExtension() {
  * @description Display Information about Extension like the title and description of OpenAPI Specification.
  */
 function generateJSONLD() {
-     console.log("generateJSONLD");
-     console.log(jsonld.generateJSONLD());
+
+     /* Open element picker dialog to pick package */
+     app.elementPickerDialog
+          .showDialog(constant.JSONLD_MSG_PICKERDIALOG, null, null) /* type.UMLPackage */
+          .then(function ({
+               buttonId,
+               returnValue
+          }) {
+               if (buttonId === "ok") {
+                    let varSel = returnValue.getClassName();
+                    let valPackagename = type.UMLPackage.name;
+                    if (varSel == valPackagename) {
+
+                         if (!utils.isEmpty(returnValue)) {
+                              console.log("generateJSONLD");
+                              jsonld.setUMLPackage(returnValue);
+                              let objJSONLd = jsonld.generateJSONLD();
+                              console.log(objJSONLd);
+                         } else {
+                              app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
+                         }
+                    } else {
+                         app.dialogs.showErrorDialog(constant.JSONLD_MSG_PICKERDIALOG);
+                    }
+               }
+          });
 
 }
 /**

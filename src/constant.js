@@ -33,6 +33,7 @@ const Constant = {
      FIELD_ERROR: 'error',
      DISPLAY_REPO_NAME: reponame,
      DISPLAY_VERSION: version,
+     JSONLD_MSG_PICKERDIALOG: "Select package to generate JSON-LD Specs.",
      DIALOG_MSG_PICKERDIALOG: "Select package or diagram to generate OpenAPI Specs.",
      DIALOG_MSG_ERRORDIALOG: "Please select the project or a package",
      DIALOG_MSG_ERROR_SELECT_PACKAGE: "Please select a package or diagram to generate OpenAPI Specification.",

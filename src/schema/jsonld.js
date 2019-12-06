@@ -76,14 +76,14 @@ function getRdfsInstance() {
 function getGraph() {
     let objGraph = {};
 
-    objGraph['@id'] = 'https://edi3.org/2019/11/vocab#',
-        objGraph['@type'] = 'owl:Ontology',
-        objGraph['dc:title'] = 'EDI3 ontology',
-        objGraph['dc:description'] = 'This document describes the RDFS vocabulary used for EDI3 UN/CEFACT Standards.',
-        objGraph['dc:date'] = getDCDate(),
-        objGraph['rdfs:seeAlso'] = getSeeAlso(),
-        objGraph['rdfs_classes'] = getRdfsClassesArr(),
-        objGraph['rdfs_properties'] = getRdfsPropertiesArr()
+    objGraph['@id'] = 'https://edi3.org/2019/11/vocab#';
+    objGraph['@type'] = 'owl:Ontology';
+    objGraph['dc:title'] = 'EDI3 ontology';
+    objGraph['dc:description'] = 'This document describes the RDFS vocabulary used for EDI3 UN/CEFACT Standards.';
+    objGraph['dc:date'] = getDCDate();
+    objGraph['rdfs:seeAlso'] = getSeeAlso();
+    objGraph['rdfs_classes'] = getRdfsClassesArr();
+    objGraph['rdfs_properties'] = getRdfsPropertiesArr();
 
 
     return objGraph;
@@ -105,10 +105,69 @@ function getSeeAlso() {
 }
 
 function getRdfsClassesArr() {
-    let rdfsClassArr = [
-        /* {# classes #} */
-    ];
+    let rdfsClassArr = [ /* {# classes #} */ ];
+    let mUMLPackage = getUMLPackage();
+    let mClasses = mUMLPackage.ownedElements.filter(function (element) {
+        return element instanceof type.UMLClass;
+    });
+    let mInterfaces = mUMLPackage.ownedElements.filter(function (element) {
+        return element instanceof type.UMLInterface;
+    });
+    let mEnumeration = mUMLPackage.ownedElements.filter(function (element) {
+        return element instanceof type.UMLEnumeration;
+    });
+    forEach(mClasses, function (mClass) {
+        let tClass = {};
+        tClass['@id'] = mClass.name;
+        tClass['@type'] = 'rdfs:Class';
+        let mSubClasses = [];
+        tClass['rdfs:subClassOf'] = getSubClasses(mSubClasses, mClass);
+
+        rdfsClassArr.push(tClass);
+
+    });
+
+    /* forEach(mInterfaces, function (mInterface) {
+        let tClass = {};
+        tClass['@id'] = mInterface.name;
+        tClass['@type'] = 'rdfs:Class';
+        let mSubInterface = [];
+        tClass['rdfs:subClassOf'] = getSubClasses(mSubInterface, mInterface);
+
+        rdfsClassArr.push(tClass);
+
+    }); */
+
+    forEach(mEnumeration, function (mEnum) {
+        let tClass = {};
+        tClass['@id'] = mEnum.name;
+        tClass['@type'] = 'rdfs:Class';
+        let mSubEnums = [];
+        tClass['rdfs:subClassOf'] = getSubClasses(mSubEnums, mEnum);
+        rdfsClassArr.push(tClass);
+
+        forEach(mEnum.literals, function (literal) {
+            let tLiteral = {};
+            tLiteral['@id'] = literal.name;
+            tLiteral['@type'] = 'rdfs:Class';
+            let mSubLiterals = [mEnum.name];
+            tLiteral['rdfs:subClassOf'] = mSubLiterals;
+            rdfsClassArr.push(tLiteral);
+        });
+
+    });
+
+
     return rdfsClassArr;
+}
+
+function getSubClasses(subElements, mElement) {
+    if (mElement.hasOwnProperty('_parent') && mElement._parent != null) {
+        let mNElement = mElement._parent;
+        subElements.push(mNElement.name);
+        getSubClasses(subElements, mNElement);
+    }
+    return subElements;
 }
 
 function getRdfsPropertiesArr() {
@@ -117,4 +176,16 @@ function getRdfsPropertiesArr() {
     ];
     return rdfsPropertiesArr;
 }
+
+let UMLPackage = null;
+
+function setUMLPackage(mUMLPackage) {
+    UMLPackage = mUMLPackage;
+}
+
+function getUMLPackage() {
+    return UMLPackage;
+}
 module.exports.generateJSONLD = generateJSONLD;
+module.exports.setUMLPackage = setUMLPackage;
+module.exports.getUMLPackage = getUMLPackage;
