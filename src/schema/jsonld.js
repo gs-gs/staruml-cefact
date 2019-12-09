@@ -189,10 +189,20 @@ function getParentClasses(mElement) {
     return parentClasses;
 }
 
+function getSubClasses(subElements, mElement) {
+    if (mElement.hasOwnProperty('_parent') && mElement._parent != null) {
+        let mNElement = mElement._parent;
+        subElements.push(mNElement.name);
+        getSubClasses(subElements, mNElement);
+    }
+    return subElements;
+}
+
 function getRdfsPropertiesArr() {
     let rdfsPropertiesArr = [ /* {# properties #} */ ];
     let mUMLPackage = getUMLPackage();
 
+    let associations = app.repository.select("@UMLAssociation");
 
 
     let mClasses = mUMLPackage.ownedElements.filter(function (element) {
@@ -208,11 +218,60 @@ function getRdfsPropertiesArr() {
             objProperty['@type'] = 'rdf:Property';
             objProperty['rdfs:domain'] = mClass.name;
 
-            rdfsPropertiesArr.push(objProperty);
+            let range=getRange(attr);
+            objProperty['rdfs:range'] = getRange(attr);
         });
 
     });
     return rdfsPropertiesArr;
+}
+
+function isString(s) {
+    return typeof (s) === 'string' || s instanceof String;
+}
+
+function getRange(attr) {
+    let range = '';
+    let starUMLType = attr.type;
+    if (isString(starUMLType)) {
+
+        if (starUMLType === 'Numeric') {
+            range = 'xsd:nonNegativeInteger';
+        } else if (starUMLType === 'Indicator') {
+            range = 'xsd:boolean';
+        } else if (starUMLType === 'Date') {
+            range = 'xsd:date';
+        } else if (starUMLType === 'DateTime') {
+            range = 'xsd:dateTime';
+        } else if (starUMLType === 'Integer') {
+            range = 'xsd:int';
+        } else if (starUMLType === 'Int32') {
+            range = 'xsd:int';
+        } else if (starUMLType === 'Int64') {
+            range = 'xsd:long';
+        } else if (starUMLType === 'Number') {
+            range = 'xsd:integer';
+        } else if (starUMLType === 'Float') {
+            range = 'xsd:float';
+        } else if (starUMLType === 'Double') {
+            range = 'xsd:double';
+        } else if (starUMLType === 'Boolean') {
+            range = 'xsd:string';
+        } else if (starUMLType === 'Password') {
+            range = 'xsd:string';
+        } else if (starUMLType === 'Byte') {
+            range = 'xsd:byte';
+        } else if (starUMLType === 'Binary') {
+            range = 'xsd:string';
+        } else if (starUMLType === 'Text') {
+            range = 'xsd:string';
+        } else if (starUMLType === 'Boolean') {
+            range = 'xsd:boolean';
+        }
+    } else {
+        range = starUMLType.name;
+    }
+    return range;
 }
 
 let UMLPackage = null;
