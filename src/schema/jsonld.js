@@ -124,6 +124,25 @@ function getRdfsClassesArr() {
 
         rdfsClassArr.push(tClass);
 
+        forEach(mClass.attributes, function (attr) {
+            if (attr.type instanceof type.UMLEnumeration) {
+                let mEnum=attr.type;
+                let tClass = {};
+                tClass['@id'] = mEnum.name;
+                tClass['@type'] = 'rdfs:Class';
+                rdfsClassArr.push(tClass);
+
+                forEach(mEnum.literals, function (literal) {
+                    let tLiteral = {};
+                    tLiteral['@id'] = literal.name;
+                    tLiteral['@type'] = 'rdfs:Class';
+                    let mSubLiterals = [mEnum.name];
+                    tLiteral['rdfs:subClassOf'] = mSubLiterals;
+                    rdfsClassArr.push(tLiteral);
+                });
+            }
+        });
+
     });
 
     /* forEach(mInterfaces, function (mInterface) {
@@ -136,38 +155,39 @@ function getRdfsClassesArr() {
         rdfsClassArr.push(tClass);
 
     }); */
+    /* 
+        forEach(mEnumeration, function (mEnum) {
+            let tClass = {};
+            tClass['@id'] = mEnum.name;
+            tClass['@type'] = 'rdfs:Class';
+            rdfsClassArr.push(tClass);
 
-    forEach(mEnumeration, function (mEnum) {
-        let tClass = {};
-        tClass['@id'] = mEnum.name;
-        tClass['@type'] = 'rdfs:Class';
-        rdfsClassArr.push(tClass);
+            forEach(mEnum.literals, function (literal) {
+                let tLiteral = {};
+                tLiteral['@id'] = literal.name;
+                tLiteral['@type'] = 'rdfs:Class';
+                let mSubLiterals = [mEnum.name];
+                tLiteral['rdfs:subClassOf'] = mSubLiterals;
+                rdfsClassArr.push(tLiteral);
+            });
 
-        forEach(mEnum.literals, function (literal) {
-            let tLiteral = {};
-            tLiteral['@id'] = literal.name;
-            tLiteral['@type'] = 'rdfs:Class';
-            let mSubLiterals = [mEnum.name];
-            tLiteral['rdfs:subClassOf'] = mSubLiterals;
-            rdfsClassArr.push(tLiteral);
         });
-
-    });
-
+     */
 
     return rdfsClassArr;
 }
 
 function getParentClasses(mElement) {
-    let parentClasses=[];
-    let generalization=app.repository.select("@UMLGeneralization");
-    forEach(generalization,function(gen){
-        if(gen.source._id==mElement._id){
+    let parentClasses = [];
+    let generalization = app.repository.select("@UMLGeneralization");
+    forEach(generalization, function (gen) {
+        if (gen.source._id == mElement._id) {
             parentClasses.push(gen.target.name);
         }
     });
     return parentClasses;
 }
+
 function getSubClasses(subElements, mElement) {
     if (mElement.hasOwnProperty('_parent') && mElement._parent != null) {
         let mNElement = mElement._parent;
