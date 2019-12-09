@@ -12,6 +12,11 @@ function generateJSONLD() {
 
 }
 
+/**
+ * @function getContext
+ * @description returns the array of JSON-LD context template
+ * @returns {Array}
+ */
 function getContext() {
     let arrContext = [];
     let objContext = {};
@@ -36,6 +41,11 @@ function getContext() {
 
 }
 
+/**
+ * @function getRdfsClasses
+ * @description returns the object of rdf classes
+ * @returns {Object}
+ */
 function getRdfsClasses() {
     let objRdfsClasses = {
         "@reverse": "rdfs:isDefinedBy",
@@ -46,6 +56,11 @@ function getRdfsClasses() {
 
 };
 
+/**
+ * @function getRdfsProperties
+ * @description returns the object of rdf properties
+ * @returns {Object}
+ */
 function getRdfsProperties() {
     let objRdfsProperties = {
         "@reverse": "rdfs:isDefinedBy",
@@ -55,6 +70,11 @@ function getRdfsProperties() {
     return objRdfsProperties;
 }
 
+/**
+ * @function getRdfsDatatype
+ * @description returns the object of rdf datatype
+ * @returns {Object}
+ */
 function getRdfsDatatype() {
     let objRdfsDatatype = {
         "@reverse": "rdfs:isDefinedBy",
@@ -64,6 +84,11 @@ function getRdfsDatatype() {
     return objRdfsDatatype;
 }
 
+/**
+ * @function getRdfsInstance
+ * @description returns the object of rdf instance
+ * @returns {Object}
+ */
 function getRdfsInstance() {
     let objRdfsInstance = {
         "@reverse": "rdfs:isDefinedBy",
@@ -73,6 +98,11 @@ function getRdfsInstance() {
     return objRdfsInstance;
 }
 
+/**
+ * @function getGraph
+ * @description returns the object of graph template
+ * @returns {Object}
+ */
 function getGraph() {
     let objGraph = {};
 
@@ -89,6 +119,11 @@ function getGraph() {
     return objGraph;
 }
 
+/**
+ * @function getDCDate
+ * @description returns the object of dcdate
+ * @returns {Object}
+ */
 function getDCDate() {
     let dcDate = {
         "@value": "2019-11-29",
@@ -97,6 +132,11 @@ function getDCDate() {
     return dcDate;
 }
 
+/**
+ * @function getSeeAlso
+ * @description returns the object of seealso
+ * @returns {Object}
+ */
 function getSeeAlso() {
     let sAlsoArr = [
         "https://edi3.org/"
@@ -104,18 +144,18 @@ function getSeeAlso() {
     return sAlsoArr;
 }
 
+/**
+ * @function getRdfsClassesArr
+ * @description returns the array of classes 
+ * @returns {Array}
+ */
 function getRdfsClassesArr() {
     let rdfsClassArr = [ /* {# classes #} */ ];
     let mUMLPackage = getUMLPackage();
     let mClasses = mUMLPackage.ownedElements.filter(function (element) {
         return element instanceof type.UMLClass;
     });
-    let mInterfaces = mUMLPackage.ownedElements.filter(function (element) {
-        return element instanceof type.UMLInterface;
-    });
-    let mEnumeration = mUMLPackage.ownedElements.filter(function (element) {
-        return element instanceof type.UMLEnumeration;
-    });
+    
     forEach(mClasses, function (mClass) {
         let tClass = {};
         tClass['@id'] = mClass.name;
@@ -124,50 +164,51 @@ function getRdfsClassesArr() {
 
         rdfsClassArr.push(tClass);
 
-    });
+        forEach(mClass.attributes, function (attr) {
+            if (attr.type instanceof type.UMLEnumeration) {
+                let mEnum = attr.type;
+                let tClass = {};
+                tClass['@id'] = mEnum.name;
+                tClass['@type'] = 'rdfs:Class';
+                rdfsClassArr.push(tClass);
 
-    /* forEach(mInterfaces, function (mInterface) {
-        let tClass = {};
-        tClass['@id'] = mInterface.name;
-        tClass['@type'] = 'rdfs:Class';
-        let mSubInterface = [];
-        tClass['rdfs:subClassOf'] = getSubClasses(mSubInterface, mInterface);
-
-        rdfsClassArr.push(tClass);
-
-    }); */
-
-    forEach(mEnumeration, function (mEnum) {
-        let tClass = {};
-        tClass['@id'] = mEnum.name;
-        tClass['@type'] = 'rdfs:Class';
-        rdfsClassArr.push(tClass);
-
-        forEach(mEnum.literals, function (literal) {
-            let tLiteral = {};
-            tLiteral['@id'] = literal.name;
-            tLiteral['@type'] = 'rdfs:Class';
-            let mSubLiterals = [mEnum.name];
-            tLiteral['rdfs:subClassOf'] = mSubLiterals;
-            rdfsClassArr.push(tLiteral);
+                forEach(mEnum.literals, function (literal) {
+                    let tLiteral = {};
+                    tLiteral['@id'] = literal.name;
+                    tLiteral['@type'] = 'rdfs:Class';
+                    let mSubLiterals = [mEnum.name];
+                    tLiteral['rdfs:subClassOf'] = mSubLiterals;
+                    rdfsClassArr.push(tLiteral);
+                });
+            }
         });
 
     });
 
-
     return rdfsClassArr;
 }
 
+/**
+ * @function getParentClasses
+ * @description returns the array of parent classes
+ * @returns {Array}
+ */
 function getParentClasses(mElement) {
-    let parentClasses=[];
-    let generalization=app.repository.select("@UMLGeneralization");
-    forEach(generalization,function(gen){
-        if(gen.source._id==mElement._id){
+    let parentClasses = [];
+    let generalization = app.repository.select("@UMLGeneralization");
+    forEach(generalization, function (gen) {
+        if (gen.source._id == mElement._id) {
             parentClasses.push(gen.target.name);
         }
     });
     return parentClasses;
 }
+
+/**
+ * @function getSubClasses
+ * @description returns the array of sub classes
+ * @returns {Array}
+ */
 function getSubClasses(subElements, mElement) {
     if (mElement.hasOwnProperty('_parent') && mElement._parent != null) {
         let mNElement = mElement._parent;
@@ -177,19 +218,141 @@ function getSubClasses(subElements, mElement) {
     return subElements;
 }
 
+/**
+ * @function getRdfsPropertiesArr
+ * @description returns the array class properties with template
+ * @returns {Array}
+ */
 function getRdfsPropertiesArr() {
-    let rdfsPropertiesArr = [
-        /* {# properties #} */
-    ];
+    let rdfsPropertiesArr = [ /* {# properties #} */ ];
+    let mUMLPackage = getUMLPackage();
+
+    let associations = app.repository.select("@UMLAssociation");
+
+
+    let mClasses = mUMLPackage.ownedElements.filter(function (element) {
+        return element instanceof type.UMLClass;
+    });
+
+    forEach(mClasses, function (mClass) {
+
+
+        forEach(mClass.attributes, function (attr) {
+            let objProperty = {};
+            objProperty['@id'] = mClass.name + '/' + attr.name;
+            objProperty['@type'] = 'rdf:Property';
+            objProperty['rdfs:domain'] = mClass.name;
+
+            let range=getRange(attr);
+            objProperty['rdfs:range'] = getRange(attr);
+            if(isString(attr.type) && range!=''){
+                rdfsPropertiesArr.push(objProperty);
+            }
+
+
+        });
+
+
+        let classAssociations = associations.filter(item => {
+            return item.end1.reference._id == mClass._id
+        });
+
+        classAssociations.forEach(assoc => {
+            if (assoc instanceof type.UMLAssociation) {
+
+                let relationName = assoc.name;
+                if (relationName != '') {
+                    let range = assoc.end2.reference.name;
+                    
+                    
+                    let objProperty = {};
+                    objProperty['@id'] = mClass.name + '/' + relationName;
+                    objProperty['@type'] = 'rdf:Property';
+                    objProperty['rdfs:domain'] = mClass.name;
+                    objProperty['rdfs:range'] = range;
+
+                    rdfsPropertiesArr.push(objProperty);
+                }
+
+            }
+        });
+    });
     return rdfsPropertiesArr;
+}
+
+/**
+ * @function isString
+ * @description returns boolean that checks values is string or any object
+ * @returns {boolean}
+ */
+function isString(s) {
+    return typeof (s) === 'string' || s instanceof String;
+}
+
+/**
+ * @function getRange
+ * @description returns datatype
+ * @returns {string}
+ */
+function getRange(attr) {
+    let range = '';
+    let starUMLType = attr.type;
+    if (isString(starUMLType)) {
+
+        if (starUMLType === 'Numeric') {
+            range = 'xsd:nonNegativeInteger';
+        } else if (starUMLType === 'Indicator') {
+            range = 'xsd:boolean';
+        } else if (starUMLType === 'Date') {
+            range = 'xsd:date';
+        } else if (starUMLType === 'DateTime') {
+            range = 'xsd:dateTime';
+        } else if (starUMLType === 'Integer') {
+            range = 'xsd:int';
+        } else if (starUMLType === 'Int32') {
+            range = 'xsd:int';
+        } else if (starUMLType === 'Int64') {
+            range = 'xsd:long';
+        } else if (starUMLType === 'Number') {
+            range = 'xsd:integer';
+        } else if (starUMLType === 'Float') {
+            range = 'xsd:float';
+        } else if (starUMLType === 'Double') {
+            range = 'xsd:double';
+        } else if (starUMLType === 'Boolean') {
+            range = 'xsd:string';
+        } else if (starUMLType === 'Password') {
+            range = 'xsd:string';
+        } else if (starUMLType === 'Byte') {
+            range = 'xsd:byte';
+        } else if (starUMLType === 'Binary') {
+            range = 'xsd:string';
+        } else if (starUMLType === 'Text') {
+            range = 'xsd:string';
+        } else if (starUMLType === 'Boolean') {
+            range = 'xsd:boolean';
+        }
+    } else {
+        range = starUMLType.name;
+    }
+    return range;
 }
 
 let UMLPackage = null;
 
+/**
+ * @function setUMLPackage
+ * @description save UMLPackage
+ */
 function setUMLPackage(mUMLPackage) {
     UMLPackage = mUMLPackage;
 }
 
+/**
+ * @function getUMLPackage
+ * @description return UMLPackage
+ * @returns {UMLPackage}
+ */
 function getUMLPackage() {
     return UMLPackage;
 }
