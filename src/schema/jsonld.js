@@ -1,4 +1,5 @@
 var forEach = require('async-foreach').forEach;
+const constant = require('../constant');
 
 /**
  * @function generateJSONLD
@@ -126,7 +127,7 @@ function getRdfsClassesArr() {
 
         forEach(mClass.attributes, function (attr) {
             if (attr.type instanceof type.UMLEnumeration) {
-                let mEnum=attr.type;
+                let mEnum = attr.type;
                 let tClass = {};
                 tClass['@id'] = mEnum.name;
                 tClass['@type'] = 'rdfs:Class';
@@ -188,19 +189,29 @@ function getParentClasses(mElement) {
     return parentClasses;
 }
 
-function getSubClasses(subElements, mElement) {
-    if (mElement.hasOwnProperty('_parent') && mElement._parent != null) {
-        let mNElement = mElement._parent;
-        subElements.push(mNElement.name);
-        getSubClasses(subElements, mNElement);
-    }
-    return subElements;
-}
-
 function getRdfsPropertiesArr() {
-    let rdfsPropertiesArr = [
-        /* {# properties #} */
-    ];
+    let rdfsPropertiesArr = [ /* {# properties #} */ ];
+    let mUMLPackage = getUMLPackage();
+
+
+
+    let mClasses = mUMLPackage.ownedElements.filter(function (element) {
+        return element instanceof type.UMLClass;
+    });
+
+    forEach(mClasses, function (mClass) {
+
+
+        forEach(mClass.attributes, function (attr) {
+            let objProperty = {};
+            objProperty['@id'] = mClass.name + '/' + attr.name;
+            objProperty['@type'] = 'rdf:Property';
+            objProperty['rdfs:domain'] = mClass.name;
+
+            rdfsPropertiesArr.push(objProperty);
+        });
+
+    });
     return rdfsPropertiesArr;
 }
 
