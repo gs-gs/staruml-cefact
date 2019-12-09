@@ -227,6 +227,30 @@ function getRdfsPropertiesArr() {
 
         });
 
+
+        let classAssociations = associations.filter(item => {
+            return item.end1.reference._id == mClass._id
+        });
+
+        classAssociations.forEach(assoc => {
+            if (assoc instanceof type.UMLAssociation) {
+
+                let relationName = assoc.name;
+                if (relationName != '') {
+                    let range = assoc.end2.reference.name;
+                    
+                    
+                    let objProperty = {};
+                    objProperty['@id'] = mClass.name + '/' + relationName;
+                    objProperty['@type'] = 'rdf:Property';
+                    objProperty['rdfs:domain'] = mClass.name;
+                    objProperty['rdfs:range'] = range;
+
+                    rdfsPropertiesArr.push(objProperty);
+                }
+
+            }
+        });
     });
     return rdfsPropertiesArr;
 }
