@@ -220,6 +220,11 @@ function getRdfsPropertiesArr() {
 
             let range=getRange(attr);
             objProperty['rdfs:range'] = getRange(attr);
+            if(isString(attr.type) && range!=''){
+                rdfsPropertiesArr.push(objProperty);
+            }
+
+
         });
 
     });
