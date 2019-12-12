@@ -73,6 +73,33 @@ function setUMLDiagramElement(mAllElement) {
         }
     });
 
+    /* Filter for invisible operation Views from diagram elements (Interface) */
+    forEach(mAllElement, function (element) {
+        if (element instanceof type.UMLInterface) {
+            console.log("----view-checking----Interface",element.name);
+            let newOperations = [];
+            forEach(element.operations, function (mOperation) {
+                console.log("----view-checking----mOperation-",mOperation);
+                let ArrUMLOperationView = app.repository.getViewsOf(mOperation);
+                if (ArrUMLOperationView.length >= 1) {
+
+                    let resAttr=ArrUMLOperationView.filter(function(item){
+                        return item.model._id == mOperation._id;
+                    });
+                    console.log("----view-checking----mOperation-views",resAttr);
+                    if(resAttr.length>0){
+
+                        let UMLOperationView = resAttr[0];
+                        if (UMLOperationView.visible) {
+                            newOperations.push(mOperation);
+                        }
+                    }
+                }
+            });
+            element.operations = newOperations;
+        }
+    });
+
     AllElement = mAllElement;
 }
 
