@@ -1,4 +1,5 @@
 const Utils = require('./utils');
+const camelize = require('../src/camelize');
 const Generalization = require('./generalization');
 const Properties = require('./properties');
 const AssociationClassLink = require('./associationClassLink');
@@ -187,14 +188,14 @@ class Component {
                // if(objClass.name == 'Logistics_TransportMovement' ){
                console.log("compositionRef", compositionRef);
                /* Remove property which is already in ref of other property in the same schema */
-               this.removeDuplicatePropertyOfRefs(compositionRef,mainPropertiesObj,objClass,duplicateDeletedReference);
+               this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
 
                // }
           });
           console.log("Total duplicate deleted reference", duplicateDeletedReference);
           return this.mainComponentObj;
      }
-
+     
      /**
       * @function getJSONSchema
       * @description Returns component object 
@@ -202,6 +203,38 @@ class Component {
       * @memberof Component
       */
      getJSONSchema() {
+          /* For Schema object */
+          let schemaModel = {};
+          this.mainSchemaObj = schemaModel;
+          schemaModel['model'] = openAPI.getUMLPackage().name;
+          schemaModel['type'] = 'object';
+
+          /* For Interface */
+          let paths, interfaceRealalization;
+          if (openAPI.isModelPackage()) {
+               interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
+               paths = openAPI.getPaths();
+          } else if (openAPI.isModelDiagram()) {
+               interfaceRealalization = diagramEle.getUMLInterfaceRealization();
+               paths = diagramEle.getUMLInterface();
+          }
+
+          let schemaModelPropertiesObj = {};
+          schemaModel['properties'] = schemaModelPropertiesObj;
+
+          paths.forEach(path => {
+               let objPath = {};
+               let interfaceName = camelize.toCamelCaseString(path.name);
+               schemaModelPropertiesObj[interfaceName] = objPath;
+               let ref = interfaceRealalization.filter(real => {
+                    return real.target._id == path._id;
+               });
+               ref.forEach(interfaceReal => {
+                    objPath['$ref'] = '#' + constant.path + constant.definitions + constant.path + interfaceReal.source.name
+               });
+          });
+
+          /* For Class */
           let classes, classLink;
           if (openAPI.isModelPackage()) {
                classes = openAPI.getClasses();
@@ -211,13 +244,10 @@ class Component {
                classLink = diagramEle.getUMLAssociationClassLink();
           }
           let arrIdClasses = [];
-          let schemaModel={};
-          this.mainSchemaObj = schemaModel;
-          schemaModel['model']=openAPI.getUMLPackage().name;
-          schemaModel['type']='object';
-          let schemaModelDefinitionsObj={};
-          schemaModel['definitions']=schemaModelDefinitionsObj;
-          
+
+          let schemaModelDefinitionsObj = {};
+          schemaModel['definitions'] = schemaModelDefinitionsObj;
+
           this.duplicatePropertyError = [];
           let duplicateDeletedReference = [];
           classes.forEach(objClass => {
@@ -356,15 +386,18 @@ class Component {
                // if(objClass.name == 'Logistics_TransportMovement' ){
                console.log("compositionRef", compositionRef);
                /* Remove property which is already in ref of other property in the same schema */
-               this.removeDuplicatePropertyOfRefs(compositionRef,mainPropertiesObj,objClass,duplicateDeletedReference);
+               this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
 
                // }
           });
+
+
+
           console.log("Total duplicate deleted reference", duplicateDeletedReference);
           return this.mainSchemaObj;
      }
 
-     removeDuplicatePropertyOfRefs(compositionRef,mainPropertiesObj,objClass,duplicateDeletedReference) {
+     removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference) {
 
           /* Find duplicate properties */
           let tempDupliCheck = [];
