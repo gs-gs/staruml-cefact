@@ -18,6 +18,33 @@ function setUMLDiagramElement(mAllElement) {
     mAllElement.sort(function (a, b) {
         return a.name.localeCompare(b.name);
     });
+
+    /* Filter for invisible Views from diagram elements */
+    forEach(mAllElement, function (element) {
+        if (element instanceof type.UMLClass || element instanceof type.UMLInterface) {
+            console.log("----view-checking----Class",element.name);
+            let newAttributes = [];
+            forEach(element.attributes, function (attrib) {
+                console.log("----view-checking----attr-",attrib);
+                let ArrUMLAttributeView = app.repository.getViewsOf(attrib);
+                if (ArrUMLAttributeView.length >= 1) {
+
+                    let resAttr=ArrUMLAttributeView.filter(function(item){
+                        return item.model._id == attrib._id;
+                    });
+                    console.log("----view-checking----attr-views",resAttr);
+                    if(resAttr.length>0){
+
+                        let UMLAttributeView = resAttr[0];
+                        if (UMLAttributeView.visible) {
+                            newAttributes.push(attrib);
+                        }
+                    }
+                }
+            });
+            element.attributes = newAttributes;
+        }
+    });
     AllElement = mAllElement;
 }
 
@@ -227,6 +254,23 @@ function removeIDFromOwnedElement(UMLEle, allDiagramElement) {
     return tempOwnedElements;
 }
 
+function getViewOf(element) {
+    let ViewOfElement = app.repository.getViewsOf(element);
+
+    let ArrUMLAttributeView = app.repository.getViewsOf(attrib);
+
+    if (ArrUMLAttributeView.length === 1) {
+        let UMLAttributeView = ArrUMLAttributeView[0];
+        if (UMLAttributeView.visible) {
+
+            let mJsonAttrib = app.repository.writeObject(attrib);
+            let mObjAttrib = JSON.parse(mJsonAttrib);
+            delete mObjAttrib['_id'];
+            // delete mObjAttrib['tags'];
+            tempAttributes.push(mObjAttrib);
+        }
+    }
+}
 /**
  * @function removeIDFromAttribute
  * @description remove '_id' property from UMLAttribute to clone new UMLAttribute and returns array of new cloned UMLAttributes
