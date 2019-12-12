@@ -19,7 +19,7 @@ function setUMLDiagramElement(mAllElement) {
         return a.name.localeCompare(b.name);
     });
 
-    /* Filter for invisible Views from diagram elements */
+    /* Filter for invisible attribute Views from diagram elements (Class & Interface) */
     forEach(mAllElement, function (element) {
         if (element instanceof type.UMLClass || element instanceof type.UMLInterface) {
             console.log("----view-checking----Class",element.name);
@@ -45,6 +45,34 @@ function setUMLDiagramElement(mAllElement) {
             element.attributes = newAttributes;
         }
     });
+
+    /* Filter for invisible literal Views from diagram elements (Enumeration) */
+    forEach(mAllElement, function (element) {
+        if (element instanceof type.UMLEnumeration) {
+            console.log("----view-checking----Enumeration",element.name);
+            let newLiterals = [];
+            forEach(element.literals, function (mEnum) {
+                console.log("----view-checking----mEnum-",mEnum);
+                let ArrUMLEnumerationView = app.repository.getViewsOf(mEnum);
+                if (ArrUMLEnumerationView.length >= 1) {
+
+                    let resAttr=ArrUMLEnumerationView.filter(function(item){
+                        return item.model._id == mEnum._id;
+                    });
+                    console.log("----view-checking----mEnum-views",resAttr);
+                    if(resAttr.length>0){
+
+                        let UMLEnumerationView = resAttr[0];
+                        if (UMLEnumerationView.visible) {
+                            newLiterals.push(mEnum);
+                        }
+                    }
+                }
+            });
+            element.literals = newLiterals;
+        }
+    });
+
     AllElement = mAllElement;
 }
 
