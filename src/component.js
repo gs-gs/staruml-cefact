@@ -215,8 +215,8 @@ class Component {
           this.mainSchemaObj = schemaModel;
           schemaModel['model']=openAPI.getUMLPackage().name;
           schemaModel['type']='object';
-          let schemaModelPropertyObj={};
-          schemaModel['properties']=schemaModelPropertyObj;
+          let schemaModelDefinitionsObj={};
+          schemaModel['definitions']=schemaModelDefinitionsObj;
           
           this.duplicatePropertyError = [];
           let duplicateDeletedReference = [];
@@ -234,7 +234,7 @@ class Component {
                     return item.associationSide.end1.reference._id == objClass._id;
                });
 
-               schemaModelPropertyObj[objClass.name] = mainClassesObj
+               schemaModelDefinitionsObj[objClass.name] = mainClassesObj
 
                mainClassesObj.type = 'object';
 
@@ -349,7 +349,7 @@ class Component {
                     });
 
                     if (filter.length == 0) {
-                         this.associationClassLink.writeAssociationProperties(mainClassesObj, itemClass, schemaModelPropertyObj);
+                         this.associationClassLink.writeAssociationProperties(mainClassesObj, itemClass, schemaModelDefinitionsObj);
                          arrIdClasses.push(itemClass)
                     }
                });
