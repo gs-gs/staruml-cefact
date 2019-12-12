@@ -441,13 +441,14 @@ function filterUMLClassDiagram(UMLClassDiagram) {
     // console.log('classDiagram',classDiagram);
     /* Filter all diagram views */
     let allDiagramView = UMLClassDiagram.ownedViews.filter(function (view) {
-        return view instanceof type.UMLClassView ||
+        return (view instanceof type.UMLClassView ||
             view instanceof type.UMLAssociationView ||
             view instanceof type.UMLInterfaceView ||
             view instanceof type.UMLInterfaceRealizationView ||
             view instanceof type.UMLGeneralizationView ||
             view instanceof type.UMLAssociationClassLinkView ||
-            view instanceof type.UMLEnumerationView
+            view instanceof type.UMLEnumerationView) 
+            && view.visible
     });
     /* Filter all model from view */
     /* let allDiagramViewNew = [];
