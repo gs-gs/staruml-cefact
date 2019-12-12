@@ -638,6 +638,8 @@ class OpenApi {
 
                     if (OpenApi.getFileType() == constant.FILE_TYPE_JSON_SCHEMA) {
 
+                         // Generate JSON-Schema Specification
+                         
                          let component = new Component();
                          console.log("-----json-schema-generated-----");
                          MainJSON.addJSONSchema(component);
@@ -656,6 +658,7 @@ class OpenApi {
 
                     } else {
 
+                         // Generate OpenAPI Specification
 
                          /*  Add openapi version */
                          MainJSON.addApiVersion('3.0.0');

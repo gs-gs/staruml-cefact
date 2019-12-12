@@ -9,6 +9,90 @@ let UMLInterfaceRealization = null;
 let UMLEnumeration = null;
 let UMLAssociationClassLink = null;
 let AllElement = null;
+
+function processVisibleAttributeViews(mAllElement) {
+    forEach(mAllElement, function (element) {
+        if (element instanceof type.UMLClass || element instanceof type.UMLInterface) {
+            console.log("----view-checking----Class", element.name);
+            let newAttributes = [];
+            forEach(element.attributes, function (attrib) {
+                console.log("----view-checking----attr-", attrib);
+                let ArrUMLAttributeView = app.repository.getViewsOf(attrib);
+                if (ArrUMLAttributeView.length >= 1) {
+
+                    let resAttr = ArrUMLAttributeView.filter(function (item) {
+                        return item.model._id == attrib._id;
+                    });
+                    console.log("----view-checking----attr-views", resAttr);
+                    if (resAttr.length > 0) {
+
+                        let UMLAttributeView = resAttr[0];
+                        if (UMLAttributeView.visible) {
+                            newAttributes.push(attrib);
+                        }
+                    }
+                }
+            });
+            element.attributes = newAttributes;
+        }
+    });
+}
+
+function processVisibleLiteralViews(mAllElement) {
+    forEach(mAllElement, function (element) {
+        if (element instanceof type.UMLEnumeration) {
+            console.log("----view-checking----Enumeration", element.name);
+            let newLiterals = [];
+            forEach(element.literals, function (mEnum) {
+                console.log("----view-checking----mEnum-", mEnum);
+                let ArrUMLEnumerationView = app.repository.getViewsOf(mEnum);
+                if (ArrUMLEnumerationView.length >= 1) {
+
+                    let resAttr = ArrUMLEnumerationView.filter(function (item) {
+                        return item.model._id == mEnum._id;
+                    });
+                    console.log("----view-checking----mEnum-views", resAttr);
+                    if (resAttr.length > 0) {
+
+                        let UMLEnumerationView = resAttr[0];
+                        if (UMLEnumerationView.visible) {
+                            newLiterals.push(mEnum);
+                        }
+                    }
+                }
+            });
+            element.literals = newLiterals;
+        }
+    });
+}
+
+function processVisibleOperationViews(mAllElement) {
+    forEach(mAllElement, function (element) {
+        if (element instanceof type.UMLInterface) {
+            console.log("----view-checking----Interface", element.name);
+            let newOperations = [];
+            forEach(element.operations, function (mOperation) {
+                console.log("----view-checking----mOperation-", mOperation);
+                let ArrUMLOperationView = app.repository.getViewsOf(mOperation);
+                if (ArrUMLOperationView.length >= 1) {
+
+                    let resAttr = ArrUMLOperationView.filter(function (item) {
+                        return item.model._id == mOperation._id;
+                    });
+                    console.log("----view-checking----mOperation-views", resAttr);
+                    if (resAttr.length > 0) {
+
+                        let UMLOperationView = resAttr[0];
+                        if (UMLOperationView.visible) {
+                            newOperations.push(mOperation);
+                        }
+                    }
+                }
+            });
+            element.operations = newOperations;
+        }
+    });
+}
 /**
  * @function setUMLDiagramElement
  * @description save & sort all element from UMLClassDiagram 
@@ -18,6 +102,16 @@ function setUMLDiagramElement(mAllElement) {
     mAllElement.sort(function (a, b) {
         return a.name.localeCompare(b.name);
     });
+
+    /* Filter for visible attribute Views from diagram elements (Class & Interface) */
+    processVisibleAttributeViews(mAllElement);
+
+    /* Filter for visible literal Views from diagram elements (Enumeration) */
+    processVisibleLiteralViews(mAllElement);
+
+    /* Filter for visible operation Views from diagram elements (Interface) */
+    processVisibleOperationViews(mAllElement);
+
     AllElement = mAllElement;
 }
 
@@ -227,6 +321,23 @@ function removeIDFromOwnedElement(UMLEle, allDiagramElement) {
     return tempOwnedElements;
 }
 
+function getViewOf(element) {
+    let ViewOfElement = app.repository.getViewsOf(element);
+
+    let ArrUMLAttributeView = app.repository.getViewsOf(attrib);
+
+    if (ArrUMLAttributeView.length === 1) {
+        let UMLAttributeView = ArrUMLAttributeView[0];
+        if (UMLAttributeView.visible) {
+
+            let mJsonAttrib = app.repository.writeObject(attrib);
+            let mObjAttrib = JSON.parse(mJsonAttrib);
+            delete mObjAttrib['_id'];
+            // delete mObjAttrib['tags'];
+            tempAttributes.push(mObjAttrib);
+        }
+    }
+}
 /**
  * @function removeIDFromAttribute
  * @description remove '_id' property from UMLAttribute to clone new UMLAttribute and returns array of new cloned UMLAttributes
@@ -334,31 +445,17 @@ function removeIDFromLiterals(UMLEle) {
  */
 function filterUMLClassDiagram(UMLClassDiagram) {
 
-    // let classDiagram = app.repository.writeObject(UMLClassDiagram);
-    // classDiagram = JSON.parse(classDiagram);
-    // delete classDiagram['_id'];
-    // return;
-    // classDiagram = app.repository.readObject(classDiagram);
-    // console.log('classDiagram',classDiagram);
     /* Filter all diagram views */
     let allDiagramView = UMLClassDiagram.ownedViews.filter(function (view) {
-        return view instanceof type.UMLClassView ||
-            view instanceof type.UMLAssociationView ||
-            view instanceof type.UMLInterfaceView ||
-            view instanceof type.UMLInterfaceRealizationView ||
-            view instanceof type.UMLGeneralizationView ||
-            view instanceof type.UMLAssociationClassLinkView ||
-            view instanceof type.UMLEnumerationView
+        return (view instanceof type.UMLClassView ||
+                view instanceof type.UMLAssociationView ||
+                view instanceof type.UMLInterfaceView ||
+                view instanceof type.UMLInterfaceRealizationView ||
+                view instanceof type.UMLGeneralizationView ||
+                view instanceof type.UMLAssociationClassLinkView ||
+                view instanceof type.UMLEnumerationView) &&
+            view.visible
     });
-    /* Filter all model from view */
-    /* let allDiagramViewNew = [];
-    forEach(allDiagramView, function (dView) {
-        let mView=app.repository.writeObject(dView);
-        mView=JSON.parse(mView);
-        delete mView['_id'];
-        let newView=app.repository.readObject(mView);
-        allDiagramViewNew.push(newView);
-    }); */
 
     let allDiagramElement = [];
     forEach(allDiagramView, function (dView) {

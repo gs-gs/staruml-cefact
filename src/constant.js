@@ -7,7 +7,7 @@ const Constant = {
      schemas: 'schemas',
      path: '/',
      shared: 'shared',
-     properties:'properties',
+     definitions:'definitions',
      msgsuccess: 'OpenAPI Specs generated',
      msgstestuccess: 'OpenAPI Specs Tested Successfully',
      msgerror: 'OpenAPI Specs generation failure',
@@ -78,7 +78,7 @@ const Constant = {
  */
 function getRef() {
      if(openAPI.getFileType() == Constant.FILE_TYPE_JSON_SCHEMA){
-          return Constant.entry + Constant.path + Constant.properties + Constant.path;
+          return Constant.entry + Constant.path + Constant.definitions + Constant.path;
      }else{
           return Constant.entry + Constant.path + Constant.components + Constant.path + Constant.schemas + Constant.path;
      }
