@@ -189,6 +189,7 @@ class Utils {
 
 
 }
+
 function isEmpty(umlPackage) {
      let ownedElements = [];
      umlPackage.ownedElements.filter(function (item) {
@@ -201,9 +202,30 @@ function isEmpty(umlPackage) {
      });
      if (ownedElements.length > 0) {
           return false;
-     } 
+     }
      return true;
+}
+
+function isAttribviewVisible(attribute) {
+     let isVisible=false;
+     let ArrUMLAttributeView = app.repository.getViewsOf(attribute);
+     if (ArrUMLAttributeView.length >= 1) {
+
+          let resAttr = ArrUMLAttributeView.filter(function (item) {
+               return item.model._id == attribute._id;
+          });
+          console.log("----view-checking----attr-views", resAttr);
+          if (resAttr.length > 0) {
+
+               let UMLAttributeView = resAttr[0];
+               if (UMLAttributeView.visible) {
+                    isVisible=true;
+               }
+          }
+     }
+     return isVisible;
 }
 
 module.exports = Utils;
 module.exports.isEmpty = isEmpty;
+module.exports.isAttribviewVisible=isAttribviewVisible;
