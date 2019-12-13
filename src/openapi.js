@@ -90,7 +90,7 @@ class OpenApi {
      getModelElements() {
 
           return new Promise(async (resolve, reject) => {
-               let umlPackage = OpenApi.getPackage();
+               let umlPackage = OpenApi.getUMLPackage();
                var _pkgName = umlPackage.name
                let umlClasses = [];
                OpenApi.operations = [];
@@ -405,7 +405,7 @@ class OpenApi {
       * @returns {UMLPackage}
       * @memberof OpenApi
       */
-     static getPackage() {
+     static getUMLPackage() {
           return OpenApi.umlPackage;
      }
 
@@ -474,9 +474,9 @@ class OpenApi {
 
                let tmpAssociation = [];
                try {
-                    let umlClasses = app.repository.select(OpenApi.getPackage().name + "::@UMLClass");
+                    let umlClasses = app.repository.select(OpenApi.getUMLPackage().name + "::@UMLClass");
                     forEach(umlClasses, async (objClass, index) => {
-                         let umlAssociation = app.repository.select(OpenApi.getPackage().name + "::" + objClass.name + "::@UMLAssociation");
+                         let umlAssociation = app.repository.select(OpenApi.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
                          /* console.log(objClass.name,umlAssociation); */
                          if (umlAssociation.length > 0) {
                               umlAssociation.forEach(function (element) {
@@ -509,9 +509,9 @@ class OpenApi {
 
                let tmpGeneralization = [];
                try {
-                    let umlClasses = app.repository.select(OpenApi.getPackage().name + "::@UMLClass");
+                    let umlClasses = app.repository.select(OpenApi.getUMLPackage().name + "::@UMLClass");
                     forEach(umlClasses, async (objClass, index) => {
-                         let umlGenera = app.repository.select(OpenApi.getPackage().name + "::" + objClass.name + "::@UMLGeneralization");
+                         let umlGenera = app.repository.select(OpenApi.getUMLPackage().name + "::" + objClass.name + "::@UMLGeneralization");
                          if (umlGenera.length > 0) {
                               umlGenera.forEach(function (element) {
                                    tmpGeneralization.push(element);
@@ -609,7 +609,7 @@ class OpenApi {
 
                     /* let _this = this;
                     this.resetPackagePath();
-                    let arrPath = OpenApi.findHierarchy(OpenApi.getPackage());
+                    let arrPath = OpenApi.findHierarchy(OpenApi.getUMLPackage());
                     let rPath = OpenApi.reversePkgPath(arrPath);
                     OpenApi.setPackagepath(rPath); */
 
@@ -620,7 +620,7 @@ class OpenApi {
 
                     if (openAPI.isModelPackage()) {
 
-                         arrPath = OpenApi.findHierarchy(OpenApi.getPackage());
+                         arrPath = OpenApi.findHierarchy(OpenApi.getUMLPackage());
                          rPath = OpenApi.reversePkgPath(arrPath);
 
                     } else if (openAPI.isModelDiagram()) {
