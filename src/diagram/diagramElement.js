@@ -107,10 +107,10 @@ function setUMLDiagramElement(mAllElement) {
     //processVisibleAttributeViews(mAllElement);
 
     /* Filter for visible literal Views from diagram elements (Enumeration) */
-    //processVisibleLiteralViews(mAllElement);
+    processVisibleLiteralViews(mAllElement);
 
     /* Filter for visible operation Views from diagram elements (Interface) */
-    //processVisibleOperationViews(mAllElement);
+    // processVisibleOperationViews(mAllElement);
 
     AllElement = mAllElement;
 }

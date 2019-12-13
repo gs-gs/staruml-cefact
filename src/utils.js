@@ -225,7 +225,34 @@ function isAttribviewVisible(attribute) {
      }
      return isVisible;
 }
+function addAttributeData(element){
+     let mAddAttributeData=false;
+     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
 
+          mAddAttributeData = true;
+
+     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+
+          mAddAttributeData = true;
+
+     }
+     return mAddAttributeData;
+}
+function addOperationData(element){
+     let mAddOperationData=false;
+     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
+
+          mAddOperationData = true;
+
+     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+
+          mAddOperationData = true;
+
+     }
+     return mAddOperationData;
+}
 module.exports = Utils;
 module.exports.isEmpty = isEmpty;
 module.exports.isAttribviewVisible=isAttribviewVisible;
+module.exports.addOperationData=addOperationData;
+module.exports.addAttributeData=addAttributeData;

@@ -46,18 +46,7 @@ class Properties {
                });
 
                /* Filter for visible attribute Views from diagram elements (Class & Interface) */
-               let addPropData = false;
-               if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && Utils.isAttribviewVisible(attribute)) {
-
-                    addPropData = true;
-
-               } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-
-                    addPropData = true;
-
-               }
-
-               if(addPropData){
+               if(Utils.addAttributeData(attribute)){
                     _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
                }
                
