@@ -37,10 +37,10 @@ class Paths {
                     paths = diagramEle.getUMLInterface();
                }
 
-               paths.forEach(objOperation => {
+               paths.forEach(objInterface => {
 
                     let filteredInterfaceRealization = interfaceRealalization.filter(itemInterface => {
-                         return itemInterface.target.name == objOperation.name;
+                         return itemInterface.target.name == objInterface.name;
                     });
 
                     if (filteredInterfaceRealization.length > 0) {
@@ -60,12 +60,17 @@ class Paths {
 
                               objInterRealization.target.operations.forEach(objOperation => {
 
-                                   if (objOperation.name.toUpperCase() == "GET") {
-                                        pathsObject.get = this.operations.get(objInterRealization, objOperation);
+                                   /* Filter for visible operation Views from diagram elements (Interface) */
+                                   if (Utils.addOperationData(objOperation)) {
+
+                                        if (objOperation.name.toUpperCase() == "GET") {
+                                             pathsObject.get = this.operations.get(objInterRealization, objOperation);
 
 
-                                   } else if (objOperation.name.toUpperCase() == "POST") {
-                                        pathsObject.post = this.operations.post(objInterRealization, null);
+                                        } else if (objOperation.name.toUpperCase() == "POST") {
+                                             pathsObject.post = this.operations.post(objInterRealization, null);
+
+                                        }
 
                                    }
                               });
@@ -78,37 +83,54 @@ class Paths {
 
                               if (checkOperationArr.length > 0) {
                                    let pathsObject = {};
+
+
+
+
+
                                    let operationAttributes = objInterRealization.target.attributes.filter(item => {
                                         return item.name == "id" || item.name == "identifier";
                                    });
                                    operationAttributes.forEach(operationAttribute => {
-                                        mainPathsObject["/" + objInterRealization.target.name + '/{' + operationAttribute.name + '}'] = pathsObject
 
 
-                                        objInterRealization.target.operations.forEach(objOperation => {
-                                             let wOperationObject = {};
-                                             if (objOperation.name.toUpperCase() == "GET") {
-                                                  pathsObject.get = wOperationObject;
-                                                  pathsObject.get = this.operations.getOperationAttribute(objInterRealization, operationAttribute)
+                                        /* Filter for visible attribute Views from diagram elements (Class & Interface) */
+                                        if (Utils.addAttributeData(operationAttribute)) {
+
+                                             mainPathsObject["/" + objInterRealization.target.name + '/{' + operationAttribute.name + '}'] = pathsObject
 
 
-                                             } else if (objOperation.name.toUpperCase() == "DELETE") {
-                                                  pathsObject.delete = this.operations.delete(objInterRealization, operationAttribute, null, null);
+                                             objInterRealization.target.operations.forEach(objOperation => {
+
+
+                                                  /* Filter for visible operation Views from diagram elements (Interface) */
+                                                  if (Utils.addOperationData(objOperation)) {
+
+                                                       let wOperationObject = {};
+                                                       if (objOperation.name.toUpperCase() == "GET") {
+                                                            pathsObject.get = wOperationObject;
+                                                            pathsObject.get = this.operations.getOperationAttribute(objInterRealization, operationAttribute)
+
+
+                                                       } else if (objOperation.name.toUpperCase() == "DELETE") {
+                                                            pathsObject.delete = this.operations.delete(objInterRealization, operationAttribute, null, null);
 
 
 
 
-                                             } else if (objOperation.name.toUpperCase() == "PUT") {
-                                                  pathsObject.put = this.operations.put(objInterRealization, operationAttribute);
+                                                       } else if (objOperation.name.toUpperCase() == "PUT") {
+                                                            pathsObject.put = this.operations.put(objInterRealization, operationAttribute);
 
 
 
-                                             } else if (objOperation.name.toUpperCase() == "PATCH") {
-                                                  pathsObject.patch = this.operations.patch(objInterRealization, operationAttribute);
+                                                       } else if (objOperation.name.toUpperCase() == "PATCH") {
+                                                            pathsObject.patch = this.operations.patch(objInterRealization, operationAttribute);
 
 
-                                             }
-                                        });
+                                                       }
+                                                  }
+                                             });
+                                        }
 
                                    });
                               }
@@ -152,126 +174,131 @@ class Paths {
                let pathsObject = {};
                interfaceRealization.target.operations.forEach(objOperation => {
 
-                    let wOperationObject = {};
-                    if (objOperation.name.toUpperCase() == "GET") {
-                         let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
-
-                         mainPathsObject[mICPath] = pathsObject;
-                         /* Get all list */
-
-                         pathsObject.get = wOperationObject;
-
-                         let tagsArray = [];
-                         wOperationObject.tags = tagsArray;
-
-                         tagsArray.push(interfaceRealization.target.name);
+                    /* Filter for visible operation Views from diagram elements (Interface) */
+                    if (Utils.addOperationData(objOperation)) {
 
 
-                         wOperationObject.description = 'Get a list of ' + interfaceRealization.source.name;
+                         let wOperationObject = {};
+                         if (objOperation.name.toUpperCase() == "GET") {
+                              let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
 
-                         let parametersArray = [];
-                         wOperationObject.parameters = parametersArray;
-                         let paramsObject = {};
-                         parametersArray.push(paramsObject);
+                              mainPathsObject[mICPath] = pathsObject;
+                              /* Get all list */
 
-                         let objSchema = {};
-                         objSchema.type = 'string';
+                              pathsObject.get = wOperationObject;
 
-                         this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
+                              let tagsArray = [];
+                              wOperationObject.tags = tagsArray;
 
-                         let responsesObj = {};
-                         wOperationObject.responses = responsesObj;
-
-                         let ok200ResOjb = {};
-                         responsesObj['200'] = ok200ResOjb;
-
-                         ok200ResOjb.description = 'OK';
-
-                         let contentObj = {};
-                         ok200ResOjb.content = contentObj;
-
-                         let appJsonObj = {};
-                         contentObj['application/json'] = appJsonObj;
-
-                         let schemaObj = {};
-                         appJsonObj.schema = schemaObj;
+                              tagsArray.push(interfaceRealization.target.name);
 
 
-                         let itemsArray = [];
-                         schemaObj.items = itemsArray;
-                         let itemsObj = {};
-                         itemsArray.push(itemsObj);
-                         itemsObj['$ref'] = constant.getReference() + interfaceRealization.source.name;
-                         schemaObj.type = 'array';
+                              wOperationObject.description = 'Get a list of ' + interfaceRealization.source.name;
+
+                              let parametersArray = [];
+                              wOperationObject.parameters = parametersArray;
+                              let paramsObject = {};
+                              parametersArray.push(paramsObject);
+
+                              let objSchema = {};
+                              objSchema.type = 'string';
+
+                              this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
+
+                              let responsesObj = {};
+                              wOperationObject.responses = responsesObj;
+
+                              let ok200ResOjb = {};
+                              responsesObj['200'] = ok200ResOjb;
+
+                              ok200ResOjb.description = 'OK';
+
+                              let contentObj = {};
+                              ok200ResOjb.content = contentObj;
+
+                              let appJsonObj = {};
+                              contentObj['application/json'] = appJsonObj;
+
+                              let schemaObj = {};
+                              appJsonObj.schema = schemaObj;
 
 
-
-                         /* Get single element record */
-
-                         let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
-
-                         let pathsSingleObject = {};
-                         mainPathsObject[mICPath1] = pathsSingleObject;
-
-                         let wOperationSingleObject = {};
-                         pathsSingleObject.get = wOperationSingleObject;
-
-                         let tagsSingleArray = [];
-                         wOperationSingleObject.tags = tagsSingleArray;
-
-                         tagsSingleArray.push(interfaceRealization.target.name);
-
-
-                         wOperationSingleObject.description = 'Get a list of ' + interfaceRealization.source.name;
-
-                         let parametersSingleArray = [];
-                         wOperationSingleObject.parameters = parametersSingleArray;
-                         let paramsSingleObject = {};
-                         parametersSingleArray.push(paramsSingleObject);
-
-                         let objSingleSchema = {};
-                         objSingleSchema.type = 'string';
-
-                         this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
-                         this.utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSingleSchema, paramsSingleObject)
-
-                         wOperationSingleObject.responses = responsesSingleObj;
-
-                         responsesSingleObj['200'] = ok200SingleResOjb;
-
-                         ok200SingleResOjb.description = 'OK';
-
-                         let contentSingleObj = {};
-                         ok200SingleResOjb.content = contentSingleObj;
-
-                         let appJsonSingleObj = {};
-                         contentSingleObj['application/json'] = appJsonSingleObj;
-
-                         let schemaSingleObj = {};
-                         appJsonSingleObj.schema = schemaSingleObj;
-
-                         schemaSingleObj['$ref'] = constant.getReference() + interfaceRealization.source.name;
+                              let itemsArray = [];
+                              schemaObj.items = itemsArray;
+                              let itemsObj = {};
+                              itemsArray.push(itemsObj);
+                              itemsObj['$ref'] = constant.getReference() + interfaceRealization.source.name;
+                              schemaObj.type = 'array';
 
 
 
+                              /* Get single element record */
 
-                    } else if (objOperation.name.toUpperCase() == "POST") {
+                              let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
 
-                         let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
+                              let pathsSingleObject = {};
+                              mainPathsObject[mICPath1] = pathsSingleObject;
 
-                         mainPathsObject[mICPath] = pathsObject;
+                              let wOperationSingleObject = {};
+                              pathsSingleObject.get = wOperationSingleObject;
 
-                         pathsObject.post = this.operations.post(interfaceRealization, end2Interface);
+                              let tagsSingleArray = [];
+                              wOperationSingleObject.tags = tagsSingleArray;
+
+                              tagsSingleArray.push(interfaceRealization.target.name);
 
 
-                    } else if (objOperation.name.toUpperCase() == "DELETE") {
+                              wOperationSingleObject.description = 'Get a list of ' + interfaceRealization.source.name;
 
-                         let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
+                              let parametersSingleArray = [];
+                              wOperationSingleObject.parameters = parametersSingleArray;
+                              let paramsSingleObject = {};
+                              parametersSingleArray.push(paramsSingleObject);
 
-                         mainPathsObject[mICPath] = pathsObject;
+                              let objSingleSchema = {};
+                              objSingleSchema.type = 'string';
 
-                         pathsObject.delete = this.operations.delete(interfaceRealization, null, end1Interface, end2Interface);
+                              this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
+                              this.utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSingleSchema, paramsSingleObject)
 
+                              wOperationSingleObject.responses = responsesSingleObj;
+
+                              responsesSingleObj['200'] = ok200SingleResOjb;
+
+                              ok200SingleResOjb.description = 'OK';
+
+                              let contentSingleObj = {};
+                              ok200SingleResOjb.content = contentSingleObj;
+
+                              let appJsonSingleObj = {};
+                              contentSingleObj['application/json'] = appJsonSingleObj;
+
+                              let schemaSingleObj = {};
+                              appJsonSingleObj.schema = schemaSingleObj;
+
+                              schemaSingleObj['$ref'] = constant.getReference() + interfaceRealization.source.name;
+
+
+
+
+                         } else if (objOperation.name.toUpperCase() == "POST") {
+
+                              let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
+
+                              mainPathsObject[mICPath] = pathsObject;
+
+                              pathsObject.post = this.operations.post(interfaceRealization, end2Interface);
+
+
+                         } else if (objOperation.name.toUpperCase() == "DELETE") {
+
+                              let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
+
+                              mainPathsObject[mICPath] = pathsObject;
+
+                              pathsObject.delete = this.operations.delete(interfaceRealization, null, end1Interface, end2Interface);
+
+                         }
                     }
                });
           } catch (error) {

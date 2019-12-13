@@ -182,13 +182,20 @@ class Utils {
       */
      getEnumerationLiteral(objEnum) {
           if (objEnum) {
-               let result = objEnum.literals.map(a => a.name);
+               let result=[];
+               objEnum.literals.forEach(literal => {
+                    /* Filter for visible literal Views from diagram elements (Enumeration) */
+                    if(Utils.addLiteralData(literal)){
+                         result.push(literal.name);
+                    }
+               });
                return (result);
           }
      }
 
 
 }
+
 function isEmpty(umlPackage) {
      let ownedElements = [];
      umlPackage.ownedElements.filter(function (item) {
@@ -201,9 +208,73 @@ function isEmpty(umlPackage) {
      });
      if (ownedElements.length > 0) {
           return false;
-     } 
+     }
      return true;
 }
 
+function isAttribviewVisible(attribute) {
+     let isVisible = false;
+     let ArrUMLAttributeView = app.repository.getViewsOf(attribute);
+     if (ArrUMLAttributeView.length >= 1) {
+
+          let resAttr = ArrUMLAttributeView.filter(function (item) {
+               return item.model._id == attribute._id;
+          });
+          console.log("----view-checking----attr-views", resAttr);
+          if (resAttr.length > 0) {
+
+               let UMLAttributeView = resAttr[0];
+               if (UMLAttributeView.visible) {
+                    isVisible = true;
+               }
+          }
+     }
+     return isVisible;
+}
+
+function addAttributeData(element) {
+     let mAddAttributeData = false;
+     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
+
+          mAddAttributeData = true;
+
+     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+
+          mAddAttributeData = true;
+
+     }
+     return mAddAttributeData;
+}
+
+function addOperationData(element) {
+     let mAddOperationData = false;
+     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
+
+          mAddOperationData = true;
+
+     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+
+          mAddOperationData = true;
+
+     }
+     return mAddOperationData;
+}
+function addLiteralData(element) {
+     let mAddLiteralData = false;
+     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
+
+          mAddLiteralData = true;
+
+     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+
+          mAddLiteralData = true;
+
+     }
+     return mAddLiteralData;
+}
 module.exports = Utils;
 module.exports.isEmpty = isEmpty;
+module.exports.isAttribviewVisible = isAttribviewVisible;
+module.exports.addOperationData = addOperationData;
+module.exports.addAttributeData = addAttributeData;
+module.exports.addLiteralData = addLiteralData;

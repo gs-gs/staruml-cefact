@@ -104,13 +104,13 @@ function setUMLDiagramElement(mAllElement) {
     });
 
     /* Filter for visible attribute Views from diagram elements (Class & Interface) */
-    processVisibleAttributeViews(mAllElement);
+    //processVisibleAttributeViews(mAllElement);
 
     /* Filter for visible literal Views from diagram elements (Enumeration) */
-    processVisibleLiteralViews(mAllElement);
+    // processVisibleLiteralViews(mAllElement);
 
     /* Filter for visible operation Views from diagram elements (Interface) */
-    processVisibleOperationViews(mAllElement);
+    // processVisibleOperationViews(mAllElement);
 
     AllElement = mAllElement;
 }
@@ -459,7 +459,8 @@ function filterUMLClassDiagram(UMLClassDiagram) {
 
     let allDiagramElement = [];
     forEach(allDiagramView, function (dView) {
-        allDiagramElement.push(dView.model);
+        let model=dView.model;
+        allDiagramElement.push(model);
     });
 
     console.log("------DElement", allDiagramElement);
@@ -510,7 +511,7 @@ function filterUMLClassDiagram(UMLClassDiagram) {
     /* Process package object of diagram */
     let mainOwnedElements = []
     let tempPackage = {
-        'name': UMLClassDiagram.name,
+        'name': 'tempPkg',
         'ownedElements': mainOwnedElements,
         'documentation': UMLClassDiagram.documentation,
         '_type': 'UMLPackage'
@@ -591,7 +592,7 @@ function removeDiagram(tempPackage) {
     operationBuilder.end();
     var cmd = operationBuilder.getOperation()
     app.repository.doOperation(cmd)
-    console.log("mPackage", tempPackage);
+    console.log("deleted package", tempPackage);
 }
 module.exports.filterUMLClassDiagram = filterUMLClassDiagram;
 module.exports.removeIDFromLiterals = removeIDFromLiterals;

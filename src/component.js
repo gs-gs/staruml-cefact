@@ -206,7 +206,7 @@ class Component {
           /* For Schema object */
           let schemaModel = {};
           this.mainSchemaObj = schemaModel;
-          schemaModel['model'] = openAPI.getUMLPackage().name;
+          schemaModel['model'] = openAPI.getUMLPackageName();
           schemaModel['type'] = 'object';
 
           /* For Interface */

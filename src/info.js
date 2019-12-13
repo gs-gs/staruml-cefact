@@ -26,7 +26,7 @@ class Info {
           }
           this.mainInfoObj = {};
           this.mainInfoObj.description = description;
-          this.mainInfoObj.title = openAPI.getUMLPackage().name;
+          this.mainInfoObj.title = openAPI.getUMLPackageName();
           this.mainInfoObj.version = version;
      }
 
