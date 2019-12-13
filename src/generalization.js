@@ -94,7 +94,7 @@ class Generalization {
                let filterGeneral = null;
                if (openAPI.isModelPackage()) {
 
-                    let generalizeClasses = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLGeneralization");
+                    let generalizeClasses = app.repository.select(openAPI.getUMLPackageName() + "::" + objClass.name + "::@UMLGeneralization");
                     //  let generalizeClasses = app.repository.select("@UMLGeneralization");
                     filterGeneral = generalizeClasses.filter(item => {
                          return item.source._id == objClass._id

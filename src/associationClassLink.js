@@ -183,7 +183,7 @@ class AssociationClassLink {
                     /* Filter association who is belong to current package */
                     filter = filterAssociation.filter(item => {
                          let parent = item.end1.reference._parent;
-                         return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackage().name);
+                         return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackageName());
                     });
 
                } else if (openAPI.isModelDiagram()) {
@@ -198,7 +198,7 @@ class AssociationClassLink {
                     filter = filterAssociation;
                     /* filterAssociation.filter(item => {
                                              let parent=item.end1.reference._parent;
-                                             return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackage().name);
+                                             return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackageName());
                                         }); */
                }
 
@@ -220,7 +220,7 @@ class AssociationClassLink {
 
 
                try {
-                    let associations = app.repository.select(openAPI.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
+                    let associations = app.repository.select(openAPI.getUMLPackageName() + "::" + objClass.name + "::@UMLAssociation");
                     let filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });

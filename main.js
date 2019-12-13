@@ -35,6 +35,7 @@ function generateSpecs(umlPackage, options = getGenOptions()) {
                     returnValue
                }) {
                     if (buttonId === "ok") {
+                         openAPI.setUMLPackageName(returnValue.name);
                          let varSel = returnValue.getClassName();
                          let valPackagename = type.UMLPackage.name;
                          let valClassDiagram = type.UMLClassDiagram.name;
@@ -202,6 +203,7 @@ function testSinglePackage() {
                returnValue
           }) {
                if (buttonId === "ok") {
+                    openAPI.setUMLPackageName(returnValue.name);
                     let varSel = returnValue.getClassName();
                     let valPackagename = type.UMLPackage.name;
                     let valClassDiagram = type.UMLClassDiagram.name;
@@ -283,6 +285,7 @@ async function starTestingAllDiagram(diagramList) {
      removeOutputFiles();
      let strSummery = '';
      for (const mUMLDiagram of diagramList) {
+          openAPI.setUMLPackageName(mUMLDiagram.name);
           const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
           const options = getGenOptions();
           openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
@@ -304,7 +307,7 @@ async function starTestingAllDiagram(diagramList) {
                if (openAPI.getError().hasOwnProperty('isDuplicate') && openAPI.getError().isDuplicate == true) {
                     let arrPath = openAPI.findHierarchy(mUMLDiagram);
                     let pkgPath = openAPI.reversePkgPath(arrPath);
-                    let bindFailureMsg = constant.msgtesterror + strModeType + '\'' + openAPI.getUMLPackage().name + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
+                    let bindFailureMsg = constant.msgtesterror + strModeType + '\'' + openAPI.getUMLPackageName() + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
                     openAPI.addSummery(bindFailureMsg, 'failure');
                }
                diagramEle.removeDiagram(mNewDiagram);
@@ -343,7 +346,7 @@ async function starTestingAllPackage(pkgList) {
      let strSummery = '';
 
      for (const umlPackage of pkgList) {
-
+          openAPI.setUMLPackageName(umlPackage.name);
           const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
           const options = getGenOptions();
           const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, 1);
@@ -363,7 +366,7 @@ async function starTestingAllPackage(pkgList) {
                     let arrPath = openAPI.findHierarchy(umlPackage);
                     let pkgPath = openAPI.reversePkgPath(arrPath);
 
-                    let bindFailureMsg = constant.msgtesterror + strModeType + '\'' + openAPI.getUMLPackage().name + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
+                    let bindFailureMsg = constant.msgtesterror + strModeType + '\'' + openAPI.getUMLPackageName() + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
                     openAPI.addSummery(bindFailureMsg, 'failure');
                }
           }

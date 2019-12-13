@@ -38,7 +38,6 @@ class OpenApi {
           OpenApi.fileType = fileType;
           OpenApi.uniqueClassesArr = [];
           OpenApi.strPackagePath = '';
-
           OpenApi.error = {};
           /* OpenApi.isDuplicate=false; */
           /* OpenApi.duplicateClasses = []; */
@@ -399,16 +398,22 @@ class OpenApi {
      }
 
      /**
-      * @function getPackage
-      * @description returns UMLPackage
+      * @function getUMLPackage
+      * @description returns getUMLPackage
       * @static
-      * @returns {UMLPackage}
+      * @returns {getUMLPackage}
       * @memberof OpenApi
       */
      static getUMLPackage() {
           return OpenApi.umlPackage;
      }
 
+     static getUMLPackageName(){
+          return OpenApi.umlPackageName;
+     }
+     static setUMLPackageName(pkgName){
+          OpenApi.umlPackageName=pkgName;
+     }
      /**
       * @function getOperations
       * @description returns path operations
@@ -474,9 +479,9 @@ class OpenApi {
 
                let tmpAssociation = [];
                try {
-                    let umlClasses = app.repository.select(OpenApi.getUMLPackage().name + "::@UMLClass");
+                    let umlClasses = app.repository.select(OpenApi.getUMLPackageName() + "::@UMLClass");
                     forEach(umlClasses, async (objClass, index) => {
-                         let umlAssociation = app.repository.select(OpenApi.getUMLPackage().name + "::" + objClass.name + "::@UMLAssociation");
+                         let umlAssociation = app.repository.select(OpenApi.getUMLPackageName() + "::" + objClass.name + "::@UMLAssociation");
                          /* console.log(objClass.name,umlAssociation); */
                          if (umlAssociation.length > 0) {
                               umlAssociation.forEach(function (element) {
@@ -509,9 +514,9 @@ class OpenApi {
 
                let tmpGeneralization = [];
                try {
-                    let umlClasses = app.repository.select(OpenApi.getUMLPackage().name + "::@UMLClass");
+                    let umlClasses = app.repository.select(OpenApi.getUMLPackageName() + "::@UMLClass");
                     forEach(umlClasses, async (objClass, index) => {
-                         let umlGenera = app.repository.select(OpenApi.getUMLPackage().name + "::" + objClass.name + "::@UMLGeneralization");
+                         let umlGenera = app.repository.select(OpenApi.getUMLPackageName() + "::" + objClass.name + "::@UMLGeneralization");
                          if (umlGenera.length > 0) {
                               umlGenera.forEach(function (element) {
                                    tmpGeneralization.push(element);
@@ -625,9 +630,9 @@ class OpenApi {
 
                     } else if (openAPI.isModelDiagram()) {
 
-                         let srcRes = app.repository.search(openAPI.getUMLPackage().name);
+                         let srcRes = app.repository.search(openAPI.getUMLPackageName());
                          let fRes = srcRes.filter(function (item) {
-                              return (item instanceof type.UMLClassDiagram && item.name == openAPI.getUMLPackage().name);
+                              return (item instanceof type.UMLClassDiagram && item.name == openAPI.getUMLPackageName());
                          });
                          if (fRes.length == 1) {
                               arrPath = openAPI.findHierarchy(fRes[0]._parent);
@@ -829,7 +834,7 @@ function findParentPackage(ele, item) {
      // return new Promise((resolve, reject) => {
 
      if (ele instanceof type.UMLPackage) {
-          if (ele != null && ele.name == 'Movements' /* openAPI.getUMLPackage().name */ ) {
+          if (ele != null && ele.name == 'Movements' /* openAPI.getUMLPackageName() */ ) {
                // console.log("ele",ele);
                // console.log("item",item);
                filteredAssociation.push(item);
@@ -845,7 +850,7 @@ function findParentPackage(ele, item) {
 module.exports.getFilePath = OpenApi.getPath;
 module.exports.OpenApi = OpenApi;
 module.exports.getClasses = OpenApi.getUniqueClasses;
-module.exports.getUMLPackage = OpenApi.getPackage;
+module.exports.getUMLPackage = OpenApi.getUMLPackage;
 module.exports.getPaths = OpenApi.getOperations;
 module.exports.getFileType = OpenApi.getFileType;
 module.exports.getError = OpenApi.getError;
@@ -876,3 +881,5 @@ module.exports.getPackageWiseUMLAssociation = getPackageWiseUMLAssociation;
 module.exports.setPackagepath = OpenApi.setPackagepath;
 module.exports.isModelPackage = OpenApi.isModelPackage;
 module.exports.isModelDiagram = OpenApi.isModelDiagram;
+module.exports.getUMLPackageName = OpenApi.getUMLPackageName;
+module.exports.setUMLPackageName = OpenApi.setUMLPackageName;
