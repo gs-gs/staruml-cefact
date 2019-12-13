@@ -309,7 +309,9 @@ class AssociationClassLink {
 
                               this.utils.addAttributeType(propertiesObj,attr);
                               if (attr.type instanceof type.UMLEnumeration) {
+
                                    propertiesObj.enum = this.utils.getEnumerationLiteral(attr.type);
+                                   
                               }
 
                          }

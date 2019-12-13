@@ -182,7 +182,13 @@ class Utils {
       */
      getEnumerationLiteral(objEnum) {
           if (objEnum) {
-               let result = objEnum.literals.map(a => a.name);
+               let result=[];
+               objEnum.literals.forEach(literal => {
+                    /* Filter for visible literal Views from diagram elements (Enumeration) */
+                    if(Utils.addLiteralData(literal)){
+                         result.push(literal.name);
+                    }
+               });
                return (result);
           }
      }
@@ -207,7 +213,7 @@ function isEmpty(umlPackage) {
 }
 
 function isAttribviewVisible(attribute) {
-     let isVisible=false;
+     let isVisible = false;
      let ArrUMLAttributeView = app.repository.getViewsOf(attribute);
      if (ArrUMLAttributeView.length >= 1) {
 
@@ -219,14 +225,15 @@ function isAttribviewVisible(attribute) {
 
                let UMLAttributeView = resAttr[0];
                if (UMLAttributeView.visible) {
-                    isVisible=true;
+                    isVisible = true;
                }
           }
      }
      return isVisible;
 }
-function addAttributeData(element){
-     let mAddAttributeData=false;
+
+function addAttributeData(element) {
+     let mAddAttributeData = false;
      if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
 
           mAddAttributeData = true;
@@ -238,8 +245,9 @@ function addAttributeData(element){
      }
      return mAddAttributeData;
 }
-function addOperationData(element){
-     let mAddOperationData=false;
+
+function addOperationData(element) {
+     let mAddOperationData = false;
      if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
 
           mAddOperationData = true;
@@ -251,8 +259,22 @@ function addOperationData(element){
      }
      return mAddOperationData;
 }
+function addLiteralData(element) {
+     let mAddLiteralData = false;
+     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
+
+          mAddLiteralData = true;
+
+     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
+
+          mAddLiteralData = true;
+
+     }
+     return mAddLiteralData;
+}
 module.exports = Utils;
 module.exports.isEmpty = isEmpty;
-module.exports.isAttribviewVisible=isAttribviewVisible;
-module.exports.addOperationData=addOperationData;
-module.exports.addAttributeData=addAttributeData;
+module.exports.isAttribviewVisible = isAttribviewVisible;
+module.exports.addOperationData = addOperationData;
+module.exports.addAttributeData = addAttributeData;
+module.exports.addLiteralData = addLiteralData;
