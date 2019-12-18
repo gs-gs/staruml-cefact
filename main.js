@@ -1,6 +1,6 @@
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
-const jsonld = require('./src/schema/jsonld');
+const jsonld = require('./src/jsonld/jsonld');
 const FileGenerator = require('./src/filegenerator');
 var fs = require('fs');
 var path = require('path');

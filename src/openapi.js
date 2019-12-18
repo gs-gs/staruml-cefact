@@ -648,6 +648,7 @@ class OpenApi {
                          let component = new Component();
                          console.log("-----json-schema-generated-----");
                          MainJSON.addJSONSchema(component);
+                         MainJSON.addJSONLayout(component);
                          console.log(MainJSON.getJSONSchema());
 
                          let generator = new FileGenerator();
