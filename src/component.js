@@ -424,6 +424,14 @@ class Component {
                     mRootObject['message']='<h1>'+interfaceName+'</h1>'
                     layout.push(mRootObject);
 
+                    forEach(source.attributes,function(attribute){
+
+                         /* Add attribute object to layout */
+                         let mAttributeObj={};
+                         mAttributeObj['key']=attribute.name;
+
+                         layout.push(mAttributeObj);
+                    });
                });
           });
 
