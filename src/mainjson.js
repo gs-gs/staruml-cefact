@@ -34,6 +34,17 @@ class MainJSON {
      }
 
      /**
+      * @function addJSONLayout
+      * @description save layout part of JSON Schema
+      * @static
+      * @param {Object} component
+      * @memberof MainJSON
+      */
+     static addJSONLayout(component) {
+          MainJSON.mainJSONSchemaObject.layout = component.getJSONLayout();
+     }
+
+     /**
       * @function saveInfo
       * @description save Info object to main json
       * @static
@@ -105,4 +116,5 @@ module.exports.addPaths = MainJSON.savePaths;
 module.exports.addServers = MainJSON.saveServers;
 module.exports.getJSON = MainJSON.giveJson;
 module.exports.addJSONSchema = MainJSON.addJSONSchema;
+module.exports.addJSONLayout = MainJSON.addJSONLayout;
 module.exports.getJSONSchema = MainJSON.giveJSONSchema;
