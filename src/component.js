@@ -1,3 +1,4 @@
+const forEach = require('async-foreach').forEach;
 const Utils = require('./utils');
 const camelize = require('../src/camelize');
 const Generalization = require('./generalization');
@@ -395,6 +396,39 @@ class Component {
 
           console.log("Total duplicate deleted reference", duplicateDeletedReference);
           return this.mainSchemaObj;
+     }
+
+     getJSONLayout(){
+          let layout = [];
+
+          /* For Interface */
+          let paths, interfaceRealalization;
+          if (openAPI.isModelPackage()) {
+               interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
+               paths = openAPI.getPaths();
+          } else if (openAPI.isModelDiagram()) {
+               interfaceRealalization = diagramEle.getUMLInterfaceRealization();
+               paths = diagramEle.getUMLInterface();
+          }
+
+          paths.forEach(path => {
+               let ref = interfaceRealalization.filter(real => {
+                    return real.target._id == path._id;
+               });
+               ref.forEach(interfaceReal => {
+                    /* Add root object to layout */
+                    let mRootObject={};
+                    let source=interfaceReal.source;
+                    let interfaceName = camelize.toCamelCaseString(source.name);
+                    mRootObject['widget']='message';
+                    mRootObject['message']='<h1>'+interfaceName+'</h1>'
+                    layout.push(mRootObject);
+
+               });
+          });
+
+
+          return layout;
      }
 
      removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference) {
