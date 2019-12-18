@@ -196,7 +196,7 @@ class Component {
           console.log("Total duplicate deleted reference", duplicateDeletedReference);
           return this.mainComponentObj;
      }
-     
+
      /**
       * @function getJSONSchema
       * @description Returns component object 
@@ -398,7 +398,7 @@ class Component {
           return this.mainSchemaObj;
      }
 
-     getJSONLayout(){
+     getJSONLayout() {
           let layout = [];
 
           /* For Interface */
@@ -417,38 +417,49 @@ class Component {
                });
                ref.forEach(interfaceReal => {
                     /* Add root object to layout */
-                    let mRootObject={};
-                    let source=interfaceReal.source;
+                    let mRootObject = {};
+                    let source = interfaceReal.source;
                     let interfaceName = camelize.toCamelCaseString(source.name);
-                    mRootObject['widget']='message';
-                    mRootObject['message']='<h1>'+interfaceName+'</h1>'
+                    mRootObject['widget'] = 'message';
+                    mRootObject['message'] = '<h1>' + interfaceName + '</h1>'
                     layout.push(mRootObject);
 
-                    forEach(source.attributes,function(attribute){
+                    forEach(source.attributes, function (attribute) {
 
                          /* Add attribute object to layout */
-                         let mAttributeObj={};
-                         mAttributeObj['key']=attribute.name;
+                         let mAttributeObj = {};
+                         mAttributeObj['key'] = attribute.name;
 
                          /* Add required field to attribute */
                          if (attribute.multiplicity == "1" || attribute.multiplicity == "1..*") {
-                              mAttributeObj['required']=true;
+                              mAttributeObj['required'] = true;
                          }
 
-                         
-                         let attrType=attribute.type;
-                         if(attrType instanceof type.UMLEnumeration){
+
+                         let attrType = attribute.type;
+                         if (attrType instanceof type.UMLEnumeration) {
                               /* Add type field to attribute */
-                              mAttributeObj['type']='array';
+                              mAttributeObj['type'] = 'array';
                               /* Add items array to attribute */
-                              let items=[];
-                              mAttributeObj['items']=items;
-                              let literals=attrType.literals;
-                              forEach(literals,function(literal){
-                                   let literalObj={};
-                                   literalObj['key']=literal.name;
+                              let items = [];
+                              mAttributeObj['items'] = items;
+                              let literals = attrType.literals;
+                              forEach(literals, function (literal) {
+                                   let literalObj = {};
+                                   literalObj['key'] = literal.name;
                                    items.push(literalObj);
                               });
+                         } else if (attrType instanceof type.UMLClass || attrType instanceof type.UMLInterface) {
+                              /* Add type field to attribute */
+                              mAttributeObj['type'] = 'section';
+                              /* Add items array to attribute */
+                              let items = [];
+                              mAttributeObj['items'] = items;
+                              let sectionObj = {};
+                              sectionObj['key'] = attrType.name;
+                              items.push(sectionObj);
+                         } else{
+                              mAttributeObj['type'] = attrType;
                          }
                          layout.push(mAttributeObj);
                     });
