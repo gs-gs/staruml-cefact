@@ -440,7 +440,15 @@ class Component {
                          if(attrType instanceof type.UMLEnumeration){
                               /* Add type field to attribute */
                               mAttributeObj['type']='array';
-                              
+                              /* Add items array to attribute */
+                              let items=[];
+                              mAttributeObj['items']=items;
+                              let literals=attrType.literals;
+                              forEach(literals,function(literal){
+                                   let literalObj={};
+                                   literalObj['key']=literal.name;
+                                   items.push(literalObj);
+                              });
                          }
                          layout.push(mAttributeObj);
                     });
