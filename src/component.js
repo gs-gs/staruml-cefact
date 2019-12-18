@@ -430,6 +430,11 @@ class Component {
                          let mAttributeObj={};
                          mAttributeObj['key']=attribute.name;
 
+                         /* Add required field to attribute */
+                         if (attribute.multiplicity == "1" || attribute.multiplicity == "1..*") {
+                              mAttributeObj['required']=true;
+                         }
+
                          layout.push(mAttributeObj);
                     });
                });
