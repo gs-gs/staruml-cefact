@@ -435,6 +435,13 @@ class Component {
                               mAttributeObj['required']=true;
                          }
 
+                         
+                         let attrType=attribute.type;
+                         if(attrType instanceof type.UMLEnumeration){
+                              /* Add type field to attribute */
+                              mAttributeObj['type']='array';
+                              
+                         }
                          layout.push(mAttributeObj);
                     });
                });
