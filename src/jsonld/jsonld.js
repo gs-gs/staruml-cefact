@@ -144,6 +144,22 @@ function getSeeAlso() {
     return sAlsoArr;
 }
 
+function getAttrTypeClass(mClasses){
+    let mNewClasses=[];
+    forEach(mClasses, function (mClass) {
+        forEach(mClass.attributes, function (attr) {
+            if(attr.type instanceof type.UMLClass){
+                let res=mNewClasses.filter(function(item){
+                    return attr.type._id == item._id;
+                });
+                if(res.length==0){
+                    mNewClasses.push(attr.type);
+                }
+            }
+        });
+    });
+    return mNewClasses;
+}
 /**
  * @function getRdfsClassesArr
  * @description returns the array of classes 
@@ -155,8 +171,11 @@ function getRdfsClassesArr() {
     let mClasses = mUMLPackage.ownedElements.filter(function (element) {
         return element instanceof type.UMLClass;
     });
-    
-    forEach(mClasses, function (mClass) {
+
+    let mNewClasses=getAttrTypeClass(mClasses);
+    mNewClasses=mClasses.concat(mNewClasses);
+
+    forEach(mNewClasses, function (mClass) {
         let tClass = {};
         tClass['@id'] = mClass.name;
         tClass['@type'] = 'rdfs:Class';
@@ -165,7 +184,7 @@ function getRdfsClassesArr() {
         rdfsClassArr.push(tClass);
 
         forEach(mClass.attributes, function (attr) {
-            if (attr.type instanceof type.UMLEnumeration) {
+            if (attr.type instanceof type.UMLEnumeration ) {
                 let mEnum = attr.type;
                 let tClass = {};
                 tClass['@id'] = mEnum.name;
