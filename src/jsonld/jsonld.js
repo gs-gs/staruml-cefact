@@ -239,6 +239,9 @@ function getRdfsPropertiesArr() {
         return element instanceof type.UMLClass;
     });
 
+    let mNewClasses=getAttrTypeClass(mClasses);
+    mNewClasses=mClasses.concat(mNewClasses);
+
     forEach(mNewClasses, function (mClass) {
 
 
