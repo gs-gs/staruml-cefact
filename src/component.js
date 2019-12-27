@@ -458,9 +458,7 @@ class Component {
                               let sectionObj = {};
                               sectionObj['key'] = attrType.name;
                               items.push(sectionObj);
-                         } else{
-                              mAttributeObj['type'] = attrType;
-                         }
+                         } 
                          layout.push(mAttributeObj);
                     });
                });

@@ -144,6 +144,22 @@ function getSeeAlso() {
     return sAlsoArr;
 }
 
+function getAttrTypeClass(mClasses){
+    let mNewClasses=[];
+    forEach(mClasses, function (mClass) {
+        forEach(mClass.attributes, function (attr) {
+            if(attr.type instanceof type.UMLClass){
+                let res=mNewClasses.filter(function(item){
+                    return attr.type._id == item._id;
+                });
+                if(res.length==0){
+                    mNewClasses.push(attr.type);
+                }
+            }
+        });
+    });
+    return mNewClasses;
+}
 /**
  * @function getRdfsClassesArr
  * @description returns the array of classes 
@@ -155,8 +171,11 @@ function getRdfsClassesArr() {
     let mClasses = mUMLPackage.ownedElements.filter(function (element) {
         return element instanceof type.UMLClass;
     });
-    
-    forEach(mClasses, function (mClass) {
+
+    let mNewClasses=getAttrTypeClass(mClasses);
+    mNewClasses=mClasses.concat(mNewClasses);
+
+    forEach(mNewClasses, function (mClass) {
         let tClass = {};
         tClass['@id'] = mClass.name;
         tClass['@type'] = 'rdfs:Class';
@@ -165,7 +184,7 @@ function getRdfsClassesArr() {
         rdfsClassArr.push(tClass);
 
         forEach(mClass.attributes, function (attr) {
-            if (attr.type instanceof type.UMLEnumeration) {
+            if (attr.type instanceof type.UMLEnumeration ) {
                 let mEnum = attr.type;
                 let tClass = {};
                 tClass['@id'] = mEnum.name;
@@ -205,20 +224,6 @@ function getParentClasses(mElement) {
 }
 
 /**
- * @function getSubClasses
- * @description returns the array of sub classes
- * @returns {Array}
- */
-function getSubClasses(subElements, mElement) {
-    if (mElement.hasOwnProperty('_parent') && mElement._parent != null) {
-        let mNElement = mElement._parent;
-        subElements.push(mNElement.name);
-        getSubClasses(subElements, mNElement);
-    }
-    return subElements;
-}
-
-/**
  * @function getRdfsPropertiesArr
  * @description returns the array class properties with template
  * @returns {Array}
@@ -234,7 +239,10 @@ function getRdfsPropertiesArr() {
         return element instanceof type.UMLClass;
     });
 
-    forEach(mClasses, function (mClass) {
+    let mNewClasses=getAttrTypeClass(mClasses);
+    mNewClasses=mClasses.concat(mNewClasses);
+
+    forEach(mNewClasses, function (mClass) {
 
 
         forEach(mClass.attributes, function (attr) {
@@ -244,14 +252,17 @@ function getRdfsPropertiesArr() {
             objProperty['rdfs:domain'] = mClass.name;
 
             let range=getRange(attr);
-            objProperty['rdfs:range'] = getRange(attr);
-            if(isString(attr.type) && range!=''){
+            objProperty['rdfs:range'] = range;//getRange(attr);
+            /* if(isString(attr.type) && range!=''){
                 rdfsPropertiesArr.push(objProperty);
             }
+            else{
 
+            } */
+            rdfsPropertiesArr.push(objProperty);
 
         });
-
+        
 
         let classAssociations = associations.filter(item => {
             return item.end1.reference._id == mClass._id
@@ -331,7 +342,15 @@ function getRange(attr) {
             range = 'xsd:string';
         } else if (starUMLType === 'Boolean') {
             range = 'xsd:boolean';
-        }
+        } else if (starUMLType === 'Measure') {
+            range = 'Measure';
+        } else if (starUMLType === 'Code') {
+            range = 'Code';
+        } else if (starUMLType === 'Identifier') {
+            range = 'Identifier';
+        } else if (starUMLType === 'Amount') {
+            range = 'Amount';
+        } 
     } else {
         range = starUMLType.name;
     }
