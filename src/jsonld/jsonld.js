@@ -114,6 +114,7 @@ function getGraph() {
     objGraph['rdfs:seeAlso'] = getSeeAlso();
     objGraph['rdfs_classes'] = getRdfsClassesArr();
     objGraph['rdfs_properties'] = getRdfsPropertiesArr();
+    objGraph['rdfs_instances'] = getRdfsInstancesArr();
 
 
     return objGraph;
@@ -172,7 +173,13 @@ function getRdfsClassesArr() {
         return element instanceof type.UMLClass;
     });
 
+    /*
+        Returns classes that have a class type of property of the class
+    */
     let mNewClasses=getAttrTypeClass(mClasses);
+    /*
+        Combine both classes in a singla classes array
+    */
     mNewClasses=mClasses.concat(mNewClasses);
 
     forEach(mNewClasses, function (mClass) {
@@ -190,15 +197,6 @@ function getRdfsClassesArr() {
                 tClass['@id'] = mEnum.name;
                 tClass['@type'] = 'rdfs:Class';
                 rdfsClassArr.push(tClass);
-
-                forEach(mEnum.literals, function (literal) {
-                    let tLiteral = {};
-                    tLiteral['@id'] = literal.name;
-                    tLiteral['@type'] = 'rdfs:Class';
-                    let mSubLiterals = [mEnum.name];
-                    tLiteral['rdfs:subClassOf'] = mSubLiterals;
-                    rdfsClassArr.push(tLiteral);
-                });
             }
         });
 
@@ -222,7 +220,21 @@ function getParentClasses(mElement) {
     });
     return parentClasses;
 }
+function getRdfsInstancesArr(){
+    let rdfsInstancesArr = [ /* {# instances #} */ ];
+    let mUMLPackage = getUMLPackage();
+    let UMLEnumeration=app.repository.select(mUMLPackage.name+"::@UMLEnumeration");
 
+    forEach(UMLEnumeration,function(enume){
+        forEach(enume.literals,function(literal){
+            let mEnumeObj={};
+            mEnumeObj['@id']=enume.name+'/'+literal.name;
+            mEnumeObj['@type']=enume.name;
+            rdfsInstancesArr.push(mEnumeObj);
+        });
+    });
+    return rdfsInstancesArr;
+}
 /**
  * @function getRdfsPropertiesArr
  * @description returns the array class properties with template
