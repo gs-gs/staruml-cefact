@@ -114,6 +114,7 @@ function getGraph() {
     objGraph['rdfs:seeAlso'] = getSeeAlso();
     objGraph['rdfs_classes'] = getRdfsClassesArr();
     objGraph['rdfs_properties'] = getRdfsPropertiesArr();
+    objGraph['rdfs_instances'] = getRdfsInstancesArr();
 
 
     return objGraph;
@@ -222,7 +223,21 @@ function getParentClasses(mElement) {
     });
     return parentClasses;
 }
+function getRdfsInstancesArr(){
+    let rdfsInstancesArr = [ /* {# instances #} */ ];
+    let mUMLPackage = getUMLPackage();
+    let UMLEnumeration=app.repository.select(mUMLPackage.name+"::@UMLEnumeration");
 
+    forEach(UMLEnumeration,function(enume){
+        forEach(enume.literals,function(literal){
+            let mEnumeObj={};
+            mEnumeObj['@id']=enume.name+'/'+literal.name;
+            mEnumeObj['@type']=enume.name;
+            rdfsInstancesArr.push(mEnumeObj);
+        });
+    });
+    return rdfsInstancesArr;
+}
 /**
  * @function getRdfsPropertiesArr
  * @description returns the array class properties with template
