@@ -173,7 +173,13 @@ function getRdfsClassesArr() {
         return element instanceof type.UMLClass;
     });
 
+    /*
+        Returns classes that have a class type of property of the class
+    */
     let mNewClasses=getAttrTypeClass(mClasses);
+    /*
+        Combine both classes in a singla classes array
+    */
     mNewClasses=mClasses.concat(mNewClasses);
 
     forEach(mNewClasses, function (mClass) {
@@ -191,15 +197,6 @@ function getRdfsClassesArr() {
                 tClass['@id'] = mEnum.name;
                 tClass['@type'] = 'rdfs:Class';
                 rdfsClassArr.push(tClass);
-
-                forEach(mEnum.literals, function (literal) {
-                    let tLiteral = {};
-                    tLiteral['@id'] = literal.name;
-                    tLiteral['@type'] = 'rdfs:Class';
-                    let mSubLiterals = [mEnum.name];
-                    tLiteral['rdfs:subClassOf'] = mSubLiterals;
-                    rdfsClassArr.push(tLiteral);
-                });
             }
         });
 
