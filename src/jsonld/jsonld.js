@@ -227,7 +227,10 @@ function getParentClasses(mElement) {
 function getRdfsInstancesArr() {
     let rdfsInstancesArr = [ /* {# instances #} */ ];
     let mUMLPackage = getUMLPackage();
-    /* let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
+    /* //TODO : Do not remove this code 
+    let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
+
+    let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
     let enumArr = [];
     forEach(UMLClasses, function (umlClass) {
         forEach(umlClass.attributes, function (attr) {
