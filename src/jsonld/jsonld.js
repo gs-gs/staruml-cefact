@@ -145,15 +145,15 @@ function getSeeAlso() {
     return sAlsoArr;
 }
 
-function getAttrTypeClass(mClasses){
-    let mNewClasses=[];
+function getAttrTypeClass(mClasses) {
+    let mNewClasses = [];
     forEach(mClasses, function (mClass) {
         forEach(mClass.attributes, function (attr) {
-            if(attr.type instanceof type.UMLClass){
-                let res=mNewClasses.filter(function(item){
+            if (attr.type instanceof type.UMLClass) {
+                let res = mNewClasses.filter(function (item) {
                     return attr.type._id == item._id;
                 });
-                if(res.length==0){
+                if (res.length == 0) {
                     mNewClasses.push(attr.type);
                 }
             }
@@ -176,11 +176,11 @@ function getRdfsClassesArr() {
     /*
         Returns classes that have a class type of property of the class
     */
-    let mNewClasses=getAttrTypeClass(mClasses);
+    let mNewClasses = getAttrTypeClass(mClasses);
     /*
         Combine both classes in a singla classes array
     */
-    mNewClasses=mClasses.concat(mNewClasses);
+    mNewClasses = mClasses.concat(mNewClasses);
 
     forEach(mNewClasses, function (mClass) {
         let tClass = {};
@@ -191,7 +191,7 @@ function getRdfsClassesArr() {
         rdfsClassArr.push(tClass);
 
         forEach(mClass.attributes, function (attr) {
-            if (attr.type instanceof type.UMLEnumeration ) {
+            if (attr.type instanceof type.UMLEnumeration) {
                 let mEnum = attr.type;
                 let tClass = {};
                 tClass['@id'] = mEnum.name;
@@ -220,16 +220,34 @@ function getParentClasses(mElement) {
     });
     return parentClasses;
 }
-function getRdfsInstancesArr(){
+
+function getRdfsInstancesArr() {
     let rdfsInstancesArr = [ /* {# instances #} */ ];
     let mUMLPackage = getUMLPackage();
-    let UMLEnumeration=app.repository.select(mUMLPackage.name+"::@UMLEnumeration");
+    let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
+    let enumArr = [];
+    forEach(UMLClasses, function (umlClass) {
+        forEach(umlClass.attributes, function (attr) {
 
-    forEach(UMLEnumeration,function(enume){
-        forEach(enume.literals,function(literal){
-            let mEnumeObj={};
-            mEnumeObj['@id']=enume.name+'/'+literal.name;
-            mEnumeObj['@type']=enume.name;
+            if (attr.type instanceof type.UMLEnumeration) {
+
+                let result = enumArr.filter(function (item) {
+                    return item._id == attr.type._id;
+                });
+
+                if (result.length == 0) {
+                    enumArr.push(attr.type);
+                }
+            }
+        });
+    });
+    console.log("used enum", enumArr);
+
+    forEach(enumArr, function (enume) {
+        forEach(enume.literals, function (literal) {
+            let mEnumeObj = {};
+            mEnumeObj['@id'] = enume.name + '/' + literal.name;
+            mEnumeObj['@type'] = enume.name;
             rdfsInstancesArr.push(mEnumeObj);
         });
     });
@@ -251,8 +269,8 @@ function getRdfsPropertiesArr() {
         return element instanceof type.UMLClass;
     });
 
-    let mNewClasses=getAttrTypeClass(mClasses);
-    mNewClasses=mClasses.concat(mNewClasses);
+    let mNewClasses = getAttrTypeClass(mClasses);
+    mNewClasses = mClasses.concat(mNewClasses);
 
     forEach(mNewClasses, function (mClass) {
 
@@ -263,8 +281,8 @@ function getRdfsPropertiesArr() {
             objProperty['@type'] = 'rdf:Property';
             objProperty['rdfs:domain'] = mClass.name;
 
-            let range=getRange(attr);
-            objProperty['rdfs:range'] = range;//getRange(attr);
+            let range = getRange(attr);
+            objProperty['rdfs:range'] = range; //getRange(attr);
             /* if(isString(attr.type) && range!=''){
                 rdfsPropertiesArr.push(objProperty);
             }
@@ -274,7 +292,7 @@ function getRdfsPropertiesArr() {
             rdfsPropertiesArr.push(objProperty);
 
         });
-        
+
 
         let classAssociations = associations.filter(item => {
             return item.end1.reference._id == mClass._id
@@ -286,8 +304,8 @@ function getRdfsPropertiesArr() {
                 let relationName = assoc.name;
                 if (relationName != '') {
                     let range = assoc.end2.reference.name;
-                    
-                    
+
+
                     let objProperty = {};
                     objProperty['@id'] = mClass.name + '/' + relationName;
                     objProperty['@type'] = 'rdf:Property';
@@ -362,7 +380,9 @@ function getRange(attr) {
             range = 'Identifier';
         } else if (starUMLType === 'Amount') {
             range = 'Amount';
-        } 
+        } else {
+            range = starUMLType;
+        }
     } else {
         range = starUMLType.name;
     }

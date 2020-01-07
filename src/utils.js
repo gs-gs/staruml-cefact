@@ -195,7 +195,12 @@ class Utils {
 
 
 }
-
+/**
+ * @function isEmpty
+ * @description check UMLPackage has UMLClass, UMLInterface, UMLEnumeration and return boolean
+ * @param {*} umlPackage
+ * @returns {boolean}
+ */
 function isEmpty(umlPackage) {
      let ownedElements = [];
      umlPackage.ownedElements.filter(function (item) {
@@ -211,7 +216,12 @@ function isEmpty(umlPackage) {
      }
      return true;
 }
-
+/**
+ * @function isAttribviewVisible
+ * @description find view of attribute and return that view is visible or not
+ * @param {*} attribute
+ * @returns {boolean}
+ */
 function isAttribviewVisible(attribute) {
      let isVisible = false;
      let ArrUMLAttributeView = app.repository.getViewsOf(attribute);
@@ -231,7 +241,12 @@ function isAttribviewVisible(attribute) {
      }
      return isVisible;
 }
-
+/**
+ * @function addAttributeData
+ * @description check that element attribute is visible and return boolean that attribute should allow to add attribute
+ * @param {*} element
+ * @returns {boolean}
+ */
 function addAttributeData(element) {
      let mAddAttributeData = false;
      if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
@@ -245,7 +260,12 @@ function addAttributeData(element) {
      }
      return mAddAttributeData;
 }
-
+/**
+ * @function addOperationData
+ * @description check that element operation is visible and return boolean that operation should allow to add operation
+ * @param {*} element
+ * @returns {boolean}
+ */
 function addOperationData(element) {
      let mAddOperationData = false;
      if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
@@ -259,6 +279,12 @@ function addOperationData(element) {
      }
      return mAddOperationData;
 }
+/**
+ * @function addLiteralData
+ * @description check that element literal is visible and return boolean that literal should allow to add literal
+ * @param {*} element
+ * @returns {boolean}
+ */
 function addLiteralData(element) {
      let mAddLiteralData = false;
      if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
