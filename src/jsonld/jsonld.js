@@ -161,12 +161,14 @@ function getAttrTypeClass(mClasses) {
     });
     return mNewClasses;
 }
+let generatedEnumInstance=[];
 /**
  * @function getRdfsClassesArr
  * @description returns the array of classes 
  * @returns {Array}
  */
 function getRdfsClassesArr() {
+    generatedEnumInstance=[];
     let rdfsClassArr = [ /* {# classes #} */ ];
     let mUMLPackage = getUMLPackage();
     let mClasses = mUMLPackage.ownedElements.filter(function (element) {
@@ -197,6 +199,7 @@ function getRdfsClassesArr() {
                 tClass['@id'] = mEnum.name;
                 tClass['@type'] = 'rdfs:Class';
                 rdfsClassArr.push(tClass);
+                generatedEnumInstance.push(attr.type);
             }
         });
 
@@ -224,7 +227,7 @@ function getParentClasses(mElement) {
 function getRdfsInstancesArr() {
     let rdfsInstancesArr = [ /* {# instances #} */ ];
     let mUMLPackage = getUMLPackage();
-    let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
+    /* let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
     let enumArr = [];
     forEach(UMLClasses, function (umlClass) {
         forEach(umlClass.attributes, function (attr) {
@@ -240,10 +243,23 @@ function getRdfsInstancesArr() {
                 }
             }
         });
-    });
+    }); 
     console.log("used enum", enumArr);
+    */
+    let UMLEnumeration = app.repository.select(mUMLPackage.name + "::@UMLEnumeration");
 
-    forEach(enumArr, function (enume) {
+    let newallyFiltered=[];
+    /* Omit already generated enum instance ex #59 */
+    forEach(UMLEnumeration,function(enume){
+        let result=generatedEnumInstance.filter(function(item){
+            return enume._id == item._id;
+        });
+        if(result.length==0){
+            newallyFiltered.push(enume);
+        }
+    });
+    console.log("newally filtered enum", newallyFiltered);
+    forEach(newallyFiltered, function (enume) {
         forEach(enume.literals, function (literal) {
             let mEnumeObj = {};
             mEnumeObj['@id'] = enume.name + '/' + literal.name;
