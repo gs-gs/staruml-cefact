@@ -161,14 +161,14 @@ function getAttrTypeClass(mClasses) {
     });
     return mNewClasses;
 }
-let generatedEnumInstance=[];
+let generatedEnumInstance = [];
 /**
  * @function getRdfsClassesArr
  * @description returns the array of classes 
  * @returns {Array}
  */
 function getRdfsClassesArr() {
-    generatedEnumInstance=[];
+    generatedEnumInstance = [];
     let rdfsClassArr = [ /* {# classes #} */ ];
     let mUMLPackage = getUMLPackage();
     let mClasses = mUMLPackage.ownedElements.filter(function (element) {
@@ -251,13 +251,13 @@ function getRdfsInstancesArr() {
     */
     let UMLEnumeration = app.repository.select(mUMLPackage.name + "::@UMLEnumeration");
 
-    let newallyFiltered=[];
+    let newallyFiltered = [];
     /* Omit already generated enum instance ex #59 */
-    forEach(UMLEnumeration,function(enume){
-        let result=generatedEnumInstance.filter(function(item){
+    forEach(UMLEnumeration, function (enume) {
+        let result = generatedEnumInstance.filter(function (item) {
             return enume._id == item._id;
         });
-        if(result.length==0){
+        if (result.length == 0) {
             newallyFiltered.push(enume);
         }
     });
@@ -291,8 +291,8 @@ function getRdfsPropertiesArr() {
     let mNewClasses = getAttrTypeClass(mClasses);
     mNewClasses = mClasses.concat(mNewClasses);
 
+    notAvailableClassOrEnumeInFile = [];
     forEach(mNewClasses, function (mClass) {
-
 
         forEach(mClass.attributes, function (attr) {
             let objProperty = {};
@@ -300,7 +300,7 @@ function getRdfsPropertiesArr() {
             objProperty['@type'] = 'rdf:Property';
             objProperty['rdfs:domain'] = mClass.name;
 
-            let range = getRange(attr);
+            let range = getRange(attr,mClass.name);
             objProperty['rdfs:range'] = range; //getRange(attr);
             /* if(isString(attr.type) && range!=''){
                 rdfsPropertiesArr.push(objProperty);
@@ -337,9 +337,10 @@ function getRdfsPropertiesArr() {
             }
         });
     });
+   
     return rdfsPropertiesArr;
 }
-
+let notAvailableClassOrEnumeInFile = [];
 /**
  * @function isString
  * @description returns boolean that checks values is string or any object
@@ -349,12 +350,94 @@ function isString(s) {
     return typeof (s) === 'string' || s instanceof String;
 }
 
+function getRange(attr,className) {
+    /* Valid DataType
+    Numeric: "rdfs:range": "xsd:nonNegativeInteger"
+    Indicator: "rdfs:range": "xsd:boolean"
+    Number: "rdfs:range": "xsd:integer"
+    Password: "rdfs:range": "xsd:string"
+    DateTime: "rdfs:range": "xsd:dateTime"
+    Date: "rdfs:range": "xsd:date"
+    Int32: "rdfs:range": "xsd:int"
+    Int64: "rdfs:range": "xsd:long"
+    Float: "rdfs:range": "xsd:float"
+    Double: "rdfs:range": "xsd:double"
+    Byte: "rdfs:range": "xsd:byte"
+     */
+
+    let range = '';
+    let attributeType = attr.type;
+    if (isString(attributeType)) {
+
+        if (attributeType === 'Numeric') {
+            range = 'xsd:nonNegativeInteger'; //
+        } else if (attributeType === 'Indicator') {
+            range = 'xsd:boolean';
+        } else if (attributeType === 'Date') {
+            range = 'xsd:date';
+        } else if (attributeType === 'DateTime') {
+            range = 'xsd:dateTime';
+        } else if (attributeType === 'Int32') {
+            range = 'xsd:int';
+        } else if (attributeType === 'Int64') {
+            range = 'xsd:long';
+        } else if (attributeType === 'Number') {
+            range = 'xsd:integer';
+        } else if (attributeType === 'Float') {
+            range = 'xsd:float';
+        } else if (attributeType === 'Double') {
+            range = 'xsd:double';
+        } else if (attributeType === 'Password') {
+            range = 'xsd:string';
+        } else if (attributeType === 'Byte') {
+            range = 'xsd:byte';
+        } else {
+
+            /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
+            let srchRes = app.repository.search(attributeType);
+            let result = srchRes.filter(function (element) {
+                if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
+                    return element.name == attributeType;
+                }
+            });
+            if (result.length == 0) {
+                let str = className + '/' + attr.name + ': ' + attributeType
+                notAvailableClassOrEnumeInFile.push(str);
+            }
+
+            if (attributeType === 'Numeric') {
+                range = 'xsd:string';
+            } else if (attributeType === 'Identifier') {
+                range = 'Identifier';
+            } else if (attributeType === 'Code') {
+                range = 'Code';
+            } else if (attributeType === 'Text') {
+                range = 'xsd:string';
+            } else if (attributeType === 'Binary') {
+                range = 'xsd:string';
+            } else if (attributeType === 'Measure') {
+                range = 'Measure';
+            } else if (attributeType === 'Amount') {
+                range = 'Amount';
+            } else {
+                range = attributeType;
+            }
+
+        }
+       
+    } else {
+        return attributeType.name;
+    }
+    return range;
+}
+
+
 /**
  * @function getRange
  * @description returns datatype
  * @returns {string}
  */
-function getRange(attr) {
+function getRange1(attr) {
     let range = '';
     let starUMLType = attr.type;
     if (isString(starUMLType)) {
@@ -426,6 +509,12 @@ function setUMLPackage(mUMLPackage) {
 function getUMLPackage() {
     return UMLPackage;
 }
+
+function getNotAvailableClassOrEnumeInFile(){
+    return notAvailableClassOrEnumeInFile;
+}
+
 module.exports.generateJSONLD = generateJSONLD;
 module.exports.setUMLPackage = setUMLPackage;
 module.exports.getUMLPackage = getUMLPackage;
+module.exports.getNotAvailableClassOrEnumeInFile = getNotAvailableClassOrEnumeInFile;
