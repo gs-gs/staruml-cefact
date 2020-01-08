@@ -13,7 +13,7 @@ var utils = require('./src/utils');
 const JSON_FILE_FILTERS = [{
      name: 'JSON File',
      extensions: ['json']
- }]
+}]
 
 
 /**
@@ -486,21 +486,14 @@ function generateJSONLD() {
           }) {
                if (buttonId === "ok") {
 
-                    
-                    
-
-
-
                     let varSel = returnValue.getClassName();
                     let valPackagename = type.UMLPackage.name;
                     if (varSel == valPackagename) {
 
                          if (!utils.isEmpty(returnValue)) {
 
-
-
                               var _filename = returnValue.name;
-                              var basePath = app.dialogs.showSaveDialog('Export JSON-LD As JSON', _filename+'-jsonld' + '.json', JSON_FILE_FILTERS);
+                              var basePath = app.dialogs.showSaveDialog('Export JSON-LD As JSON', _filename + '-jsonld' + '.json', JSON_FILE_FILTERS);
                               if (basePath == null) {
                                    console.log("Dialog cancelled : basePath not available")
                                    return;
@@ -509,9 +502,20 @@ function generateJSONLD() {
                               console.log("generateJSONLD");
                               jsonld.setUMLPackage(returnValue);
                               let objJSONLd = jsonld.generateJSONLD();
+
+                              let notAvailableClassOrEnumeInFile = jsonld.getNotAvailableClassOrEnumeInFile();
+                              if (notAvailableClassOrEnumeInFile.length > 0) {
+
+                                   let dlgMessage = 'Warning: your vocabulary may be invalid because following properties have unknown or undefined type (range):\n';
+                                   forEach(notAvailableClassOrEnumeInFile, function (item) {
+                                        dlgMessage += '\n' + item;
+                                   });
+                                   app.dialogs.showAlertDialog(dlgMessage);
+                              }
+
                               let generator = new FileGenerator();
-                              generator.createJSONLD(basePath,objJSONLd).then(function(res){
-                                   if(res.result==constant.FIELD_SUCCESS){
+                              generator.createJSONLD(basePath, objJSONLd).then(function (res) {
+                                   if (res.result == constant.FIELD_SUCCESS) {
                                         app.dialogs.showInfoDialog(res.message);
                                    }
                               }).catch(function (err) {
