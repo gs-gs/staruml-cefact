@@ -349,7 +349,11 @@ let notAvailableClassOrEnumeInFile = [];
 function isString(s) {
     return typeof (s) === 'string' || s instanceof String;
 }
-
+/**
+ * @function getRange
+ * @description returns datatype
+ * @returns {string}
+ */
 function getRange(attr,className) {
     /* Valid DataType
     Numeric: "rdfs:range": "xsd:nonNegativeInteger"
@@ -391,6 +395,8 @@ function getRange(attr,className) {
             range = 'xsd:string';
         } else if (attributeType === 'Byte') {
             range = 'xsd:byte';
+        } else if (attributeType === 'Quantity') {
+            range = 'xsd:nonNegativeInteger';
         } else {
 
             /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
@@ -431,65 +437,6 @@ function getRange(attr,className) {
     return range;
 }
 
-
-/**
- * @function getRange
- * @description returns datatype
- * @returns {string}
- */
-function getRange1(attr) {
-    let range = '';
-    let starUMLType = attr.type;
-    if (isString(starUMLType)) {
-
-        if (starUMLType === 'Numeric') {
-            range = 'xsd:nonNegativeInteger';
-        } else if (starUMLType === 'Indicator') {
-            range = 'xsd:boolean';
-        } else if (starUMLType === 'Date') {
-            range = 'xsd:date';
-        } else if (starUMLType === 'DateTime') {
-            range = 'xsd:dateTime';
-        } else if (starUMLType === 'Integer') {
-            range = 'xsd:int';
-        } else if (starUMLType === 'Int32') {
-            range = 'xsd:int';
-        } else if (starUMLType === 'Int64') {
-            range = 'xsd:long';
-        } else if (starUMLType === 'Number') {
-            range = 'xsd:integer';
-        } else if (starUMLType === 'Float') {
-            range = 'xsd:float';
-        } else if (starUMLType === 'Double') {
-            range = 'xsd:double';
-        } else if (starUMLType === 'Boolean') {
-            range = 'xsd:string';
-        } else if (starUMLType === 'Password') {
-            range = 'xsd:string';
-        } else if (starUMLType === 'Byte') {
-            range = 'xsd:byte';
-        } else if (starUMLType === 'Binary') {
-            range = 'xsd:string';
-        } else if (starUMLType === 'Text') {
-            range = 'xsd:string';
-        } else if (starUMLType === 'Boolean') {
-            range = 'xsd:boolean';
-        } else if (starUMLType === 'Measure') {
-            range = 'Measure';
-        } else if (starUMLType === 'Code') {
-            range = 'Code';
-        } else if (starUMLType === 'Identifier') {
-            range = 'Identifier';
-        } else if (starUMLType === 'Amount') {
-            range = 'Amount';
-        } else {
-            range = starUMLType;
-        }
-    } else {
-        range = starUMLType.name;
-    }
-    return range;
-}
 
 let UMLPackage = null;
 
