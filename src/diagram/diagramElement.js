@@ -344,11 +344,41 @@ function getViewOf(element) {
  * @param {*} UMLEle
  * @returns {Array} tempAttributes
  */
-function removeIDFromAttribute(UMLEle) {
+function removeIDFromAttribute(UMLEle,UMLClassDiagram) {
     let tempAttributes = [];
-    if (UMLEle.hasOwnProperty('attributes')) {
 
-        forEach(UMLEle.attributes, function (attrib) {
+    let allCViw = app.repository.select(UMLClassDiagram.name+'::@UMLClassView');
+    let resAllCView = allCViw.filter(function (item) {
+        return UMLEle._id == item.model._id;
+    });
+    console.log("resAllCView", resAllCView);
+    if (resAllCView.length == 1) {
+
+        /* let ElementView = app.repository.getViewsOf(UMLEle);
+        ElementView = ElementView.filter(function (item) {
+            return item instanceof type.UMLClassView;
+        });
+
+        console.log("ElementView", ElementView);
+        let mIds = [];
+        forEach(ElementView, function (item) {
+            mIds.push(item.model);
+        }); */
+
+        let subAttributeViews = resAllCView[0].attributeCompartment.subViews
+        let resultAttrView = subAttributeViews.filter(function (itemAttrView) {
+            return itemAttrView.visible
+        });
+        let resAttribute = [];
+        forEach(resultAttrView, function (item) {
+            resAttribute.push(item.model);
+        });
+        console.log("refactore attribute : "+UMLEle.name+" : ",resAttribute);
+
+
+        // if (UMLEle.hasOwnProperty('attributes')) {
+
+        forEach(resAttribute, function (attrib) {
 
             let mJsonAttrib = app.repository.writeObject(attrib);
             let mObjAttrib = JSON.parse(mJsonAttrib);
@@ -356,6 +386,7 @@ function removeIDFromAttribute(UMLEle) {
             // delete mObjAttrib['tags'];
             tempAttributes.push(mObjAttrib);
         });
+        // }
     }
     return tempAttributes;
 }
@@ -459,7 +490,7 @@ function filterUMLClassDiagram(UMLClassDiagram) {
 
     let allDiagramElement = [];
     forEach(allDiagramView, function (dView) {
-        let model=dView.model;
+        let model = dView.model;
         allDiagramElement.push(model);
     });
 
@@ -517,24 +548,30 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         '_type': 'UMLPackage'
     };
 
+    let newClasses=[];
     /* Process UMLClasses in package */
     forEach(UMLClasses, function (mClass) {
 
         let mJson = app.repository.writeObject(mClass);
         let mObj = JSON.parse(mJson);
-        delete mObj['_id'];
-
+        
         /* Remove '_id' field from UMLAttribute */
-        mObj.attributes = removeIDFromAttribute(mClass);
-
+        mObj.attributes = removeIDFromAttribute(mClass,UMLClassDiagram);
+        
         /* Remove '_id' field from UMLOperation */
         mObj.operations = removeIDFromOperation(mClass);
-
+        
         /* Remove '_id' field from Elements available in 'ownedElements' array */
         mObj.ownedElements = removeIDFromOwnedElement(mClass, allDiagramElement);
-
+        
         mainOwnedElements.push(mObj);
+
+        newClasses.push(app.repository.readObject(mObj));
+
+        delete mObj['_id'];
+
     });
+    setUMLClass(newClasses);
 
     /* Process UMLInterface in package */
     forEach(UMLInterface, function (mInterface) {
@@ -544,7 +581,7 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         delete mObj['_id'];
 
         /* Remove '_id' field from UMLAttribute */
-        mObj.attributes = removeIDFromAttribute(mInterface);
+        mObj.attributes = removeIDFromAttribute(mInterface,UMLClassDiagram);
 
         /* Remove '_id' field from UMLOperation */
         mObj.operations = removeIDFromOperation(mInterface);
@@ -562,7 +599,7 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         delete mObj['_id'];
 
         /* Remove '_id' field from UMLAttribute */
-        mObj.attributes = removeIDFromAttribute(mEnum);
+        mObj.attributes = removeIDFromAttribute(mEnum,UMLClassDiagram);
 
         /* Remove '_id' field from UMLOperation */
         mObj.operations = removeIDFromOperation(mEnum);

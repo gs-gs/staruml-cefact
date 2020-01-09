@@ -259,7 +259,7 @@ function isAttribviewVisible(attribute) {
  */
 function addAttributeData(element) {
      let mAddAttributeData = false;
-     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
+     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM /* && isAttribviewVisible(element) */) {
 
           mAddAttributeData = true;
 
