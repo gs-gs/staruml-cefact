@@ -1,4 +1,5 @@
 const fs = require('fs');
+const notAvail = require('./notavail');
 const Info = require('./info');
 const Component = require('./component');
 const Utils = require('./utils');
@@ -647,12 +648,12 @@ class OpenApi {
                          
                          let component = new Component();
                          console.log("-----json-schema-generated-----");
+                         notAvail.resetNotAvailableClassOrEnumeInFile();
                          MainJSON.addJSONSchema(component);
                          MainJSON.addJSONLayout(component);
-                         console.log(MainJSON.getJSONSchema());
-
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
+                              notAvail.showDialogForNotAvailableClassOrEnum();
                               console.log("-----file-generated-----");
                               console.log("result-file-generated", fileGenerate);
                               resolve(fileGenerate);
