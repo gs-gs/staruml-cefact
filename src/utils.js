@@ -1,3 +1,5 @@
+var forEach = require('async-foreach').forEach;
+const notAvail = require('./notavail');
 const openAPI = require('./openapi');
 const fs = require('fs');
 const constant = require('./constant');
@@ -5,6 +7,7 @@ const constant = require('./constant');
  * @description class is general utility class for the whole project
  * @class Utils
  */
+let _this=this;
 class Utils {
      /**
       * @constructor Creates an instance of Utils.
@@ -96,19 +99,23 @@ class Utils {
           } else if (starUMLType === 'Double') {
                itemsObj.type = 'number';
                itemsObj.format = 'double';
-          } else if (starUMLType === 'Boolean') {
-               itemsObj.type = 'boolean';
           } else if (starUMLType === 'Password') {
                itemsObj.type = 'string';
                itemsObj.format = "password";
           } else if (starUMLType === 'Byte') {
                itemsObj.type = 'string';
                itemsObj.format = 'byte';
+          } else if (starUMLType === 'Boolean') {
+               itemsObj.type = 'boolean';
           } else if (starUMLType === 'Binary') {
                itemsObj.type = 'string';
                itemsObj.format = 'binary';
           } else {
                itemsObj.type = 'string';
+
+               if(notAvail.isString(starUMLType)){
+                    notAvail.checkAndaddNotAvailableClassOrEnumeInFile(attr._parent.name,attr,starUMLType);
+               }
           }
      }
 
@@ -155,12 +162,12 @@ class Utils {
                          objSchema.type = 'string';
                          if (!(itemParameters.type instanceof type.UMLClass)) {
                               this.buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
-                                   this.utils.buildDescription(itemParameters.documentation) :
+                                   this.buildDescription(itemParameters.documentation) :
                                    "missing description"), false, objSchema, paramsObject);
                          } else {
 
                               this.buildParameter(itemParameters.type.name + "." + itemParameters.name, "query", (itemParameters.documentation ?
-                                   this.utils.buildDescription(itemParameters.documentation) :
+                                   this.buildDescription(itemParameters.documentation) :
                                    "missing description"), false, objSchema, paramsObject);
 
 
@@ -182,10 +189,10 @@ class Utils {
       */
      getEnumerationLiteral(objEnum) {
           if (objEnum) {
-               let result=[];
+               let result = [];
                objEnum.literals.forEach(literal => {
                     /* Filter for visible literal Views from diagram elements (Enumeration) */
-                    if(Utils.addLiteralData(literal)){
+                    if (_this.addLiteralData(literal)) {
                          result.push(literal.name);
                     }
                });

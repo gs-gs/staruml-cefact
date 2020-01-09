@@ -10,6 +10,7 @@ let vDialog = null;
 var forEach = require('async-foreach').forEach;
 var diagramEle = require('./src/diagram/diagramElement');
 var utils = require('./src/utils');
+var notAvail = require('./src/notavail');
 const JSON_FILE_FILTERS = [{
      name: 'JSON File',
      extensions: ['json']
@@ -501,17 +502,11 @@ function generateJSONLD() {
 
                               console.log("generateJSONLD");
                               jsonld.setUMLPackage(returnValue);
+                              notAvail.resetNotAvailableClassOrEnumeInFile();
                               let objJSONLd = jsonld.generateJSONLD();
 
-                              let notAvailableClassOrEnumeInFile = jsonld.getNotAvailableClassOrEnumeInFile();
-                              if (notAvailableClassOrEnumeInFile.length > 0) {
-
-                                   let dlgMessage = 'Warning: your vocabulary may be invalid because following properties have unknown or undefined type (range):\n';
-                                   forEach(notAvailableClassOrEnumeInFile, function (item) {
-                                        dlgMessage += '\n' + item;
-                                   });
-                                   app.dialogs.showAlertDialog(dlgMessage);
-                              }
+                              /* Will alert dialog for not availabel class or enume in file */
+                              notAvail.showDialogForNotAvailableClassOrEnum();
 
                               let generator = new FileGenerator();
                               generator.createJSONLD(basePath, objJSONLd).then(function (res) {
