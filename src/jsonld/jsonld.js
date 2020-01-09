@@ -1,6 +1,6 @@
 var forEach = require('async-foreach').forEach;
-var utils = require('../utils');
-var notAvail = require('../notavail');
+var notAvailElement = require('../notavailelement');
+var utils = require('../utils')
 
 
 /**
@@ -304,7 +304,7 @@ function getRdfsPropertiesArr() {
 
             let range = getRange(attr, mClass.name);
             objProperty['rdfs:range'] = range; //getRange(attr);
-            /* if(isString(attr.type) && range!=''){
+            /* if(utils.isString(attr.type) && range!=''){
                 rdfsPropertiesArr.push(objProperty);
             }
             else{
@@ -365,7 +365,7 @@ function getRange(attr, className) {
 
     let range = '';
     let attributeType = attr.type;
-    if (notAvail.isString(attributeType)) {
+    if (utils.isString(attributeType)) {
 
         if (attributeType === 'Numeric') {
             range = 'xsd:nonNegativeInteger'; //
@@ -394,7 +394,7 @@ function getRange(attr, className) {
         } else {
 
             /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
-            notAvail.checkAndaddNotAvailableClassOrEnumeInFile(className,attr,attributeType);
+            notAvailElement.checkAndaddNotAvailableClassOrEnumeInFile(className, attr, attributeType);
 
             if (attributeType === 'Numeric') {
                 range = 'xsd:string';
