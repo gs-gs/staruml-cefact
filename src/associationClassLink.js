@@ -1,4 +1,4 @@
-const Utils = require('./utils');
+const utils = require('./utils');
 const Generalization = require('./generalization');
 const Required = require('./required');
 const constant = require('./constant');
@@ -13,7 +13,7 @@ class AssociationClassLink {
       * @constructor Creates an instance of AssociationClassLink.
       */
      constructor() {
-          this.utils = new Utils();
+          utils.resetErrorBlock();
           this.arrAssoc = [];
           this.required = new Required();
      }
@@ -36,11 +36,11 @@ class AssociationClassLink {
       * @returns
       * @memberof AssociationClassLink
       */
-     addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj,compositionRef) {
+     addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef) {
 
           if (assocClassLink.length > 0) {
                assocClassLink.forEach(item => {
-                    this.writeAssociationClassProperties(mainPropertiesObj, item,compositionRef);
+                    this.writeAssociationClassProperties(mainPropertiesObj, item, compositionRef);
                     this.arrAssoc.push(item.classSide);
                })
           }
@@ -53,7 +53,7 @@ class AssociationClassLink {
       * @param {Object} main properties json object
       * @param {UMLAssociationClassLink} associationClass `
       */
-     writeAssociationClassProperties(mainPropertiesObj, associationClass,compositionRef) {
+     writeAssociationClassProperties(mainPropertiesObj, associationClass, compositionRef) {
           let propertiesObj = {};
 
 
@@ -72,36 +72,36 @@ class AssociationClassLink {
                     let allOfArray = [];
                     itemsObj.allOf = allOfArray;
 
-                    let ref='';
-                    let sName='';
+                    let ref = '';
+                    let sName = '';
                     let objAllOfArry = {};
                     if (associationSide.end1.aggregation == constant.shared) {
-                         sName=associationSide.end2.reference.name + 'Ids';
-                         ref=constant.getReference() + sName;
+                         sName = associationSide.end2.reference.name + 'Ids';
+                         ref = constant.getReference() + sName;
                     } else {
-                         sName=associationSide.end2.reference.name;
-                         ref=constant.getReference() + sName;
+                         sName = associationSide.end2.reference.name;
+                         ref = constant.getReference() + sName;
                     }
                     objAllOfArry['$ref'] = ref;
                     allOfArray.push(objAllOfArry);
 
-                    let temp={};
-                    temp['ref']=propertiesObj;
-                    temp['sName']=sName;
+                    let temp = {};
+                    temp['ref'] = propertiesObj;
+                    temp['sName'] = sName;
                     // compositionRef.push('2. association 1: '+ref,temp);
                     compositionRef.push(temp);
 
                     /* Add reference of Class Side Schema */
                     objAllOfArry = {};
-                    sName=classSide.name;
-                    ref=constant.getReference() + sName;
+                    sName = classSide.name;
+                    ref = constant.getReference() + sName;
 
                     objAllOfArry['$ref'] = ref;
                     allOfArray.push(objAllOfArry);
-                    
-                    temp={};
-                    temp['ref']=propertiesObj;
-                    temp['sName']=sName
+
+                    temp = {};
+                    temp['ref'] = propertiesObj;
+                    temp['sName'] = sName
                     // compositionRef.push('3. association 2: '+ref,temp);
                     compositionRef.push(temp);
                     objAllOfArry = {};
@@ -120,33 +120,33 @@ class AssociationClassLink {
                     let objAllOfArry = {};
                     propertiesObj.allOf = allOfArray;
 
-                    let ref='';
-                    let sName='';
+                    let ref = '';
+                    let sName = '';
                     if (associationSide.end1.aggregation == constant.shared) {
-                         sName=associationSide.end2.reference.name + 'Ids';
-                         ref=constant.getReference() + sName;
+                         sName = associationSide.end2.reference.name + 'Ids';
+                         ref = constant.getReference() + sName;
                     } else {
-                         sName=associationSide.end2.reference.name;
-                         ref=constant.getReference() + sName;
+                         sName = associationSide.end2.reference.name;
+                         ref = constant.getReference() + sName;
                     }
-                    objAllOfArry['$ref'] =ref ;
+                    objAllOfArry['$ref'] = ref;
                     allOfArray.push(objAllOfArry);
-                    let temp={};
-                    temp['ref']=propertiesObj;
-                    temp['sName']=sName
+                    let temp = {};
+                    temp['ref'] = propertiesObj;
+                    temp['sName'] = sName
                     // compositionRef.push('4. association 3: '+ref,temp);
                     compositionRef.push(temp);
 
                     /* Add reference of Class Side Schema */
                     objAllOfArry = {};
-                    sName=classSide.name;
-                    ref=constant.getReference() + sName;
+                    sName = classSide.name;
+                    ref = constant.getReference() + sName;
                     objAllOfArry['$ref'] = ref;
                     allOfArray.push(objAllOfArry);
 
-                    temp={};
-                    temp['ref']=propertiesObj;
-                    temp['sName']=sName;
+                    temp = {};
+                    temp['ref'] = propertiesObj;
+                    temp['sName'] = sName;
                     // compositionRef.push('5. association 4: '+ref,temp);
                     compositionRef.push(temp);
 
@@ -209,7 +209,7 @@ class AssociationClassLink {
 
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
+               utils.writeErrorToFile(error);
           }
      }
 
@@ -231,7 +231,7 @@ class AssociationClassLink {
                     resolve(filterAssociation);
                } catch (error) {
                     console.error("Found error", error.message);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                     reject(error);
                }
           });
@@ -293,8 +293,8 @@ class AssociationClassLink {
                               propertiesObj.items = itemsObj;
 
 
-                              itemsObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
-                              this.utils.addAttributeType(itemsObj,attr);                              
+                              itemsObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : "missing description");
+                              utils.addAttributeType(itemsObj, attr);
 
                               propertiesObj.type = 'array';
                               /**
@@ -305,13 +305,13 @@ class AssociationClassLink {
                               }
 
                          } else {
-                              propertiesObj.description = (attr.documentation ? this.utils.buildDescription(attr.documentation) : "missing description");
+                              propertiesObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : "missing description");
 
-                              this.utils.addAttributeType(propertiesObj,attr);
+                              utils.addAttributeType(propertiesObj, attr);
                               if (attr.type instanceof type.UMLEnumeration) {
 
-                                   propertiesObj.enum = this.utils.getEnumerationLiteral(attr.type);
-                                   
+                                   propertiesObj.enum = utils.getEnumerationLiteral(attr.type);
+
                               }
 
                          }
@@ -327,7 +327,7 @@ class AssociationClassLink {
                }
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
+               utils.writeErrorToFile(error);
           }
      }
 }

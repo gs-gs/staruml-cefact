@@ -1,6 +1,6 @@
 const openAPI = require('./openapi');
 const constant = require('./constant');
-const Utils = require('./utils');
+const utils = require('./utils');
 var diagramEle = require('./diagram/diagramElement');
 
 /**
@@ -12,7 +12,7 @@ class Generalization {
       * @constructor Creates an instance of Generalization.
       */
      constructor() {
-          this.utils = new Utils();
+          utils.resetErrorBlock();
      }
 
 
@@ -24,7 +24,7 @@ class Generalization {
       * @returns {Object}
       * @memberof Generalization
       */
-     addGeneralization(arrGeneral, mainClassesObj,compositionRef) {
+     addGeneralization(arrGeneral, mainClassesObj, compositionRef) {
           /**
            * Add Generalization class
            * Inherite all properties of parent class
@@ -34,9 +34,9 @@ class Generalization {
                mainClassesObj.allOf = allOfArray;
                arrGeneral.forEach(generalizeClass => {
                     let allOfObj = {};
-                    let sName='';
-                    sName=generalizeClass.target.name;
-                    let ref=constant.getReference() + sName;
+                    let sName = '';
+                    sName = generalizeClass.target.name;
+                    let ref = constant.getReference() + sName;
                     allOfObj['$ref'] = ref;
                     allOfArray.push(allOfObj);
 
@@ -45,9 +45,9 @@ class Generalization {
                     allOfObj['type'] = 'object';
                     allOfArray.push(allOfObj);
 
-                    let temp={};
-                    temp['ref']=mainClassesObj;
-                    temp['sName']=sName;
+                    let temp = {};
+                    temp['ref'] = mainClassesObj;
+                    temp['sName'] = sName;
                     // compositionRef.push('7. generalization : '+ref,temp);
                     compositionRef.push(temp);
                });
@@ -112,7 +112,7 @@ class Generalization {
                return filterGeneral;
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
+               utils.writeErrorToFile(error);
           }
      }
 }

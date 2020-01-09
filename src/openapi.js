@@ -1,7 +1,9 @@
 const fs = require('fs');
+
+const notAvailElement = require('./notavailelement');
 const Info = require('./info');
 const Component = require('./component');
-const Utils = require('./utils');
+const utils = require('./utils');
 const FileGenerator = require('./filegenerator');
 const Paths = require('./paths');
 const Servers = require('./servers');
@@ -34,7 +36,7 @@ class OpenApi {
           this.schemas = [];
           OpenApi.pkgPath = [];
           OpenApi.operations = [];
-          this.utils = new Utils();
+          utils.resetErrorBlock();
           OpenApi.fileType = fileType;
           OpenApi.uniqueClassesArr = [];
           OpenApi.strPackagePath = '';
@@ -408,11 +410,11 @@ class OpenApi {
           return OpenApi.umlPackage;
      }
 
-     static getUMLPackageName(){
+     static getUMLPackageName() {
           return OpenApi.umlPackageName;
      }
-     static setUMLPackageName(pkgName){
-          OpenApi.umlPackageName=pkgName;
+     static setUMLPackageName(pkgName) {
+          OpenApi.umlPackageName = pkgName;
      }
      /**
       * @function getOperations
@@ -495,7 +497,7 @@ class OpenApi {
                     resolve(tmpAssociation);
                } catch (error) {
                     console.error("Found error", error.message);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                     reject(error);
                }
 
@@ -528,7 +530,7 @@ class OpenApi {
                     resolve(tmpGeneralization);
                } catch (error) {
                     console.error("Found error", error.message);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                }
           });
      }
@@ -644,15 +646,17 @@ class OpenApi {
                     if (OpenApi.getFileType() == constant.FILE_TYPE_JSON_SCHEMA) {
 
                          // Generate JSON-Schema Specification
-                         
+
                          let component = new Component();
                          console.log("-----json-schema-generated-----");
+
+                         notAvailElement.resetNotAvailableClassOrEnumeInFile();
                          MainJSON.addJSONSchema(component);
                          MainJSON.addJSONLayout(component);
-                         console.log(MainJSON.getJSONSchema());
-
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
+
+                              notAvailElement.showDialogForNotAvailableClassOrEnum();
                               console.log("-----file-generated-----");
                               console.log("result-file-generated", fileGenerate);
                               resolve(fileGenerate);
@@ -713,7 +717,7 @@ class OpenApi {
                } catch (error) {
 
                     console.error("generateOpenAPI", error);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                     reject(error);
                }
           });

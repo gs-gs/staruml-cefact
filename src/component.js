@@ -1,5 +1,5 @@
 const forEach = require('async-foreach').forEach;
-const Utils = require('./utils');
+const utils = require('./utils');
 const camelize = require('../src/camelize');
 const Generalization = require('./generalization');
 const Properties = require('./properties');
@@ -24,7 +24,7 @@ class Component {
      constructor() {
           this.mainComponentObj = {};
           this.mainSchemaObj = {};
-          this.utils = new Utils();
+          utils.resetErrorBlock();
           this.arrAttRequired = [];
           /* this.arrAssoc = []; */
           this.required = new Required();
@@ -399,6 +399,7 @@ class Component {
      }
 
      getJSONLayout() {
+          let _this = this;
           let layout = [];
 
           /* For Interface */
@@ -424,50 +425,73 @@ class Component {
                     mRootObject['message'] = '<h1>' + interfaceName + '</h1>'
                     layout.push(mRootObject);
 
-                    forEach(source.attributes, function (attribute) {
 
-                         /* Add attribute object to layout */
-                         let mAttributeObj = {};
-                         mAttributeObj['key'] = attribute.name;
+                    let allInheritedClasses = [];
 
-                         /* Add required field to attribute */
-                         if (attribute.multiplicity == "1" || attribute.multiplicity == "1..*") {
-                              mAttributeObj['required'] = true;
-                         }
+                    _this.findAllInheritedClassesByGeneralization(allInheritedClasses, source);
+                    let unique = [...new Set(allInheritedClasses.map(item => item._id))];
+                    let uniqueArr = [];
+                    uniqueArr.push(source);
+                    forEach(unique, function (id) {
+                         let obj = app.repository.get(id);
+                         uniqueArr.push(obj);
+                    });
+                    console.log("all inherited classes", uniqueArr)
+                    forEach(uniqueArr, function (mClasses) {
 
 
-                         let attrType = attribute.type;
-                         if (attrType instanceof type.UMLEnumeration) {
-                              /* Add type field to attribute */
-                              mAttributeObj['type'] = 'array';
-                              /* Add items array to attribute */
-                              let items = [];
-                              mAttributeObj['items'] = items;
-                              let literals = attrType.literals;
-                              forEach(literals, function (literal) {
-                                   let literalObj = {};
-                                   literalObj['key'] = literal.name;
-                                   items.push(literalObj);
-                              });
-                         } else if (attrType instanceof type.UMLClass || attrType instanceof type.UMLInterface) {
-                              /* Add type field to attribute */
-                              mAttributeObj['type'] = 'section';
-                              /* Add items array to attribute */
-                              let items = [];
-                              mAttributeObj['items'] = items;
-                              let sectionObj = {};
-                              sectionObj['key'] = attrType.name;
-                              items.push(sectionObj);
-                         } 
-                         layout.push(mAttributeObj);
+                         forEach(mClasses.attributes, function (attribute) {
+
+                              /* Add attribute object to layout */
+                              let mAttributeObj = {};
+                              mAttributeObj['key'] = attribute.name;
+
+                              /* Add required field to attribute */
+                              if (attribute.multiplicity == "1" || attribute.multiplicity == "1..*") {
+                                   mAttributeObj['required'] = true;
+                              }
+
+
+                              let attrType = attribute.type;
+                              if (attrType instanceof type.UMLEnumeration) {
+                                   /* Add type field to attribute */
+                                   mAttributeObj['type'] = 'array';
+                                   /* Add items array to attribute */
+                                   let items = [];
+                                   mAttributeObj['items'] = items;
+                                   let literals = attrType.literals;
+                                   forEach(literals, function (literal) {
+                                        let literalObj = {};
+                                        literalObj['key'] = literal.name;
+                                        items.push(literalObj);
+                                   });
+                              } else if (attrType instanceof type.UMLClass || attrType instanceof type.UMLInterface) {
+                                   /* Add type field to attribute */
+                                   mAttributeObj['type'] = 'section';
+                                   /* Add items array to attribute */
+                                   let items = [];
+                                   mAttributeObj['items'] = items;
+                                   let sectionObj = {};
+                                   sectionObj['key'] = attrType.name;
+                                   items.push(sectionObj);
+                              }
+                              layout.push(mAttributeObj);
+                         });
+
                     });
                });
           });
-
-
           return layout;
      }
 
+     findAllInheritedClassesByGeneralization(allInheritedClasses, target) {
+          let _this = this;
+          let result = app.repository.select(target.name + '::@UMLGeneralization');
+          forEach(result, function (item) {
+               allInheritedClasses.push(item.target);
+               _this.findAllInheritedClassesByGeneralization(allInheritedClasses, item.target)
+          });
+     }
      removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference) {
 
           /* Find duplicate properties */
