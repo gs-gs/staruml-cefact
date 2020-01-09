@@ -1,4 +1,4 @@
-const Utils = require('./utils');
+const utils = require('./utils');
 var forEach = require('async-foreach').forEach;
 const openAPI = require('../src/openapi');
 /**
@@ -14,7 +14,7 @@ class Properties {
           this.objClass = objClass;
           this.assocSideClassLink = assocSideClassLink;
           this.arrAttRequired = [];
-          this.utils = new Utils();
+          utils.resetErrorBlock();
      }
 
      /**
@@ -46,10 +46,10 @@ class Properties {
                });
 
                /* Filter for visible attribute Views from diagram elements (Class & Interface) */
-               if(Utils.addAttributeData(attribute)){
+               if (utils.addAttributeData(attribute)) {
                     _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
                }
-               
+
           });
           return mainPropertiesObj;
      }
@@ -68,9 +68,9 @@ class Properties {
                     if (attribute.multiplicity === "1..*" || attribute.multiplicity === "0..*") {
                          let itemsObj = {};
                          propertiesObj.items = itemsObj;
-                         itemsObj.description = (attribute.documentation ? _this.utils.buildDescription(attribute.documentation) : "missing description");
+                         itemsObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : "missing description");
 
-                         _this.utils.addAttributeType(itemsObj, attribute);
+                         utils.addAttributeType(itemsObj, attribute);
 
                          propertiesObj.type = 'array';
                          /**
@@ -80,13 +80,13 @@ class Properties {
                               propertiesObj.minItems = 1;
                          }
                     } else {
-                         propertiesObj.description = (attribute.documentation ? _this.utils.buildDescription(attribute.documentation) : "missing description");
+                         propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : "missing description");
 
-                         _this.utils.addAttributeType(propertiesObj, attribute);
+                         utils.addAttributeType(propertiesObj, attribute);
 
                          if (attribute.type instanceof type.UMLEnumeration) {
                               /* Add Enumeration */
-                              propertiesObj.enum = _this.utils.getEnumerationLiteral(attribute.type);
+                              propertiesObj.enum = utils.getEnumerationLiteral(attribute.type);
                          }
                     }
                     if (attribute.defaultValue != "") {

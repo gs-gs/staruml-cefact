@@ -1,4 +1,7 @@
 var forEach = require('async-foreach').forEach;
+var notAvailElement = require('../notavailelement');
+var utils = require('../utils')
+
 
 /**
  * @function generateJSONLD
@@ -291,7 +294,6 @@ function getRdfsPropertiesArr() {
     let mNewClasses = getAttrTypeClass(mClasses);
     mNewClasses = mClasses.concat(mNewClasses);
 
-    notAvailableClassOrEnumeInFile = [];
     forEach(mNewClasses, function (mClass) {
 
         forEach(mClass.attributes, function (attr) {
@@ -300,9 +302,9 @@ function getRdfsPropertiesArr() {
             objProperty['@type'] = 'rdf:Property';
             objProperty['rdfs:domain'] = mClass.name;
 
-            let range = getRange(attr,mClass.name);
+            let range = getRange(attr, mClass.name);
             objProperty['rdfs:range'] = range; //getRange(attr);
-            /* if(isString(attr.type) && range!=''){
+            /* if(utils.isString(attr.type) && range!=''){
                 rdfsPropertiesArr.push(objProperty);
             }
             else{
@@ -337,24 +339,16 @@ function getRdfsPropertiesArr() {
             }
         });
     });
-   
+
     return rdfsPropertiesArr;
 }
 let notAvailableClassOrEnumeInFile = [];
-/**
- * @function isString
- * @description returns boolean that checks values is string or any object
- * @returns {boolean}
- */
-function isString(s) {
-    return typeof (s) === 'string' || s instanceof String;
-}
 /**
  * @function getRange
  * @description returns datatype
  * @returns {string}
  */
-function getRange(attr,className) {
+function getRange(attr, className) {
     /* Valid DataType
     Numeric: "rdfs:range": "xsd:nonNegativeInteger"
     Indicator: "rdfs:range": "xsd:boolean"
@@ -371,7 +365,7 @@ function getRange(attr,className) {
 
     let range = '';
     let attributeType = attr.type;
-    if (isString(attributeType)) {
+    if (utils.isString(attributeType)) {
 
         if (attributeType === 'Numeric') {
             range = 'xsd:nonNegativeInteger'; //
@@ -400,16 +394,7 @@ function getRange(attr,className) {
         } else {
 
             /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
-            let srchRes = app.repository.search(attributeType);
-            let result = srchRes.filter(function (element) {
-                if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
-                    return element.name == attributeType;
-                }
-            });
-            if (result.length == 0) {
-                let str = className + '/' + attr.name + ': ' + attributeType
-                notAvailableClassOrEnumeInFile.push(str);
-            }
+            notAvailElement.checkAndaddNotAvailableClassOrEnumeInFile(className, attr, attributeType);
 
             if (attributeType === 'Numeric') {
                 range = 'xsd:string';
@@ -430,7 +415,7 @@ function getRange(attr,className) {
             }
 
         }
-       
+
     } else {
         return attributeType.name;
     }
@@ -457,7 +442,7 @@ function getUMLPackage() {
     return UMLPackage;
 }
 
-function getNotAvailableClassOrEnumeInFile(){
+function getNotAvailableClassOrEnumeInFile() {
     return notAvailableClassOrEnumeInFile;
 }
 
