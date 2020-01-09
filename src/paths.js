@@ -1,4 +1,4 @@
-const Utils = require('./utils');
+const utils = require('./utils');
 const openAPI = require('./openapi');
 // const Generalization = require('./generalization');
 const constant = require('./constant');
@@ -13,7 +13,7 @@ class Paths {
       * @constructor Creates an instance of Paths.
       */
      constructor() {
-          this.utils = new Utils();
+          utils.resetErrorBlock();
           // this.generalization = new Generalization();
           this.operations = new Operations();
      }
@@ -61,7 +61,7 @@ class Paths {
                               objInterRealization.target.operations.forEach(objOperation => {
 
                                    /* Filter for visible operation Views from diagram elements (Interface) */
-                                   if (Utils.addOperationData(objOperation)) {
+                                   if (utils.addOperationData(objOperation)) {
 
                                         if (objOperation.name.toUpperCase() == "GET") {
                                              pathsObject.get = this.operations.get(objInterRealization, objOperation);
@@ -95,7 +95,7 @@ class Paths {
 
 
                                         /* Filter for visible attribute Views from diagram elements (Class & Interface) */
-                                        if (Utils.addAttributeData(operationAttribute)) {
+                                        if (utils.addAttributeData(operationAttribute)) {
 
                                              mainPathsObject["/" + objInterRealization.target.name + '/{' + operationAttribute.name + '}'] = pathsObject
 
@@ -104,7 +104,7 @@ class Paths {
 
 
                                                   /* Filter for visible operation Views from diagram elements (Interface) */
-                                                  if (Utils.addOperationData(objOperation)) {
+                                                  if (utils.addOperationData(objOperation)) {
 
                                                        let wOperationObject = {};
                                                        if (objOperation.name.toUpperCase() == "GET") {
@@ -152,7 +152,7 @@ class Paths {
                });
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
+               utils.writeErrorToFile(error);
           }
 
           return mainPathsObject;
@@ -203,7 +203,7 @@ class Paths {
                               let objSchema = {};
                               objSchema.type = 'string';
 
-                              this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
+                              utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
 
                               let responsesObj = {};
                               wOperationObject.responses = responsesObj;
@@ -258,8 +258,8 @@ class Paths {
                               let objSingleSchema = {};
                               objSingleSchema.type = 'string';
 
-                              this.utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
-                              this.utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? this.utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSingleSchema, paramsSingleObject)
+                              utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
+                              utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSingleSchema, paramsSingleObject)
 
                               wOperationSingleObject.responses = responsesSingleObj;
 
@@ -303,7 +303,7 @@ class Paths {
                });
           } catch (error) {
                console.error("Found error", error.message);
-               this.utils.writeErrorToFile(error);
+               utils.writeErrorToFile(error);
           }
      }
 }

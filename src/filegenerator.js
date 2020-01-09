@@ -1,4 +1,4 @@
-const Utils = require('./utils');
+const utils = require('./utils');
 const fs = require('fs');
 const path = require('path');
 const openAPI = require('./openapi');
@@ -19,7 +19,7 @@ class FileGenerator {
       */
      constructor() {
           this.basePath = '';
-          this.utils = new Utils();
+          utils.resetErrorBlock();
      }
 
      /**
@@ -48,7 +48,7 @@ class FileGenerator {
                } catch (error) {
 
                     console.error("Error generating JSON file", error);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                     reject(error);
                }
           });
@@ -77,7 +77,7 @@ class FileGenerator {
                } catch (error) {
 
                     console.error("Error generating JSON file", error);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                     reject(error);
                }
           });
@@ -108,7 +108,7 @@ class FileGenerator {
                } catch (error) {
 
                     console.error("Error generating JSON file", error);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                     reject(error);
                }
           });
@@ -193,7 +193,7 @@ class FileGenerator {
 
                } catch (error) {
                     console.error(error);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                     reject(error);
                }
           });
@@ -356,7 +356,7 @@ class FileGenerator {
                } catch (error) {
 
                     console.error("Error generating JSON file", error);
-                    this.utils.writeErrorToFile(error);
+                    utils.writeErrorToFile(error);
                     reject(error);
                }
           });
