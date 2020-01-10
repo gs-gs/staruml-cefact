@@ -344,26 +344,22 @@ function getViewOf(element) {
  * @param {*} UMLEle
  * @returns {Array} tempAttributes
  */
-function removeIDFromAttribute(UMLEle,UMLClassDiagram) {
+function removeIDFromAttribute(UMLEle, UMLClassDiagram) {
     let tempAttributes = [];
+    let allCView = [];
 
-    let allCViw = app.repository.select(UMLClassDiagram.name+'::@UMLClassView');
-    let resAllCView = allCViw.filter(function (item) {
+    if (UMLEle instanceof type.UMLClass) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLClassView');
+    } else if (UMLEle instanceof type.UMLInterface) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLInterfaceView');
+    } else if (UMLEle instanceof type.UMLEnumeration) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLEnumerationView');
+    }
+    let resAllCView = allCView.filter(function (item) {
         return UMLEle._id == item.model._id;
     });
     console.log("resAllCView", resAllCView);
     if (resAllCView.length == 1) {
-
-        /* let ElementView = app.repository.getViewsOf(UMLEle);
-        ElementView = ElementView.filter(function (item) {
-            return item instanceof type.UMLClassView;
-        });
-
-        console.log("ElementView", ElementView);
-        let mIds = [];
-        forEach(ElementView, function (item) {
-            mIds.push(item.model);
-        }); */
 
         let subAttributeViews = resAllCView[0].attributeCompartment.subViews
         let resultAttrView = subAttributeViews.filter(function (itemAttrView) {
@@ -373,15 +369,52 @@ function removeIDFromAttribute(UMLEle,UMLClassDiagram) {
         forEach(resultAttrView, function (item) {
             resAttribute.push(item.model);
         });
-        console.log("refactore attribute : "+UMLEle.name+" : ",resAttribute);
+        console.log("refactore attribute : " + UMLEle.name + " : ", resAttribute);
 
 
         // if (UMLEle.hasOwnProperty('attributes')) {
 
         forEach(resAttribute, function (attrib) {
 
+            let newEnum=null;
+            
             let mJsonAttrib = app.repository.writeObject(attrib);
             let mObjAttrib = JSON.parse(mJsonAttrib);
+
+
+            //TODO Do not remove this code : This is for invisible enumeration code
+            
+            if (attrib.type instanceof type.UMLEnumeration) {
+                let enumView = app.repository.select(UMLClassDiagram.name + '::@UMLEnumerationView');
+                let resEnumView = enumView.filter(function (item) {
+                    return item.model._id == attrib.type._id;
+                });
+                if (resEnumView.length == 1) {
+                    let subLiteralViews = resEnumView[0].enumerationLiteralCompartment.subViews
+                    let resultLiteralView = subLiteralViews.filter(function (itemLiteralView) {
+                        return itemLiteralView.visible
+                    });
+                    let resLiteral = [];
+                    forEach(resultLiteralView, function (item) {
+                        let tmp=app.repository.writeObject(item.model);
+                        let tmpObj=JSON.parse(tmp);
+                        delete tmpObj['_id'];
+                        resLiteral.push(tmpObj);
+                    });
+                    let stringEnum=app.repository.writeObject(attrib.type)
+                    let tempNewEnum=JSON.parse(stringEnum);
+
+                    delete tempNewEnum['_id'];
+
+                    tempNewEnum.literals=resLiteral;
+
+                    newEnum=app.repository.readObject(tempNewEnum);
+                    mObjAttrib.type={'$ref':newEnum._id};
+
+                }
+            } 
+           
+
             delete mObjAttrib['_id'];
             // delete mObjAttrib['tags'];
             tempAttributes.push(mObjAttrib);
@@ -397,9 +430,47 @@ function removeIDFromAttribute(UMLEle,UMLClassDiagram) {
  * @param {*} UMLEle
  * @returns {Array} tempOperation
  */
-function removeIDFromOperation(UMLEle) {
+function removeIDFromOperation(UMLEle, UMLClassDiagram) {
     let tempOperation = [];
-    if (UMLEle.hasOwnProperty('operations')) {
+    let allCView = [];
+
+    if (UMLEle instanceof type.UMLClass) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLClassView');
+    } else if (UMLEle instanceof type.UMLInterface) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLInterfaceView');
+    } else if (UMLEle instanceof type.UMLEnumeration) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLEnumerationView');
+    }
+    let resAllCView = allCView.filter(function (item) {
+        return UMLEle._id == item.model._id;
+    });
+    console.log("resAllCView", resAllCView);
+    if (resAllCView.length == 1) {
+
+        let subOperationViews = resAllCView[0].operationCompartment.subViews
+        let resultOperationView = subOperationViews.filter(function (itemOperationView) {
+            return itemOperationView.visible
+        });
+        let resOperation = [];
+        forEach(resultOperationView, function (item) {
+            resOperation.push(item.model);
+        });
+        console.log("refactore attribute : " + UMLEle.name + " : ", resOperation);
+
+
+        // if (UMLEle.hasOwnProperty('attributes')) {
+
+        forEach(resOperation, function (attrib) {
+
+            let mJsonOperation = app.repository.writeObject(attrib);
+            let mObjOperation = JSON.parse(mJsonOperation);
+            delete mObjOperation['_id'];
+            // delete mObjAttrib['tags'];
+            tempOperation.push(mObjOperation);
+        });
+        // }
+    }
+    /* if (UMLEle.hasOwnProperty('operations')) {
 
         forEach(UMLEle.operations, function (operation) {
 
@@ -410,7 +481,7 @@ function removeIDFromOperation(UMLEle) {
             mObjOperation.parameters = removeIDFromParameter(operation);
             tempOperation.push(mObjOperation);
         });
-    }
+    } */
     return tempOperation;
 }
 
@@ -441,17 +512,43 @@ function removeIDFromParameter(UMLOperation) {
  * @param {*} UMLEle
  * @returns {Array} tempLiterals
  */
-function removeIDFromLiterals(UMLEle) {
+function removeIDFromLiterals(UMLEle, UMLClassDiagram) {
     let tempLiterals = [];
-    if (UMLEle.hasOwnProperty('literals')) {
+    let allCView = [];
 
-        forEach(UMLEle.literals, function (literals) {
+    if (UMLEle instanceof type.UMLClass) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLClassView');
+    } else if (UMLEle instanceof type.UMLInterface) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLInterfaceView');
+    } else if (UMLEle instanceof type.UMLEnumeration) {
+        allCView = app.repository.select(UMLClassDiagram.name + '::@UMLEnumerationView');
+    }
+    let resAllCView = allCView.filter(function (item) {
+        return UMLEle._id == item.model._id;
+    });
+    console.log("resAllCView", resAllCView);
+    if (resAllCView.length == 1) {
 
-            let mJsonLiteral = app.repository.writeObject(literals);
-            let mObjJsonLiteral = JSON.parse(mJsonLiteral);
-            delete mObjJsonLiteral['_id'];
+        let subLiteralViews = resAllCView[0].enumerationLiteralCompartment.subViews
+        let resultLiteralView = subLiteralViews.filter(function (itemLiteralView) {
+            return itemLiteralView.visible
+        });
+        let resLiteral = [];
+        forEach(resultLiteralView, function (item) {
+            resLiteral.push(item.model);
+        });
+        console.log("refactore attribute : " + UMLEle.name + " : ", resLiteral);
 
-            let tags = mObjJsonLiteral.tags;
+
+        // if (UMLEle.hasOwnProperty('attributes')) {
+
+        forEach(resLiteral, function (attrib) {
+
+            let mJsonLiteral = app.repository.writeObject(attrib);
+            let mObjLiteral = JSON.parse(mJsonLiteral);
+            delete mObjLiteral['_id'];
+
+            let tags = mObjLiteral.tags;
             /* remove ID from Tags from literal */
             if (tags != null && tags.length > 0) {
 
@@ -460,11 +557,36 @@ function removeIDFromLiterals(UMLEle) {
                     delete tag['_id'];
                     tempTags.push(tag);
                 });
-                mObjJsonLiteral.tags = tempTags;
+                mObjLiteral.tags = tempTags;
             }
-            tempLiterals.push(mObjJsonLiteral);
+
+            tempLiterals.push(mObjLiteral);
         });
+        // }
     }
+
+    // if (UMLEle.hasOwnProperty('literals')) {
+
+    //     forEach(UMLEle.literals, function (literals) {
+
+    //         let mJsonLiteral = app.repository.writeObject(literals);
+    //         let mObjJsonLiteral = JSON.parse(mJsonLiteral);
+    //         delete mObjJsonLiteral['_id'];
+
+    //         let tags = mObjJsonLiteral.tags;
+    //         /* remove ID from Tags from literal */
+    //         if (tags != null && tags.length > 0) {
+
+    //             let tempTags = [];
+    //             forEach(tags, function (tag) {
+    //                 delete tag['_id'];
+    //                 tempTags.push(tag);
+    //             });
+    //             mObjJsonLiteral.tags = tempTags;
+    //         }
+    //         tempLiterals.push(mObjJsonLiteral);
+    //     });
+    // }
     return tempLiterals;
 }
 
@@ -494,7 +616,6 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         allDiagramElement.push(model);
     });
 
-    console.log("------DElement", allDiagramElement);
     setUMLDiagramElement(allDiagramElement);
 
     /* Filter UMLClass from model */
@@ -548,32 +669,35 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         '_type': 'UMLPackage'
     };
 
-    let newClasses=[];
+    let newClasses = [];
     /* Process UMLClasses in package */
     forEach(UMLClasses, function (mClass) {
 
         let mJson = app.repository.writeObject(mClass);
         let mObj = JSON.parse(mJson);
-        
+        delete mObj['_id'];
+
         /* Remove '_id' field from UMLAttribute */
-        mObj.attributes = removeIDFromAttribute(mClass,UMLClassDiagram);
-        
+        mObj.attributes = removeIDFromAttribute(mClass, UMLClassDiagram);
+
         /* Remove '_id' field from UMLOperation */
-        mObj.operations = removeIDFromOperation(mClass);
-        
+        mObj.operations = removeIDFromOperation(mClass, UMLClassDiagram);
+
         /* Remove '_id' field from Elements available in 'ownedElements' array */
         mObj.ownedElements = removeIDFromOwnedElement(mClass, allDiagramElement);
-        
-        mainOwnedElements.push(mObj);
 
-        newClasses.push(app.repository.readObject(mObj));
 
-        delete mObj['_id'];
+        let created = app.repository.readObject(mObj);
+
+        mainOwnedElements.push(created);
+
+        newClasses.push(created);
 
     });
     setUMLClass(newClasses);
 
     /* Process UMLInterface in package */
+    let newInterfaces = [];
     forEach(UMLInterface, function (mInterface) {
 
         let mJson = app.repository.writeObject(mInterface);
@@ -581,38 +705,49 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         delete mObj['_id'];
 
         /* Remove '_id' field from UMLAttribute */
-        mObj.attributes = removeIDFromAttribute(mInterface,UMLClassDiagram);
+        mObj.attributes = removeIDFromAttribute(mInterface, UMLClassDiagram);
 
         /* Remove '_id' field from UMLOperation */
-        mObj.operations = removeIDFromOperation(mInterface);
+        mObj.operations = removeIDFromOperation(mInterface, UMLClassDiagram);
 
         /* Remove '_id' field from Elements available in 'ownedElements' array */
         mObj.ownedElements = removeIDFromOwnedElement(mInterface, allDiagramElement);
 
-        mainOwnedElements.push(mObj);
+        let created = app.repository.readObject(mObj);
+
+        mainOwnedElements.push(created);
+
+        newInterfaces.push(created);
     });
+    setUMLInterface(newInterfaces);
 
     /* Process UMLEnumeration in package */
+    let newEnumeration = [];
     forEach(UMLEnumeration, function (mEnum) {
         let mJson = app.repository.writeObject(mEnum);
         let mObj = JSON.parse(mJson);
         delete mObj['_id'];
 
         /* Remove '_id' field from UMLAttribute */
-        mObj.attributes = removeIDFromAttribute(mEnum,UMLClassDiagram);
+        mObj.attributes = removeIDFromAttribute(mEnum, UMLClassDiagram);
 
         /* Remove '_id' field from UMLOperation */
-        mObj.operations = removeIDFromOperation(mEnum);
+        mObj.operations = removeIDFromOperation(mEnum, UMLClassDiagram);
 
         /* Remove '_id' field from Elements available in 'ownedElements' array */
         mObj.ownedElements = removeIDFromOwnedElement(mEnum, allDiagramElement);
 
         /* Remove '_id' field from 'literals' array */
-        mObj.literals = removeIDFromLiterals(mEnum);
+        mObj.literals = removeIDFromLiterals(mEnum, UMLClassDiagram);
 
-        mainOwnedElements.push(mObj);
+        let created = app.repository.readObject(mObj);
+
+        mainOwnedElements.push(created);
+
+        newEnumeration.push(created);
 
     });
+    setUMLEnumeration(newEnumeration);
 
     return tempPackage;
 }

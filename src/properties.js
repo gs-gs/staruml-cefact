@@ -46,9 +46,7 @@ class Properties {
                });
 
                /* Filter for visible attribute Views from diagram elements (Class & Interface) */
-               if (utils.addAttributeData(attribute)) {
-                    _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
-               }
+               _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
 
           });
           return mainPropertiesObj;

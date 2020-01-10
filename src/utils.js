@@ -197,9 +197,7 @@ function getEnumerationLiteral(objEnum) {
           let result = [];
           objEnum.literals.forEach(literal => {
                /* Filter for visible literal Views from diagram elements (Enumeration) */
-               if (addLiteralData(literal)) {
-                    result.push(literal.name);
-               }
+               result.push(literal.name);
           });
           return (result);
      }
@@ -226,88 +224,6 @@ function isEmpty(umlPackage) {
      }
      return true;
 }
-/**
- * @function isAttribviewVisible
- * @description find view of attribute and return that view is visible or not
- * @param {*} attribute
- * @returns {boolean}
- */
-function isAttribviewVisible(attribute) {
-     let isVisible = false;
-     let ArrUMLAttributeView = app.repository.getViewsOf(attribute);
-     if (ArrUMLAttributeView.length >= 1) {
-
-          let resAttr = ArrUMLAttributeView.filter(function (item) {
-               return item.model._id == attribute._id;
-          });
-          console.log("----view-checking----attr-views", resAttr);
-          if (resAttr.length > 0) {
-
-               let UMLAttributeView = resAttr[0];
-               if (UMLAttributeView.visible) {
-                    isVisible = true;
-               }
-          }
-     }
-     return isVisible;
-}
-/**
- * @function addAttributeData
- * @description check that element attribute is visible and return boolean that attribute should allow to add attribute
- * @param {*} element
- * @returns {boolean}
- */
-function addAttributeData(element) {
-     let mAddAttributeData = false;
-     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM /* && isAttribviewVisible(element) */) {
-
-          mAddAttributeData = true;
-
-     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-
-          mAddAttributeData = true;
-
-     }
-     return mAddAttributeData;
-}
-/**
- * @function addOperationData
- * @description check that element operation is visible and return boolean that operation should allow to add operation
- * @param {*} element
- * @returns {boolean}
- */
-function addOperationData(element) {
-     let mAddOperationData = false;
-     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
-
-          mAddOperationData = true;
-
-     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-
-          mAddOperationData = true;
-
-     }
-     return mAddOperationData;
-}
-/**
- * @function addLiteralData
- * @description check that element literal is visible and return boolean that literal should allow to add literal
- * @param {*} element
- * @returns {boolean}
- */
-function addLiteralData(element) {
-     let mAddLiteralData = false;
-     if (openAPI.getModelType() == openAPI.APP_MODEL_DIAGRAM && isAttribviewVisible(element)) {
-
-          mAddLiteralData = true;
-
-     } else if (openAPI.getModelType() == openAPI.APP_MODEL_PACKAGE) {
-
-          mAddLiteralData = true;
-
-     }
-     return mAddLiteralData;
-}
 
 /**
  * @function isString
@@ -319,10 +235,6 @@ function isString(s) {
 }
 module.exports.isString = isString;
 module.exports.isEmpty = isEmpty;
-module.exports.isAttribviewVisible = isAttribviewVisible;
-module.exports.addOperationData = addOperationData;
-module.exports.addAttributeData = addAttributeData;
-module.exports.addLiteralData = addLiteralData;
 module.exports.resetErrorBlock = resetErrorBlock;
 module.exports.writeErrorToFile = writeErrorToFile;
 module.exports.buildDescription = buildDescription;
