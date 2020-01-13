@@ -23,6 +23,13 @@ function showDialogForNotAvailableClassOrEnum() {
 }
 
 function addNotAvailableClassOrEnumeInFile(str) {
+     /* check and avoid inserting duplicate msg  */
+     let result = notAvailableClassOrEnumeInFile.filter(function (msg) {
+          return msg == str;
+     });
+     if (result.length != 0) {
+          return;
+     }
      notAvailableClassOrEnumeInFile.push(str);
 }
 
