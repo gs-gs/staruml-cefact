@@ -24,7 +24,7 @@ const JSON_FILE_FILTERS = [{
  * @param {UMLPackage} umlPackage
  * @param {Object} options
  */
-function generateSpecs(umlPackage, options = getGenOptions()) {
+function genSpecs(umlPackage, options = getGenOptions()) {
      /* There are two modes of extension, TEST & GENERATE. Here we set APP_MODE_GEN. */
      openAPI.setAppMode(openAPI.APP_MODE_GEN); /* 0 mode for Generate API */
      /* If umlPackage is not assigned, popup ElementPicker */
@@ -223,25 +223,21 @@ function testSinglePackage() {
                     } else if (varSel == valPackagename) {
                          openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                          umlPackage = returnValue;
-                         let ownedElements = [];
-                         umlPackage.ownedElements.filter(function (item) {
-                              if (item instanceof type.UMLClass ||
-                                   item instanceof type.UMLInterface ||
-                                   item instanceof type.UMLEnumeration) {
 
-                                   ownedElements.push(item);
-                              }
-                         });
-                         if (ownedElements.length > 0) {
+
+                         if (!utils.isEmpty(umlPackage)) {
                               removeOutputFiles();
 
                               let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package";
                               setTimeout(function () {
                                    testSingleOpenAPI(message, umlPackage);
                               }, 10);
+                              
                          } else {
                               app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
                          }
+
+                         
 
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
@@ -477,7 +473,7 @@ function aboutUsExtension() {
  * @function aboutUsExtension
  * @description Display Information about Extension like the title and description of OpenAPI Specification.
  */
-function generateJSONLD() {
+function genJSONLD() {
 
      /* Open element picker dialog to pick package */
      app.elementPickerDialog
@@ -534,7 +530,7 @@ function generateJSONLD() {
  */
 function init() {
      /* Register command to Generate Specification */
-     app.commands.register('openapi:generate-specs', generateSpecs);
+     app.commands.register('openapi:generate-specs', genSpecs);
      /* Register command to Test Single Pacakge */
      app.commands.register('openapi:test-single-package', testSinglePackage /* swaggerTest */ );
      /* Register command to Test Entire Project */
@@ -542,7 +538,7 @@ function init() {
      /* Register command to Display Extension information in dialog */
      app.commands.register('openapi:about-us', aboutUsExtension);
      /* Register command to Generate Generate JSON-LD Specification */
-     app.commands.register('jsonld:generate', generateJSONLD);
+     app.commands.register('jsonld:generate', genJSONLD);
 
 }
 

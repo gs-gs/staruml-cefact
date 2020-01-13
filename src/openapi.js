@@ -650,7 +650,9 @@ class OpenApi {
                          let component = new Component();
                          console.log("-----json-schema-generated-----");
 
+                         /* Resetting for not available class or enum for Qualified attribute type */
                          notAvailElement.resetNotAvailableClassOrEnumeInFile();
+                         
                          MainJSON.addJSONSchema(component);
                          MainJSON.addJSONLayout(component);
                          let generator = new FileGenerator();
@@ -667,7 +669,8 @@ class OpenApi {
 
 
                     } else {
-
+                         /* Resetting for not available class or enum for Qualified attribute type */
+                         notAvailElement.resetNotAvailableClassOrEnumeInFile();
                          // Generate OpenAPI Specification
 
                          /*  Add openapi version */
@@ -702,6 +705,7 @@ class OpenApi {
                               console.log("-----file-generated-----");
                               console.log("result-file-generated", fileGenerate);
                               generator.validateAndPrompt().then(function (result) {
+                                   notAvailElement.showDialogForNotAvailableClassOrEnum();
                                    console.log("-----validate & prompt-----");
                                    console.log("result-validate & prompt", result);
                                    resolve(result);
