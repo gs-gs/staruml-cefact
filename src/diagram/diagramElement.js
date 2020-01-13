@@ -666,7 +666,9 @@ function filterUMLClassDiagram(UMLClassDiagram) {
 
         let created = app.repository.readObject(mObj);
 
-        mainOwnedElements.push(created);
+        mJson = app.repository.writeObject(created);
+        mObj = JSON.parse(mJson);
+        mainOwnedElements.push(mObj);
 
         newClasses.push(created);
 
@@ -692,7 +694,9 @@ function filterUMLClassDiagram(UMLClassDiagram) {
 
         let created = app.repository.readObject(mObj);
 
-        mainOwnedElements.push(created);
+        mJson = app.repository.writeObject(created);
+        mObj = JSON.parse(mJson);
+        mainOwnedElements.push(mObj);
 
         newInterfaces.push(created);
     });
@@ -719,7 +723,9 @@ function filterUMLClassDiagram(UMLClassDiagram) {
 
         let created = app.repository.readObject(mObj);
 
-        mainOwnedElements.push(created);
+        mJson = app.repository.writeObject(created);
+        mObj = JSON.parse(mJson);
+        mainOwnedElements.push(mObj);
 
         newEnumeration.push(created);
 
