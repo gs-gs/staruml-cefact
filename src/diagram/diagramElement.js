@@ -411,6 +411,7 @@ function removeIDFromAttribute(UMLEle, UMLClassDiagram) {
                     mObjAttrib.type = {
                         '$ref': newEnum._id
                     };
+                    addNewCreatedElement(newEnum);
 
                 }
             }
@@ -611,7 +612,7 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         return dElement instanceof type.UMLEnumeration
     });
     setUMLEnumeration(UMLEnumeration);
-    
+
     /* Filter UMLAssociation from model */
     let UMLAssociation = allDiagramElement.filter(function (dElement) {
         return dElement instanceof type.UMLAssociation
@@ -749,6 +750,24 @@ function removeDiagram(tempPackage) {
     app.repository.doOperation(cmd)
     console.log("deleted package", tempPackage);
 }
+let newCreatedElementsArr = [];
+
+function getNewCreatedElements() {
+    return newCreatedElementsArr;
+}
+
+function addNewCreatedElement(element) {
+    newCreatedElementsArr.push(element);
+}
+
+function deleteNewCreatedElement() {
+
+    let eleList = getNewCreatedElements();
+    forEach(eleList, function (element) {
+        removeDiagram(element);
+    });
+}
+
 module.exports.filterUMLClassDiagram = filterUMLClassDiagram;
 module.exports.removeIDFromLiterals = removeIDFromLiterals;
 module.exports.removeIDFromOperation = removeIDFromOperation;
@@ -771,3 +790,4 @@ module.exports.getUMLAssociationClassLink = getUMLAssociationClassLink;
 module.exports.setUMLDiagramElement = setUMLDiagramElement;
 module.exports.getUMLDiagramElement = getUMLDiagramElement;
 module.exports.removeDiagram = removeDiagram;
+module.exports.deleteNewCreatedElement = deleteNewCreatedElement;
