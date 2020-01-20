@@ -702,10 +702,10 @@ class OpenApi {
 
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
+                              notAvailElement.showDialogForNotAvailableClassOrEnum();
                               console.log("-----file-generated-----");
                               console.log("result-file-generated", fileGenerate);
                               generator.validateAndPrompt().then(function (result) {
-                                   notAvailElement.showDialogForNotAvailableClassOrEnum();
                                    console.log("-----validate & prompt-----");
                                    console.log("result-validate & prompt", result);
                                    resolve(result);
