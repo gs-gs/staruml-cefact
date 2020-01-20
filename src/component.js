@@ -91,6 +91,17 @@ class Component {
                     }
                });
           });
+          /* Throw error if attribute type is not available in model  */
+          let notAvailEle = notAvailElement.getNotAvailableClassOrEnumeInFile();
+          if (notAvailEle.length > 0) {
+
+               let dlgMessage = 'Warning: your vocabulary may be invalid because following properties have unknown or undefined type (range):\n';
+               forEach(notAvailEle, function (item) {
+                    dlgMessage += '\n' + item;
+               });
+               throw new Error(dlgMessage);
+          }
+
           classes = classes.concat(arrMeasureTypeAtt);
           let arrIdClasses = [];
           this.mainComponentObj.schemas = this.mainSchemaObj;
