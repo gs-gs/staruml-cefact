@@ -54,36 +54,39 @@ class Component {
           forEach(classes, function (mClass) {
                /* Iterate to all attributes for check and add for qualified data type 'Measure */
                forEach(mClass.attributes, function (attrib) {
-                    if (utils.isString(attrib.type) && attrib.type === 'Measure' && notAvailElement.isAvailabl('Measure')) {
 
-                         /* Check and add if attrib type in string and that qualified datatype is available in model */
-                         let srchRes = app.repository.search('Measure');
-                         let srchResult = srchRes.filter(function (element) {
-                              if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
-                                   return element.name == 'Measure';
+                    console.log("1111----type", attrib.type);
+                    if (utils.isCoreDataType(attrib.type)) {
+                         let attribType = utils.getCoreDataType(attrib.type);
+                         console.log("1111----2222----type", type);
+
+                         if (utils.isString(attrib.type) && attrib.type === attribType && notAvailElement.isAvailabl(attribType)) {
+                              /* Check and add if attrib type in string and that qualified datatype is available in model */
+                              let srchRes = app.repository.search(attribType);
+                              let srchResult = srchRes.filter(function (element) {
+                                   if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
+                                        return element.name == attribType;
+                                   }
+                              });
+                              if (srchResult.length == 1) {
+                                   let result = arrMeasureTypeAtt.filter(function (item) {
+                                        return item._id == srchResult[0]._id;
+                                   });
+                                   if (result.length == 0) {
+                                        arrMeasureTypeAtt.push(srchResult[0]);
+                                   }
                               }
-                         });
-                         if (srchResult.length == 1) {
+                         } else if (utils.isString(attrib.type) && attrib.type === attribType && !notAvailElement.isAvailabl(attribType)) {
+                              let str = attrib._parent.name + '/' + attrib.name + ': ' + attrib.type
+                              notAvailElement.addNotAvailableClassOrEnumeInFile(str);
+                         } else if (attrib.type instanceof type.UMLClass && attrib.type.name == attribType) {
+                              /* Check and add if attrib type is reference of UMLClass and available in model */
                               let result = arrMeasureTypeAtt.filter(function (item) {
-                                   return item._id == srchResult[0]._id;
+                                   return item._id == attrib.type._id;
                               });
                               if (result.length == 0) {
-                                   arrMeasureTypeAtt.push(srchResult[0]);
+                                   arrMeasureTypeAtt.push(attrib.type);
                               }
-                         }
-
-                    } else if (utils.isString(attrib.type) && attrib.type === 'Measure' && !notAvailElement.isAvailabl('Measure')) {
-
-                         let str = attrib._parent.name + '/' + attrib.name + ': ' + attrib.type
-                         notAvailElement.addNotAvailableClassOrEnumeInFile(str);
-
-                    } else if (attrib.type instanceof type.UMLClass && attrib.type.name == 'Measure') {
-                         /* Check and add if attrib type is reference of UMLClass and available in model */
-                         let result = arrMeasureTypeAtt.filter(function (item) {
-                              return item._id == attrib.type._id;
-                         });
-                         if (result.length == 0) {
-                              arrMeasureTypeAtt.push(attrib.type);
                          }
                     }
                });
@@ -95,7 +98,7 @@ class Component {
           let duplicateDeletedReference = [];
           classes.forEach(objClass => {
                let mainClassesObj = {};
-               let mainPropertiesObj = {}; 
+               let mainPropertiesObj = {};
 
                let assocSideClassLink = classLink.filter(item => {
                     return item.associationSide.end2.reference._id == objClass._id;
