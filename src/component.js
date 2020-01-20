@@ -10,6 +10,7 @@ const Required = require('./required');
 const openAPI = require('./openapi');
 const constant = require('./constant');
 const diagramEle = require('./diagram/diagramElement');
+const notAvailElement = require('./notavailelement');
 
 /**
  * @class Component 
@@ -47,15 +48,54 @@ class Component {
                classes = diagramEle.getUMLClass();
                classLink = diagramEle.getUMLAssociationClassLink();
           }
+
+          /* Add class which class's attribute type is qualified data type having 'Measure'  */
+          let arrMeasureTypeAtt = [];
+          forEach(classes, function (mClass) {
+               /* Iterate to all attributes for check and add for qualified data type 'Measure */
+               forEach(mClass.attributes, function (attrib) {
+                    if (utils.isString(attrib.type) && attrib.type === 'Measure' && notAvailElement.isAvailabl('Measure')) {
+
+                         /* Check and add if attrib type in string and that qualified datatype is available in model */
+                         let srchRes = app.repository.search('Measure');
+                         let srchResult = srchRes.filter(function (element) {
+                              if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
+                                   return element.name == 'Measure';
+                              }
+                         });
+                         if (srchResult.length == 1) {
+                              let result = arrMeasureTypeAtt.filter(function (item) {
+                                   return item._id == srchResult[0]._id;
+                              });
+                              if (result.length == 0) {
+                                   arrMeasureTypeAtt.push(srchResult[0]);
+                              }
+                         }
+
+                    } else if (utils.isString(attrib.type) && attrib.type === 'Measure' && !notAvailElement.isAvailabl('Measure')) {
+
+                         let str = attrib._parent.name + '/' + attrib.name + ': ' + attrib.type
+                         notAvailElement.addNotAvailableClassOrEnumeInFile(str);
+
+                    } else if (attrib.type instanceof type.UMLClass && attrib.type.name == 'Measure') {
+                         /* Check and add if attrib type is reference of UMLClass and available in model */
+                         let result = arrMeasureTypeAtt.filter(function (item) {
+                              return item._id == attrib.type._id;
+                         });
+                         if (result.length == 0) {
+                              arrMeasureTypeAtt.push(attrib.type);
+                         }
+                    }
+               });
+          });
+          classes = classes.concat(arrMeasureTypeAtt);
           let arrIdClasses = [];
-          let flagNoName = false;
-          let noNameRel = [];
           this.mainComponentObj.schemas = this.mainSchemaObj;
           this.duplicatePropertyError = [];
           let duplicateDeletedReference = [];
           classes.forEach(objClass => {
                let mainClassesObj = {};
-               let mainPropertiesObj = {};
+               let mainPropertiesObj = {}; 
 
                let assocSideClassLink = classLink.filter(item => {
                     return item.associationSide.end2.reference._id == objClass._id;
