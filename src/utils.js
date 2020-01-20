@@ -70,63 +70,7 @@ function buildParameter(name, type, description, required, schema, paramsObject)
 }
 
 
-/**
- * @function addAttributeType
- * @description add attribute type based on openapi spefication datatype
- * @param {Object} itemsObj 
- * @memberof Utils
- */
-function addAttributeType(itemsObj, attr) {
-     let starUMLType = attr.type;
-     if (starUMLType === 'Numeric') {
-          itemsObj.type = 'number';
-     } else if (starUMLType === 'Indicator') {
-          itemsObj.type = 'boolean';
-     } else if (starUMLType === 'Date') {
-          itemsObj.type = 'string';
-          itemsObj.format = 'date';
-     } else if (starUMLType === 'DateTime') {
-          itemsObj.type = 'string';
-          itemsObj.format = 'date-time';
-     } else if (starUMLType === 'Integer') {
-          itemsObj.type = 'integer';
-     } else if (starUMLType === 'Int32') {
-          itemsObj.type = 'integer';
-          itemsObj.format = 'int32';
-     } else if (starUMLType === 'Int64') {
-          itemsObj.type = 'integer';
-          itemsObj.format = 'int64';
-     } else if (starUMLType === 'Number') {
-          itemsObj.type = 'number';
-     } else if (starUMLType === 'Float') {
-          itemsObj.type = 'number';
-          itemsObj.format = 'float';
-     } else if (starUMLType === 'Double') {
-          itemsObj.type = 'number';
-          itemsObj.format = 'double';
-     } else if (starUMLType === 'Password') {
-          itemsObj.type = 'string';
-          itemsObj.format = "password";
-     } else if (starUMLType === 'Byte') {
-          itemsObj.type = 'string';
-          itemsObj.format = 'byte';
-     } else if (starUMLType === 'Boolean') {
-          itemsObj.type = 'boolean';
-     } else if (starUMLType === 'Binary') {
-          itemsObj.type = 'string';
-          itemsObj.format = 'binary';
-     } else if (starUMLType instanceof type.UMLClass && starUMLType.name === 'Measure') {
-          itemsObj['$ref'] = constant.getReference() + starUMLType.name;
-     } else if(isString(starUMLType) && starUMLType === 'Measure'){
-          itemsObj['$ref'] = constant.getReference() + starUMLType;
-     }else {
-          itemsObj.type = 'string';
 
-          if (isString(starUMLType)) {
-               notAvailElement.checkAndaddNotAvailableClassOrEnumeInFile(attr._parent.name, attr, starUMLType);
-          }
-     }
-}
 
 /**
  * @function buildRequestBody
@@ -237,6 +181,95 @@ function isEmpty(umlPackage) {
 function isString(s) {
      return typeof (s) === 'string' || s instanceof String;
 }
+
+/**
+ * @function addAttributeType
+ * @description add attribute type based on openapi spefication datatype
+ * @param {Object} itemsObj 
+ * @memberof Utils
+ */
+function addAttributeType(itemsObj, attr) {
+     let starUMLType = attr.type;
+     if (starUMLType === 'Numeric') {
+          itemsObj.type = 'number';
+     } else if (starUMLType === 'Indicator') {
+          itemsObj.type = 'boolean';
+     } else if (starUMLType === 'Date') {
+          itemsObj.type = 'string';
+          itemsObj.format = 'date';
+     } else if (starUMLType === 'DateTime') {
+          itemsObj.type = 'string';
+          itemsObj.format = 'date-time';
+     } else if (starUMLType === 'Integer') {
+          itemsObj.type = 'integer';
+     } else if (starUMLType === 'Int32') {
+          itemsObj.type = 'integer';
+          itemsObj.format = 'int32';
+     } else if (starUMLType === 'Int64') {
+          itemsObj.type = 'integer';
+          itemsObj.format = 'int64';
+     } else if (starUMLType === 'Number') {
+          itemsObj.type = 'number';
+     } else if (starUMLType === 'Float') {
+          itemsObj.type = 'number';
+          itemsObj.format = 'float';
+     } else if (starUMLType === 'Double') {
+          itemsObj.type = 'number';
+          itemsObj.format = 'double';
+     } else if (starUMLType === 'Password') {
+          itemsObj.type = 'string';
+          itemsObj.format = "password";
+     } else if (starUMLType === 'Byte') {
+          itemsObj.type = 'string';
+          itemsObj.format = 'byte';
+     } else if (starUMLType === 'Boolean') {
+          itemsObj.type = 'boolean';
+     } else if (starUMLType === 'Binary') {
+          itemsObj.type = 'string';
+          itemsObj.format = 'binary';
+     } else if(isCoreDataType(starUMLType)){
+          let attrType=getCoreDataType(starUMLType);
+          itemsObj['$ref'] = constant.getReference() + attrType;
+     }/* else if (starUMLType instanceof type.UMLClass && starUMLType.name === 'Measure') {
+          itemsObj['$ref'] = constant.getReference() + starUMLType.name;
+     } else if(isString(starUMLType) && starUMLType === 'Measure'){
+          itemsObj['$ref'] = constant.getReference() + starUMLType;
+     } */else {
+          itemsObj.type = 'string';
+
+          if (isString(starUMLType)) {
+               notAvailElement.checkAndaddNotAvailableClassOrEnumeInFile(attr._parent.name, attr, starUMLType);
+          }
+     }
+}
+
+function isCoreDataType(attrType){
+     let mType='';
+     if(isString(attrType) ){
+          mType=attrType;
+     }
+     else if(attrType instanceof type.UMLClass){
+          mType=attrType.name;
+     }
+     if(mType === 'Measure' || mType === 'Text' || mType === 'Binary' || mType === 'Amount'
+          || mType === 'Numeric' || mType==='Identifier' || mType === 'Code' || mType === 'Indicator' || mType === 'DateTime'){
+          return true;
+     }
+     return false;
+}
+
+function getCoreDataType(attrType){
+     let mType='';
+     if(isString(attrType) ){
+          mType=attrType;
+     }
+     else if(attrType instanceof type.UMLClass){
+          mType=attrType.name;
+     }
+     return mType
+}
+module.exports.isCoreDataType = isCoreDataType;
+module.exports.getCoreDataType = getCoreDataType;
 module.exports.isString = isString;
 module.exports.isEmpty = isEmpty;
 module.exports.resetErrorBlock = resetErrorBlock;
