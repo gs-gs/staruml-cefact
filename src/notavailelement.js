@@ -47,8 +47,23 @@ function checkAndaddNotAvailableClassOrEnumeInFile(className, attr, attributeTyp
 
 }
 
+function isAvailable(className) {
+     let srchRes = app.repository.search(className);
+     let result = srchRes.filter(function (element) {
+          if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
+               return element.name == className;
+          }
+     });
+     if (result.length == 0) {
+          return false;
+     }
+     return true;
+
+}
+
 module.exports.resetNotAvailableClassOrEnumeInFile = resetNotAvailableClassOrEnumeInFile;
 module.exports.getNotAvailableClassOrEnumeInFile = getNotAvailableClassOrEnumeInFile;
 module.exports.showDialogForNotAvailableClassOrEnum = showDialogForNotAvailableClassOrEnum;
 module.exports.addNotAvailableClassOrEnumeInFile = addNotAvailableClassOrEnumeInFile;
 module.exports.checkAndaddNotAvailableClassOrEnumeInFile = checkAndaddNotAvailableClassOrEnumeInFile;
+module.exports.isAvailabl = isAvailable;

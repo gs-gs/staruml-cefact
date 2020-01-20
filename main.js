@@ -95,7 +95,10 @@ async function startOpenApiGenerator(message, tempPackage, basePath, options, re
                setTimeout(function () {
                     app.dialogs.showInfoDialog(resultGen.message);
                     if (openAPI.isModelDiagram()) {
+                         /* remove temporary created package from model after specs had been generated successfully */
                          diagramEle.removeDiagram(tempPackage);
+                         /* delete newaly created element while generating specs from Diagram*/
+                         diagramEle.deleteNewCreatedElement();
                     }
 
                }, 10);
@@ -108,7 +111,10 @@ async function startOpenApiGenerator(message, tempPackage, basePath, options, re
           setTimeout(function () {
                app.dialogs.showErrorDialog(err.message);
                if (openAPI.isModelDiagram()) {
+                    /* remove temporary created package from model after specs had been generated successfully */
                     diagramEle.removeDiagram(tempPackage);
+                    /* delete newaly created element while generating specs from Diagram*/
+                    diagramEle.deleteNewCreatedElement();
                }
                console.error("Error getUMLModel", err);
           }, 10);
@@ -232,12 +238,12 @@ function testSinglePackage() {
                               setTimeout(function () {
                                    testSingleOpenAPI(message, umlPackage);
                               }, 10);
-                              
+
                          } else {
                               app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
                          }
 
-                         
+
 
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
@@ -298,7 +304,10 @@ async function starTestingAllDiagram(diagramList) {
                let resultGen = await mOpenApi.generateOpenAPI();
                console.log("resultGen", resultGen);
                if (resultGen.result == constant.FIELD_SUCCESS) {
-                    diagramEle.removeDiagram(mNewDiagram);
+                    /* remove temporary created package from model after specs had been generated successfully */
+                    diagramEle.removeDiagram(tempPackage);
+                    /* delete newaly created element while generating specs from Diagram*/
+                    diagramEle.deleteNewCreatedElement();
                }
           } catch (err) {
                console.error("Error startTestingAllPackage", err);
@@ -308,7 +317,10 @@ async function starTestingAllDiagram(diagramList) {
                     let bindFailureMsg = constant.msgtesterror + strModeType + '\'' + openAPI.getUMLPackageName() + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
                     openAPI.addSummery(bindFailureMsg, 'failure');
                }
-               diagramEle.removeDiagram(mNewDiagram);
+               /* remove temporary created package from model after specs had been generated successfully */
+               diagramEle.removeDiagram(tempPackage);
+               /* delete newaly created element while generating specs from Diagram*/
+               diagramEle.deleteNewCreatedElement();
           }
      }
      vDialog.close();
@@ -491,7 +503,7 @@ function genJSONLD() {
                          if (!utils.isEmpty(returnValue)) {
 
                               var _filename = returnValue.name;
-                              var basePath = app.dialogs.showSaveDialog('Export JSON-LD As JSON', _filename + '-jsonld' + '.json', JSON_FILE_FILTERS);
+                              var basePath = app.dialogs.showSaveDialog('Export JSON-LD As JSON', _filename + '-vocabulary' + '.json', JSON_FILE_FILTERS);
                               if (basePath == null) {
                                    console.log("Dialog cancelled : basePath not available")
                                    return;
