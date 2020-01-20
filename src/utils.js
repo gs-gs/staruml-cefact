@@ -115,7 +115,11 @@ function addAttributeType(itemsObj, attr) {
      } else if (starUMLType === 'Binary') {
           itemsObj.type = 'string';
           itemsObj.format = 'binary';
-     } else {
+     } else if (starUMLType instanceof type.UMLClass && starUMLType.name === 'Measure') {
+          itemsObj['$ref'] = constant.getReference() + starUMLType.name;
+     } else if(isString(starUMLType) && starUMLType === 'Measure'){
+          itemsObj['$ref'] = constant.getReference() + starUMLType;
+     }else {
           itemsObj.type = 'string';
 
           if (isString(starUMLType)) {
