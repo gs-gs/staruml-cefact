@@ -503,7 +503,7 @@ function genJSONLD() {
                          if (!utils.isEmpty(returnValue)) {
 
                               var _filename = returnValue.name;
-                              var basePath = app.dialogs.showSaveDialog('Export JSON-LD As JSON', _filename + '-jsonld' + '.json', JSON_FILE_FILTERS);
+                              var basePath = app.dialogs.showSaveDialog('Export JSON-LD As JSON', _filename + '-vocabulary' + '.json', JSON_FILE_FILTERS);
                               if (basePath == null) {
                                    console.log("Dialog cancelled : basePath not available")
                                    return;
