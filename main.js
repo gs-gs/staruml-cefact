@@ -45,7 +45,7 @@ function genSpecs(umlPackage, options = getGenOptions()) {
 
                               openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
                               let tempPackage = diagramEle.filterUMLClassDiagram(returnValue);
-                              let mNewDiagram = app.repository.readObject(tempPackage);
+                              let mNewDiagram = diagramEle.createPackage(tempPackage);
                               console.log(mNewDiagram);
 
                               fileTypeSelection(mNewDiagram, options);
@@ -219,7 +219,8 @@ function testSinglePackage() {
 
                          openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
                          let tempPackage = diagramEle.filterUMLClassDiagram(returnValue);
-                         let mNewDiagram = app.repository.readObject(tempPackage);
+                         let mNewDiagram = diagramEle.createPackage(tempPackage);
+                         console.log("New created package",mNewDiagram);
                          removeOutputFiles();
                          let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + mNewDiagram.name + "\' diagram";
                          setTimeout(function () {
@@ -294,7 +295,7 @@ async function starTestingAllDiagram(diagramList) {
           const options = getGenOptions();
           openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
           let tempPackage = diagramEle.filterUMLClassDiagram(mUMLDiagram);
-          let mNewDiagram = app.repository.readObject(tempPackage);
+          let mNewDiagram = diagramEle.createPackage(tempPackage);
           const mOpenApi = new openAPI.OpenApi(mNewDiagram, basePath, options, 1);
           try {
                let result = await mOpenApi.initUMLPackage()
