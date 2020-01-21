@@ -227,6 +227,8 @@ function addAttributeType(itemsObj, attr) {
      } else if (starUMLType === 'Binary') {
           itemsObj.type = 'string';
           itemsObj.format = 'binary';
+     } else if (starUMLType === 'Quantity') {
+          itemsObj.type = 'integer';
      } else if(isCoreDataType(starUMLType)){
           let attrType=getCoreDataType(starUMLType);
           itemsObj['$ref'] = constant.getReference() + attrType;
