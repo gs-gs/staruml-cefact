@@ -124,32 +124,33 @@ class OpenApi {
                     /* ------------ 4. Generalization Class from Diagram ------------ */
                     generaCurrentPkg = diagramEle.getUMLGeneralization();
                }
-
+               //TODO do not remove this code. We are leaving this for future
                let tmpAsso = [];
-               forEach(assocCurrentPkg, (child, index) => {
-                    if (child.end1.reference.name != child.end2.reference.name) {
+               forEach(assocCurrentPkg, (association) => {
+                    if (association.end1.reference.name != association.end2.reference.name) {
 
-                         let filter = umlClasses.filter(subItem => {
-                              return child.end2.reference.name == subItem.name;
+                         let filter = umlClasses.filter(mClass => {
+                              return association.end2.reference.name == mClass.name;
                          });
 
                          if (filter.length == 0) {
-                              umlClasses.push(child.end2.reference);
-                              tmpAsso.push(child.end2.reference);
+                              umlClasses.push(association.end2.reference);
+                              tmpAsso.push(association.end2.reference);
                          }
                     }
-               });
+               }); 
 
                let tmpGen = [];
-               forEach(generaCurrentPkg, (child, index) => {
-                    let filter = umlClasses.filter(subItem => {
-                         return child.target.name == subItem.name;
+               //TODO do not remove this code. We are leaving this for future
+               forEach(generaCurrentPkg, (generalization) => {
+                    let filter = umlClasses.filter(mClass => {
+                         return generalization.target.name == mClass.name;
                     });
                     if (filter.length == 0) {
-                         umlClasses.push(child.target);
-                         tmpGen.push(child.target.name);
+                         umlClasses.push(generalization.target);
+                         tmpGen.push(generalization.target.name);
                     }
-               });
+               }); 
 
                /* ------------ 5. Find and sort classes ------------ */
                let resArr = OpenApi.findAndSort(umlClasses);
