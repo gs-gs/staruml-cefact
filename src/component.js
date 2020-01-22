@@ -49,16 +49,16 @@ class Component {
                classLink = diagramEle.getUMLAssociationClassLink();
           }
 
-          /* Add class which class's attribute type is qualified data type having 'Measure'  */
+          /* Add class which class's attribute type is qualified data type having all Core Data Type  */
           let arrMeasureTypeAtt = [];
           forEach(classes, function (mClass) {
-               /* Iterate to all attributes for check and add for qualified data type 'Measure */
+               /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
                forEach(mClass.attributes, function (attrib) {
 
-                    console.log("1111----type", attrib.type);
+                    // console.log("1111----type", attrib.type);
                     if (utils.isCoreDataType(attrib.type)) {
                          let attribType = utils.getCoreDataType(attrib.type);
-                         console.log("1111----2222----type", type);
+                         // console.log("1111----2222----type", type);
 
                          if (utils.isString(attrib.type) && attrib.type === attribType && notAvailElement.isAvailabl(attribType)) {
                               /* Check and add if attrib type in string and that qualified datatype is available in model */
@@ -103,6 +103,8 @@ class Component {
           }
 
           classes = classes.concat(arrMeasureTypeAtt);
+
+
           let arrIdClasses = [];
           this.mainComponentObj.schemas = this.mainSchemaObj;
           this.duplicatePropertyError = [];
@@ -144,7 +146,7 @@ class Component {
                /* Get generalization of class */
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
                let aggregationClasses = [];
-               let classAssociations = this.associationClassLink.getAssociationOfAssociationClassLink(objClass);
+               let classAssociations = this.associationClassLink.getAssociationOfClass(objClass);
 
 
                console.log("classAssociations", classAssociations);
@@ -152,6 +154,7 @@ class Component {
 
 
 
+               console.log("abc---",objClass.name);
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
 
@@ -342,7 +345,7 @@ class Component {
                /* Get generalization of class */
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
                let aggregationClasses = [];
-               let classAssociations = this.associationClassLink.getAssociationOfAssociationClassLink(objClass);
+               let classAssociations = this.associationClassLink.getAssociationOfClass(objClass);
 
 
                console.log("classAssociations", classAssociations);
