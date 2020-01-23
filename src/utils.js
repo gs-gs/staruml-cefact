@@ -235,13 +235,26 @@ function addAttributeType(itemsObj, attr) {
           itemsObj['$ref'] = constant.getReference() + attrType;
            */
           /* Added reference in allOf object when attribute type is among the Core Data Type */
+
+          
           let attrType=getCoreDataType(starUMLType);
           let allOfArray=[];
           itemsObj.allOf=allOfArray;
+          
+          /* Adding description */
           let allOfObject={};
+          allOfObject['description'] = itemsObj.description;
+          allOfArray.push(allOfObject);
+
+          /* Delete description from parent object */
+          delete itemsObj['description']
+
+          /* Adding reference */
+          allOfObject={};
           allOfObject['$ref'] = constant.getReference() + attrType;
           allOfArray.push(allOfObject);
 
+          /* Adding object field */
           allOfObject={};
           allOfObject.type = 'object';
           allOfArray.push(allOfObject);
