@@ -195,15 +195,6 @@ class AssociationClassLink {
 
                     /* Filter association who is belong to current package */
                     filter = filterAssociation;
-                    /* filterAssociation.filter(item => {
-                                             let parent=item.end1.reference._parent;
-                                             return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackageName());
-                                        }); */
-
-                    /* Filter association who is belong to current package */
-                    /* let associationClasses = app.repository.select("tempPkg::" + objClass.name + "::@UMLAssociation");
-                    filter = associationClasses; */
-                    
                }
 
                return filter;
