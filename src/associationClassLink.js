@@ -161,11 +161,11 @@ class AssociationClassLink {
      }
 
      /**
-      * @function getAssociationOfAssociationClassLink
+      * @function getAssociationOfClass
       * @description Find all association of UMLClass
       * @param {UMLClass} objClass 
       */
-     getAssociationOfAssociationClassLink(objClass) {
+     getAssociationOfClass(objClass) {
           try {
                /* Find the all UMLAssociation of project */
 
@@ -194,12 +194,7 @@ class AssociationClassLink {
                     });
 
                     /* Filter association who is belong to current package */
-                    console.log("diagramAsso", diagramEle.getUMLAssociation());
                     filter = filterAssociation;
-                    /* filterAssociation.filter(item => {
-                                             let parent=item.end1.reference._parent;
-                                             return (parent && parent instanceof type.UMLPackage);// && parent.name == openAPI.getUMLPackageName());
-                                        }); */
                }
 
                return filter;
@@ -214,8 +209,8 @@ class AssociationClassLink {
      }
 
 
-     /* TODO : Do not remove getAssociationOfAssociationClassLink function. The function is in progress for experiment 
-     getAssociationOfAssociationClassLink(objClass) {
+     /* TODO : Do not remove getAssociationOfClass function. The function is in progress for experiment 
+     getAssociationOfClass(objClass) {
           return new Promise((resolve, reject) => {
 
 

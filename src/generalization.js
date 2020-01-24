@@ -105,6 +105,9 @@ class Generalization {
                     filterGeneral = generalizeClasses.filter(item => {
                          return item.source._id == objClass._id
                     });
+                    /* let generalizeClasses = app.repository.select("tempPkg::" + objClass.name + "::@UMLGeneralization");
+                    filterGeneral=generalizeClasses; */
+
 
                }
 

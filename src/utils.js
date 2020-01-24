@@ -227,9 +227,38 @@ function addAttributeType(itemsObj, attr) {
      } else if (starUMLType === 'Binary') {
           itemsObj.type = 'string';
           itemsObj.format = 'binary';
+     } else if (starUMLType === 'Quantity') {
+          itemsObj.type = 'integer';
      } else if(isCoreDataType(starUMLType)){
+          /* 
           let attrType=getCoreDataType(starUMLType);
           itemsObj['$ref'] = constant.getReference() + attrType;
+           */
+          /* Added reference in allOf object when attribute type is among the Core Data Type */
+
+          
+          let attrType=getCoreDataType(starUMLType);
+          let allOfArray=[];
+          itemsObj.allOf=allOfArray;
+          
+          /* Adding description */
+          let allOfObject={};
+          allOfObject['description'] = itemsObj.description;
+          allOfArray.push(allOfObject);
+
+          /* Delete description from parent object */
+          delete itemsObj['description']
+
+          /* Adding reference */
+          allOfObject={};
+          allOfObject['$ref'] = constant.getReference() + attrType;
+          allOfArray.push(allOfObject);
+
+          /* Adding object field */
+          allOfObject={};
+          allOfObject.type = 'object';
+          allOfArray.push(allOfObject);
+
      }/* else if (starUMLType instanceof type.UMLClass && starUMLType.name === 'Measure') {
           itemsObj['$ref'] = constant.getReference() + starUMLType.name;
      } else if(isString(starUMLType) && starUMLType === 'Measure'){
