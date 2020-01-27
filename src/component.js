@@ -269,6 +269,25 @@ class Component {
           let schemaModelDefinitionsObj = {};
           schemaModel['definitions'] = schemaModelDefinitionsObj;
 
+          /* Add classes that class's attribute type is Core Data Type  
+          Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount
+          */
+
+          let arrCoreDataTypeAttr = utils.getCoreDataTypeAttributeClass(classes);
+
+          /* Throw error if attribute type is not available in model  */
+          /* let notAvailEle = notAvailElement.getNotAvailableClassOrEnumeInFile();
+          if (notAvailEle.length > 0) {
+               let dlgMessage = constant.WARNING_VOCAB_MSG;
+               forEach(notAvailEle, function (item) {
+                    dlgMessage += '\n' + item;
+               });
+               throw new Error(dlgMessage);
+          } */
+
+          /* Combine classes and classes that class's attribute type is Core Data Type */
+          classes = classes.concat(arrCoreDataTypeAttr);
+
           this.duplicatePropertyError = [];
           let duplicateDeletedReference = [];
           classes.forEach(objClass => {
