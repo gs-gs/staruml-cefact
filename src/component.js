@@ -49,60 +49,24 @@ class Component {
                classLink = diagramEle.getUMLAssociationClassLink();
           }
 
-          /* Add class which class's attribute type is qualified data type having all Core Data Type  */
-          let arrMeasureTypeAtt = [];
-          forEach(classes, function (mClass) {
-               /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
-               forEach(mClass.attributes, function (attrib) {
+          /* Add classes that class's attribute type is Core Data Type  
+          Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount
+          */
 
-                    // console.log("1111----type", attrib.type);
-                    if (utils.isCoreDataType(attrib.type)) {
-                         let attribType = utils.getCoreDataType(attrib.type);
-                         // console.log("1111----2222----type", type);
+          let arrCoreDataTypeAttr = utils.getCoreDataTypeAttributeClass(classes);
 
-                         if (utils.isString(attrib.type) && attrib.type === attribType && notAvailElement.isAvailabl(attribType)) {
-                              /* Check and add if attrib type in string and that qualified datatype is available in model */
-                              let srchRes = app.repository.search(attribType);
-                              let srchResult = srchRes.filter(function (element) {
-                                   if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
-                                        return element.name == attribType;
-                                   }
-                              });
-                              if (srchResult.length == 1) {
-                                   let result = arrMeasureTypeAtt.filter(function (item) {
-                                        return item._id == srchResult[0]._id;
-                                   });
-                                   if (result.length == 0) {
-                                        arrMeasureTypeAtt.push(srchResult[0]);
-                                   }
-                              }
-                         } else if (utils.isString(attrib.type) && attrib.type === attribType && !notAvailElement.isAvailabl(attribType)) {
-                              let str = attrib._parent.name + '/' + attrib.name + ': ' + attrib.type
-                              notAvailElement.addNotAvailableClassOrEnumeInFile(str);
-                         } else if (attrib.type instanceof type.UMLClass && attrib.type.name == attribType) {
-                              /* Check and add if attrib type is reference of UMLClass and available in model */
-                              let result = arrMeasureTypeAtt.filter(function (item) {
-                                   return item._id == attrib.type._id;
-                              });
-                              if (result.length == 0) {
-                                   arrMeasureTypeAtt.push(attrib.type);
-                              }
-                         }
-                    }
-               });
-          });
           /* Throw error if attribute type is not available in model  */
           let notAvailEle = notAvailElement.getNotAvailableClassOrEnumeInFile();
           if (notAvailEle.length > 0) {
-
-               let dlgMessage = 'Warning: your vocabulary may be invalid because following properties have unknown or undefined type (range):\n';
+               let dlgMessage = constant.WARNING_VOCAB_MSG;
                forEach(notAvailEle, function (item) {
                     dlgMessage += '\n' + item;
                });
                throw new Error(dlgMessage);
           }
 
-          classes = classes.concat(arrMeasureTypeAtt);
+          /* Combine classes and classes that class's attribute type is Core Data Type */
+          classes = classes.concat(arrCoreDataTypeAttr);
 
 
           let arrIdClasses = [];
@@ -154,7 +118,6 @@ class Component {
 
 
 
-               console.log("abc---",objClass.name);
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
 
@@ -549,6 +512,7 @@ class Component {
                _this.findAllInheritedClassesByGeneralization(allInheritedClasses, item.target)
           });
      }
+
      removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference) {
 
           /* Find duplicate properties */

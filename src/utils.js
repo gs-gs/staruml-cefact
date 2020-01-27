@@ -1,5 +1,4 @@
 var forEach = require('async-foreach').forEach;
-
 const notAvailElement = require('./notavailelement');
 const openAPI = require('./openapi');
 const fs = require('fs');
@@ -297,6 +296,50 @@ function getCoreDataType(attrType){
      }
      return mType
 }
+function getCoreDataTypeAttributeClass(classes){
+     let arrCoreDataTypeAttr = [];
+     forEach(classes, function (mClass) {
+          /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
+          forEach(mClass.attributes, function (attrib) {
+
+               // console.log("1111----type", attrib.type);
+               if (isCoreDataType(attrib.type)) {
+                    let attribType = getCoreDataType(attrib.type);
+                    // console.log("1111----2222----type", type);
+
+                    if (isString(attrib.type) && attrib.type === attribType && notAvailElement.isAvailabl(attribType)) {
+                         /* Check and add if attrib type in string and that qualified datatype is available in model */
+                         let srchRes = app.repository.search(attribType);
+                         let srchResult = srchRes.filter(function (element) {
+                              if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
+                              return element.name == attribType;
+                         }
+                         });
+                         if (srchResult.length == 1) {
+                              let result = arrCoreDataTypeAttr.filter(function (item) {
+                                   return item._id == srchResult[0]._id;
+                              });
+                              if (result.length == 0) {
+                                   arrCoreDataTypeAttr.push(srchResult[0]);
+                              }
+                         }
+                    } else if (isString(attrib.type) && attrib.type === attribType && !notAvailElement.isAvailabl(attribType)) {
+                         let str = attrib._parent.name + '/' + attrib.name + ': ' + attrib.type
+                         notAvailElement.addNotAvailableClassOrEnumeInFile(str);
+                    } else if (attrib.type instanceof type.UMLClass && attrib.type.name == attribType) {
+                         /* Check and add if attrib type is reference of UMLClass and available in model */
+                         let result = arrCoreDataTypeAttr.filter(function (item) {
+                              return item._id == attrib.type._id;
+                         });
+                         if (result.length == 0) {
+                              arrCoreDataTypeAttr.push(attrib.type);
+                         }
+                    }
+               }
+          });
+     });
+     return arrCoreDataTypeAttr;
+}
 module.exports.isCoreDataType = isCoreDataType;
 module.exports.getCoreDataType = getCoreDataType;
 module.exports.isString = isString;
@@ -309,3 +352,4 @@ module.exports.addAttributeType = addAttributeType;
 module.exports.buildRequestBody = buildRequestBody;
 module.exports.writeQueryParameters = writeQueryParameters;
 module.exports.getEnumerationLiteral = getEnumerationLiteral;
+module.exports.getCoreDataTypeAttributeClass = getCoreDataTypeAttributeClass;
