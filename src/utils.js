@@ -228,20 +228,20 @@ function addAttributeType(itemsObj, attr) {
           itemsObj.format = 'binary';
      } else if (starUMLType === 'Quantity') {
           itemsObj.type = 'integer';
-     } else if(isCoreDataType(starUMLType)){
+     } else if (isCoreDataType(starUMLType)) {
           /* 
           let attrType=getCoreDataType(starUMLType);
           itemsObj['$ref'] = constant.getReference() + attrType;
            */
           /* Added reference in allOf object when attribute type is among the Core Data Type */
 
-          
-          let attrType=getCoreDataType(starUMLType);
-          let allOfArray=[];
-          itemsObj.allOf=allOfArray;
-          
+
+          let attrType = getCoreDataType(starUMLType);
+          let allOfArray = [];
+          itemsObj.allOf = allOfArray;
+
           /* Adding description */
-          let allOfObject={};
+          let allOfObject = {};
           allOfObject['description'] = itemsObj.description;
           allOfArray.push(allOfObject);
 
@@ -249,20 +249,22 @@ function addAttributeType(itemsObj, attr) {
           delete itemsObj['description']
 
           /* Adding reference */
-          allOfObject={};
+          allOfObject = {};
           allOfObject['$ref'] = constant.getReference() + attrType;
           allOfArray.push(allOfObject);
 
           /* Adding object field */
-          allOfObject={};
+          allOfObject = {};
           allOfObject.type = 'object';
           allOfArray.push(allOfObject);
 
-     }/* else if (starUMLType instanceof type.UMLClass && starUMLType.name === 'Measure') {
-          itemsObj['$ref'] = constant.getReference() + starUMLType.name;
-     } else if(isString(starUMLType) && starUMLType === 'Measure'){
-          itemsObj['$ref'] = constant.getReference() + starUMLType;
-     } */else {
+     }
+     /* else if (starUMLType instanceof type.UMLClass && starUMLType.name === 'Measure') {
+               itemsObj['$ref'] = constant.getReference() + starUMLType.name;
+          } else if(isString(starUMLType) && starUMLType === 'Measure'){
+               itemsObj['$ref'] = constant.getReference() + starUMLType;
+          } */
+     else {
           itemsObj.type = 'string';
 
           if (isString(starUMLType)) {
@@ -271,32 +273,31 @@ function addAttributeType(itemsObj, attr) {
      }
 }
 
-function isCoreDataType(attrType){
-     let mType='';
-     if(isString(attrType) ){
-          mType=attrType;
+function isCoreDataType(attrType) {
+     let mType = '';
+     if (isString(attrType)) {
+          mType = attrType;
+     } else if (attrType instanceof type.UMLClass) {
+          mType = attrType.name;
      }
-     else if(attrType instanceof type.UMLClass){
-          mType=attrType.name;
-     }
-     if(mType === 'Measure' || mType === 'Text' || mType === 'Binary' || mType === 'Amount'
-          || mType === 'Numeric' || mType==='Identifier' || mType === 'Code' || mType === 'Indicator' || mType === 'DateTime'){
+     if (mType === 'Measure' || mType === 'Text' || mType === 'Binary' || mType === 'Amount' ||
+          mType === 'Numeric' || mType === 'Identifier' || mType === 'Code' || mType === 'Indicator' || mType === 'DateTime') {
           return true;
      }
      return false;
 }
 
-function getCoreDataType(attrType){
-     let mType='';
-     if(isString(attrType) ){
-          mType=attrType;
-     }
-     else if(attrType instanceof type.UMLClass){
-          mType=attrType.name;
+function getCoreDataType(attrType) {
+     let mType = '';
+     if (isString(attrType)) {
+          mType = attrType;
+     } else if (attrType instanceof type.UMLClass) {
+          mType = attrType.name;
      }
      return mType
 }
-function getCoreDataTypeAttributeClass(classes){
+
+function getCoreDataTypeAttributeClass(classes) {
      let arrCoreDataTypeAttr = [];
      forEach(classes, function (mClass) {
           /* Iterate to all attributes for check and add for qualified data type all Core Data Type */

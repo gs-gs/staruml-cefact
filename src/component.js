@@ -40,13 +40,13 @@ class Component {
       * @memberof Component
       */
      getComponent() {
-          let classes, classLink;
+          let classes, assoClassLink;
           if (openAPI.isModelPackage()) {
                classes = openAPI.getClasses();
-               classLink = app.repository.select("@UMLAssociationClassLink");
+               assoClassLink = app.repository.select("@UMLAssociationClassLink");
           } else if (openAPI.isModelDiagram()) {
                classes = diagramEle.getUMLClass();
-               classLink = diagramEle.getUMLAssociationClassLink();
+               assoClassLink = diagramEle.getUMLAssociationClassLink();
           }
 
           /* Add classes that class's attribute type is Core Data Type  
@@ -55,7 +55,8 @@ class Component {
 
           let arrCoreDataTypeAttr = utils.getCoreDataTypeAttributeClass(classes);
 
-          /* Throw error if attribute type is not available in model  */
+          /* Throw error if attribute type is not available in model 
+          Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount */
           let notAvailEle = notAvailElement.getNotAvailableClassOrEnumeInFile();
           if (notAvailEle.length > 0) {
                let dlgMessage = constant.WARNING_VOCAB_MSG;
@@ -73,17 +74,18 @@ class Component {
           this.mainComponentObj.schemas = this.mainSchemaObj;
           this.duplicatePropertyError = [];
           let duplicateDeletedReference = [];
+          /* Iterate through all classes*/
           classes.forEach(objClass => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
 
-               let assocSideClassLink = classLink.filter(item => {
+
+               let assocSideClassLink = assoClassLink.filter(item => {
                     return item.associationSide.end2.reference._id == objClass._id;
                });
 
-               console.log("-----track", assocSideClassLink);
                /* Filter Association Class Link of Current Class */
-               let assocClassLink = classLink.filter(item => {
+               let assocClassLink = assoClassLink.filter(item => {
                     return item.associationSide.end1.reference._id == objClass._id;
                });
 
@@ -256,13 +258,13 @@ class Component {
           });
 
           /* For Class */
-          let classes, classLink;
+          let classes, assoClassLink;
           if (openAPI.isModelPackage()) {
                classes = openAPI.getClasses();
-               classLink = app.repository.select("@UMLAssociationClassLink");
+               assoClassLink = app.repository.select("@UMLAssociationClassLink");
           } else if (openAPI.isModelDiagram()) {
                classes = diagramEle.getUMLClass();
-               classLink = diagramEle.getUMLAssociationClassLink();
+               assoClassLink = diagramEle.getUMLAssociationClassLink();
           }
           let arrIdClasses = [];
 
@@ -294,13 +296,13 @@ class Component {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
 
-               let assocSideClassLink = classLink.filter(item => {
+               let assocSideClassLink = assoClassLink.filter(item => {
                     return item.associationSide.end2.reference._id == objClass._id;
                });
 
                console.log("-----track", assocSideClassLink);
                /* Filter Association Class Link of Current Class */
-               let assocClassLink = classLink.filter(item => {
+               let assocClassLink = assoClassLink.filter(item => {
                     return item.associationSide.end1.reference._id == objClass._id;
                });
 
@@ -453,7 +455,7 @@ class Component {
 
           paths.forEach(path => {
                let ref = interfaceRealalization.filter(real => {
-                    return real.target._id == path._id;
+                    return real.target.name == path.name;
                });
                ref.forEach(interfaceReal => {
                     /* Add root object to layout */
