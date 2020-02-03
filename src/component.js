@@ -101,7 +101,7 @@ class Component {
 
                let compositionRef = [];
 
-               this.arrAttRequired = properties.getAttributes();
+               this.arrAttRequired = properties.getRequiredAttributes();
 
 
                /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
@@ -318,7 +318,7 @@ class Component {
 
                let compositionRef = [];
 
-               this.arrAttRequired = properties.getAttributes();
+               this.arrAttRequired = properties.getRequiredAttributes();
 
 
                /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
