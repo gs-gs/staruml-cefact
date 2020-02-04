@@ -1,3 +1,4 @@
+const openAPI = require('./openapi');
 /**
  * @class MainJSON 
  * @description class returns the API MainJSON 
@@ -19,7 +20,11 @@ class MainJSON {
       * @memberof MainJSON
       */
      static saveComponent(component) {
-          MainJSON.mainOpenApiObj.components = component.getComponent();
+          if(openAPI.isModelPackage()){
+               MainJSON.mainOpenApiObj.components = component.getComponent();
+          }else if(openAPI.isModelDiagram()){
+               MainJSON.mainOpenApiObj.components = component.getComponentForDiagram();
+          }
      }
 
      /**
@@ -30,7 +35,11 @@ class MainJSON {
       * @memberof MainJSON
       */
      static addJSONSchema(component) {
-          MainJSON.mainJSONSchemaObject.schema = component.getJSONSchema();
+          if(openAPI.isModelPackage()){
+               MainJSON.mainJSONSchemaObject.schema = component.getJSONSchema();
+          }else if(openAPI.isModelDiagram()){
+               //MainJSON.mainJSONSchemaObject.schema = component.getJSONSchema();
+          }
      }
 
      /**

@@ -1,7 +1,8 @@
+const forEach = require('async-foreach').forEach;
 const openAPI = require('./openapi');
 const constant = require('./constant');
 const utils = require('./utils');
-var diagramEle = require('./diagram/diagramElement');
+const dElement = require('./diagram/dElement');
 
 /**
  * @class Generalization 
@@ -94,14 +95,20 @@ class Generalization {
                let filterGeneral = null;
                if (openAPI.isModelPackage()) {
 
-                    let generalizeClasses = app.repository.select(openAPI.getUMLPackageName() + "::" + objClass.name + "::@UMLGeneralization");
+                    let generalizeClasses = app.repository.select(openAPI.getExportElementName() + "::" + objClass.name + "::@UMLGeneralization");
                     //  let generalizeClasses = app.repository.select("@UMLGeneralization");
                     filterGeneral = generalizeClasses.filter(item => {
                          return item.source._id == objClass._id
                     });
 
                } else if (openAPI.isModelDiagram()) {
-                    let generalizeClasses = diagramEle.getUMLGeneralization();;
+                    let generalizeClassesViews = dElement.getUMLGeneralizationView();
+
+                    let generalizeClasses=[];
+                    forEach(generalizeClassesViews,function(generalizationView){
+                         generalizeClasses.push(generalizationView.model);
+                    });
+
                     filterGeneral = generalizeClasses.filter(item => {
                          return item.source._id == objClass._id
                     });

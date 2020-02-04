@@ -23,7 +23,7 @@ class Properties {
       * @returns {Array}
       * @memberof Properties
       */
-     getAttributes() {
+     getRequiredAttributes() {
           return this.arrAttRequired;
      }
 
@@ -35,28 +35,55 @@ class Properties {
      addProperties() {
           let mainPropertiesObj = {};
           let _this = this;
-          _this.arrAttRequired = [];
-          let propertiesObj = {};
-          let attributes = this.objClass.attributes;
-          forEach(attributes, function (attribute) {
-
-               propertiesObj = {};
-               let filterAttr = _this.arrAttRequired.filter(item => {
-                    return item.name == attribute.name;
+          if(openAPI.isModelDiagram()){
+               _this.arrAttRequired = [];
+               let propertiesObj = {};
+               let attributesView = utils.getVisibleAttributeView(this.objClass);
+               forEach(attributesView, function (attrView) {
+                    let attribute=attrView.model;
+                    propertiesObj = {};
+                    let filterAttr = _this.arrAttRequired.filter(item => {
+                         return item.name == attribute.name;
+                    });
+                    
+                    /* Filter for visible attribute Views from diagram elements (Class & Interface) */
+                    _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
+                    
                });
+          }else{
 
-               /* Filter for visible attribute Views from diagram elements (Class & Interface) */
-               _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
-
-          });
+               _this.arrAttRequired = [];
+               let propertiesObj = {};
+               let attributes = this.objClass.attributes;
+               forEach(attributes, function (attribute) {
+                    
+                    propertiesObj = {};
+                    let filterAttr = _this.arrAttRequired.filter(item => {
+                         return item.name == attribute.name;
+                    });
+                    
+                    /* Filter for visible attribute Views from diagram elements (Class & Interface) */
+                    _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
+                    
+               });
+          }
           return mainPropertiesObj;
      }
      addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute) {
           let _this = this;
+          let aclAssoSideArr=[];
+          if(openAPI.isModelDiagram()){
+               forEach(_this.assocSideClassLink,function(aclView){
+                    aclAssoSideArr.push(aclView.model);
+               });
+          }
+          else{
+               aclAssoSideArr=_this.assocSideClassLink;
+          }
           if (filterAttr.length == 0) {
                _this.arrAttRequired.push(attribute);
 
-               if (_this.assocSideClassLink.length > 0 && attribute.isID) {
+               if (aclAssoSideArr.length > 0 && attribute.isID) {
                     console.log("Skipped classlink : " + _this.objClass.name + " : " + attribute.name);
                } else {
 

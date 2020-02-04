@@ -3,6 +3,8 @@ const notAvailElement = require('./notavailelement');
 const openAPI = require('./openapi');
 const fs = require('fs');
 const constant = require('./constant');
+const dElement = require('../src/diagram/dElement');
+const utils = require('./utils');
 
 /**
  * @description class is general utility class for the whole project
@@ -297,50 +299,133 @@ function getCoreDataType(attrType) {
      return mType
 }
 
+function getVisibleAttributeView(mClassView){
+     let mAttriabuteView = mClassView.attributeCompartment.subViews.filter(function (attrView) {
+          return attrView.visible
+     });
+     return mAttriabuteView;
+}
+
+function getVisibleOperationView(mOperationView){
+     let operationView = mOperationView.operationCompartment.subViews.filter(function (operationView) {
+          return operationView.visible
+     });
+     return operationView;
+}
+
 function getCoreDataTypeAttributeClass(classes) {
      let arrCoreDataTypeAttr = [];
-     forEach(classes, function (mClass) {
-          /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
-          forEach(mClass.attributes, function (attrib) {
 
-               // console.log("1111----type", attrib.type);
-               if (isCoreDataType(attrib.type)) {
-                    let attribType = getCoreDataType(attrib.type);
-                    // console.log("1111----2222----type", type);
+     if (openAPI.isModelDiagram()) {
 
-                    if (isString(attrib.type) && attrib.type === attribType && notAvailElement.isAvailabl(attribType)) {
-                         /* Check and add if attrib type in string and that qualified datatype is available in model */
-                         let srchRes = app.repository.search(attribType);
-                         let srchResult = srchRes.filter(function (element) {
-                              if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
-                              return element.name == attribType;
-                         }
-                         });
-                         if (srchResult.length == 1) {
+          let mClassesView = dElement.getUMLClassView();
+
+          forEach(mClassesView, function (mClassView) {
+               let mAttriabuteView = mClassView.attributeCompartment.subViews.filter(function (attrView) {
+                    return attrView.visible
+               });
+               /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
+               forEach(mAttriabuteView, function (attribView) {
+                    let attrib = attribView.model;
+                    if (isCoreDataType(attrib.type)) {
+                         let attribType = getCoreDataType(attrib.type);
+
+                         if (isString(attrib.type) && attrib.type === attribType && notAvailElement.isAvailabl(attribType)) {
+                              /* Check and add if attrib type in string and that qualified datatype is available in model */
+                              let srchRes = app.repository.search(attribType);
+                              let srchResult = srchRes.filter(function (element) {
+                                   if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
+                                        return element.name == attribType;
+                                   }
+                              });
+                              if (srchResult.length == 1) {
+                                   let result = arrCoreDataTypeAttr.filter(function (item) {
+                                        return item._id == srchResult[0]._id;
+                                   });
+                                   if (result.length == 0) {
+                                        arrCoreDataTypeAttr.push(srchResult[0]);
+                                   }
+                              }
+                         } else if (isString(attrib.type) && attrib.type === attribType && !notAvailElement.isAvailabl(attribType)) {
+                              let str = attrib._parent.name + '/' + attrib.name + ': ' + attrib.type
+                              notAvailElement.addNotAvailableClassOrEnumeInFile(str);
+                         } else if (attrib.type instanceof type.UMLClass && attrib.type.name == attribType) {
+                              /* Check and add if attrib type is reference of UMLClass and available in model */
                               let result = arrCoreDataTypeAttr.filter(function (item) {
-                                   return item._id == srchResult[0]._id;
+                                   return item._id == attrib.type._id;
                               });
                               if (result.length == 0) {
-                                   arrCoreDataTypeAttr.push(srchResult[0]);
+                                   arrCoreDataTypeAttr.push(attrib.type);
                               }
                          }
-                    } else if (isString(attrib.type) && attrib.type === attribType && !notAvailElement.isAvailabl(attribType)) {
-                         let str = attrib._parent.name + '/' + attrib.name + ': ' + attrib.type
-                         notAvailElement.addNotAvailableClassOrEnumeInFile(str);
-                    } else if (attrib.type instanceof type.UMLClass && attrib.type.name == attribType) {
-                         /* Check and add if attrib type is reference of UMLClass and available in model */
-                         let result = arrCoreDataTypeAttr.filter(function (item) {
-                              return item._id == attrib.type._id;
-                         });
-                         if (result.length == 0) {
-                              arrCoreDataTypeAttr.push(attrib.type);
+                    }
+               });
+          });
+     } else {
+          forEach(classes, function (mClass) {
+               /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
+               forEach(mClass.attributes, function (attrib) {
+
+                    // console.log("1111----type", attrib.type);
+                    if (isCoreDataType(attrib.type)) {
+                         let attribType = getCoreDataType(attrib.type);
+                         // console.log("1111----2222----type", type);
+
+                         if (isString(attrib.type) && attrib.type === attribType && notAvailElement.isAvailabl(attribType)) {
+                              /* Check and add if attrib type in string and that qualified datatype is available in model */
+                              let srchRes = app.repository.search(attribType);
+                              let srchResult = srchRes.filter(function (element) {
+                                   if (element instanceof type.UMLClass || element instanceof type.UMLEnumeration) {
+                                        return element.name == attribType;
+                                   }
+                              });
+                              if (srchResult.length == 1) {
+                                   let result = arrCoreDataTypeAttr.filter(function (item) {
+                                        return item._id == srchResult[0]._id;
+                                   });
+                                   if (result.length == 0) {
+                                        arrCoreDataTypeAttr.push(srchResult[0]);
+                                   }
+                              }
+                         } else if (isString(attrib.type) && attrib.type === attribType && !notAvailElement.isAvailabl(attribType)) {
+                              let str = attrib._parent.name + '/' + attrib.name + ': ' + attrib.type
+                              notAvailElement.addNotAvailableClassOrEnumeInFile(str);
+                         } else if (attrib.type instanceof type.UMLClass && attrib.type.name == attribType) {
+                              /* Check and add if attrib type is reference of UMLClass and available in model */
+                              let result = arrCoreDataTypeAttr.filter(function (item) {
+                                   return item._id == attrib.type._id;
+                              });
+                              if (result.length == 0) {
+                                   arrCoreDataTypeAttr.push(attrib.type);
+                              }
                          }
                     }
-               }
+               });
           });
-     });
+     }
      return arrCoreDataTypeAttr;
 }
+function getViewFromCurrentDiagram(element){
+     let mInterfaceViews = app.repository.getViewsOf(element).filter(e =>
+          e.constructor === element.getViewType() &&
+          e._parent instanceof type.UMLClassDiagram &&
+          e._parent.name === openAPI.getExportElement().name
+     );
+     if (mInterfaceViews.length == 1) {
+          return mInterfaceViews[0];
+     }
+     return null;
+}
+function getViewFromOther(element){
+     let elementViews = app.repository.getViewsOf(element).filter(e =>
+          e.constructor === element.getViewType()
+          );
+     if (elementViews.length > 0) {
+          return elementViews[0];
+     }
+     return null;
+}
+module.exports.getViewFromOther = getViewFromOther;
 module.exports.isCoreDataType = isCoreDataType;
 module.exports.getCoreDataType = getCoreDataType;
 module.exports.isString = isString;
@@ -354,3 +439,6 @@ module.exports.buildRequestBody = buildRequestBody;
 module.exports.writeQueryParameters = writeQueryParameters;
 module.exports.getEnumerationLiteral = getEnumerationLiteral;
 module.exports.getCoreDataTypeAttributeClass = getCoreDataTypeAttributeClass;
+module.exports.getVisibleAttributeView = getVisibleAttributeView;
+module.exports.getVisibleOperationView = getVisibleOperationView;
+module.exports.getViewFromCurrentDiagram = getViewFromCurrentDiagram;

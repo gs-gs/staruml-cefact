@@ -13,7 +13,7 @@ const SwaggerParser = require("swagger-parser");
 let parser = new SwaggerParser();
 var forEach = require('async-foreach').forEach;
 const openAPI = require('./openapi');
-const diagramEle = require('./diagram/diagramElement');
+const dElement = require('./diagram/dElement');
 /* var filterAsync = require('node-filter-async'); */
 /**
  * @class OpenApi 
@@ -23,14 +23,14 @@ class OpenApi {
 
      /**
       * @constructor Creates an instance of OpenApi.
-      * @param {UMLPackage} umlPackage
+      * @param {*} exportElement
       * @param {string} basePath
       * @param {Object} options
       * @param {integer} fileType
       * @memberof OpenAPI
       */
-     constructor(umlPackage, basePath, options, fileType) {
-          OpenApi.umlPackage = umlPackage;
+     constructor(exportElement, basePath, options, fileType) {
+          OpenApi.exportElement = exportElement;
           OpenApi.filePath = basePath;
           this.options = options;
           this.schemas = [];
@@ -54,18 +54,24 @@ class OpenApi {
       */
      initUMLPackage() {
           return new Promise((resolve, reject) => {
+               let strType='';
+               if(openAPI.getExportElement() instanceof type.UMLClassDiagram){
+                    strType='Diagram';
+               }else if(openAPI.getExportElement() instanceof type.UMLPackage){
+                    strType='Package';
+               }
                try {
                     try {
                          if (!fs.existsSync(OpenApi.filePath)) {
                               fs.mkdirSync(OpenApi.filePath);
                               resolve({
                                    result: "success",
-                                   message: "Package initialize successfully"
+                                   message: strType+" initialize successfully"
                               })
                          } else {
                               resolve({
                                    result: "success",
-                                   message: "Package initialize successfully"
+                                   message: strType+" initialize successfully"
                               })
                          }
                     } catch (err) {
@@ -91,8 +97,8 @@ class OpenApi {
      getModelElements() {
 
           return new Promise(async (resolve, reject) => {
-               let umlPackage = OpenApi.getUMLPackage();
-               var _pkgName = umlPackage.name
+               let exportElement = OpenApi.getExportElement();
+               var _pkgName = exportElement.name
                let umlClasses = [];
                OpenApi.operations = [];
                let assocCurrentPkg = []
@@ -113,16 +119,34 @@ class OpenApi {
 
                } else if (openAPI.isModelDiagram()) {
                     /* ------------ 1. UMLClass from Diagram ------------ */
-                    umlClasses = diagramEle.getUMLClass();
+
+                     umlClasses = [];
+                    let classesView = dElement.getUMLClassView();
+                    forEach(classesView, function (mView) {
+                         umlClasses.push(mView.model);
+                    });
 
                     /* ------------ 2. UMLInterface from Diagram ------------ */
-                    OpenApi.operations = diagramEle.getUMLInterface();
+                    OpenApi.operations=[];
+                    let umlInterfaceView = dElement.getUMLInterfaceView();
+                    forEach(umlInterfaceView, function (mView) {
+                         OpenApi.operations.push(mView.model);
+                    });
 
                     /* ------------ 3. Association Class from Diagram ------------ */
-                    assocCurrentPkg = diagramEle.getUMLAssociation();
+                    let assocCurrentPkg = [];
+                    let umlAssocView = dElement.getUMLAssociationView();
+                    forEach(umlAssocView, function (mView) {
+                         assocCurrentPkg.push(mView.model);
+                    });
 
                     /* ------------ 4. Generalization Class from Diagram ------------ */
-                    generaCurrentPkg = diagramEle.getUMLGeneralization();
+                    let generaCurrentPkg = [];
+                    let umlGeneraView = dElement.getUMLGeneralizationView();
+                    forEach(umlGeneraView, function (mView) {
+                         generaCurrentPkg.push(mView.model);
+                    });
+
                }
                //TODO do not remove this code. We are leaving this for future
                let tmpAsso = [];
@@ -155,7 +179,7 @@ class OpenApi {
                /* ------------ 5. Find and sort classes ------------ */
                let resArr = OpenApi.findAndSort(umlClasses);
 
-               /* ------------ 5. Check for duplicate classes ------------ */
+               /* ------------ 6. Check for duplicate classes ------------ */
                try {
                     let resultDup = OpenApi.checkForDuplicate(resArr);
                     resolve(resultDup);
@@ -401,20 +425,20 @@ class OpenApi {
      }
 
      /**
-      * @function getUMLPackage
-      * @description returns getUMLPackage
+      * @function getExportElement
+      * @description returns getExportElement
       * @static
-      * @returns {getUMLPackage}
+      * @returns {getExportElement}
       * @memberof OpenApi
       */
-     static getUMLPackage() {
-          return OpenApi.umlPackage;
+     static getExportElement() {
+          return OpenApi.exportElement;
      }
 
-     static getUMLPackageName() {
+     static getExportElementName() {
           return OpenApi.umlPackageName;
      }
-     static setUMLPackageName(pkgName) {
+     static setExportElementName(pkgName) {
           OpenApi.umlPackageName = pkgName;
      }
      /**
@@ -482,9 +506,9 @@ class OpenApi {
 
                let tmpAssociation = [];
                try {
-                    let umlClasses = app.repository.select(OpenApi.getUMLPackageName() + "::@UMLClass");
+                    let umlClasses = app.repository.select(OpenApi.getExportElementName() + "::@UMLClass");
                     forEach(umlClasses, async (objClass, index) => {
-                         let umlAssociation = app.repository.select(OpenApi.getUMLPackageName() + "::" + objClass.name + "::@UMLAssociation");
+                         let umlAssociation = app.repository.select(OpenApi.getExportElementName() + "::" + objClass.name + "::@UMLAssociation");
                          /* console.log(objClass.name,umlAssociation); */
                          if (umlAssociation.length > 0) {
                               umlAssociation.forEach(function (element) {
@@ -517,9 +541,9 @@ class OpenApi {
 
                let tmpGeneralization = [];
                try {
-                    let umlClasses = app.repository.select(OpenApi.getUMLPackageName() + "::@UMLClass");
+                    let umlClasses = app.repository.select(OpenApi.getExportElementName() + "::@UMLClass");
                     forEach(umlClasses, async (objClass, index) => {
-                         let umlGenera = app.repository.select(OpenApi.getUMLPackageName() + "::" + objClass.name + "::@UMLGeneralization");
+                         let umlGenera = app.repository.select(OpenApi.getExportElementName() + "::" + objClass.name + "::@UMLGeneralization");
                          if (umlGenera.length > 0) {
                               umlGenera.forEach(function (element) {
                                    tmpGeneralization.push(element);
@@ -583,11 +607,11 @@ class OpenApi {
       * @returns {Array}
       * @memberof OpenApi
       */
-     static findHierarchy(umlPackage) {
-          OpenApi.pkgPath.push(umlPackage.name);
-          if (umlPackage.hasOwnProperty('_parent') && umlPackage._parent != null && umlPackage._parent instanceof type.UMLPackage) {
+     static findHierarchy(exportElement) {
+          OpenApi.pkgPath.push(exportElement.name);
+          if (exportElement.hasOwnProperty('_parent') && exportElement._parent != null && exportElement._parent instanceof type.UMLPackage) {
 
-               this.findHierarchy(umlPackage._parent);
+               this.findHierarchy(exportElement._parent);
           }
           return OpenApi.pkgPath;
      }
@@ -617,7 +641,7 @@ class OpenApi {
 
                     /* let _this = this;
                     this.resetPackagePath();
-                    let arrPath = OpenApi.findHierarchy(OpenApi.getUMLPackage());
+                    let arrPath = OpenApi.findHierarchy(OpenApi.getExportElement());
                     let rPath = OpenApi.reversePkgPath(arrPath);
                     OpenApi.setPackagepath(rPath); */
 
@@ -628,14 +652,14 @@ class OpenApi {
 
                     if (openAPI.isModelPackage()) {
 
-                         arrPath = OpenApi.findHierarchy(OpenApi.getUMLPackage());
+                         arrPath = OpenApi.findHierarchy(OpenApi.getExportElement());
                          rPath = OpenApi.reversePkgPath(arrPath);
 
                     } else if (openAPI.isModelDiagram()) {
 
-                         let srcRes = app.repository.search(openAPI.getUMLPackageName());
+                         let srcRes = app.repository.search(openAPI.getExportElementName());
                          let fRes = srcRes.filter(function (item) {
-                              return (item instanceof type.UMLClassDiagram && item.name == openAPI.getUMLPackageName());
+                              return (item instanceof type.UMLClassDiagram && item.name == openAPI.getExportElementName());
                          });
                          if (fRes.length == 1) {
                               arrPath = openAPI.findHierarchy(fRes[0]._parent);
@@ -698,8 +722,6 @@ class OpenApi {
                          MainJSON.addComponent(component);
 
                          console.log("-----component-generated-----");
-                         console.log(MainJSON.getJSON());
-                         MainJSON.addJSONSchema(component);
 
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
@@ -844,7 +866,7 @@ function findParentPackage(ele, item) {
      // return new Promise((resolve, reject) => {
 
      if (ele instanceof type.UMLPackage) {
-          if (ele != null && ele.name == 'Movements' /* openAPI.getUMLPackageName() */ ) {
+          if (ele != null && ele.name == 'Movements' /* openAPI.getExportElementName() */ ) {
                // console.log("ele",ele);
                // console.log("item",item);
                filteredAssociation.push(item);
@@ -860,7 +882,7 @@ function findParentPackage(ele, item) {
 module.exports.getFilePath = OpenApi.getPath;
 module.exports.OpenApi = OpenApi;
 module.exports.getClasses = OpenApi.getUniqueClasses;
-module.exports.getUMLPackage = OpenApi.getUMLPackage;
+module.exports.getExportElement = OpenApi.getExportElement;
 module.exports.getPaths = OpenApi.getOperations;
 module.exports.getFileType = OpenApi.getFileType;
 module.exports.getError = OpenApi.getError;
@@ -891,5 +913,5 @@ module.exports.getPackageWiseUMLAssociation = getPackageWiseUMLAssociation;
 module.exports.setPackagepath = OpenApi.setPackagepath;
 module.exports.isModelPackage = OpenApi.isModelPackage;
 module.exports.isModelDiagram = OpenApi.isModelDiagram;
-module.exports.getUMLPackageName = OpenApi.getUMLPackageName;
-module.exports.setUMLPackageName = OpenApi.setUMLPackageName;
+module.exports.getExportElementName = OpenApi.getExportElementName;
+module.exports.setExportElementName = OpenApi.setExportElementName;

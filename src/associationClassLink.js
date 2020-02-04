@@ -1,9 +1,10 @@
+const forEach = require('async-foreach').forEach;
 const utils = require('./utils');
 const Generalization = require('./generalization');
 const Required = require('./required');
 const constant = require('./constant');
 const openAPI = require('./openapi');
-const diagramEle = require('./diagram/diagramElement');
+const dElement = require('./diagram/dElement');
 /**
  * @class AssociationClassLink
  * @description class returns the API AssociationClassLink 
@@ -39,11 +40,19 @@ class AssociationClassLink {
      addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef) {
 
           if (assocClassLink.length > 0) {
-               assocClassLink.forEach(item => {
-                    this.writeAssociationClassProperties(mainPropertiesObj, item, compositionRef);
-                    this.arrAssoc.push(item.classSide);
-               })
+
+               assocClassLink.forEach(aclAssocSideView => {
+                    let classSide = null;
+                    if (openAPI.isModelDiagram()) {
+                         classSide = aclAssocSideView.model.classSide;
+                    } else {
+                         classSide = aclAssocSideView.classSide;
+                    }
+                    this.arrAssoc.push(classSide);
+                    this.writeAssociationClassProperties(mainPropertiesObj, aclAssocSideView.model, compositionRef);
+               });
           }
+
           return mainPropertiesObj;
      }
 
@@ -56,14 +65,11 @@ class AssociationClassLink {
      writeAssociationClassProperties(mainPropertiesObj, associationClass, compositionRef) {
           let propertiesObj = {};
 
-
           if (associationClass != null && associationClass.classSide != null && associationClass.associationSide != null) {
                let associationSide = associationClass.associationSide;
                let classSide = associationClass.classSide;
                let multiplicity = associationSide.end2.multiplicity;
                mainPropertiesObj[classSide.name] = propertiesObj;
-
-
                /* Check and add multiplicity */
                if (multiplicity == "0..*" || multiplicity == "1..*") {
                     /* Add reference of Association Side Schema */
@@ -107,9 +113,6 @@ class AssociationClassLink {
                     objAllOfArry = {};
                     objAllOfArry['type'] = 'object';
                     allOfArray.push(objAllOfArry);
-
-
-
                     propertiesObj.type = 'array';
                     if (associationSide.end2.multiplicity == "1..*") {
                          propertiesObj.minItems = 1;
@@ -157,6 +160,7 @@ class AssociationClassLink {
                }
 
           }
+          /* } */
 
      }
 
@@ -183,12 +187,18 @@ class AssociationClassLink {
                     /* Filter association who is belong to current package */
                     filter = filterAssociation.filter(item => {
                          let parent = item.end1.reference._parent;
-                         return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getUMLPackageName());
+                         return (parent && parent instanceof type.UMLPackage && parent.name == openAPI.getExportElementName());
                     });
 
                } else if (openAPI.isModelDiagram()) {
-                    let dAssociation = null;
-                    dAssociation = diagramEle.getUMLAssociation();
+
+                    let dAssociationViews = dElement.getUMLAssociationView();
+
+                    let dAssociation = [];
+                    forEach(dAssociationViews,function(associationView){
+                         dAssociation.push(associationView.model);
+                    });
+                    
                     filterAssociation = dAssociation.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });
@@ -215,7 +225,7 @@ class AssociationClassLink {
 
 
                try {
-                    let associations = app.repository.select(openAPI.getUMLPackageName() + "::" + objClass.name + "::@UMLAssociation");
+                    let associations = app.repository.select(openAPI.getExportElementName() + "::" + objClass.name + "::@UMLAssociation");
                     let filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });
