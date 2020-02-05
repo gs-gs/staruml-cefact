@@ -54,11 +54,11 @@ class OpenApi {
       */
      initUMLPackage() {
           return new Promise((resolve, reject) => {
-               let strType='';
-               if(openAPI.getExportElement() instanceof type.UMLClassDiagram){
-                    strType='Diagram';
-               }else if(openAPI.getExportElement() instanceof type.UMLPackage){
-                    strType='Package';
+               let strType = '';
+               if (openAPI.getExportElement() instanceof type.UMLClassDiagram) {
+                    strType = 'Diagram';
+               } else if (openAPI.getExportElement() instanceof type.UMLPackage) {
+                    strType = 'Package';
                }
                try {
                     try {
@@ -66,12 +66,12 @@ class OpenApi {
                               fs.mkdirSync(OpenApi.filePath);
                               resolve({
                                    result: "success",
-                                   message: strType+" initialize successfully"
+                                   message: strType + " initialize successfully"
                               })
                          } else {
                               resolve({
                                    result: "success",
-                                   message: strType+" initialize successfully"
+                                   message: strType + " initialize successfully"
                               })
                          }
                     } catch (err) {
@@ -120,20 +120,24 @@ class OpenApi {
                } else if (openAPI.isModelDiagram()) {
                     /* ------------ 1. UMLClass from Diagram ------------ */
 
-                     umlClasses = [];
+                    /* Adds classes */
+                    umlClasses = [];
                     let classesView = dElement.getUMLClassView();
                     forEach(classesView, function (mView) {
                          umlClasses.push(mView.model);
                     });
 
                     /* ------------ 2. UMLInterface from Diagram ------------ */
-                    OpenApi.operations=[];
+
+                    /* Adds interfaces */
+                    OpenApi.operations = [];
                     let umlInterfaceView = dElement.getUMLInterfaceView();
                     forEach(umlInterfaceView, function (mView) {
                          OpenApi.operations.push(mView.model);
                     });
 
                     /* ------------ 3. Association Class from Diagram ------------ */
+
                     let assocCurrentPkg = [];
                     let umlAssocView = dElement.getUMLAssociationView();
                     forEach(umlAssocView, function (mView) {
@@ -141,6 +145,7 @@ class OpenApi {
                     });
 
                     /* ------------ 4. Generalization Class from Diagram ------------ */
+
                     let generaCurrentPkg = [];
                     let umlGeneraView = dElement.getUMLGeneralizationView();
                     forEach(umlGeneraView, function (mView) {
@@ -148,8 +153,8 @@ class OpenApi {
                     });
 
                }
-               //TODO do not remove this code. We are leaving this for future
-               let tmpAsso = [];
+
+               /*  Add identical target class of association  */
                forEach(assocCurrentPkg, (association) => {
                     if (association.end1.reference.name != association.end2.reference.name) {
 
@@ -159,27 +164,27 @@ class OpenApi {
 
                          if (filter.length == 0) {
                               umlClasses.push(association.end2.reference);
-                              tmpAsso.push(association.end2.reference);
                          }
                     }
-               }); 
+               });
 
-               let tmpGen = [];
-               //TODO do not remove this code. We are leaving this for future
+               /*  Add identical target class of generalizatin  */
                forEach(generaCurrentPkg, (generalization) => {
                     let filter = umlClasses.filter(mClass => {
                          return generalization.target.name == mClass.name;
                     });
                     if (filter.length == 0) {
                          umlClasses.push(generalization.target);
-                         tmpGen.push(generalization.target.name);
                     }
-               }); 
+               });
 
                /* ------------ 5. Find and sort classes ------------ */
                let resArr = OpenApi.findAndSort(umlClasses);
 
-               /* ------------ 6. Check for duplicate classes ------------ */
+               /* ------------ 6. Find and sort interfaces ------------ */
+               OpenApi.operations = OpenApi.findAndSort(OpenApi.operations);
+
+               /* ------------ 7. Check for duplicate classes ------------ */
                try {
                     let resultDup = OpenApi.checkForDuplicate(resArr);
                     resolve(resultDup);
@@ -677,7 +682,7 @@ class OpenApi {
 
                          /* Resetting for not available class or enum for Qualified attribute type */
                          notAvailElement.resetNotAvailableClassOrEnumeInFile();
-                         
+
                          MainJSON.addJSONSchema(component);
                          MainJSON.addJSONLayout(component);
                          let generator = new FileGenerator();
