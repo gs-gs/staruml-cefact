@@ -30,20 +30,14 @@ class Paths {
 
           try {
                let paths, interfaceRealalization;
+               paths = openAPI.getPaths();
                if (openAPI.isModelPackage()) {
                     interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
-                    paths = openAPI.getPaths();
                } else if (openAPI.isModelDiagram()) {
                     interfaceRealalization = [];
                     let interfaceRealalizationView = dElement.getUMLInterfaceRealizationView();
                     forEach(interfaceRealalizationView, function (mView) {
                          interfaceRealalization.push(mView.model);
-                    });
-
-                    paths = [];
-                    let umlInterfaceView = dElement.getUMLInterfaceView();
-                    forEach(umlInterfaceView, function (mView) {
-                         paths.push(mView.model);
                     });
                }
 
@@ -58,9 +52,9 @@ class Paths {
                     if (filteredInterfaceRealization.length > 0) {
 
 
-                         let objInterRealization = filteredInterfaceRealization[0];
-                         
-                         
+                         let objInterfaceRealization = filteredInterfaceRealization[0];
+
+
                          let interfaceAssociation = app.repository.select(objInterface.name + "::@UMLAssociation");
                          let filterInterfaceAssociation = interfaceAssociation.filter(item => {
                               return item.end2.aggregation == "composite";
@@ -84,13 +78,12 @@ class Paths {
                               mOperations.forEach(objOperation => {
 
                                    /* Filter for visible operation Views from diagram elements (Interface) */
-
                                    if (objOperation.name.toUpperCase() == "GET") {
-                                        pathsObject.get = this.operations.get(objInterRealization, objOperation);
+                                        pathsObject.get = this.operations.get(objInterfaceRealization, objOperation);
 
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
-                                        pathsObject.post = this.operations.post(objInterRealization, null);
+                                        pathsObject.post = this.operations.post(objInterfaceRealization, null);
 
                                    }
 
@@ -140,22 +133,22 @@ class Paths {
                                              let wOperationObject = {};
                                              if (objOperation.name.toUpperCase() == "GET") {
                                                   pathsObject.get = wOperationObject;
-                                                  pathsObject.get = this.operations.getOperationAttribute(objInterRealization, iAttribute)
+                                                  pathsObject.get = this.operations.getOperationAttribute(objInterfaceRealization, iAttribute)
 
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
-                                                  pathsObject.delete = this.operations.delete(objInterRealization, iAttribute, null, null);
+                                                  pathsObject.delete = this.operations.delete(objInterfaceRealization, iAttribute, null, null);
 
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PUT") {
-                                                  pathsObject.put = this.operations.put(objInterRealization, iAttribute);
+                                                  pathsObject.put = this.operations.put(objInterfaceRealization, iAttribute);
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PATCH") {
-                                                  pathsObject.patch = this.operations.patch(objInterRealization, iAttribute);
+                                                  pathsObject.patch = this.operations.patch(objInterfaceRealization, iAttribute);
 
 
                                              }
@@ -170,7 +163,7 @@ class Paths {
                                    interfaceRelation.forEach(interAsso => {
                                         if (interAsso instanceof type.UMLAssociation) {
                                              if (interAsso.end2.aggregation == "composite") {
-                                                  this.writeInterfaceComposite(objInterRealization, interAsso, mainPathsObject);
+                                                  this.writeInterfaceComposite(objInterfaceRealization, interAsso, mainPathsObject);
                                              }
                                         }
                                    });
