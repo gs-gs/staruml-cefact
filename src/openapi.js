@@ -644,12 +644,6 @@ class OpenApi {
           return new Promise((resolve, reject) => {
                try {
 
-                    /* let _this = this;
-                    this.resetPackagePath();
-                    let arrPath = OpenApi.findHierarchy(OpenApi.getExportElement());
-                    let rPath = OpenApi.reversePkgPath(arrPath);
-                    OpenApi.setPackagepath(rPath); */
-
                     this.resetPackagePath();
 
                     let arrPath = [];
