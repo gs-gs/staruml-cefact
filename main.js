@@ -8,7 +8,6 @@ const title = require('./package.json').title;
 const description = require('./package.json').description;
 let vDialog = null;
 var forEach = require('async-foreach').forEach;
-var diagramEle = require('./src/diagram/diagramElement');
 var dElement = require('./src/diagram/dElement');
 var utils = require('./src/utils');
 
@@ -44,12 +43,10 @@ function genSpecs(umlPackage, options = getGenOptions()) {
                          let valClassDiagram = type.UMLClassDiagram.name;
                          if (varSel == valClassDiagram) {
 
+                              let UMLClassDiagram = returnValue;
                               openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
-                              let tempPackage = diagramEle.filterUMLClassDiagram(returnValue);
-                              let mNewDiagram = diagramEle.createPackage(tempPackage);
-                              console.log(mNewDiagram);
-
-                              fileTypeSelection(mNewDiagram, options);
+                              dElement.filterUMLClassDiagram(UMLClassDiagram);
+                              fileTypeSelection(UMLClassDiagram, options);
 
                          } else if (varSel == valPackagename) {
 
@@ -74,7 +71,7 @@ function genSpecs(umlPackage, options = getGenOptions()) {
  * @function startOpenApiGenerator
  * @description initialize package path directory, gets all element from package, generate openapi from package
  * @param {string} message
- * @param {UMLClassDiagram} tempPackage
+ * @param {UMLClassDiagram} exportElement
  * @param {string} basePath
  * @param {Object} options
  * @param {integer} returnValue
@@ -104,12 +101,6 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
           vDialog.close();
           setTimeout(function () {
                app.dialogs.showErrorDialog(err.message);
-               if (openAPI.isModelDiagram()) {
-                    /* remove temporary created package from model after specs had been generated successfully */
-                    //diagramEle.removeDiagram(tempPackage);
-                    /* delete newaly created element while generating specs from Diagram*/
-                    //diagramEle.deleteNewCreatedElement();
-               }
                console.error("Error getUMLModel", err);
           }, 10);
      }
@@ -121,7 +112,7 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
  * @param {UMLPackage} umljPackage
  * @param {Object} options
  */
-function fileTypeSelection(tempPackage, options) {
+function fileTypeSelection(tempExportElement, options) {
 
      app.dialogs.showSelectDropdownDialog(constant.msg_file_select, constant.fileOptions).then(function ({
           buttonId,
@@ -134,11 +125,11 @@ function fileTypeSelection(tempPackage, options) {
                     setTimeout(function () {
                          let message = '';
                          if (openAPI.isModelPackage()) {
-                              message = "Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' package";
+                              message = "Please wait untill OpenAPI spec generation is being processed for the \'" + tempExportElement.name + "\' package";
                          } else if (openAPI.isModelDiagram()) {
-                              message = "Please wait untill OpenAPI spec generation is being processed for the \'" + tempPackage.name + "\' diagram";
+                              message = "Please wait untill OpenAPI spec generation is being processed for the \'" + tempExportElement.name + "\' diagram";
                          }
-                         startOpenApiGenerator(message, tempPackage, basePath, options, returnValue);
+                         startOpenApiGenerator(message, tempExportElement, basePath, options, returnValue);
                     }, 10);
 
                } else {
@@ -210,12 +201,15 @@ function testSinglePackage() {
                     let valPackagename = type.UMLPackage.name;
                     let valClassDiagram = type.UMLClassDiagram.name;
                     if (varSel == valClassDiagram) {
-                         let UMLClassDiagram=returnValue;
+                         let UMLClassDiagram = returnValue;
                          openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
                          dElement.filterUMLClassDiagram(UMLClassDiagram);
                          let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + UMLClassDiagram.name + "\' diagram";
                          setTimeout(function () {
-                              testSingleOpenAPI(message, UMLClassDiagram);
+                              const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
+                              const options = getGenOptions();
+                              startOpenApiGenerator(message, UMLClassDiagram, basePath, options, 1);
+
                          }, 10);
 
                     } else if (varSel == valPackagename) {
@@ -225,18 +219,16 @@ function testSinglePackage() {
 
                          if (!utils.isEmpty(umlPackage)) {
                               removeOutputFiles();
-
                               let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package";
                               setTimeout(function () {
-                                   testSingleOpenAPI(message, umlPackage);
+                                   const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
+                                   const options = getGenOptions();
+                                   startOpenApiGenerator(message, umlPackage, basePath, options, 1);
                               }, 10);
 
                          } else {
                               app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
                          }
-
-
-
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
                     }
@@ -285,9 +277,8 @@ async function starTestingAllDiagram(diagramList) {
           const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
           const options = getGenOptions();
           openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
-          let tempPackage = diagramEle.filterUMLClassDiagram(mUMLDiagram);
-          let mNewDiagram = diagramEle.createPackage(tempPackage);
-          const mOpenApi = new openAPI.OpenApi(mNewDiagram, basePath, options, 1);
+          dElement.filterUMLClassDiagram(mUMLDiagram);
+          const mOpenApi = new openAPI.OpenApi(mUMLDiagram, basePath, options, 1);
           try {
                let result = await mOpenApi.initUMLPackage()
                console.log("initialize", result);
@@ -295,12 +286,6 @@ async function starTestingAllDiagram(diagramList) {
                console.log("resultElement", resultElement);
                let resultGen = await mOpenApi.generateOpenAPI();
                console.log("resultGen", resultGen);
-               if (resultGen.result == constant.FIELD_SUCCESS) {
-                    /* remove temporary created package from model after specs had been generated successfully */
-                    diagramEle.removeDiagram(tempPackage);
-                    /* delete newaly created element while generating specs from Diagram*/
-                    diagramEle.deleteNewCreatedElement();
-               }
           } catch (err) {
                console.error("Error startTestingAllPackage", err);
                if (openAPI.getError().hasOwnProperty('isDuplicate') && openAPI.getError().isDuplicate == true) {
@@ -309,10 +294,6 @@ async function starTestingAllDiagram(diagramList) {
                     let bindFailureMsg = constant.msgtesterror + strModeType + '\'' + openAPI.getExportElementName() + '\' {' + pkgPath + '}' + '\n' + constant.strerror + openAPI.getError().msg;
                     openAPI.addSummery(bindFailureMsg, 'failure');
                }
-               /* remove temporary created package from model after specs had been generated successfully */
-               diagramEle.removeDiagram(tempPackage);
-               /* delete newaly created element while generating specs from Diagram*/
-               diagramEle.deleteNewCreatedElement();
           }
      }
      vDialog.close();
@@ -392,18 +373,6 @@ async function starTestingAllPackage(pkgList) {
                app.dialogs.showErrorDialog(strSummery);
           }
      }, 10);
-}
-
-/**
- * @function testSingleOpenAPI
- * @params {UMLPackage} umlPackage
- * @description Async function to generate test api 
- * */
-async function testSingleOpenAPI(message, exportElement) {
-
-     const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
-     const options = getGenOptions();
-     startOpenApiGenerator(message, exportElement, basePath, options, 1);
 }
 
 /**
