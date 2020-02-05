@@ -465,4 +465,5 @@ module.exports.getEnumerationLiteral = getEnumerationLiteral;
 module.exports.getCoreDataTypeAttributeClass = getCoreDataTypeAttributeClass;
 module.exports.getVisibleAttributeView = getVisibleAttributeView;
 module.exports.getVisibleOperationView = getVisibleOperationView;
+module.exports.getVisibleLiteralsView = getVisibleLiteralsView;
 module.exports.getViewFromCurrentDiagram = getViewFromCurrentDiagram;

@@ -35,11 +35,7 @@ class MainJSON {
       * @memberof MainJSON
       */
      static addJSONSchema(component) {
-          if(openAPI.isModelPackage()){
-               MainJSON.mainJSONSchemaObject.schema = component.getJSONSchema();
-          }else if(openAPI.isModelDiagram()){
-               //MainJSON.mainJSONSchemaObject.schema = component.getJSONSchema();
-          }
+          MainJSON.mainJSONSchemaObject.schema = component.getJSONSchema();
      }
 
      /**
