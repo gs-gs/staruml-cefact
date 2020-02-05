@@ -133,7 +133,6 @@ function writeQueryParameters(parametersArray, objOperation) {
      }
 }
 
-
 /**
  * @function getEnumerationLiteral
  * @description return Enumeratoin literals
@@ -144,11 +143,27 @@ function writeQueryParameters(parametersArray, objOperation) {
 function getEnumerationLiteral(objEnum) {
      if (objEnum) {
           let result = [];
-          objEnum.literals.forEach(literal => {
-               /* Filter for visible literal Views from diagram elements (Enumeration) */
-               result.push(literal.name);
-          });
-          return (result);
+          let literals = [];
+          if (openAPI.isModelPackage()) {
+               forEach(objEnum.literals, function (literal) {
+                    result.push(literal.name);
+               });
+          } else if (openAPI.isModelDiagram()) {
+               let enumView = getViewFromCurrentDiagram(objEnum);
+               if (enumView) {
+
+                    let literalViews = getVisibleLiteralsView(enumView);
+                    forEach(literalViews, function (literalView) {
+                         literals.push(literalView.model);
+                    });
+                    forEach(literals, function (literal) {
+                         /* Filter for visible literal Views from diagram elements (Enumeration) */
+                         result.push(literal.name);
+                    });
+               }
+
+          }
+          return result;
      }
 }
 
@@ -299,15 +314,22 @@ function getCoreDataType(attrType) {
      return mType
 }
 
-function getVisibleAttributeView(mClassView){
-     let mAttriabuteView = mClassView.attributeCompartment.subViews.filter(function (attrView) {
+function getVisibleAttributeView(elementView) {
+     let mAttriabuteView = elementView.attributeCompartment.subViews.filter(function (attrView) {
           return attrView.visible
      });
      return mAttriabuteView;
 }
 
-function getVisibleOperationView(mOperationView){
-     let operationView = mOperationView.operationCompartment.subViews.filter(function (operationView) {
+function getVisibleLiteralsView(elementView) {
+     let mAttriabuteView = elementView.enumerationLiteralCompartment.subViews.filter(function (attrView) {
+          return attrView.visible
+     });
+     return mAttriabuteView;
+}
+
+function getVisibleOperationView(elementView) {
+     let operationView = elementView.operationCompartment.subViews.filter(function (operationView) {
           return operationView.visible
      });
      return operationView;
@@ -405,7 +427,8 @@ function getCoreDataTypeAttributeClass(classes) {
      }
      return arrCoreDataTypeAttr;
 }
-function getViewFromCurrentDiagram(element){
+
+function getViewFromCurrentDiagram(element) {
      let mInterfaceViews = app.repository.getViewsOf(element).filter(e =>
           e.constructor === element.getViewType() &&
           e._parent instanceof type.UMLClassDiagram &&
@@ -416,10 +439,11 @@ function getViewFromCurrentDiagram(element){
      }
      return null;
 }
-function getViewFromOther(element){
+
+function getViewFromOther(element) {
      let elementViews = app.repository.getViewsOf(element).filter(e =>
           e.constructor === element.getViewType()
-          );
+     );
      if (elementViews.length > 0) {
           return elementViews[0];
      }

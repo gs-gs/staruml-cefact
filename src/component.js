@@ -422,7 +422,7 @@ class Component {
                paths = openAPI.getPaths();
           } else if (openAPI.isModelDiagram()) {
                interfaceRealalization = [];
-               let interfaceRealalizationView=dElement.getUMLInterfaceRealizationView();
+               let interfaceRealalizationView = dElement.getUMLInterfaceRealizationView();
                forEach(interfaceRealalizationView, function (mView) {
                     interfaceRealalization.push(mView.model);
                });
@@ -709,7 +709,18 @@ class Component {
                                    /* Add items array to attribute */
                                    let items = [];
                                    mAttributeObj['items'] = items;
-                                   let literals = attrType.literals;
+                                   let literals = [];
+                                   if (openAPI.isModelPackage()) {
+                                        literals = attrType.literals;
+                                   } else if (openAPI.isModelDiagram()) {
+                                        let enumView = utils.getViewFromCurrentDiagram(objEnum);
+                                        let literalViews = utils.getVisibleLiteralsView(enumView);
+                                        let literals = [];
+                                        forEach(literalViews, function (literalView) {
+                                             literals.push(literalView.model);
+                                        });
+                                   }
+
                                    forEach(literals, function (literal) {
                                         let literalObj = {};
                                         literalObj['key'] = literal.name;

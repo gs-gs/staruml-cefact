@@ -44,7 +44,7 @@ class Paths {
                paths.forEach(objInterface => {
 
                     let mInterfaceView = utils.getViewFromCurrentDiagram(objInterface);
-                    // The interface that will be the target interface of the interface realization will return
+                    // It  will return, The interface that will be the target interface of the interface realization
                     let filteredInterfaceRealization = interfaceRealalization.filter(itemInterfaceRealization => {
                          return itemInterfaceRealization.target.name == objInterface.name;
                     });
