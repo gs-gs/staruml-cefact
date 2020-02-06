@@ -1,3 +1,4 @@
+const nodeUtils=require('util');
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
 const jsonld = require('./src/jsonld/jsonld');
@@ -37,31 +38,34 @@ function genSpecs(umlPackage, options = getGenOptions()) {
                     returnValue
                }) {
                     if (buttonId === "ok") {
-                         openAPI.setExportElementName(returnValue.name);
-                         let varSel = returnValue.getClassName();
+
+                         let exportElement = returnValue;
+                         openAPI.setExportElementName(exportElement.name);
+                         let varSel = exportElement.getClassName();
                          let valPackagename = type.UMLPackage.name;
                          let valClassDiagram = type.UMLClassDiagram.name;
+     
+                         let eleTypeStr='';
                          if (varSel == valClassDiagram) {
-
-                              let UMLClassDiagram = returnValue;
+                              eleTypeStr='diagram'
                               openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
-                              dElement.filterUMLClassDiagram(UMLClassDiagram);
-                              fileTypeSelection(UMLClassDiagram, options);
-
+                              dElement.filterUMLClassDiagram(exportElement);
                          } else if (varSel == valPackagename) {
-
+                              eleTypeStr='package';
                               openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
-                              umlPackage = returnValue;
-
-                              if (!utils.isEmpty(umlPackage)) {
-                                   fileTypeSelection(umlPackage, options);
-                              } else {
-                                   app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
-                              }
-
                          } else {
                               app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
+                              return;
                          }
+     
+                         if (utils.isEmpty(exportElement)) {
+                              let str=nodeUtils.format(constant.PACKAGE_SELECTION_ERROR,eleTypeStr,eleTypeStr);
+                              app.dialogs.showErrorDialog(str);
+                              return;
+                         }
+     
+                         const options = getGenOptions();
+                         fileTypeSelection(umlPackage, options);
                     }
                });
      }
@@ -190,48 +194,44 @@ function testSinglePackage() {
      openAPI.setTestMode(openAPI.TEST_MODE_SINGLE);
      /* Open element picker dialog to pick package */
      app.elementPickerDialog
-          .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) /* type.UMLPackage */
+          .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) 
           .then(function ({
                buttonId,
                returnValue
           }) {
                if (buttonId === "ok") {
-                    openAPI.setExportElementName(returnValue.name);
-                    let varSel = returnValue.getClassName();
+                    let exportElement = returnValue;
+                    openAPI.setExportElementName(exportElement.name);
+                    let varSel = exportElement.getClassName();
                     let valPackagename = type.UMLPackage.name;
                     let valClassDiagram = type.UMLClassDiagram.name;
+
+                    let message = '';
+                    let eleTypeStr='';
                     if (varSel == valClassDiagram) {
-                         let UMLClassDiagram = returnValue;
+                         eleTypeStr='diagram'
                          openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
-                         dElement.filterUMLClassDiagram(UMLClassDiagram);
-                         let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + UMLClassDiagram.name + "\' diagram";
-                         setTimeout(function () {
-                              const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
-                              const options = getGenOptions();
-                              startOpenApiGenerator(message, UMLClassDiagram, basePath, options, 1);
-
-                         }, 10);
-
+                         dElement.filterUMLClassDiagram(exportElement);
+                         message = "Please wait untill OpenAPI spec generation is being tested for the \'" + exportElement.name + "\' diagram";
                     } else if (varSel == valPackagename) {
+                         eleTypeStr='package';
                          openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
-                         umlPackage = returnValue;
-
-
-                         if (!utils.isEmpty(umlPackage)) {
-                              removeOutputFiles();
-                              let message = "Please wait untill OpenAPI spec generation is being tested for the \'" + umlPackage.name + "\' package";
-                              setTimeout(function () {
-                                   const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
-                                   const options = getGenOptions();
-                                   startOpenApiGenerator(message, umlPackage, basePath, options, 1);
-                              }, 10);
-
-                         } else {
-                              app.dialogs.showErrorDialog(constant.PACKAGE_SELECTION_ERROR);
-                         }
+                         removeOutputFiles();
+                         message = "Please wait untill OpenAPI spec generation is being tested for the \'" + exportElement.name + "\' package";
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
+                         return;
                     }
+
+                    if (utils.isEmpty(exportElement)) {
+                         let str=nodeUtils.format(constant.PACKAGE_SELECTION_ERROR,eleTypeStr,eleTypeStr);
+                         app.dialogs.showErrorDialog(str);
+                         return;
+                    }
+
+                    const basePath = __dirname + constant.IDEAL_TEST_FILE_PATH;
+                    const options = getGenOptions();
+                    startOpenApiGenerator(message, exportElement, basePath, options, 1);
                }
           });
 
