@@ -4,7 +4,6 @@ const openAPI = require('./openapi');
 const fs = require('fs');
 const constant = require('./constant');
 const dElement = require('../src/diagram/dElement');
-const utils = require('./utils');
 
 /**
  * @description class is general utility class for the whole project
@@ -173,16 +172,26 @@ function getEnumerationLiteral(objEnum) {
  * @param {*} umlPackage
  * @returns {boolean}
  */
-function isEmpty(umlPackage) {
+function isEmpty(exportElement) {
      let ownedElements = [];
-     umlPackage.ownedElements.filter(function (item) {
-          if (item instanceof type.UMLClass ||
-               item instanceof type.UMLInterface ||
-               item instanceof type.UMLEnumeration) {
+     if (exportElement instanceof type.UMLClassDiagram) {
+          exportElement.ownedViews.filter(function (item) {
+               if (item instanceof type.UMLClassView ||
+                    item instanceof type.UMLInterfaceView ||
+                    item instanceof type.UMLEnumerationView) {
+                    ownedElements.push(item);
+               }
+          });
+     } else if (exportElement instanceof type.UMLPackage) {
+          exportElement.ownedElements.filter(function (item) {
+               if (item instanceof type.UMLClass ||
+                    item instanceof type.UMLInterface ||
+                    item instanceof type.UMLEnumeration) {
+                    ownedElements.push(item);
+               }
+          });
+     }
 
-               ownedElements.push(item);
-          }
-     });
      if (ownedElements.length > 0) {
           return false;
      }
