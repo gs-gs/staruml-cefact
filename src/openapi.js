@@ -669,24 +669,23 @@ class OpenApi {
 
                     if (OpenApi.getFileType() == constant.FILE_TYPE_JSON_SCHEMA) {
 
-                         // Generate JSON-Schema Specification
-
+                         /* Generate JSON-Schema Specification */
                          let component = new Component();
-                         console.log("-----json-schema-generated-----");
 
                          /* Resetting for not available class or enum for Qualified attribute type */
                          notAvailElement.resetNotAvailableClassOrEnumeInFile();
 
+                         /* Add JSONSchema object in JSONSchema */                         
                          MainJSON.addJSONSchema(component);
+
+                         /* Add JSONLayout object in JSONSchema */
                          MainJSON.addJSONLayout(component);
+
+                         /* Generate file after JSONSchema generated */
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
-
                               notAvailElement.showDialogForNotAvailableClassOrEnum();
-                              console.log("-----file-generated-----");
-                              console.log("result-file-generated", fileGenerate);
                               resolve(fileGenerate);
-
                          }).catch(function (err) {
                               reject(err);
                          });
@@ -699,37 +698,30 @@ class OpenApi {
 
                          /*  Add openapi version */
                          MainJSON.addApiVersion('3.0.0');
-                         console.log("-----version-generated");
 
                          /* Add openapi information */
                          let mInfo = new Info();
                          MainJSON.addInfo(mInfo);
-                         console.log("-----info-generated");
 
                          /* Add openapi servers */
                          let server = new Servers();
                          MainJSON.addServers(server);
-                         console.log("-----server-generated");
 
                          /* Add openapi paths */
                          let paths = new Paths();
                          MainJSON.addPaths(paths);
-                         console.log("-----path-generated");
 
                          /* Add openapi component */
                          let component = new Component();
                          MainJSON.addComponent(component);
 
-                         console.log("-----component-generated-----");
-
+                         /* Generate file after OpenAPI specs generated */
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
                               notAvailElement.showDialogForNotAvailableClassOrEnum();
-                              console.log("-----file-generated-----");
-                              console.log("result-file-generated", fileGenerate);
+
+                              /* Validate OpenAPI generated json and alert success or failure according  */
                               generator.validateAndPrompt().then(function (result) {
-                                   console.log("-----validate & prompt-----");
-                                   console.log("result-validate & prompt", result);
                                    resolve(result);
                               }).catch(function (err) {
                                    reject(err);
@@ -834,7 +826,6 @@ let filteredAssociation = [];
 function getPackageWiseUMLAssociation() {
      // new Promise((resolve, reject) => {
 
-     let _this = this;
      let associations = app.repository.select("@UMLAssociation");
      filteredAssociation = [];
      forEach(associations, (item) => {
