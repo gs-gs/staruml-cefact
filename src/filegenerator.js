@@ -120,7 +120,6 @@ class FileGenerator {
       */
      generate() {
           return new Promise((resolve, reject) => {
-               let _this = this;
                try {
                     let fileType = openAPI.getFileType();
 

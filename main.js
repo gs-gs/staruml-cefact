@@ -216,7 +216,6 @@ function testSinglePackage() {
                     } else if (varSel == valPackagename) {
                          eleTypeStr='package';
                          openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
-                         removeOutputFiles();
                          message = "Please wait untill OpenAPI spec generation is being tested for the \'" + exportElement.name + "\' package";
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
