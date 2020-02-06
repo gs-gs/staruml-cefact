@@ -1,3 +1,5 @@
+const forEach = require('async-foreach').forEach;
+const openAPI = require('./openapi');
 const constant = require('./constant');
 const utils = require('./utils')
 /**
@@ -128,21 +130,21 @@ class Operations {
      /**
       * @function put
       * @description returns the object of put method
-      * @param {UMLInterface} objInterface
+      * @param {UMLInterfaceRealization} objInterfaceRealization
       * @param {UMLAttribute} operationAttribute
       * @returns {Object}
       * @memberof Operations
       */
-     put(objInterface, operationAttribute) {
+     put(objInterfaceRealization, operationAttribute) {
           let wOperationObject = {};
 
           let tagsArray = [];
           wOperationObject.tags = tagsArray;
 
-          tagsArray.push(objInterface.target.name);
+          tagsArray.push(objInterfaceRealization.target.name);
 
 
-          wOperationObject.description = 'Update an existing ' + objInterface.source.name;
+          wOperationObject.description = 'Update an existing ' + objInterfaceRealization.source.name;
 
           let parametersArray = [];
           wOperationObject.parameters = parametersArray;
@@ -153,7 +155,23 @@ class Operations {
           objSchema.type = 'string';
 
           utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
-          objInterface.target.attributes.forEach(itemAttribute => {
+
+          let mAttributes = [];
+          if (openAPI.isModelPackage()) {
+               mAttributes = objInterfaceRealization.target.attributes;
+          } else if (openAPI.isModelDiagram()) {
+               let mInterfaceView = utils.getViewFromCurrentDiagram(objInterfaceRealization.target);
+               if (mInterfaceView != null) {
+                    let attributeViews = utils.getVisibleAttributeView(mInterfaceView)
+                    forEach(attributeViews, function (attributeView) {
+                         mAttributes.push(attributeView.model);
+                    });
+               }
+
+          }
+
+          /* objInterfaceRealization.target.attributes */
+          mAttributes.forEach(itemAttribute => {
                let paramsObject = {};
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                     utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
@@ -164,7 +182,7 @@ class Operations {
           let requestBodyObj = {}
           wOperationObject.requestBody = requestBodyObj;
 
-          utils.buildRequestBody(objInterface, requestBodyObj);
+          utils.buildRequestBody(objInterfaceRealization, requestBodyObj);
 
           let resObj = {};
           wOperationObject.responses = resObj;
@@ -182,7 +200,7 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + objInterface.source.name;
+          schemaObj['$ref'] = constant.getReference() + objInterfaceRealization.source.name;
 
           return wOperationObject;
      }
@@ -215,7 +233,23 @@ class Operations {
           objSchema.type = 'string';
 
           utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
-          objInterface.target.attributes.forEach(itemAttribute => {
+
+          let mAttributes = [];
+          if (openAPI.isModelPackage()) {
+               mAttributes = objInterface.target.attributes;
+          } else if (openAPI.isModelDiagram()) {
+               let mInterfaceView = utils.getViewFromCurrentDiagram(objInterface.target);
+               if (mInterfaceView != null) {
+                    let attributeViews = utils.getVisibleAttributeView(mInterfaceView)
+                    forEach(attributeViews, function (attributeView) {
+                         mAttributes.push(attributeView.model);
+                    });
+               }
+
+          }
+
+          /* objInterface.target.attributes */
+          mAttributes.forEach(itemAttribute => {
                let paramsObject = {};
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                     utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
@@ -241,23 +275,23 @@ class Operations {
      /**
       * @function delete
       * @description Returns the object of delete method
-      * @param {UMLInterface} objInterface
-      * @param {UMLAttribute} operationAttribute
+      * @param {UMLInterfaceRealization} objInterfaceRealization
+      * @param {UMLAttribute} iAttribute
       * @param {UMLAssociationEnd} end1Interface
       * @param {UMLAssociationEnd} end2Interface
       * @returns {Object}
       * @memberof Operations
       */
-     delete(objInterface, operationAttribute, end1Interface, end2Interface) {
+     delete(objInterfaceRealization, iAttribute, end1Interface, end2Interface) {
           let wOperationObject = {};
 
           let tagsArray = [];
           wOperationObject.tags = tagsArray;
 
-          tagsArray.push(objInterface.target.name);
+          tagsArray.push(objInterfaceRealization.target.name);
 
 
-          wOperationObject.description = 'Delete an existing ' + objInterface.source.name;
+          wOperationObject.description = 'Delete an existing ' + objInterfaceRealization.source.name;
 
           let parametersArray = [];
           wOperationObject.parameters = parametersArray;
@@ -267,11 +301,11 @@ class Operations {
           let objSchema = {};
           objSchema.type = 'string';
 
-          if (operationAttribute != null && end1Interface == null && end2Interface == null) {
+          if (iAttribute != null && end1Interface == null && end2Interface == null) {
 
-               utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
+               utils.buildParameter(iAttribute.name, "path", (iAttribute.documentation ? utils.buildDescription(iAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
 
-               objInterface.target.attributes.forEach(itemAttribute => {
+               objInterfaceRealization.target.attributes.forEach(itemAttribute => {
                     let paramsObject = {};
                     if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                          utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
@@ -279,7 +313,7 @@ class Operations {
                     }
                });
 
-          } else if (operationAttribute == null && end1Interface != null && end2Interface != null) {
+          } else if (iAttribute == null && end1Interface != null && end2Interface != null) {
 
                utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
 
@@ -303,22 +337,22 @@ class Operations {
      /**
       * @function getOperationAttribute
       * @description returns the attributes object of Operation object
-      * @param {UMLInterface} objInterface
-      * @param {UMLAttribute} operationAttribute
+      * @param {UMLInterfaceRealization} objInterfaceRealization
+      * @param {UMLAttribute} iAttribute
       * @returns {Object}
       * @memberof Operations
       */
-     getOperationAttribute(objInterface, operationAttribute) {
+     getOperationAttribute(objInterfaceRealization, iAttribute) {
           let wOperationObject = {};
 
 
           let tagsArray = [];
           wOperationObject.tags = tagsArray;
 
-          tagsArray.push(objInterface.target.name);
+          tagsArray.push(objInterfaceRealization.target.name);
 
 
-          wOperationObject.description = 'Get single ' + objInterface.source.name + ' by ' + operationAttribute.name;
+          wOperationObject.description = 'Get single ' + objInterfaceRealization.source.name + ' by ' + iAttribute.name;
 
           let parametersArray = [];
           wOperationObject.parameters = parametersArray;
@@ -329,9 +363,22 @@ class Operations {
           let objSchema = {};
           objSchema.type = 'string';
 
-          utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
+          utils.buildParameter(iAttribute.name, "path", (iAttribute.documentation ? utils.buildDescription(iAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
 
-          objInterface.target.attributes.forEach(itemAttribute => {
+          let mAttributes = [];
+          if (openAPI.isModelPackage()) {
+               mAttributes = objInterfaceRealization.target.attributes;
+          } else if (openAPI.isModelDiagram()) {
+               let mInterfaceView = utils.getViewFromCurrentDiagram(objInterfaceRealization.target);
+               if (mInterfaceView != null) {
+                    let attributeViews = utils.getVisibleAttributeView(mInterfaceView)
+                    forEach(attributeViews, function (attributeView) {
+                         mAttributes.push(attributeView.model);
+                    });
+               }
+          }
+          /* objInterfaceRealization.target.attributes */
+          mAttributes.forEach(itemAttribute => {
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                     let paramsObject = {};
                     utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
@@ -356,7 +403,7 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + objInterface.source.name;
+          schemaObj['$ref'] = constant.getReference() + objInterfaceRealization.source.name;
 
           return wOperationObject;
      }

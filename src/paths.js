@@ -1,9 +1,10 @@
+const forEach = require('async-foreach').forEach;
 const utils = require('./utils');
 const openAPI = require('./openapi');
 // const Generalization = require('./generalization');
 const constant = require('./constant');
 const Operations = require('./operations');
-var diagramEle = require('./diagram/diagramElement');
+const dElement = require('./diagram/dElement');
 /**
  * @class Paths
  * @description class returns the Paths
@@ -29,45 +30,62 @@ class Paths {
 
           try {
                let paths, interfaceRealalization;
+               paths = openAPI.getPaths();
                if (openAPI.isModelPackage()) {
                     interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
-                    paths = openAPI.getPaths();
                } else if (openAPI.isModelDiagram()) {
-                    interfaceRealalization = diagramEle.getUMLInterfaceRealization();
-                    paths = diagramEle.getUMLInterface();
+                    interfaceRealalization = [];
+                    let interfaceRealalizationView = dElement.getUMLInterfaceRealizationView();
+                    forEach(interfaceRealalizationView, function (mView) {
+                         interfaceRealalization.push(mView.model);
+                    });
                }
 
                paths.forEach(objInterface => {
 
-                    let filteredInterfaceRealization = interfaceRealalization.filter(itemInterface => {
-                         return itemInterface.target.name == objInterface.name;
+                    /* view of Interface */
+                    let mInterfaceView = utils.getViewFromCurrentDiagram(objInterface);
+
+                    /*  It  will return, The interface that will be the target interface of the interface realization */
+                    let filteredInterfaceRealization = interfaceRealalization.filter(itemInterfaceRealization => {
+                         return itemInterfaceRealization.target.name == objInterface.name;
                     });
 
                     if (filteredInterfaceRealization.length > 0) {
 
 
-                         let objInterRealization = filteredInterfaceRealization[0];
+                         let objInterfaceRealization = filteredInterfaceRealization[0];
 
-                         let interfaceAssociation = app.repository.select(objInterRealization.target.name + "::@UMLAssociation");
+
+                         let interfaceAssociation = app.repository.select(objInterface.name + "::@UMLAssociation");
                          let filterInterfaceAssociation = interfaceAssociation.filter(item => {
                               return item.end2.aggregation == "composite";
                          });
 
                          if (filterInterfaceAssociation.length == 0) {
                               let pathsObject = {};
-                              mainPathsObject["/" + objInterRealization.target.name] = pathsObject;
+                              mainPathsObject["/" + objInterface.name] = pathsObject;
+                              let mOperations = [];
+                              if (openAPI.isModelPackage()) {
+                                   mOperations = objInterface.operations;
+                              } else if (openAPI.isModelDiagram()) {
+                                   if (mInterfaceView != null) {
+                                        let operationViews = utils.getVisibleOperationView(mInterfaceView)
+                                        forEach(operationViews, function (operationView) {
+                                             mOperations.push(operationView.model);
+                                        });
+                                   }
 
-
-                              objInterRealization.target.operations.forEach(objOperation => {
+                              }
+                              mOperations.forEach(objOperation => {
 
                                    /* Filter for visible operation Views from diagram elements (Interface) */
-
                                    if (objOperation.name.toUpperCase() == "GET") {
-                                        pathsObject.get = this.operations.get(objInterRealization, objOperation);
+                                        pathsObject.get = this.operations.get(objInterfaceRealization, objOperation);
 
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
-                                        pathsObject.post = this.operations.post(objInterRealization, null);
+                                        pathsObject.post = this.operations.post(objInterfaceRealization, null);
 
                                    }
 
@@ -75,7 +93,7 @@ class Paths {
 
 
 
-                              let checkOperationArr = objInterRealization.target.operations.filter(item => {
+                              let checkOperationArr = mOperations.filter(item => {
                                    return item.name == "GET" || item.name == "PUT" || item.name == "DELTE";
                               });
 
@@ -83,21 +101,33 @@ class Paths {
                                    let pathsObject = {};
 
 
+                                   let mAttributes = [];
+                                   if (openAPI.isModelPackage()) {
+                                        mAttributes = objInterface.attributes;
+                                   } else if (openAPI.isModelDiagram()) {
+                                        if (mInterfaceView != null) {
+                                             let attributeViews = utils.getVisibleAttributeView(mInterfaceView)
+                                             forEach(attributeViews, function (attributeView) {
+                                                  mAttributes.push(attributeView.model);
+                                             });
+                                        }
+
+                                   }
 
 
 
-                                   let operationAttributes = objInterRealization.target.attributes.filter(item => {
+                                   let interfaceAttributes = /* objInterface.attributes */ mAttributes.filter(item => {
                                         return item.name == "id" || item.name == "identifier";
                                    });
-                                   operationAttributes.forEach(operationAttribute => {
+                                   interfaceAttributes.forEach(iAttribute => {
 
 
                                         /* Filter for visible attribute Views from diagram elements (Class & Interface) */
 
-                                        mainPathsObject["/" + objInterRealization.target.name + '/{' + operationAttribute.name + '}'] = pathsObject
+                                        mainPathsObject["/" + objInterface.name + '/{' + iAttribute.name + '}'] = pathsObject
 
 
-                                        objInterRealization.target.operations.forEach(objOperation => {
+                                        mOperations.forEach(objOperation => {
 
 
                                              /* Filter for visible operation Views from diagram elements (Interface) */
@@ -105,22 +135,22 @@ class Paths {
                                              let wOperationObject = {};
                                              if (objOperation.name.toUpperCase() == "GET") {
                                                   pathsObject.get = wOperationObject;
-                                                  pathsObject.get = this.operations.getOperationAttribute(objInterRealization, operationAttribute)
+                                                  pathsObject.get = this.operations.getOperationAttribute(objInterfaceRealization, iAttribute)
 
 
                                              } else if (objOperation.name.toUpperCase() == "DELETE") {
-                                                  pathsObject.delete = this.operations.delete(objInterRealization, operationAttribute, null, null);
+                                                  pathsObject.delete = this.operations.delete(objInterfaceRealization, iAttribute, null, null);
 
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PUT") {
-                                                  pathsObject.put = this.operations.put(objInterRealization, operationAttribute);
+                                                  pathsObject.put = this.operations.put(objInterfaceRealization, iAttribute);
 
 
 
                                              } else if (objOperation.name.toUpperCase() == "PATCH") {
-                                                  pathsObject.patch = this.operations.patch(objInterRealization, operationAttribute);
+                                                  pathsObject.patch = this.operations.patch(objInterfaceRealization, iAttribute);
 
 
                                              }
@@ -130,12 +160,12 @@ class Paths {
                               }
 
                          } else {
-                              if (objInterRealization.target.ownedElements.length > 0) {
-                                   let interfaceRelation = objInterRealization.target.ownedElements;
+                              if (objInterface.ownedElements.length > 0) {
+                                   let interfaceRelation = objInterface.ownedElements;
                                    interfaceRelation.forEach(interAsso => {
                                         if (interAsso instanceof type.UMLAssociation) {
                                              if (interAsso.end2.aggregation == "composite") {
-                                                  this.writeInterfaceComposite(objInterRealization, interAsso, mainPathsObject);
+                                                  this.writeInterfaceComposite(objInterfaceRealization, interAsso, mainPathsObject);
                                              }
                                         }
                                    });

@@ -173,7 +173,7 @@ let generatedEnumInstance = [];
 function getRdfsClassesArr() {
     generatedEnumInstance = [];
     let rdfsClassArr = [ /* {# classes #} */ ];
-    let mUMLPackage = getUMLPackage();
+    let mUMLPackage = getExportElement();
     let mClasses = mUMLPackage.ownedElements.filter(function (element) {
         return element instanceof type.UMLClass;
     });
@@ -229,7 +229,7 @@ function getParentClasses(mElement) {
 
 function getRdfsInstancesArr() {
     let rdfsInstancesArr = [ /* {# instances #} */ ];
-    let mUMLPackage = getUMLPackage();
+    let mUMLPackage = getExportElement();
     /* //TODO : Do not remove this code 
     let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
 
@@ -282,7 +282,7 @@ function getRdfsInstancesArr() {
  */
 function getRdfsPropertiesArr() {
     let rdfsPropertiesArr = [ /* {# properties #} */ ];
-    let mUMLPackage = getUMLPackage();
+    let mUMLPackage = getExportElement();
 
     let associations = app.repository.select("@UMLAssociation");
 
@@ -426,19 +426,19 @@ function getRange(attr, className) {
 let UMLPackage = null;
 
 /**
- * @function setUMLPackage
+ * @function setExportElement
  * @description save UMLPackage
  */
-function setUMLPackage(mUMLPackage) {
+function setExportElement(mUMLPackage) {
     UMLPackage = mUMLPackage;
 }
 
 /**
- * @function getUMLPackage
+ * @function getExportElement
  * @description return UMLPackage
  * @returns {UMLPackage}
  */
-function getUMLPackage() {
+function getExportElement() {
     return UMLPackage;
 }
 
@@ -447,6 +447,6 @@ function getNotAvailableClassOrEnumeInFile() {
 }
 
 module.exports.generateJSONLD = generateJSONLD;
-module.exports.setUMLPackage = setUMLPackage;
-module.exports.getUMLPackage = getUMLPackage;
+module.exports.setExportElement = setExportElement;
+module.exports.getExportElement = getExportElement;
 module.exports.getNotAvailableClassOrEnumeInFile = getNotAvailableClassOrEnumeInFile;

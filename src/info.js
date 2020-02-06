@@ -12,8 +12,8 @@ class Info {
      constructor() {
           var version = '';
           var description = '';
-          if (openAPI.getUMLPackage().hasOwnProperty('documentation')) {
-               var re = openAPI.getUMLPackage().documentation.split("\n");
+          if (openAPI.getExportElement().hasOwnProperty('documentation')) {
+               var re = openAPI.getExportElement().documentation.split("\n");
                if (re.length >= 1) {
                     var verArr = re[0].split(":")
                     if (verArr.length > 1) {
@@ -26,7 +26,7 @@ class Info {
           }
           this.mainInfoObj = {};
           this.mainInfoObj.description = description;
-          this.mainInfoObj.title = openAPI.getUMLPackageName();
+          this.mainInfoObj.title = openAPI.getExportElementName();
           this.mainInfoObj.version = version;
      }
 

@@ -31,7 +31,6 @@ class Aggregation {
                               if (attrIsID.length > 0) {
                                    parentGeneralizationClassAttribute.push(attrIsID);
                               }
-                              console.log("attrIsID", attrIsID);
                               this.findParentClassAggregationIsID(item.target, parentGeneralizationClassAttribute);
                          }
                     }
