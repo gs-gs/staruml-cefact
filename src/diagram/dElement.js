@@ -1,19 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-const forEach = require('async-foreach').forEach;
-const utils = require('../utils');
-const camelize = require('../../src/camelize');
-const Generalization = require('../generalization');
-const Properties = require('../properties');
-const AssociationClassLink = require('../associationClassLink');
-const Aggregation = require('../aggregation');
-const Composition = require('../composition');
-const Required = require('../required');
-const openAPI = require('../openapi');
-const constant = require('../constant');
-const notAvailElement = require('../notavailelement');
-
-
 let UMLClassView = [];
 let UMLInterfaceView = [];
 let UMLAssociationView = [];
@@ -21,7 +5,6 @@ let UMLGeneralizationView = [];
 let UMLInterfaceRealizationView = [];
 let UMLEnumerationView = [];
 let UMLAssociationClassLinkView = [];
-let AllView = [];
 
 
 
@@ -46,19 +29,19 @@ function filterUMLClassDiagram(UMLClassDiagram) {
             view.visible
     });
 
-    setAllView(allView);
-
-
+    /* Filter all UMLClassView from selected UMLClassDiagram */
     let UMLClassView = allView.filter(function (item) {
         return item instanceof type.UMLClassView;
     });
     setUMLClassView(UMLClassView);
 
+    /* Filter all UMLInterfaceView from selected UMLClassDiagram */
     let UMLInterfaceView = allView.filter(function (item) {
         return item instanceof type.UMLInterfaceView;
     });
     setUMLInterfaceView(UMLInterfaceView);
 
+    /* Filter all UMLEnumerationView from selected UMLClassDiagram */
     let UMLEnumerationView = allView.filter(function (item) {
         return item instanceof type.UMLEnumerationView;
     });
@@ -77,7 +60,6 @@ function filterUMLClassDiagram(UMLClassDiagram) {
     });
     setUMLAssociationView(UMLAssociationView);
 
-
     /* Filter UMLInterfaceRealizationView from model */
     let UMLInterfaceRealizationView = allView.filter(function (dElement) {
         return dElement instanceof type.UMLInterfaceRealizationView
@@ -91,79 +73,6 @@ function filterUMLClassDiagram(UMLClassDiagram) {
     });
     setUMLAssociationClassLinkView(UMLAssociationClassLinkView);
 
-}
-
-
-
-function removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference) {
-
-    /* Find duplicate properties */
-    let tempDupliCheck = [];
-    let uniqueArray = [];
-    compositionRef.forEach(function (comp) {
-         let result = tempDupliCheck.filter(function (item) {
-              return item.sName == comp.sName;
-         });
-         if (result.length == 0) {
-              tempDupliCheck.push(comp);
-         } else {
-              uniqueArray.push(comp);
-         }
-    });
-    console.log("Duplicate reference ", uniqueArray);
-
-    /* Remove 'Ids' character from Schema name so we can delete it from duplicate property */
-    let newUniqueArray = [];
-    uniqueArray.forEach(function (item) {
-         if (item.sName.endsWith("Ids")) {
-              item.sName = item.sName.replace('Ids', '');
-         }
-         newUniqueArray.push(item);
-    });
-    console.log("Duplicate reference : New", newUniqueArray);
-
-    /* Remove duplicate property */
-    newUniqueArray.forEach(function (comp) {
-         if (mainPropertiesObj.hasOwnProperty(comp.sName)) {
-              delete mainPropertiesObj[comp.sName];
-              console.log("deleted duplicate attributes", comp.ref);
-
-              let objTemp = {};
-              objTemp[objClass.name] = comp
-              duplicateDeletedReference.push(objTemp);
-         }
-    });
-}
-
-function setAllView(allView) {
-    AllView = allView;
-}
-/**
- * @function setUMLDiagramElementView
- * @description save & sort all element from UMLClassDiagram 
- * @param {Array} mAllElement
- */
-function setUMLDiagramElementView(mAllElement) {
-
-    /* Filter for visible attribute Views from diagram elements (Class & Interface) */
-    //processVisibleAttributeViews(mAllElement);
-
-    /* Filter for visible literal Views from diagram elements (Enumeration) */
-    // processVisibleLiteralViews(mAllElement);
-
-    /* Filter for visible operation Views from diagram elements (Interface) */
-    // processVisibleOperationViews(mAllElement);
-
-    AllElement = mAllElement;
-}
-
-/**
- * @function getUMLDiagramElementView
- * @description returns all element from UMLClasssDiagram
- * @returns {Array} AllElement
- */
-function getUMLDiagramElementView() {
-    return AllElement;
 }
 
 /**
@@ -312,6 +221,3 @@ module.exports.setUMLEnumerationView = setUMLEnumerationView;
 module.exports.getUMLEnumerationView = getUMLEnumerationView;
 module.exports.setUMLAssociationClassLinkView = setUMLAssociationClassLinkView;
 module.exports.getUMLAssociationClassLinkView = getUMLAssociationClassLinkView;
-module.exports.setUMLDiagramElementView = setUMLDiagramElementView;
-module.exports.getUMLDiagramElementView = getUMLDiagramElementView;
-module.exports.setAllView = setAllView;
