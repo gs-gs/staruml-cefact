@@ -65,7 +65,7 @@ function genSpecs(umlPackage, options = getGenOptions()) {
                          }
      
                          const options = getGenOptions();
-                         fileTypeSelection(umlPackage, options);
+                         fileTypeSelection(exportElement, options);
                     }
                });
      }
