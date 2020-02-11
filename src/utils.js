@@ -217,7 +217,9 @@ function addAttributeType(itemsObj, attr) {
      let starUMLType = attr.type;
      if (starUMLType === 'Numeric') {
           itemsObj.type = 'number';
-     } else if (starUMLType === 'Indicator') {
+     }else if (starUMLType.name === 'Text') {
+          itemsObj.type = 'string';
+     }else if (starUMLType === 'Indicator') {
           itemsObj.type = 'boolean';
      } else if (starUMLType === 'Date') {
           itemsObj.type = 'string';
@@ -255,34 +257,43 @@ function addAttributeType(itemsObj, attr) {
      } else if (starUMLType === 'Quantity') {
           itemsObj.type = 'integer';
      } else if (isCoreDataType(starUMLType)) {
-          /* 
-          let attrType=getCoreDataType(starUMLType);
-          itemsObj['$ref'] = constant.getReference() + attrType;
-           */
+
           /* Added reference in allOf object when attribute type is among the Core Data Type */
 
-
           let attrType = getCoreDataType(starUMLType);
-          let allOfArray = [];
-          itemsObj.allOf = allOfArray;
 
-          /* Adding description */
-          let allOfObject = {};
-          allOfObject['description'] = itemsObj.description;
-          allOfArray.push(allOfObject);
+          if (starUMLType.name === 'Text') {
+               itemsObj.type = 'string';
+          } else if (starUMLType.name === 'DateTime') {
+               itemsObj.type = 'string';
+               itemsObj.format = 'date-time';
+          } else if (starUMLType.name === 'Date') {
+               itemsObj.type = 'string';
+               itemsObj.format = 'date';
+          } else {
 
-          /* Delete description from parent object */
-          delete itemsObj['description']
 
-          /* Adding reference */
-          allOfObject = {};
-          allOfObject['$ref'] = constant.getReference() + attrType;
-          allOfArray.push(allOfObject);
+               let allOfArray = [];
+               itemsObj.allOf = allOfArray;
 
-          /* Adding object field */
-          allOfObject = {};
-          allOfObject.type = 'object';
-          allOfArray.push(allOfObject);
+               /* Adding description */
+               let allOfObject = {};
+               allOfObject['description'] = itemsObj.description;
+               allOfArray.push(allOfObject);
+
+               /* Delete description from parent object */
+               delete itemsObj['description']
+
+               /* Adding reference */
+               allOfObject = {};
+               allOfObject['$ref'] = constant.getReference() + attrType;
+               allOfArray.push(allOfObject);
+
+               /* Adding object field */
+               allOfObject = {};
+               allOfObject.type = 'object';
+               allOfArray.push(allOfObject);
+          }
 
      }
      /* else if (starUMLType instanceof type.UMLClass && starUMLType.name === 'Measure') {
