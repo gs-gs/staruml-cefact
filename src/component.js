@@ -387,11 +387,7 @@ class Component {
                // }
 
           });
-          console.log("mainComponentObj", this.mainComponentObj);
-          console.log("mainComponentObj-length", this.mainComponentObj.schemas.length);
-          console.log("file-generate-started");
-          let basePath = path.join('/home/vi109/Desktop', 'temp.json');
-          fs.writeFileSync(basePath, JSON.stringify(this.mainComponentObj, null, 4));
+          
 
           return this.mainComponentObj;
 
