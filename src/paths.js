@@ -57,12 +57,34 @@ class Paths {
                          let objInterfaceRealization = filteredInterfaceRealization[0];
 
 
-                         let interfaceAssociation = app.repository.select(objInterface.name + "::@UMLAssociation");
+                         /* let interfaceAssociation = app.repository.select(objInterface.name + "::@UMLAssociation");
                          let filterInterfaceAssociation = interfaceAssociation.filter(item => {
                               return item.end2.aggregation == "composite";
+                         }); */
+                         let interfaceAssociation = app.repository.select("@UMLAssociation");
+                         let resFilter = interfaceAssociation.filter(function (item) {
+                              return (item.end1.aggregation == 'none' && item.end1.reference._id == objInterface._id);
                          });
 
-                         if (filterInterfaceAssociation.length == 0) {
+
+                         let filterInterfaceAssociation = resFilter.filter(function (item) {
+                              return item.end2.aggregation == 'composite';
+                         });
+
+                         /* sub-resource pattern #90 */
+                         if (filterInterfaceAssociation.length > 0) {
+                              if (objInterface.ownedElements.length > 0) {
+                                   let interfaceRelation = objInterface.ownedElements;
+                                   console.log("SubResource relationship", interfaceRelation);
+                                   interfaceRelation.forEach(interAsso => {
+                                        if (interAsso instanceof type.UMLAssociation) {
+                                             if (interAsso.end2.aggregation == "composite") {
+                                                  this.writeInterfaceComposite(objInterfaceRealization, interAsso, mainPathsObject);
+                                             }
+                                        }
+                                   });
+                              }
+                         } else if (filterInterfaceAssociation.length == 0) {
                               let pathsObject = {};
                               mainPathsObject["/" + objInterface.name] = pathsObject;
                               let mOperations = [];
@@ -81,7 +103,8 @@ class Paths {
 
                                    /* Filter for visible operation Views from diagram elements (Interface) */
                                    if (objOperation.name.toUpperCase() == "GET") {
-                                        pathsObject.get = this.operations.get(objInterfaceRealization, objOperation);
+                                        console.log("----test---1");
+                                        pathsObject.get = this.operations.get(mainPathsObject, objInterfaceRealization, objOperation);
 
 
                                    } else if (objOperation.name.toUpperCase() == "POST") {
@@ -135,6 +158,7 @@ class Paths {
                                              let wOperationObject = {};
                                              if (objOperation.name.toUpperCase() == "GET") {
                                                   pathsObject.get = wOperationObject;
+                                                  console.log("----test---2");
                                                   pathsObject.get = this.operations.getOperationAttribute(objInterfaceRealization, iAttribute)
 
 
@@ -159,17 +183,6 @@ class Paths {
                                    });
                               }
 
-                         } else {
-                              if (objInterface.ownedElements.length > 0) {
-                                   let interfaceRelation = objInterface.ownedElements;
-                                   interfaceRelation.forEach(interAsso => {
-                                        if (interAsso instanceof type.UMLAssociation) {
-                                             if (interAsso.end2.aggregation == "composite") {
-                                                  this.writeInterfaceComposite(objInterfaceRealization, interAsso, mainPathsObject);
-                                             }
-                                        }
-                                   });
-                              }
                          }
 
                     }
@@ -193,18 +206,19 @@ class Paths {
      writeInterfaceComposite(interfaceRealization, interfaceAssociation, mainPathsObject) {
           try {
 
-               let end1Interface = interfaceAssociation.end1;
-               let end2Interface = interfaceAssociation.end2;
-               let pathsObject = {};
-               interfaceRealization.target.operations.forEach(objOperation => {
 
+               let end1Interface = interfaceAssociation.end1; //source example : imprtDeclarations
+               let end2Interface = interfaceAssociation.end2; //target : CargoLines
+               interfaceRealization.target.operations.forEach(objOperation => {
+                    console.log("interfaceRealization", objOperation);
                     /* Filter for visible operation Views from diagram elements (Interface) */
 
 
+                    let pathsObject = {};
                     let wOperationObject = {};
                     if (objOperation.name.toUpperCase() == "GET") {
+                         // for CargoLines (GET) : "/CargoLines/{CargoLines_id}/ImportDeclarations"
                          let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
-
                          mainPathsObject[mICPath] = pathsObject;
                          /* Get all list */
 
@@ -226,7 +240,9 @@ class Paths {
                          let objSchema = {};
                          objSchema.type = 'string';
 
-                         utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
+                         let name = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
+                         let description = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description");
+                         utils.buildParameter(name, "path", description, true, objSchema, paramsObject);
 
                          let responsesObj = {};
                          wOperationObject.responses = responsesObj;
@@ -246,12 +262,17 @@ class Paths {
                          appJsonObj.schema = schemaObj;
 
 
-                         let itemsArray = [];
+                         /* let itemsArray = [];
                          schemaObj.items = itemsArray;
                          let itemsObj = {};
                          itemsArray.push(itemsObj);
                          itemsObj['$ref'] = constant.getReference() + interfaceRealization.source.name;
-                         schemaObj.type = 'array';
+                         schemaObj.type = 'array'; */
+
+                         let itemsObject = {};
+                         schemaObj.items = itemsObject;
+                         itemsObject['$ref'] = constant.getReference() + interfaceRealization.source.name;
+                         schemaObj.type = 'object';
 
 
 
@@ -275,17 +296,36 @@ class Paths {
 
                          let parametersSingleArray = [];
                          wOperationSingleObject.parameters = parametersSingleArray;
+
+                         /* -------- Add parameters body 1 -------- */
                          let paramsSingleObject = {};
                          parametersSingleArray.push(paramsSingleObject);
 
                          let objSingleSchema = {};
                          objSingleSchema.type = 'string';
 
-                         utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, "{type: string}")
-                         utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSingleSchema, paramsSingleObject)
+                         let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
+                         let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description");
+                         utils.buildParameter(name1, "path", description1, true, objSingleSchema, paramsSingleObject);
 
+                         /* -------- Add parameters body 2 -------- */
+
+                         paramsSingleObject = {};
+                         parametersSingleArray.push(paramsSingleObject);
+
+                         objSingleSchema = {};
+                         objSingleSchema.type = 'string';
+
+                         let name2 = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
+                         let description2 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description");
+                         utils.buildParameter(name2, "path", description2, true, objSingleSchema, paramsSingleObject);
+
+
+                         /* -------- Add response body -------- */
+                         let responsesSingleObj = {};
                          wOperationSingleObject.responses = responsesSingleObj;
 
+                         let ok200SingleResOjb = {};
                          responsesSingleObj['200'] = ok200SingleResOjb;
 
                          ok200SingleResOjb.description = 'OK';
@@ -305,7 +345,6 @@ class Paths {
 
 
                     } else if (objOperation.name.toUpperCase() == "POST") {
-
                          let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
 
                          mainPathsObject[mICPath] = pathsObject;

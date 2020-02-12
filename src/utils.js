@@ -60,6 +60,9 @@ function buildDescription(desc) {
  */
 function buildParameter(name, type, description, required, schema, paramsObject) {
 
+     if(paramsObject==null){
+          return;
+     }
 
      paramsObject.name = name;
      paramsObject.in = type;
@@ -317,8 +320,8 @@ function isCoreDataType(attrType) {
      } else if (attrType instanceof type.UMLClass) {
           mType = attrType.name;
      }
-     if (mType === 'Measure' || mType === 'Text' || mType === 'Binary' || mType === 'Amount' ||
-          mType === 'Numeric' || mType === 'Identifier' || mType === 'Code' || mType === 'Indicator' || mType === 'DateTime') {
+     if (mType === 'Measure' /* || mType === 'Text' */ || mType === 'Binary' || mType === 'Amount' ||
+          mType === 'Numeric' || mType === 'Identifier' || mType === 'Code' || mType === 'Indicator' /* || mType === 'DateTime' */) {
           return true;
      }
      return false;
