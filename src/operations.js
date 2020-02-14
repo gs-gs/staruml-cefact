@@ -17,6 +17,7 @@ class Operations {
      /**
       * @function get
       * @description returns the object of get method
+      * @param {Object} mainPathsObject 
       * @param {UMLInterface} objInterface 
       * @param {objOperation} objOperation
       * @returns {Object} 

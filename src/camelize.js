@@ -1,4 +1,8 @@
-// util function to convert the input to string type
+/**
+ * @function convertToString
+ * @param {string} input
+ * @description util function to convert the input to string type
+ */
 function convertToString(input) {
 
     if (input) {
@@ -13,8 +17,11 @@ function convertToString(input) {
     return '';
 }
 
-
-// convert string to words
+/**
+ * @function toWords
+ * @param {string} input
+ * @description convert string to words
+ */
 function toWords(input) {
 
     input = convertToString(input);
@@ -25,8 +32,11 @@ function toWords(input) {
 
 }
 
-
-// convert the input array to camel case
+/**
+ * @function toCamelCase
+ * @param {Array} inputArray
+ * @description convert the input array to camel case
+ */
 function toCamelCase(inputArray) {
 
     let result = "";
@@ -51,9 +61,11 @@ function toCamelCase(inputArray) {
     return result;
 }
 
-
-// this function call all other functions
-
+/**
+ * @function toCamelCaseString
+ * @param {string} input
+ * @description this function call all other functions
+ */
 function toCamelCaseString(input) {
 
     let words = toWords(input);

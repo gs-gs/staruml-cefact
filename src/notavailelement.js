@@ -1,15 +1,28 @@
 var forEach = require('async-foreach').forEach;
 
 var notAvailableClassOrEnumeInFile = [];
-
+/**
+ * @function resetNotAvailableClassOrEnumeInFile
+ * @description reset not available classes which is referenced in attribute type
+ */
 function resetNotAvailableClassOrEnumeInFile() {
      notAvailableClassOrEnumeInFile = [];
 }
 
+/**
+ * @function getNotAvailableClassOrEnumeInFile
+ * @description returns array of not available classes which is referenced in attribute type
+ * @returns {Array}
+ */
 function getNotAvailableClassOrEnumeInFile() {
      return notAvailableClassOrEnumeInFile;
 }
 
+/**
+ * @function showDialogForNotAvailableClassOrEnum
+ * @description display alert dialog if not available classes 
+ * @returns {Array}
+ */
 function showDialogForNotAvailableClassOrEnum() {
      let notAvailElement = getNotAvailableClassOrEnumeInFile();
      if (notAvailElement.length > 0) {
@@ -22,6 +35,11 @@ function showDialogForNotAvailableClassOrEnum() {
      }
 }
 
+/**
+ * @function addNotAvailableClassOrEnumeInFile
+ * @param (string) str
+ * @description add not available classes
+ */
 function addNotAvailableClassOrEnumeInFile(str) {
      /* check and avoid inserting duplicate msg  */
      let result = notAvailableClassOrEnumeInFile.filter(function (msg) {
@@ -33,6 +51,13 @@ function addNotAvailableClassOrEnumeInFile(str) {
      notAvailableClassOrEnumeInFile.push(str);
 }
 
+/**
+ * @function checkAndaddNotAvailableClassOrEnumeInFile
+ * @param {string} className
+ * @param {UMLAttribute} attr
+ * @param {string} attributeType
+ * @description add not available classes
+ */
 function checkAndaddNotAvailableClassOrEnumeInFile(className, attr, attributeType) {
      let srchRes = app.repository.search(attributeType);
      let result = srchRes.filter(function (element) {
@@ -47,6 +72,12 @@ function checkAndaddNotAvailableClassOrEnumeInFile(className, attr, attributeTyp
 
 }
 
+/**
+ * @function isAvailable
+ * @param {string} className
+ * @description check that UMLClass or UMLEnumeration available of name like className. If element available return true or false
+ * @returns {boolean} 
+ */
 function isAvailable(className) {
      let srchRes = app.repository.search(className);
      let result = srchRes.filter(function (element) {

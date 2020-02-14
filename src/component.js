@@ -37,7 +37,7 @@ class Component {
 
      /**
       * @function getComponent
-      * @description Returns component object 
+      * @description Returns component object of selected UMLPackage
       * @returns {Object}
       * @memberof Component
       */
@@ -213,7 +213,12 @@ class Component {
           console.log("Total duplicate deleted reference", duplicateDeletedReference);
           return this.mainComponentObj;
      }
-
+     /**
+      * @function getComponentForDiagram
+      * @description Returns component object of selecte UMLClassDiagram
+      * @returns {Object}
+      * @memberof Component
+      */
      getComponentForDiagram() {
           let mClassesView, mAssoClassLinkView;
           mClassesView = dElement.getUMLClassView();
@@ -448,6 +453,12 @@ class Component {
           return mainSchemaObj;
      }
 
+     /**
+      * @function getJSONSchema
+      * @description Returns component object 
+      * @returns {Object}
+      * @memberof Component
+      */
      getJSONLayout() {
           let _this = this;
           let layout = [];
@@ -554,6 +565,13 @@ class Component {
           return layout;
      }
 
+     /**
+      * @function findAllInheritedClassesByGeneralization
+      * @description find recursively inherited classes by generalization
+      * @returns {Array} allInheritedClasses
+      * @returns {UMLClass} target
+      * @memberof Component
+      */
      findAllInheritedClassesByGeneralization(allInheritedClasses, target) {
           let _this = this;
           let result = app.repository.select(target.name + '::@UMLGeneralization');
@@ -563,6 +581,15 @@ class Component {
           });
      }
 
+     /**
+      * @function removeDuplicatePropertyOfRefs
+      * @description remove duplicate property of references
+      * @returns {Array} allInheritedClasses
+      * @returns {Object} mainPropertiesObj
+      * @returns {UMLClass} objClass
+      * @returns {Array} duplicateDeletedReference 
+      * @memberof Component
+      */
      removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference) {
 
           /* Find duplicate properties */
