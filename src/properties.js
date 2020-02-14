@@ -69,6 +69,16 @@ class Properties {
           }
           return mainPropertiesObj;
      }
+
+     /**
+      * @function addPropData
+      * @description Adds property data like multiplicity, attribute typ etc to mainPropertiesObject
+      * @param {Array} filterAttr
+      * @param {Object} mainPropertiesObj
+      * @param {Object} propertiesObj
+      * @param {UMLAttribute} attribute
+      * @memberof Properties
+      */
      addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute) {
           let _this = this;
           let aclAssoSideArr=[];

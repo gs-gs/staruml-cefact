@@ -301,6 +301,13 @@ function addAttributeType(itemsObj, attr) {
      }
 }
 
+/**
+ * @function isCoreDataType
+ * @description check attrType is coretype or not. If it is core data type then returns true else false
+ * @param {Object} attrType 
+ * @returns {boolean}
+ * @memberof Utils
+ */
 function isCoreDataType(attrType) {
      let mType = '';
      if (isString(attrType)) {
@@ -315,6 +322,13 @@ function isCoreDataType(attrType) {
      return false;
 }
 
+/**
+ * @function getCoreDataType
+ * @description return core type
+ * @param {Object} attrType 
+ * @returns {Object}
+ * @memberof Utils
+ */
 function getCoreDataType(attrType) {
      let mType = '';
      if (isString(attrType)) {
@@ -325,6 +339,13 @@ function getCoreDataType(attrType) {
      return mType
 }
 
+/**
+ * @function getVisibleAttributeView
+ * @description find and returns all attributeviews of specified element
+ * @param {Object} elementView 
+ * @returns {Array}
+ * @memberof Utils
+ */
 function getVisibleAttributeView(elementView) {
      let mAttriabuteView = elementView.attributeCompartment.subViews.filter(function (attrView) {
           return attrView.visible
@@ -332,6 +353,13 @@ function getVisibleAttributeView(elementView) {
      return mAttriabuteView;
 }
 
+/**
+ * @function getVisibleLiteralsView
+ * @description find and returns all literalviews of specified element
+ * @param {Object} elementView 
+ * @returns {Array}
+ * @memberof Utils
+ */
 function getVisibleLiteralsView(elementView) {
      let mAttriabuteView = elementView.enumerationLiteralCompartment.subViews.filter(function (attrView) {
           return attrView.visible
@@ -339,6 +367,13 @@ function getVisibleLiteralsView(elementView) {
      return mAttriabuteView;
 }
 
+/**
+ * @function getVisibleOperationView
+ * @description find and returns all operationviews of specified element
+ * @param {Object} elementView 
+ * @returns {Array}
+ * @memberof Utils
+ */
 function getVisibleOperationView(elementView) {
      let operationView = elementView.operationCompartment.subViews.filter(function (operationView) {
           return operationView.visible
@@ -346,6 +381,13 @@ function getVisibleOperationView(elementView) {
      return operationView;
 }
 
+/**
+ * @function getCoreDataTypeAttributeClass
+ * @description find and returns list of classes that of CoreTypes
+ * @param {Object} classes 
+ * @returns {Array}
+ * @memberof Utils
+ */
 function getCoreDataTypeAttributeClass(classes) {
      let arrCoreDataTypeAttr = [];
 
@@ -439,6 +481,13 @@ function getCoreDataTypeAttributeClass(classes) {
      return arrCoreDataTypeAttr;
 }
 
+/**
+ * @function getViewFromCurrentDiagram
+ * @description find and returns view of specified element of current selected diagram
+ * @param {Object} element 
+ * @returns {Object}
+ * @memberof Utils
+ */
 function getViewFromCurrentDiagram(element) {
      let mInterfaceViews = app.repository.getViewsOf(element).filter(e =>
           e.constructor === element.getViewType() &&
@@ -451,6 +500,13 @@ function getViewFromCurrentDiagram(element) {
      return null;
 }
 
+/**
+ * @function getViewFromOther
+ * @description find and returns view of specified element from the whole project
+ * @param {Object} element 
+ * @returns {Object}
+ * @memberof Utils
+ */
 function getViewFromOther(element) {
      let elementViews = app.repository.getViewsOf(element).filter(e =>
           e.constructor === element.getViewType()
