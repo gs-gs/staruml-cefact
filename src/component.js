@@ -60,7 +60,8 @@ class Component {
                forEach(notAvailEle, function (item) {
                     dlgMessage += '\n' + item;
                });
-               throw new Error(dlgMessage);
+               // throw new Error(dlgMessage);
+               app.dialogs.showAlertDialog(dlgMessage);
           }
 
           /* Combine classes and classes that class's attribute type is Core Data Type */
