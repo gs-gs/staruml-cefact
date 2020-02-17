@@ -68,7 +68,7 @@ class Paths {
           try {
                let paths, interfaceRealalization;
                paths = openAPI.getPaths();
-               interfaceRealalization=utils.fetchUMLInterfaceRealization();
+               interfaceRealalization = utils.fetchUMLInterfaceRealization();
 
                /* Get list of sub-resource  */
                let subResources = this.getSubResources(paths);
@@ -177,11 +177,11 @@ class Paths {
      writeSimplePathObject(pathsObject, mOperations, mainPathsObject, objInterfaceRealization) {
           mOperations.forEach(objOperation => {
 
-               if (objOperation.name.toUpperCase() == "GET") {
+               if (objOperation.name.toUpperCase() == constant.GET) {
                     pathsObject.get = this.operations.get(mainPathsObject, objInterfaceRealization, objOperation);
 
 
-               } else if (objOperation.name.toUpperCase() == "POST") {
+               } else if (objOperation.name.toUpperCase() == constant.POST) {
                     pathsObject.post = this.operations.post(objInterfaceRealization, null);
 
                }
@@ -201,7 +201,7 @@ class Paths {
       */
      writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization) {
           let checkOperationArr = mOperations.filter(item => {
-               return item.name == "GET" || item.name == "PUT" || item.name == "DELTE";
+               return item.name == constant.GET || item.name == constant.PUT || item.name == constant.DELETE;
           });
 
           if (checkOperationArr.length > 0) {
@@ -239,18 +239,15 @@ class Paths {
                          /* Filter for visible operation Views from diagram elements (Interface) */
 
                          let wOperationObject = {};
-                         if (objOperation.name.toUpperCase() == "GET") {
+                         if (objOperation.name.toUpperCase() == constant.GET) {
                               pathsObject.get = wOperationObject;
                               pathsObject.get = this.operations.getOperationAttribute(objInterfaceRealization, iAttribute)
-                         } else if (objOperation.name.toUpperCase() == "DELETE") {
+                         } else if (objOperation.name.toUpperCase() == constant.DELETE) {
                               pathsObject.delete = this.operations.delete(objInterfaceRealization, iAttribute, null, null);
-                         } else if (objOperation.name.toUpperCase() == "PUT") {
+                         } else if (objOperation.name.toUpperCase() == constant.PUT) {
                               pathsObject.put = this.operations.put(objInterfaceRealization, iAttribute);
-
-                         } else if (objOperation.name.toUpperCase() == "PATCH") {
+                         } else if (objOperation.name.toUpperCase() == constant.PATCH) {
                               pathsObject.patch = this.operations.patch(objInterfaceRealization, iAttribute);
-
-
                          }
                     });
 
@@ -299,13 +296,12 @@ class Paths {
                let end1Interface = interfaceAssociation.end1; //source example : imprtDeclarations
                let end2Interface = interfaceAssociation.end2; //target : CargoLines
                interfaceRealization.target.operations.forEach(objOperation => {
-                    console.log("interfaceRealization", objOperation);
                     /* Filter for visible operation Views from diagram elements (Interface) */
 
 
                     let pathsObject = {};
                     let wOperationObject = {};
-                    if (objOperation.name.toUpperCase() == "GET") {
+                    if (objOperation.name.toUpperCase() == constant.GET) {
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
                          // let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
                          //test
@@ -443,7 +439,7 @@ class Paths {
 
 
 
-                    } else if (objOperation.name.toUpperCase() == "POST") {
+                    } else if (objOperation.name.toUpperCase() == constant.POST) {
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
                          //   let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
 
@@ -457,7 +453,7 @@ class Paths {
                          pathsObject.post = this.operations.post(interfaceRealization, end1Interface);
 
 
-                    } else if (objOperation.name.toUpperCase() == "DELETE") {
+                    } else if (objOperation.name.toUpperCase() == constant.DELETE) {
 
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
                          //   let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
@@ -469,7 +465,7 @@ class Paths {
 
                          pathsObject.delete = this.operations.delete(interfaceRealization, null, end1Interface, end1Interface);
 
-                    } else if (objOperation.name.toUpperCase() == "PUT") {
+                    } else if (objOperation.name.toUpperCase() == constant.PUT) {
 
 
                          /* Get single element record */

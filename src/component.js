@@ -141,17 +141,12 @@ class Component {
                          if (assoc.end1.aggregation == constant.shared) {
                               /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
                               let aggregation = new Aggregation(this.arrAttRequired);
-                              console.log("Classname", objClass.name);
                               mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
 
                          } else {
                               /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
                               let composition = new Composition(this.arrAttRequired);
-                              console.log("Classname", objClass.name);
                               mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
-                              // if(objClass.name == 'Logistics_TransportMovement' ){
-                              //      console.log("inner");
-                              // }
 
                          }
                     } else if (assoc instanceof type.UMLGeneralization) {
@@ -203,8 +198,6 @@ class Component {
                          arrIdClasses.push(itemClass)
                     }
                });
-               // if(objClass.name == 'Logistics_TransportMovement' ){
-               console.log("compositionRef", compositionRef);
                /* Remove property which is already in ref of other property in the same schema */
                this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
 
@@ -248,7 +241,6 @@ class Component {
                let view = utils.getViewFromOther(coreTypeElement);
                if (view != null) {
                     coreTypeViews.push(view);
-                    console.log("views", view);
                }
           });
           mClassesView = mClassesView.concat(coreTypeViews);
@@ -292,11 +284,10 @@ class Component {
 
                /* Get generalization of class */
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
+               
                let aggregationClasses = [];
+               /* Get association class link of class */
                let classAssociations = this.associationClassLink.getAssociationOfClass(objClass);
-
-               console.log("classAssociations", classAssociations);
-               console.log("mainPropertiesObj", mainPropertiesObj);
 
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
@@ -325,17 +316,12 @@ class Component {
                          if (assoc.end1.aggregation == constant.shared) {
                               /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
                               let aggregation = new Aggregation(arrAttRequired);
-                              console.log("Classname", objClass.name);
                               mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
 
                          } else {
                               /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
                               let composition = new Composition(arrAttRequired);
-                              console.log("Classname", objClass.name);
                               mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
-                              // if(objClass.name == 'Logistics_TransportMovement' ){
-                              //      console.log("inner");
-                              // }
 
                          }
                     } else if (assoc instanceof type.UMLGeneralization) {
@@ -386,13 +372,8 @@ class Component {
                          arrIdClasses.push(itemClass)
                     }
                });
-               // if(objClass.name == 'Logistics_TransportMovement' ){
-               console.log("compositionRef", compositionRef);
                /* Remove property which is already in ref of other property in the same schema */
                this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
-
-               // }
-
           });
           
 
@@ -591,7 +572,6 @@ class Component {
                     uniqueArray.push(comp);
                }
           });
-          console.log("Duplicate reference ", uniqueArray);
 
           /* Remove 'Ids' character from Schema name so we can delete it from duplicate property */
           let newUniqueArray = [];
@@ -601,7 +581,6 @@ class Component {
                }
                newUniqueArray.push(item);
           });
-          console.log("Duplicate reference : New", newUniqueArray);
 
           /* Remove duplicate property */
           newUniqueArray.forEach(function (comp) {

@@ -3,6 +3,11 @@ const reponame = require('../package.json').name
 const openAPI = require('./openapi');
 const Constant = {
      entry: '#',
+     GET: 'GET',
+     POST: 'POST',
+     PUT: 'PUT',
+     DELETE: 'DELETE',
+     PATCH: 'PATCH',
      components: 'components',
      schemas: 'schemas',
      path: '/',

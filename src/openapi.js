@@ -824,26 +824,13 @@ let filteredAssociation = [];
  * @returns {Array}
  */
 function getPackageWiseUMLAssociation() {
-     // new Promise((resolve, reject) => {
 
      let associations = app.repository.select("@UMLAssociation");
      filteredAssociation = [];
      forEach(associations, (item) => {
-          // var clonedElement = Object.assign(item, item);
-          // var clonedItem = Object.assign(item, item);
-
-          // var copyObject=copy(item);
           findParentPackage(item, item);
-          // let mItem = findParentPackage(item,item);
-          /* console.log("mItem", mItem);
-          if(mItem!=null){
-               filteredAssociation.push(mPkg);
-          } */
-
      });
-     // resolve(filteredAssociation);
      return filteredAssociation;
-     // });
 }
 
 /**
@@ -856,14 +843,10 @@ function findParentPackage(ele, item) {
      // return new Promise((resolve, reject) => {
 
      if (ele instanceof type.UMLPackage) {
-          if (ele != null && ele.name == 'Movements' /* openAPI.getExportElementName() */ ) {
-               // console.log("ele",ele);
-               // console.log("item",item);
+          if (ele != null && ele.name == openAPI.getExportElementName()) {
                filteredAssociation.push(item);
-               // return item;
           }
 
-          // resolve(assocItem);
      } else if (ele.hasOwnProperty('_parent') && ele._parent != null) {
           findParentPackage(ele._parent, item);
      }
