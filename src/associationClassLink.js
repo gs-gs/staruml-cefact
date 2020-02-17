@@ -177,9 +177,9 @@ class AssociationClassLink {
 
                let filterAssociation = [];
                let filter = [];
+               let associations=utils.fetchUMLAssociation();
                if (openAPI.isModelPackage()) {
 
-                    let associations = app.repository.select("@UMLAssociation");
                     filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });
@@ -192,14 +192,7 @@ class AssociationClassLink {
 
                } else if (openAPI.isModelDiagram()) {
 
-                    let dAssociationViews = dElement.getUMLAssociationView();
-
-                    let dAssociation = [];
-                    forEach(dAssociationViews,function(associationView){
-                         dAssociation.push(associationView.model);
-                    });
-                    
-                    filterAssociation = dAssociation.filter(item => {
+                    filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });
 

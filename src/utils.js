@@ -535,6 +535,18 @@ function fetchUMLInterfaceRealization() {
      }
      return interfaceRealalization;
 }
+function fetchUMLAssociation(){
+     let interfaceAssociation = [];
+     if (openAPI.isModelPackage()) {
+          interfaceAssociation = app.repository.select("@UMLAssociation");
+     } else if (openAPI.isModelDiagram()) {
+          let interfaceAssociationViews = dElement.getUMLAssociationView();
+          forEach(interfaceAssociationViews, function (umlAssocView) {
+               interfaceAssociation.push(umlAssocView.model);
+          });
+     }
+     return interfaceAssociation;
+}
 module.exports.getViewFromOther = getViewFromOther;
 module.exports.isCoreDataType = isCoreDataType;
 module.exports.getCoreDataType = getCoreDataType;
@@ -554,3 +566,4 @@ module.exports.getVisibleOperationView = getVisibleOperationView;
 module.exports.getVisibleLiteralsView = getVisibleLiteralsView;
 module.exports.getViewFromCurrentDiagram = getViewFromCurrentDiagram;
 module.exports.fetchUMLInterfaceRealization = fetchUMLInterfaceRealization;
+module.exports.fetchUMLAssociation = fetchUMLAssociation;

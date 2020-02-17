@@ -29,16 +29,7 @@ class Paths {
      getSubResources(paths) {
           let tmpResources = [];
           paths.forEach(objInterface => {
-               let interfaceAssociation = [];
-               if (openAPI.isModelPackage()) {
-                    interfaceAssociation = app.repository.select("@UMLAssociation");
-               } else if (openAPI.isModelDiagram()) {
-                    let interfaceAssociationViews = dElement.getUMLAssociationView();
-                    forEach(interfaceAssociationViews, function (umlAssocView) {
-                         interfaceAssociation.push(umlAssocView.model);
-                    });
-               }
-
+               let interfaceAssociation = utils.fetchUMLAssociation();
 
                let resFilter = interfaceAssociation.filter(function (item) {
                     return (item.end1.aggregation == 'composite' && item.end1.reference._id == objInterface._id);
@@ -275,16 +266,7 @@ class Paths {
       * @memberof Paths
       */
      hasSubResources(objInterface) {
-          let interfaceAssociation = [];
-
-          if (openAPI.isModelPackage()) {
-               interfaceAssociation = app.repository.select("@UMLAssociation");
-          } else if (openAPI.isModelDiagram()) {
-               let interfaceAssociationViews = dElement.getUMLAssociationView();
-               forEach(interfaceAssociationViews, function (umlAssocView) {
-                    interfaceAssociation.push(umlAssocView.model);
-               });
-          }
+          let interfaceAssociation = utils.fetchUMLAssociation();
 
           let resFilter = interfaceAssociation.filter(function (item) {
                return (item.end1.aggregation == 'composite' && item.end1.reference._id == objInterface._id);
