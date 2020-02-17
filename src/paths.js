@@ -19,10 +19,27 @@ class Paths {
           this.operations = new Operations();
      }
 
+     /**
+      * @function getSubResources
+      * @param {Array} paths
+      * @description returns array of UMLInterface those are sub-resources of any other UMLInterface
+      * @returns {Array} 
+      * @memberof Paths
+      */
      getSubResources(paths) {
           let tmpResources = [];
           paths.forEach(objInterface => {
-               let interfaceAssociation = app.repository.select("@UMLAssociation");
+               let interfaceAssociation = [];
+               if (openAPI.isModelPackage()) {
+                    interfaceAssociation = app.repository.select("@UMLAssociation");
+               } else if (openAPI.isModelDiagram()) {
+                    let interfaceAssociationViews = dElement.getUMLAssociationView();
+                    forEach(interfaceAssociationViews, function (umlAssocView) {
+                         interfaceAssociation.push(umlAssocView.model);
+                    });
+               }
+
+
                let resFilter = interfaceAssociation.filter(function (item) {
                     return (item.end1.aggregation == 'composite' && item.end1.reference._id == objInterface._id);
                });
@@ -84,6 +101,7 @@ class Paths {
                     }
                });
 
+               /* Iterate to all path and generate request method (POST,GET,PUT,DELETE) */
                pathWithoutSubresource.forEach(objInterface => {
 
                     /* view of Interface */
@@ -99,23 +117,39 @@ class Paths {
 
                          let objInterfaceRealization = filteredInterfaceRealization[0];
 
-                         /* Path object without subresources */
-                         this.writePathObject(mainPathsObject, objInterface, mInterfaceView, objInterfaceRealization);
-
-                         /* Path object for sub-resource pattern #90 */
-                         if (this.hasSubResources(objInterface)) {
-                              if (objInterface.ownedElements.length > 0) {
-                                   let interfaceRelation = objInterface.ownedElements;
-                                   console.log("SubResource relationship", interfaceRelation);
-                                   interfaceRelation.forEach(interAsso => {
-                                        if (interAsso instanceof type.UMLAssociation) {
-                                             if (interAsso.end1.aggregation == "composite" && interAsso.end2.aggregation == "none") {
-                                                  this.writeInterfaceComposite(mInterfaceView, objInterfaceRealization, interAsso, mainPathsObject);
-                                             }
-                                        }
+                         /* Get visible operations based on selection ('package' or 'diagram')  */
+                         let pathsObject = {};
+                         mainPathsObject["/" + objInterface.name] = pathsObject;
+                         let mOperations = [];
+                         if (openAPI.isModelPackage()) {
+                              mOperations = objInterface.operations;
+                         } else if (openAPI.isModelDiagram()) {
+                              if (mInterfaceView != null) {
+                                   let operationViews = utils.getVisibleOperationView(mInterfaceView)
+                                   forEach(operationViews, function (operationView) {
+                                        mOperations.push(operationView.model);
                                    });
                               }
+
                          }
+
+                         /* 1.
+                         write simple path object of GET, POST operations 
+                         Pattern : (GET/POST) : '/{pathname}'
+                         */
+                         this.writeSimplePathObject(pathsObject, mOperations, mainPathsObject, objInterfaceRealization);
+
+                         /* 2.
+                         write {id} path object of (GET, PUT, DELETE) Operations
+                         Pattern : (GET/PUT/DELETE) : '/{pathname}/{id}'
+                         */
+                         this.writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization);
+
+                         /* 3.
+                         Write path object for sub-resource pattern #90 
+                         Pattern : (GET/POST/DELETE/PUT) : '/{pathname}/{id}/{sub-resource-pathname}/{sub-resource-id}'
+                         */
+                         this.writeSubResourcePathObject(objInterface, objInterfaceRealization, mainPathsObject);
 
                     }
                });
@@ -126,26 +160,41 @@ class Paths {
 
           return mainPathsObject;
      }
-     writePathObject(mainPathsObject, objInterface, mInterfaceView, objInterfaceRealization) {
-          let pathsObject = {};
-          mainPathsObject["/" + objInterface.name] = pathsObject;
-          let mOperations = [];
-          if (openAPI.isModelPackage()) {
-               mOperations = objInterface.operations;
-          } else if (openAPI.isModelDiagram()) {
-               if (mInterfaceView != null) {
-                    let operationViews = utils.getVisibleOperationView(mInterfaceView)
-                    forEach(operationViews, function (operationView) {
-                         mOperations.push(operationView.model);
+
+     /**
+      * @function writeSubResourcePathObject
+      * @description write path object of sub resource interface
+      * @param {Object} objInterface
+      * @memberof Paths
+      */
+     writeSubResourcePathObject(objInterface, objInterfaceRealization, mainPathsObject) {
+          if (this.hasSubResources(objInterface)) {
+               if (objInterface.ownedElements.length > 0) {
+                    let interfaceRelation = objInterface.ownedElements;
+                    interfaceRelation.forEach(interAsso => {
+                         if (interAsso instanceof type.UMLAssociation) {
+                              if (interAsso.end1.aggregation == "composite" && interAsso.end2.aggregation == "none") {
+                                   this.writeInterfaceComposite(objInterfaceRealization, interAsso, mainPathsObject);
+                              }
+                         }
                     });
                }
-
           }
+     }
+     /**
+      * @function writeSimplePathObject
+      * @description write simple path object of interface
+      * @param {Object} pathsObject
+      * @param {Array} mOperations
+      * @param {Object} mainPathsObject
+      * @param {UMLInterfaceRealization} objInterfaceRealization
+      * @return {object} mainPathsObject
+      * @memberof Paths
+      */
+     writeSimplePathObject(pathsObject, mOperations, mainPathsObject, objInterfaceRealization) {
           mOperations.forEach(objOperation => {
 
-               /* Filter for visible operation Views from diagram elements (Interface) */
                if (objOperation.name.toUpperCase() == "GET") {
-                    console.log("----test---1");
                     pathsObject.get = this.operations.get(mainPathsObject, objInterfaceRealization, objOperation);
 
 
@@ -155,9 +204,19 @@ class Paths {
                }
 
           });
+     }
 
-
-
+     /**
+      * @function writeIDPathObject
+      * @description write path object with {id} parameter in path of interface
+      * @param {UMLInterfaceView} mInterfaceView
+      * @param {UMLInterface} objInterface
+      * @param {Array} mOperations
+      * @param {Object} mainPathsObject
+      * @param {UMLInterfaceRealization} objInterfaceRealization
+      * @memberof Paths
+      */
+     writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization) {
           let checkOperationArr = mOperations.filter(item => {
                return item.name == "GET" || item.name == "PUT" || item.name == "DELTE";
           });
@@ -179,11 +238,10 @@ class Paths {
 
                }
 
-
-
-               let interfaceAttributes = /* objInterface.attributes */ mAttributes.filter(item => {
+               let interfaceAttributes = mAttributes.filter(item => {
                     return item.name == "id" || item.name == "identifier";
                });
+
                interfaceAttributes.forEach(iAttribute => {
 
 
@@ -200,20 +258,11 @@ class Paths {
                          let wOperationObject = {};
                          if (objOperation.name.toUpperCase() == "GET") {
                               pathsObject.get = wOperationObject;
-                              console.log("----test---2");
                               pathsObject.get = this.operations.getOperationAttribute(objInterfaceRealization, iAttribute)
-
-
                          } else if (objOperation.name.toUpperCase() == "DELETE") {
                               pathsObject.delete = this.operations.delete(objInterfaceRealization, iAttribute, null, null);
-
-
-
-
                          } else if (objOperation.name.toUpperCase() == "PUT") {
                               pathsObject.put = this.operations.put(objInterfaceRealization, iAttribute);
-
-
 
                          } else if (objOperation.name.toUpperCase() == "PATCH") {
                               pathsObject.patch = this.operations.patch(objInterfaceRealization, iAttribute);
@@ -225,8 +274,26 @@ class Paths {
                });
           }
      }
+
+     /**
+      * @function hasSubResources
+      * @param {UMLInterface} objInterface
+      * @description check that interface has any sub resources and return boolean
+      * @returns {boolean}
+      * @memberof Paths
+      */
      hasSubResources(objInterface) {
-          let interfaceAssociation = app.repository.select("@UMLAssociation");
+          let interfaceAssociation = [];
+
+          if (openAPI.isModelPackage()) {
+               interfaceAssociation = app.repository.select("@UMLAssociation");
+          } else if (openAPI.isModelDiagram()) {
+               let interfaceAssociationViews = dElement.getUMLAssociationView();
+               forEach(interfaceAssociationViews, function (umlAssocView) {
+                    interfaceAssociation.push(umlAssocView.model);
+               });
+          }
+
           let resFilter = interfaceAssociation.filter(function (item) {
                return (item.end1.aggregation == 'composite' && item.end1.reference._id == objInterface._id);
           });
@@ -251,7 +318,7 @@ class Paths {
       * @param {Object} mainPathsObject
       * @memberof Paths 
       */
-     writeInterfaceComposite(mInterfaceView, interfaceRealization, interfaceAssociation, mainPathsObject) {
+     writeInterfaceComposite(interfaceRealization, interfaceAssociation, mainPathsObject) {
           try {
 
 
