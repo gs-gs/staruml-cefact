@@ -417,15 +417,7 @@ class Component {
           /* Interface for schema->properties object */
           let paths, interfaceRealalization;
           paths = openAPI.getPaths();
-          if (openAPI.isModelPackage()) {
-               interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
-          } else if (openAPI.isModelDiagram()) {
-               interfaceRealalization = [];
-               let interfaceRealalizationView = dElement.getUMLInterfaceRealizationView();
-               forEach(interfaceRealalizationView, function (mView) {
-                    interfaceRealalization.push(mView.model);
-               });
-          }
+          interfaceRealalization=utils.fetchUMLInterfaceRealization();
 
           let schemaModelPropertiesObj = {};
           schemaModel['properties'] = schemaModelPropertiesObj;
@@ -465,16 +457,10 @@ class Component {
 
           /* For Interface */
           let paths, interfaceRealalization;
+          interfaceRealalization=utils.fetchUMLInterfaceRealization();
           if (openAPI.isModelPackage()) {
-               interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
                paths = openAPI.getPaths();
           } else if (openAPI.isModelDiagram()) {
-               interfaceRealalization = [];
-               let interfaceRealalizationView = dElement.getUMLInterfaceRealizationView();
-               forEach(interfaceRealalizationView, function (mView) {
-                    interfaceRealalization.push(mView.model);
-               });
-
                paths = [];
                let umlInterfaceView = dElement.getUMLInterfaceView();
                forEach(umlInterfaceView, function (mView) {

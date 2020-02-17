@@ -77,15 +77,7 @@ class Paths {
           try {
                let paths, interfaceRealalization;
                paths = openAPI.getPaths();
-               if (openAPI.isModelPackage()) {
-                    interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
-               } else if (openAPI.isModelDiagram()) {
-                    interfaceRealalization = [];
-                    let interfaceRealalizationView = dElement.getUMLInterfaceRealizationView();
-                    forEach(interfaceRealalizationView, function (mView) {
-                         interfaceRealalization.push(mView.model);
-                    });
-               }
+               interfaceRealalization=utils.fetchUMLInterfaceRealization();
 
                /* Get list of sub-resource  */
                let subResources = this.getSubResources(paths);

@@ -516,6 +516,25 @@ function getViewFromOther(element) {
      }
      return null;
 }
+/**
+ * @function fetchUMLInterfaceRealization
+ * @description find and returns view of specified element from the whole project
+ * @returns {Object}
+ * @memberof Utils
+ */
+function fetchUMLInterfaceRealization() {
+     let interfaceRealalization=[];
+     if (openAPI.isModelPackage()) {
+          interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
+     } else if (openAPI.isModelDiagram()) {
+          interfaceRealalization = [];
+          let interfaceRealalizationView = dElement.getUMLInterfaceRealizationView();
+          forEach(interfaceRealalizationView, function (mView) {
+               interfaceRealalization.push(mView.model);
+          });
+     }
+     return interfaceRealalization;
+}
 module.exports.getViewFromOther = getViewFromOther;
 module.exports.isCoreDataType = isCoreDataType;
 module.exports.getCoreDataType = getCoreDataType;
@@ -534,3 +553,4 @@ module.exports.getVisibleAttributeView = getVisibleAttributeView;
 module.exports.getVisibleOperationView = getVisibleOperationView;
 module.exports.getVisibleLiteralsView = getVisibleLiteralsView;
 module.exports.getViewFromCurrentDiagram = getViewFromCurrentDiagram;
+module.exports.fetchUMLInterfaceRealization = fetchUMLInterfaceRealization;
