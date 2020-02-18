@@ -98,7 +98,7 @@ class Operations {
                let objSchema = {};
                objSchema.type = 'string';
 
-               utils.buildParameter(end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
+               utils.buildParameter(end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
           }
 
           let requestBodyObj = {}
@@ -155,7 +155,7 @@ class Operations {
           let objSchema = {};
           objSchema.type = 'string';
 
-          utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
+          utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? utils.buildDescription(operationAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
 
           let mAttributes = [];
           if (openAPI.isModelPackage()) {
@@ -175,7 +175,7 @@ class Operations {
           mAttributes.forEach(itemAttribute => {
                let paramsObject = {};
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                    utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
+                    utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                     parametersArray.push(paramsObject);
                }
           });
@@ -233,7 +233,7 @@ class Operations {
           let objSchema = {};
           objSchema.type = 'string';
 
-          utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? utils.buildDescription(operationAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
+          utils.buildParameter(operationAttribute.name, "path", (operationAttribute.documentation ? utils.buildDescription(operationAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
 
           let mAttributes = [];
           if (openAPI.isModelPackage()) {
@@ -253,7 +253,7 @@ class Operations {
           mAttributes.forEach(itemAttribute => {
                let paramsObject = {};
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                    utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
+                    utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                     parametersArray.push(paramsObject);
                }
           });
@@ -304,23 +304,23 @@ class Operations {
 
           if (iAttribute != null && end1Interface == null && end2Interface == null) {
 
-               utils.buildParameter(iAttribute.name, "path", (iAttribute.documentation ? utils.buildDescription(iAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
+               utils.buildParameter(iAttribute.name, "path", (iAttribute.documentation ? utils.buildDescription(iAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
 
                objInterfaceRealization.target.attributes.forEach(itemAttribute => {
                     let paramsObject = {};
                     if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
-                         utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
+                         utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                          parametersArray.push(paramsObject);
                     }
                });
 
           } else if (iAttribute == null && end1Interface != null && end2Interface != null) {
 
-               utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject);
+               utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
 
                /* AskQue */
                let paramsObject1 = {};
-               utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description"), true, objSchema, paramsObject1);
+               utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject1);
                parametersArray.push(paramsObject1);
 
           }
@@ -364,7 +364,7 @@ class Operations {
           let objSchema = {};
           objSchema.type = 'string';
 
-          utils.buildParameter(iAttribute.name, "path", (iAttribute.documentation ? utils.buildDescription(iAttribute.documentation) : "missing description"), true, objSchema, paramsObject);
+          utils.buildParameter(iAttribute.name, "path", (iAttribute.documentation ? utils.buildDescription(iAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
 
           let mAttributes = [];
           if (openAPI.isModelPackage()) {
@@ -382,7 +382,7 @@ class Operations {
           mAttributes.forEach(itemAttribute => {
                if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
                     let paramsObject = {};
-                    utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : "missing description"), false, objSchema, paramsObject);
+                    utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                     parametersArray.push(paramsObject);
                }
           })

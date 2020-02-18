@@ -331,9 +331,9 @@ class Paths {
                          objSchema.type = 'string';
 
                          let name = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
-                         let description = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description");
+                         let description = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
                          /* let name = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
-                         let description = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description"); */
+                         let description = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION); */
                          utils.buildParameter(name, "path", description, true, objSchema, paramsObject);
 
                          let responsesObj = {};
@@ -396,10 +396,10 @@ class Paths {
                          objSingleSchema.type = 'string';
 
                          let name1 = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
-                         let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description");
+                         let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
 
                          //   let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
-                         //   let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description");
+                         //   let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
 
                          utils.buildParameter(name1, "path", description1, true, objSingleSchema, paramsSingleObject);
 
@@ -412,7 +412,7 @@ class Paths {
                          objSingleSchema.type = 'string';
 
                          let name2 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
-                         let description2 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description");
+                         let description2 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
                          utils.buildParameter(name2, "path", description2, true, objSingleSchema, paramsSingleObject);
 
 
@@ -501,10 +501,10 @@ class Paths {
                          objSingleSchema.type = 'string';
 
                          let name1 = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
-                         let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : "missing description");
+                         let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
 
                          //   let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
-                         //   let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description");
+                         //   let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
 
                          utils.buildParameter(name1, "path", description1, true, objSingleSchema, paramsSingleObject);
 
@@ -517,7 +517,7 @@ class Paths {
                          objSingleSchema.type = 'string';
 
                          let name2 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
-                         let description2 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : "missing description");
+                         let description2 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
                          utils.buildParameter(name2, "path", description2, true, objSingleSchema, paramsSingleObject);
 
 

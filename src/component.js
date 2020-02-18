@@ -1,3 +1,4 @@
+const nodeUtils = require('util');
 const fs = require('fs');
 const path = require('path');
 const forEach = require('async-foreach').forEach;
@@ -56,7 +57,7 @@ class Component {
           Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount */
           let notAvailEle = notAvailElement.getNotAvailableClassOrEnumeInFile();
           if (notAvailEle.length > 0) {
-               let dlgMessage = constant.WARNING_VOCAB_MSG;
+               let dlgMessage = constant.STR_WARNING_VOCABULARY;
                forEach(notAvailEle, function (item) {
                     dlgMessage += '\n' + item;
                });
@@ -112,9 +113,6 @@ class Component {
                let aggregationClasses = [];
                let classAssociations = this.associationClassLink.getAssociationOfClass(objClass);
 
-               console.log("classAssociations", classAssociations);
-               console.log("mainPropertiesObj", mainPropertiesObj);
-
                classAssociations.forEach(assoc => {
                     if (assoc instanceof type.UMLAssociation) {
 
@@ -128,7 +126,7 @@ class Component {
                          let propKeys = Object.keys(mainPropertiesObj);
                          propKeys.forEach(prop => {
                               if (assocName == prop) {
-                                   let error = "There is duplicate property in class \'" + assoc.end1.reference.name + "\' and property name is \'" + prop + "\'";
+                                   let error=nodeUtils.format(constant.STR_DUPLICATE_PROPERTY,assoc.end1.reference.name,prop);
                                    this.duplicatePropertyError.push(error);
                                    let jsonError = {
                                         isDuplicateProp: true,
@@ -203,7 +201,6 @@ class Component {
 
                // }
           });
-          console.log("Total duplicate deleted reference", duplicateDeletedReference);
           return this.mainComponentObj;
      }
      /**
@@ -227,7 +224,7 @@ class Component {
           Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount */
           let notAvailEle = notAvailElement.getNotAvailableClassOrEnumeInFile();
           if (notAvailEle.length > 0) {
-               let dlgMessage = constant.WARNING_VOCAB_MSG;
+               let dlgMessage = constant.STR_WARNING_VOCABULARY;
                forEach(notAvailEle, function (item) {
                     dlgMessage += '\n' + item;
                });
@@ -302,7 +299,7 @@ class Component {
                          let propKeys = Object.keys(mainPropertiesObj);
                          propKeys.forEach(prop => {
                               if (assocName == prop) {
-                                   let error = "There is duplicate property in class \'" + assoc.end1.reference.name + "\' and property name is \'" + prop + "\'";
+                                   let error=nodeUtils.format(constant.STR_DUPLICATE_PROPERTY,assoc.end1.reference.name,prop);
                                    duplicatePropertyError.push(error);
                                    let jsonError = {
                                         isDuplicateProp: true,
@@ -473,7 +470,6 @@ class Component {
                          let obj = app.repository.get(id);
                          uniqueArr.push(obj);
                     });
-                    console.log("all inherited classes", uniqueArr)
                     forEach(uniqueArr, function (mClasses) {
 
 
@@ -586,7 +582,6 @@ class Component {
           newUniqueArray.forEach(function (comp) {
                if (mainPropertiesObj.hasOwnProperty(comp.sName)) {
                     delete mainPropertiesObj[comp.sName];
-                    console.log("deleted duplicate attributes", comp.ref);
 
                     let objTemp = {};
                     objTemp[objClass.name] = comp

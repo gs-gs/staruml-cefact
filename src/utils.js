@@ -119,12 +119,12 @@ function writeQueryParameters(parametersArray, objOperation) {
                     if (!(itemParameters.type instanceof type.UMLClass)) {
                          buildParameter(itemParameters.name, "query", (itemParameters.documentation ?
                               buildDescription(itemParameters.documentation) :
-                              "missing description"), false, objSchema, paramsObject);
+                              constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                     } else {
 
                          buildParameter(itemParameters.type.name + "." + itemParameters.name, "query", (itemParameters.documentation ?
                               buildDescription(itemParameters.documentation) :
-                              "missing description"), false, objSchema, paramsObject);
+                              constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
 
                     }
                }
@@ -441,10 +441,8 @@ function getCoreDataTypeAttributeClass(classes) {
                /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
                forEach(mClass.attributes, function (attrib) {
 
-                    // console.log("1111----type", attrib.type);
                     if (isCoreDataType(attrib.type)) {
                          let attribType = getCoreDataType(attrib.type);
-                         // console.log("1111----2222----type", type);
 
                          if (isString(attrib.type) && attrib.type === attribType && notAvailElement.isAvailabl(attribType)) {
                               /* Check and add if attrib type in string and that qualified datatype is available in model */

@@ -1,4 +1,5 @@
 var forEach = require('async-foreach').forEach;
+var constant = require('./constant');
 
 var notAvailableClassOrEnumeInFile = [];
 /**
@@ -27,7 +28,7 @@ function showDialogForNotAvailableClassOrEnum() {
      let notAvailElement = getNotAvailableClassOrEnumeInFile();
      if (notAvailElement.length > 0) {
 
-          let dlgMessage = 'Warning: your vocabulary may be invalid because following properties have unknown or undefined type (range):\n';
+          let dlgMessage = constant.STR_WARNING_VOCABULARY;
           forEach(notAvailElement, function (item) {
                dlgMessage += '\n' + item;
           });

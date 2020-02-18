@@ -52,7 +52,6 @@ class Composition {
           let temp={};
           temp['ref']=propertiesObj;
           temp['sName']=sName;
-          // compositionRef.push('6. composition : '+ref,temp);
           compositionRef.push(temp);
           return mainPropertiesObj;
      }

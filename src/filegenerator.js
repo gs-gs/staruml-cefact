@@ -31,14 +31,12 @@ class FileGenerator {
                try {
 
                     /* Direct json from JsonOject */
-                    console.log("file-generate-started");
                     this.basePath = null;
                     let mainJson = null;
                     this.basePath = path.join(openAPI.getFilePath(), openAPI.getExportElementName() + '.json');
                     mainJson = MainJSON.getJSON();
 
                     fs.writeFileSync(this.basePath, JSON.stringify(mainJson, null, 4));
-                    console.log("file-generate-ended");
                     resolve({
                          result: constant.FIELD_SUCCESS,
                          message: 'JSON file generated successfully'
@@ -92,14 +90,12 @@ class FileGenerator {
           return new Promise((resolve, reject) => {
                try {
                     /* Direct json from JsonOject */
-                    console.log("file-generate-started");
                     this.basePath = null;
                     let mainJson = null;
                     this.basePath = path.join(openAPI.getFilePath(), openAPI.getExportElementName() + '.json');
                     mainJson = MainJSON.getJSONSchema();
 
                     fs.writeFileSync(this.basePath, JSON.stringify(mainJson, null, 4));
-                    console.log("file-generate-ended");
                     resolve({
                          result: constant.FIELD_SUCCESS,
                          message: 'JSON Schema is generated successfully at path : ' + this.basePath
@@ -124,9 +120,7 @@ class FileGenerator {
                     let fileType = openAPI.getFileType();
 
                     if (fileType == constant.FILE_TYPE_JSON) {
-                         console.log("---json-generate-start");
                          this.createJSON().then(function (result) {
-                              console.log("---json-generate-end");
                               resolve(result);
                          }).catch(function (error) {
                               console.error(error);
@@ -138,10 +132,7 @@ class FileGenerator {
 
                     } else if (fileType == constant.FILE_TYPE_YML) {
                          /* Convert JSON object to YAML using j2yaml and save the file */
-                         console.log("---yaml-generate-start");
                          this.createYAML().then(function (result) {
-                              console.log("Result", result);
-                              console.log("---yaml-generate-end");
                               resolve(result);
                          }).catch(function (error) {
                               console.error(error);
@@ -153,10 +144,7 @@ class FileGenerator {
                          /* Direct conversion from JsonObject to JSON/YAML */
 
                          /* Direct json from JsonOject */
-                         console.log("---json-generate-start");
                          this.createJSON().then(function (result) {
-                              console.log("Result", result);
-                              console.log("---json-generate-end");
                               resolve(result);
                          }).catch(function (error) {
                               console.error(error);
@@ -164,10 +152,7 @@ class FileGenerator {
                          });
 
                          /* Direct YML from JsonObject */
-                         console.log("---yaml-generate-start");
                          this.createYAML().then(function (result) {
-                              console.log("Result", result);
-                              console.log("---yaml-generate-end");
                               resolve(result);
                          }).catch(function (error) {
                               console.error(error);
@@ -177,10 +162,7 @@ class FileGenerator {
 
                     } else if (fileType == constant.FILE_TYPE_JSON_SCHEMA) {
                          /* Direct json from JsonOject */
-                         console.log("---jsonschema-generate-start");
                          this.createJSONSchema().then(function (result) {
-                              console.log("Result", result);
-                              console.log("---json-generate-end");
                               resolve(result);
                          }).catch(function (error) {
                               console.error(error);
@@ -353,7 +335,6 @@ class FileGenerator {
 
                } catch (error) {
 
-                    console.error("Error generating JSON file", error);
                     utils.writeErrorToFile(error);
                     reject(error);
                }

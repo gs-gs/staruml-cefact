@@ -224,11 +224,9 @@ class AssociationClassLink {
                     });
 
                     let arrASS = openAPI.getPackageWiseUMLAssociation();
-                    console.log("arr-assso--", arrASS);
 
                     resolve(filterAssociation);
                } catch (error) {
-                    console.error("Found error", error.message);
                     utils.writeErrorToFile(error);
                     reject(error);
                }
@@ -291,7 +289,7 @@ class AssociationClassLink {
                               propertiesObj.items = itemsObj;
 
 
-                              itemsObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : "missing description");
+                              itemsObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : constant.STR_MISSING_DESCRIPTION);
                               utils.addAttributeType(itemsObj, attr);
 
                               propertiesObj.type = 'array';
@@ -303,7 +301,7 @@ class AssociationClassLink {
                               }
 
                          } else {
-                              propertiesObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : "missing description");
+                              propertiesObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : constant.STR_MISSING_DESCRIPTION);
 
                               utils.addAttributeType(propertiesObj, attr);
                               if (attr.type instanceof type.UMLEnumeration) {

@@ -12,7 +12,7 @@ const Constant = {
      schemas: 'schemas',
      path: '/',
      shared: 'shared',
-     definitions:'definitions',
+     definitions: 'definitions',
      msgsuccess: 'OpenAPI Specs generated',
      msgstestuccess: 'OpenAPI Specs Tested Successfully',
      msgerror: 'OpenAPI Specs generation failure',
@@ -23,6 +23,11 @@ const Constant = {
      strpath: 'File Generated at \nPath :',
      stronlypath: '\nPath : ',
      strend: '     ',
+     PROGRESS_MSG: 'Please wait untill OpenAPI spec generation is being processed for the \'%s\' %s',
+     PROGRESS_MSG_ENTIRE_PROJECT: "Please wait untill OpenAPI spec testing is being processed for the entire project.",
+     STR_PACKAGE: 'package',
+     STR_DIAGRAM: 'diagram',
+     STR_MISSING_DESCRIPTION: 'missing description',
      msgpackage: 'Package not available',
      msg_file_select: 'Select one of the following type.',
      msg_pkg_diagram_select: 'Select \'Package\' or \'Diagram\' to test entire project.',
@@ -31,7 +36,7 @@ const Constant = {
      PREF_GENDOC: 'openapi.gen.idlDoc',
      PREF_INDENTSPC: 'openapi.gen.indentSpaces',
      IDEAL_MDJ_FILE_PATH: '/src/model',
-     IDEAL_MDJ_FILE_NAME: 'SampleModel.mdj',
+     IDEAL_MDJ_FILE_NAME: 'Sa mpleModel.mdj',
      IDEAL_TEST_FILE_PATH: '/src/output',
      IDEAL_JSON_FILE_NAME: 'SampleModel.json',
      FIELD_SUCCESS: 'success',
@@ -43,14 +48,18 @@ const Constant = {
      DIALOG_MSG_ERRORDIALOG: "Please select the project or a package",
      DIALOG_MSG_ERROR_SELECT_PACKAGE: "Please select a package or diagram to generate OpenAPI Specification.",
      PACKAGE_SELECTION_ERROR: "No elements found in selected %s. Please select other %s.",
+     STR_ISID_MSG: "There is no \'isID\' Attribute in Target Class \'%s\' which is referenced in the Source Class \'%s\'",
+     STR_DUPLICATE_PROPERTY: "There is duplicate property in class \'%s\' and property name is \'%s\'",
+     STR_WARNING_VOCABULARY:'Warning: your vocabulary may be invalid because following properties have unknown or undefined type (range):\n',
+     STR_DUPLICATE_CLASSES: "There are duplicate \'%s\' %s for same name.",
+     STR_MODEL_GENERATED: "model element generated",
      JSON_LD_SUCCESS_MSG: "JSON-LD generated successfully at : ",
      DIALOG_MSG_TEST_PICKERDIALOG: "Select package or diagram to test OpenAPI Specs.",
      msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
-     WARNING_VOCAB_MSG:"Warning: your vocabulary may be invalid because following properties have unknown or undefined type (range):\n",
-     FILE_TYPE_JSON:1,
-     FILE_TYPE_YML:2,
-     FILE_TYPE_JSON_YML:3,
-     FILE_TYPE_JSON_SCHEMA:4,
+     FILE_TYPE_JSON: 1,
+     FILE_TYPE_YML: 2,
+     FILE_TYPE_JSON_YML: 3,
+     FILE_TYPE_JSON_SCHEMA: 4,
      fileOptions: [{
                text: "JSON & YML",
                value: 3
@@ -73,7 +82,14 @@ const Constant = {
      }, {
           text: "Diagram",
           value: 2
-     }]
+     }],
+     MULTIPLICITY:{
+          m0__star:'0..*',
+          m1__star:'1..*',
+          m0:'0',
+          m1:'1'
+     }
+
 
 }
 
@@ -83,9 +99,9 @@ const Constant = {
  * @returns {string}
  */
 function getRef() {
-     if(openAPI.getFileType() == Constant.FILE_TYPE_JSON_SCHEMA){
+     if (openAPI.getFileType() == Constant.FILE_TYPE_JSON_SCHEMA) {
           return Constant.entry + Constant.path + Constant.definitions + Constant.path;
-     }else{
+     } else {
           return Constant.entry + Constant.path + Constant.components + Constant.path + Constant.schemas + Constant.path;
      }
 }

@@ -1,5 +1,5 @@
+const nodeUtils = require('util');
 const fs = require('fs');
-
 const notAvailElement = require('./notavailelement');
 const Info = require('./info');
 const Component = require('./component');
@@ -41,9 +41,6 @@ class OpenApi {
           OpenApi.uniqueClassesArr = [];
           OpenApi.strPackagePath = '';
           OpenApi.error = {};
-          /* OpenApi.isDuplicate=false; */
-          /* OpenApi.duplicateClasses = []; */
-
      }
 
 
@@ -241,19 +238,16 @@ class OpenApi {
                forEach(OpenApi.operations, element => {
                     mPaths.push(element.name);
                });
-               console.log("Duplication filter done");
-               console.log("Query Total Classes", mClasses);
-               console.log("Query Total Interfaces", mPaths);
                return {
                     result: constant.FIELD_SUCCESS,
-                    message: "model element generated"
+                    message: constant.STR_MODEL_GENERATED
                };
           } else {
                let message = null;
                if (duplicateClasses.length > 1) {
-                    message = "There are duplicate \'" + duplicateClasses.join("\', \'") + "\'" + " classes for same name.";
+                    message=nodeUtils.format(constant.STR_DUPLICATE_CLASSES,duplicateClasses.join("\', \'"),'classes');
                } else {
-                    message = "There is duplicate \'" + duplicateClasses.join("\', \'") + "\'" + " class for same name.";
+                    message=nodeUtils.format(constant.STR_DUPLICATE_CLASSES,duplicateClasses.join("\', \'"),'class');
                }
 
                if (openAPI.getAppMode() == openAPI.APP_MODE_TEST && openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {

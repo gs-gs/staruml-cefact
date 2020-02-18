@@ -1,3 +1,4 @@
+const nodeUtils = require('util');
 const openAPI = require('./openapi');
 const constant = require('./constant');
 /**
@@ -75,7 +76,6 @@ class Aggregation {
                /* This will store the attributes of target class of Generalization */
                let parentGeneralizationClassAttribute = [];
                this.findParentClassAggregationIsID(itemClass, parentGeneralizationClassAttribute);
-               console.log("parentIDs", parentGeneralizationClassAttribute);
                /* Check and add if there any isID attributes of parent Class  */
                /* itemClass.ownedElements.forEach(item => {
 
@@ -90,7 +90,6 @@ class Aggregation {
                               if (attrIsID.length > 0) {
                                    tAttArray.push(item);
                               }
-                              console.log("attrIsID", attrIsID);
                          }
                     }
 
@@ -124,9 +123,10 @@ class Aggregation {
           });
           /* If no isID attribute found in Aggregation, Will be prompt error to user. */
           if (arrIsID.length == 0) {
+               let strMsg=nodeUtils.format(constant.STR_ISID_MSG,assoc.end2.reference.name,assoc.end1.reference.name);
                let jsonError = {
                     isWarning: true,
-                    msg: "There is no \'isID\' Attribute in Target Class \'" + assoc.end2.reference.name + "\' which is referenced in the Source Class \'" + assoc.end1.reference.name + "\'"
+                    msg: strMsg
                };
                openAPI.setError(jsonError);
           }
