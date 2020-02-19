@@ -546,15 +546,13 @@ function fetchUMLAssociation() {
 
 function initCoreTypes() {
 
-     let packages = app.repository.select('@UMLPackage');
-     let result = packages.filter(function (pkg) {
-          return pkg.name == 'Core';
+     let result = app.repository.select('Core::@UMLPackage');
+     result=result.filter(function(pkg){
+          return pkg instanceof type.UMLPackage && pkg.name == 'Types';
      });
 
-     let mPackage = result[0].ownedElements.filter(function (element) {
-          return element instanceof type.UMLPackage && element.name == 'Types';
-     });
-     let typePkg = mPackage[0];
+     // result = app.repository.select(result.name + '::@UMLPackage');
+     let typePkg = result[0];
      let coreTypes = app.repository.select(typePkg.name + "::@UMLClass");
      setCoreTypes(coreTypes);
 

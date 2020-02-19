@@ -84,7 +84,7 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
      const mOpenApi = new openAPI.OpenApi(exportElement, basePath, options, returnValue);
      let dm = app.dialogs;
      vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
-
+     utils.initCoreTypes();
      setTimeout(async function(){
 
           try {
