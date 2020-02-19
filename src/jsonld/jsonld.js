@@ -342,7 +342,7 @@ function getRdfsPropertiesArr() {
 
     return rdfsPropertiesArr;
 }
-let notAvailableClassOrEnumeInFile = [];
+let notAvailableAttribute = [];
 /**
  * @function getRange
  * @description returns datatype
@@ -394,7 +394,7 @@ function getRange(attr, className) {
         } else {
 
             /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
-            notAvailElement.checkAndaddNotAvailableClassOrEnumeInFile(className, attr, attributeType);
+            notAvailElement.addNotAvailableAttribute(className, attr, attributeType);
 
             if (attributeType === 'Numeric') {
                 range = 'xsd:string';
@@ -442,11 +442,11 @@ function getExportElement() {
     return UMLPackage;
 }
 
-function getNotAvailableClassOrEnumeInFile() {
-    return notAvailableClassOrEnumeInFile;
+function getNotAvailableAttribute() {
+    return notAvailableAttribute;
 }
 
 module.exports.generateJSONLD = generateJSONLD;
 module.exports.setExportElement = setExportElement;
 module.exports.getExportElement = getExportElement;
-module.exports.getNotAvailableClassOrEnumeInFile = getNotAvailableClassOrEnumeInFile;
+module.exports.getNotAvailableAttribute = getNotAvailableAttribute;

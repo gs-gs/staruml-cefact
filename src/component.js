@@ -50,21 +50,7 @@ class Component {
           /* Add classes that class's attribute type is Core Data Type  
           Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount
           */
-
           let arrCoreDataTypeAttr = utils.getCoreDataTypeAttributeClass(classes);
-
-          /* Throw error if attribute type is not available in model 
-          Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount */
-          let notAvailEle = notAvailElement.getNotAvailableClassOrEnumeInFile();
-          if (notAvailEle.length > 0) {
-               let dlgMessage = constant.STR_WARNING_VOCABULARY;
-               forEach(notAvailEle, function (item) {
-                    dlgMessage += '\n' + item;
-               });
-               // throw new Error(dlgMessage);
-               // app.dialogs.showAlertDialog(dlgMessage);
-          }
-
           /* Combine classes and classes that class's attribute type is Core Data Type */
           classes = classes.concat(arrCoreDataTypeAttr);
 
@@ -126,7 +112,7 @@ class Component {
                          let propKeys = Object.keys(mainPropertiesObj);
                          propKeys.forEach(prop => {
                               if (assocName == prop) {
-                                   let error=nodeUtils.format(constant.STR_DUPLICATE_PROPERTY,assoc.end1.reference.name,prop);
+                                   let error = nodeUtils.format(constant.STR_DUPLICATE_PROPERTY, assoc.end1.reference.name, prop);
                                    this.duplicatePropertyError.push(error);
                                    let jsonError = {
                                         isDuplicateProp: true,
@@ -217,21 +203,7 @@ class Component {
           /* Add classes that class's attribute type is Core Data Type  
           Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount
           */
-
           let arrCoreDataTypeAttr = utils.getCoreDataTypeAttributeClass(null);
-
-          /* Throw error if attribute type is not available in model 
-          Ex. Numeric, Identifier, Code, Indicator, DateTime, Text, Binary, Measure, Amount */
-          let notAvailEle = notAvailElement.getNotAvailableClassOrEnumeInFile();
-          if (notAvailEle.length > 0) {
-               let dlgMessage = constant.STR_WARNING_VOCABULARY;
-               forEach(notAvailEle, function (item) {
-                    dlgMessage += '\n' + item;
-               });
-               // throw new Error(dlgMessage);
-               // app.dialogs.showAlertDialog(dlgMessage);
-          }
-
           /* Combine classes and classes that class's attribute type is Core Data Type */
           let coreTypeViews = [];
           arrCoreDataTypeAttr.filter(function (coreTypeElement) {
@@ -281,7 +253,7 @@ class Component {
 
                /* Get generalization of class */
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
-               
+
                let aggregationClasses = [];
                /* Get association class link of class */
                let classAssociations = this.associationClassLink.getAssociationOfClass(objClass);
@@ -299,7 +271,7 @@ class Component {
                          let propKeys = Object.keys(mainPropertiesObj);
                          propKeys.forEach(prop => {
                               if (assocName == prop) {
-                                   let error=nodeUtils.format(constant.STR_DUPLICATE_PROPERTY,assoc.end1.reference.name,prop);
+                                   let error = nodeUtils.format(constant.STR_DUPLICATE_PROPERTY, assoc.end1.reference.name, prop);
                                    duplicatePropertyError.push(error);
                                    let jsonError = {
                                         isDuplicateProp: true,
@@ -372,7 +344,7 @@ class Component {
                /* Remove property which is already in ref of other property in the same schema */
                this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
           });
-          
+
 
           return this.mainComponentObj;
 
@@ -395,7 +367,7 @@ class Component {
           /* Interface for schema->properties object */
           let paths, interfaceRealalization;
           paths = openAPI.getPaths();
-          interfaceRealalization=utils.fetchUMLInterfaceRealization();
+          interfaceRealalization = utils.fetchUMLInterfaceRealization();
 
           let schemaModelPropertiesObj = {};
           schemaModel['properties'] = schemaModelPropertiesObj;
@@ -412,13 +384,13 @@ class Component {
                });
           });
           /* Class for schema->definitions object */
-          let schemaModelDefinitionsObj={};
-          if(openAPI.isModelPackage()){
+          let schemaModelDefinitionsObj = {};
+          if (openAPI.isModelPackage()) {
                schemaModelDefinitionsObj = this.getComponent();
-          }else if(openAPI.isModelDiagram()){
+          } else if (openAPI.isModelDiagram()) {
                schemaModelDefinitionsObj = this.getComponentForDiagram();
           }
-          schemaModel['definitions']=schemaModelDefinitionsObj.schemas;
+          schemaModel['definitions'] = schemaModelDefinitionsObj.schemas;
 
           return mainSchemaObj;
      }
@@ -435,7 +407,7 @@ class Component {
 
           /* For Interface */
           let paths, interfaceRealalization;
-          interfaceRealalization=utils.fetchUMLInterfaceRealization();
+          interfaceRealalization = utils.fetchUMLInterfaceRealization();
           if (openAPI.isModelPackage()) {
                paths = openAPI.getPaths();
           } else if (openAPI.isModelDiagram()) {
@@ -463,14 +435,89 @@ class Component {
                     let allInheritedClasses = [];
 
                     _this.findAllInheritedClassesByGeneralization(allInheritedClasses, source);
-                    let unique = [...new Set(allInheritedClasses.map(item => item._id))];
-                    let uniqueArr = [];
-                    uniqueArr.push(source);
-                    forEach(unique, function (id) {
+                    let inheritedIDs = [...new Set(allInheritedClasses.map(item => item._id))];
+                    let inheritedClasses = [];
+                    inheritedClasses.push(source);
+                    forEach(inheritedIDs, function (id) {
                          let obj = app.repository.get(id);
-                         uniqueArr.push(obj);
+                         inheritedClasses.push(obj);
                     });
-                    forEach(uniqueArr, function (mClasses) {
+
+                    forEach(inheritedClasses, function (mClasses) {
+
+
+                         forEach(mClasses.attributes, function (attribute) {
+
+                              /* Add attribute object to layout */
+                              let mAttributeObj = {};
+                              mAttributeObj['key'] = attribute.name;
+
+                              /* Add required field to attribute */
+                              if (attribute.multiplicity == "1" || attribute.multiplicity == "1..*") {
+                                   mAttributeObj['required'] = true;
+                              }
+
+
+                              let attrType = attribute.type;
+                              if (attrType instanceof type.UMLEnumeration) {
+                                   /* Add type field to attribute */
+                                   mAttributeObj['type'] = 'array';
+                                   /* Add items array to attribute */
+                                   let items = [];
+                                   mAttributeObj['items'] = items;
+                                   let literals = [];
+                                   if (openAPI.isModelPackage()) {
+                                        literals = attrType.literals;
+                                   } else if (openAPI.isModelDiagram()) {
+                                        let enumView = utils.getViewFromCurrentDiagram(attrType);
+                                        let literalViews = utils.getVisibleLiteralsView(enumView);
+                                        let literals = [];
+                                        forEach(literalViews, function (literalView) {
+                                             literals.push(literalView.model);
+                                        });
+                                   }
+
+                                   forEach(literals, function (literal) {
+                                        let literalObj = {};
+                                        literalObj['key'] = literal.name;
+                                        items.push(literalObj);
+                                   });
+                              } else if (attrType instanceof type.UMLClass || attrType instanceof type.UMLInterface) {
+                                   /* Add type field to attribute */
+                                   mAttributeObj['type'] = 'section';
+                                   /* Add items array to attribute */
+                                   let items = [];
+                                   mAttributeObj['items'] = items;
+                                   let sectionObj = {};
+                                   sectionObj['key'] = attrType.name;
+                                   items.push(sectionObj);
+                              }
+                              layout.push(mAttributeObj);
+                         });
+
+                    });
+
+                    console.log("---------------");
+                    let referenceClasses = [];
+                    forEach(inheritedClasses, function (mClass) {
+
+                         if (openAPI.isModelPackage()) {
+                              let res = app.repository.select(mClass.name + "::@UMLAssociation");
+                              forEach(res, function (assoc) {
+                                   referenceClasses.push(assoc.end2.reference);
+                              });
+                         } else {
+                              let views = dElement.getUMLAssociationView();
+                              forEach(views, function (item) {
+                                   if (mClass._id == item.model.end1.reference._id) {
+                                        referenceClasses.push(item.model.end2.reference);
+                                   }
+                              });
+
+                         }
+                    });
+                    console.log("referenc classes", referenceClasses);
+                    forEach(referenceClasses, function (mClasses) {
 
 
                          forEach(mClasses.attributes, function (attribute) {
@@ -537,7 +584,20 @@ class Component {
       */
      findAllInheritedClassesByGeneralization(allInheritedClasses, target) {
           let _this = this;
-          let result = app.repository.select(target.name + '::@UMLGeneralization');
+          let result = [];
+          if (openAPI.isModelPackage()) {
+               result = app.repository.select(target.name + '::@UMLGeneralization');
+          } else {
+               let views = dElement.getUMLGeneralizationView();
+               let vModel = [];
+               forEach(views, function (item) {
+                    if (target._id == item.model.source._id) {
+                         vModel.push(item.model);
+                    }
+               });
+
+          }
+
           forEach(result, function (item) {
                allInheritedClasses.push(item.target);
                _this.findAllInheritedClassesByGeneralization(allInheritedClasses, item.target)

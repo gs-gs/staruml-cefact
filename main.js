@@ -85,29 +85,32 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
      let dm = app.dialogs;
      vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
 
-     try {
-          let result = await mOpenApi.initUMLPackage()
-          console.log("initialized Package", result);
-          let resultElement = await mOpenApi.getModelElements();
-          console.log("initialized Model Elements", resultElement);
-          let resultGen = await mOpenApi.generateOpenAPI();
-          console.log("result : OpenAPI Generated", resultGen);
-          if (resultGen.result == constant.FIELD_SUCCESS) {
+     setTimeout(async function(){
+
+          try {
+               let result = await mOpenApi.initUMLPackage()
+               console.log("initialized Package", result);
+               let resultElement = await mOpenApi.getModelElements();
+               console.log("initialized Model Elements", resultElement);
+               let resultGen = await mOpenApi.generateOpenAPI();
+               console.log("result : OpenAPI Generated", resultGen);
+               if (resultGen.result == constant.FIELD_SUCCESS) {
+                    vDialog.close();
+                    setTimeout(function () {
+                         app.dialogs.showInfoDialog(resultGen.message);
+                    }, 10);
+                    vDialog = null;
+               }
+               
+               
+          } catch (err) {
                vDialog.close();
                setTimeout(function () {
-                    app.dialogs.showInfoDialog(resultGen.message);
+                    app.dialogs.showErrorDialog(err.message);
+                    console.error("Error getUMLModel", err);
                }, 10);
-               vDialog = null;
           }
-
-
-     } catch (err) {
-          vDialog.close();
-          setTimeout(function () {
-               app.dialogs.showErrorDialog(err.message);
-               console.error("Error getUMLModel", err);
-          }, 10);
-     }
+     },0);
 }
 
 /**
@@ -483,7 +486,7 @@ function genJSONLD() {
                               let objJSONLd = jsonld.generateJSONLD();
 
                               /* Will alert dialog for not availabel class or enume in file */
-                              notAvailElement.showDialogForNotAvailableClassOrEnum();
+                              notAvailElement.showDialogNotAvailableAttribute();
 
                               let generator = new FileGenerator();
                               generator.createJSONLD(basePath, objJSONLd).then(function (res) {
@@ -520,6 +523,8 @@ function init() {
      /* Register command to Generate Generate JSON-LD Specification */
      app.commands.register('jsonld:generate', genJSONLD);
 
+     app.project.on('projectLoaded', utils.initCoreTypes);
+     app.project.on('projectLoaded', utils.initJsonRuleType);
 }
 
 exports.init = init

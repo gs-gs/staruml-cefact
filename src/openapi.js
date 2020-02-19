@@ -678,7 +678,7 @@ class OpenApi {
                          /* Generate file after JSONSchema generated */
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
-                              notAvailElement.showDialogForNotAvailableClassOrEnum();
+                              notAvailElement.showDialogNotAvailableAttribute();
                               resolve(fileGenerate);
                          }).catch(function (err) {
                               reject(err);
@@ -712,7 +712,7 @@ class OpenApi {
                          /* Generate file after OpenAPI specs generated */
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
-                              notAvailElement.showDialogForNotAvailableClassOrEnum();
+                              notAvailElement.showDialogNotAvailableAttribute();
 
                               /* Validate OpenAPI generated json and alert success or failure according  */
                               generator.validateAndPrompt().then(function (result) {
