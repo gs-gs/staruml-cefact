@@ -6,9 +6,6 @@ let UMLInterfaceRealizationView = [];
 let UMLEnumerationView = [];
 let UMLAssociationClassLinkView = [];
 
-
-
-
 /**
  * @function filterUMLClassDiagram
  * @description filter class, interface, enumeration, association, generalization, interfacerealization, association class link views from UMLClassDiagram

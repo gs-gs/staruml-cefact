@@ -177,9 +177,9 @@ class AssociationClassLink {
 
                let filterAssociation = [];
                let filter = [];
+               let associations=utils.fetchUMLAssociation();
                if (openAPI.isModelPackage()) {
 
-                    let associations = app.repository.select("@UMLAssociation");
                     filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });
@@ -192,14 +192,7 @@ class AssociationClassLink {
 
                } else if (openAPI.isModelDiagram()) {
 
-                    let dAssociationViews = dElement.getUMLAssociationView();
-
-                    let dAssociation = [];
-                    forEach(dAssociationViews,function(associationView){
-                         dAssociation.push(associationView.model);
-                    });
-                    
-                    filterAssociation = dAssociation.filter(item => {
+                    filterAssociation = associations.filter(item => {
                          return item.end1.reference._id == objClass._id
                     });
 
@@ -231,11 +224,9 @@ class AssociationClassLink {
                     });
 
                     let arrASS = openAPI.getPackageWiseUMLAssociation();
-                    console.log("arr-assso--", arrASS);
 
                     resolve(filterAssociation);
                } catch (error) {
-                    console.error("Found error", error.message);
                     utils.writeErrorToFile(error);
                     reject(error);
                }
@@ -298,7 +289,7 @@ class AssociationClassLink {
                               propertiesObj.items = itemsObj;
 
 
-                              itemsObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : "missing description");
+                              itemsObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : constant.STR_MISSING_DESCRIPTION);
                               utils.addAttributeType(itemsObj, attr);
 
                               propertiesObj.type = 'array';
@@ -310,7 +301,7 @@ class AssociationClassLink {
                               }
 
                          } else {
-                              propertiesObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : "missing description");
+                              propertiesObj.description = (attr.documentation ? utils.buildDescription(attr.documentation) : constant.STR_MISSING_DESCRIPTION);
 
                               utils.addAttributeType(propertiesObj, attr);
                               if (attr.type instanceof type.UMLEnumeration) {

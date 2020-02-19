@@ -80,7 +80,6 @@ class Generalization {
 
                });
           }
-          console.log("Generalization classes", parentGeneralizationClassAttribute);
      }
 
      /**

@@ -1,4 +1,5 @@
 const utils = require('./utils');
+const constant = require('./constant');
 var forEach = require('async-foreach').forEach;
 const openAPI = require('../src/openapi');
 /**
@@ -69,6 +70,16 @@ class Properties {
           }
           return mainPropertiesObj;
      }
+
+     /**
+      * @function addPropData
+      * @description Adds property data like multiplicity, attribute typ etc to mainPropertiesObject
+      * @param {Array} filterAttr
+      * @param {Object} mainPropertiesObj
+      * @param {Object} propertiesObj
+      * @param {UMLAttribute} attribute
+      * @memberof Properties
+      */
      addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute) {
           let _this = this;
           let aclAssoSideArr=[];
@@ -93,7 +104,7 @@ class Properties {
                     if (attribute.multiplicity === "1..*" || attribute.multiplicity === "0..*") {
                          let itemsObj = {};
                          propertiesObj.items = itemsObj;
-                         itemsObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : "missing description");
+                         itemsObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
 
                          utils.addAttributeType(itemsObj, attribute);
 
@@ -105,7 +116,7 @@ class Properties {
                               propertiesObj.minItems = 1;
                          }
                     } else {
-                         propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : "missing description");
+                         propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
 
                          utils.addAttributeType(propertiesObj, attribute);
 

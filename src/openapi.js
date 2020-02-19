@@ -1,5 +1,5 @@
+const nodeUtils = require('util');
 const fs = require('fs');
-
 const notAvailElement = require('./notavailelement');
 const Info = require('./info');
 const Component = require('./component');
@@ -41,9 +41,6 @@ class OpenApi {
           OpenApi.uniqueClassesArr = [];
           OpenApi.strPackagePath = '';
           OpenApi.error = {};
-          /* OpenApi.isDuplicate=false; */
-          /* OpenApi.duplicateClasses = []; */
-
      }
 
 
@@ -241,19 +238,16 @@ class OpenApi {
                forEach(OpenApi.operations, element => {
                     mPaths.push(element.name);
                });
-               console.log("Duplication filter done");
-               console.log("Query Total Classes", mClasses);
-               console.log("Query Total Interfaces", mPaths);
                return {
                     result: constant.FIELD_SUCCESS,
-                    message: "model element generated"
+                    message: constant.STR_MODEL_GENERATED
                };
           } else {
                let message = null;
                if (duplicateClasses.length > 1) {
-                    message = "There are duplicate \'" + duplicateClasses.join("\', \'") + "\'" + " classes for same name.";
+                    message=nodeUtils.format(constant.STR_DUPLICATE_CLASSES,duplicateClasses.join("\', \'"),'classes');
                } else {
-                    message = "There is duplicate \'" + duplicateClasses.join("\', \'") + "\'" + " class for same name.";
+                    message=nodeUtils.format(constant.STR_DUPLICATE_CLASSES,duplicateClasses.join("\', \'"),'class');
                }
 
                if (openAPI.getAppMode() == openAPI.APP_MODE_TEST && openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
@@ -684,7 +678,7 @@ class OpenApi {
                          /* Generate file after JSONSchema generated */
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
-                              notAvailElement.showDialogForNotAvailableClassOrEnum();
+                              notAvailElement.showDialogNotAvailableAttribute();
                               resolve(fileGenerate);
                          }).catch(function (err) {
                               reject(err);
@@ -718,7 +712,7 @@ class OpenApi {
                          /* Generate file after OpenAPI specs generated */
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
-                              notAvailElement.showDialogForNotAvailableClassOrEnum();
+                              notAvailElement.showDialogNotAvailableAttribute();
 
                               /* Validate OpenAPI generated json and alert success or failure according  */
                               generator.validateAndPrompt().then(function (result) {
@@ -824,26 +818,13 @@ let filteredAssociation = [];
  * @returns {Array}
  */
 function getPackageWiseUMLAssociation() {
-     // new Promise((resolve, reject) => {
 
      let associations = app.repository.select("@UMLAssociation");
      filteredAssociation = [];
      forEach(associations, (item) => {
-          // var clonedElement = Object.assign(item, item);
-          // var clonedItem = Object.assign(item, item);
-
-          // var copyObject=copy(item);
           findParentPackage(item, item);
-          // let mItem = findParentPackage(item,item);
-          /* console.log("mItem", mItem);
-          if(mItem!=null){
-               filteredAssociation.push(mPkg);
-          } */
-
      });
-     // resolve(filteredAssociation);
      return filteredAssociation;
-     // });
 }
 
 /**
@@ -856,14 +837,10 @@ function findParentPackage(ele, item) {
      // return new Promise((resolve, reject) => {
 
      if (ele instanceof type.UMLPackage) {
-          if (ele != null && ele.name == 'Movements' /* openAPI.getExportElementName() */ ) {
-               // console.log("ele",ele);
-               // console.log("item",item);
+          if (ele != null && ele.name == openAPI.getExportElementName()) {
                filteredAssociation.push(item);
-               // return item;
           }
 
-          // resolve(assocItem);
      } else if (ele.hasOwnProperty('_parent') && ele._parent != null) {
           findParentPackage(ele._parent, item);
      }

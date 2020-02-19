@@ -1,4 +1,4 @@
-const nodeUtils=require('util');
+const nodeUtils = require('util');
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
 const jsonld = require('./src/jsonld/jsonld');
@@ -44,26 +44,26 @@ function genSpecs(umlPackage, options = getGenOptions()) {
                          let varSel = exportElement.getClassName();
                          let valPackagename = type.UMLPackage.name;
                          let valClassDiagram = type.UMLClassDiagram.name;
-     
-                         let eleTypeStr='';
+
+                         let eleTypeStr = '';
                          if (varSel == valClassDiagram) {
-                              eleTypeStr='diagram'
+                              eleTypeStr = constant.STR_DIAGRAM
                               openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
                               dElement.filterUMLClassDiagram(exportElement);
                          } else if (varSel == valPackagename) {
-                              eleTypeStr='package';
+                              eleTypeStr = constant.STR_PACKAGE;
                               openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
                          } else {
                               app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
                               return;
                          }
-     
+
                          if (utils.isEmpty(exportElement)) {
-                              let str=nodeUtils.format(constant.PACKAGE_SELECTION_ERROR,eleTypeStr,eleTypeStr);
+                              let str = nodeUtils.format(constant.PACKAGE_SELECTION_ERROR, eleTypeStr, eleTypeStr);
                               app.dialogs.showErrorDialog(str);
                               return;
                          }
-     
+
                          const options = getGenOptions();
                          fileTypeSelection(exportElement, options);
                     }
@@ -84,30 +84,33 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
      const mOpenApi = new openAPI.OpenApi(exportElement, basePath, options, returnValue);
      let dm = app.dialogs;
      vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
+     utils.initCoreTypes();
+     setTimeout(async function(){
 
-     try {
-          let result = await mOpenApi.initUMLPackage()
-          console.log("initialize", result);
-          let resultElement = await mOpenApi.getModelElements();
-          console.log("resultElement", resultElement);
-          let resultGen = await mOpenApi.generateOpenAPI();
-          console.log("resultGen", resultGen);
-          if (resultGen.result == constant.FIELD_SUCCESS) {
+          try {
+               let result = await mOpenApi.initUMLPackage()
+               console.log("initialized Package", result);
+               let resultElement = await mOpenApi.getModelElements();
+               console.log("initialized Model Elements", resultElement);
+               let resultGen = await mOpenApi.generateOpenAPI();
+               console.log("result : OpenAPI Generated", resultGen);
+               if (resultGen.result == constant.FIELD_SUCCESS) {
+                    vDialog.close();
+                    setTimeout(function () {
+                         app.dialogs.showInfoDialog(resultGen.message);
+                    }, 10);
+                    vDialog = null;
+               }
+               
+               
+          } catch (err) {
                vDialog.close();
                setTimeout(function () {
-                    app.dialogs.showInfoDialog(resultGen.message);
+                    app.dialogs.showErrorDialog(err.message);
+                    console.error("Error getUMLModel", err);
                }, 10);
-               vDialog = null;
           }
-
-
-     } catch (err) {
-          vDialog.close();
-          setTimeout(function () {
-               app.dialogs.showErrorDialog(err.message);
-               console.error("Error getUMLModel", err);
-          }, 10);
-     }
+     },0);
 }
 
 /**
@@ -129,9 +132,9 @@ function fileTypeSelection(tempExportElement, options) {
                     setTimeout(function () {
                          let message = '';
                          if (openAPI.isModelPackage()) {
-                              message = "Please wait untill OpenAPI spec generation is being processed for the \'" + tempExportElement.name + "\' package";
+                              message = nodeUtils.format(constant.PROGRESS_MSG, tempExportElement.name, constant.STR_PACKAGE);
                          } else if (openAPI.isModelDiagram()) {
-                              message = "Please wait untill OpenAPI spec generation is being processed for the \'" + tempExportElement.name + "\' diagram";
+                              message = nodeUtils.format(constant.PROGRESS_MSG, tempExportElement.name, constant.STR_DIAGRAM);
                          }
                          startOpenApiGenerator(message, tempExportElement, basePath, options, returnValue);
                     }, 10);
@@ -194,7 +197,7 @@ function testSinglePackage() {
      openAPI.setTestMode(openAPI.TEST_MODE_SINGLE);
      /* Open element picker dialog to pick package */
      app.elementPickerDialog
-          .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null) 
+          .showDialog(constant.DIALOG_MSG_TEST_PICKERDIALOG, null, null)
           .then(function ({
                buttonId,
                returnValue
@@ -207,23 +210,22 @@ function testSinglePackage() {
                     let valClassDiagram = type.UMLClassDiagram.name;
 
                     let message = '';
-                    let eleTypeStr='';
+                    let eleTypeStr = '';
                     if (varSel == valClassDiagram) {
-                         eleTypeStr='diagram'
+                         eleTypeStr = constant.STR_DIAGRAM;
                          openAPI.setModelType(openAPI.APP_MODEL_DIAGRAM);
                          dElement.filterUMLClassDiagram(exportElement);
-                         message = "Please wait untill OpenAPI spec generation is being tested for the \'" + exportElement.name + "\' diagram";
                     } else if (varSel == valPackagename) {
-                         eleTypeStr='package';
+                         eleTypeStr = constant.STR_PACKAGE;
                          openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
-                         message = "Please wait untill OpenAPI spec generation is being tested for the \'" + exportElement.name + "\' package";
                     } else {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
                          return;
                     }
-
+                    
+                    message = nodeUtils.format(constant.PROGRESS_MSG, exportElement.name, eleTypeStr);
                     if (utils.isEmpty(exportElement)) {
-                         let str=nodeUtils.format(constant.PACKAGE_SELECTION_ERROR,eleTypeStr,eleTypeStr);
+                         let str = nodeUtils.format(constant.PACKAGE_SELECTION_ERROR, eleTypeStr, eleTypeStr);
                          app.dialogs.showErrorDialog(str);
                          return;
                     }
@@ -280,11 +282,11 @@ async function starTestingAllDiagram(diagramList) {
           const mOpenApi = new openAPI.OpenApi(mUMLDiagram, basePath, options, 1);
           try {
                let result = await mOpenApi.initUMLPackage()
-               console.log("initialize", result);
+               console.log("initialized Package", result);
                let resultElement = await mOpenApi.getModelElements();
-               console.log("resultElement", resultElement);
+               console.log("initialized Model Elements", resultElement);
                let resultGen = await mOpenApi.generateOpenAPI();
-               console.log("resultGen", resultGen);
+               console.log("result : OpenAPI Generated", resultGen);
           } catch (err) {
                console.error("Error startTestingAllPackage", err);
                if (openAPI.getError().hasOwnProperty('isDuplicate') && openAPI.getError().isDuplicate == true) {
@@ -398,7 +400,7 @@ function testEntirePackage() {
      });
      vDialog = null;
      let dm = app.dialogs;
-     vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec testing is being processed for the entire project.", [], true);
+     vDialog = dm.showModalDialog("", constant.titleopenapi, constant.PROGRESS_MSG_ENTIRE_PROJECT, [], true);
      setTimeout(function () {
           starTestingAllPackage(mPackages);
      }, 10);
@@ -428,7 +430,7 @@ function testEntireDiagram() {
      });
      vDialog = null;
      let dm = app.dialogs;
-     vDialog = dm.showModalDialog("", constant.titleopenapi, "Please wait untill OpenAPI spec testing is being processed for the entire diagram.", [], true);
+     vDialog = dm.showModalDialog("", constant.titleopenapi, constant.PROGRESS_MSG_ENTIRE_PROJECT, [], true);
      setTimeout(function () {
           starTestingAllDiagram(mUMLDiagrams);
      }, 10);
@@ -484,7 +486,7 @@ function genJSONLD() {
                               let objJSONLd = jsonld.generateJSONLD();
 
                               /* Will alert dialog for not availabel class or enume in file */
-                              notAvailElement.showDialogForNotAvailableClassOrEnum();
+                              notAvailElement.showDialogNotAvailableAttribute();
 
                               let generator = new FileGenerator();
                               generator.createJSONLD(basePath, objJSONLd).then(function (res) {
@@ -521,6 +523,8 @@ function init() {
      /* Register command to Generate Generate JSON-LD Specification */
      app.commands.register('jsonld:generate', genJSONLD);
 
+     app.project.on('projectLoaded', utils.initCoreTypes);
+     app.project.on('projectLoaded', utils.initJsonRuleType);
 }
 
 exports.init = init
