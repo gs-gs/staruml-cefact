@@ -393,8 +393,14 @@ function getRange(attr, className) {
             range = 'xsd:nonNegativeInteger';
         } else {
 
-            /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
-            notAvailElement.addNotAvailableAttribute(className, attr, attributeType);
+
+            if (utils.isString(attributeType) && utils.isStringCoreType(attributeType)) {
+                notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeType);
+            }
+            else{
+                /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
+                notAvailElement.addNotAvailableAttribute(className, attr, attributeType);
+            }
 
             if (attributeType === 'Numeric') {
                 range = 'xsd:string';
