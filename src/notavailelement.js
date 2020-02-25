@@ -2,12 +2,17 @@ var forEach = require('async-foreach').forEach;
 var constant = require('./constant');
 
 var notAvailableAttribute = [];
+var notLinkedType = [];
 /**
  * @function resetNotAvailableClassOrEnumeInFile
  * @description reset not available classes which is referenced in attribute type
  */
 function resetNotAvailableClassOrEnumeInFile() {
      notAvailableAttribute = [];
+}
+
+function resetNotLinkedType() {
+     notLinkedType = [];
 }
 
 /**
@@ -19,6 +24,9 @@ function getNotAvailableAttribute() {
      return notAvailableAttribute;
 }
 
+function getNotLinkedType() {
+     return notLinkedType;
+}
 /**
  * @function showDialogNotAvailableAttribute
  * @description display alert dialog if not available classes 
@@ -36,6 +44,19 @@ function showDialogNotAvailableAttribute() {
      }
 }
 
+function showDialogNotLinkedType() {
+     let mNotLinkedType = getNotLinkedType();
+     if (mNotLinkedType.length > 0) {
+
+          let dlgMessage = constant.DATA_TYPE_NOTE_LINKED_ERROR;
+          forEach(mNotLinkedType, function (item) {
+               dlgMessage += '\n' + item;
+          });
+          app.dialogs.showAlertDialog(dlgMessage);
+     }
+}
+
+
 /**
  * @function addNotAvailableClassOrEnumeInFile
  * @param (string) str
@@ -50,6 +71,23 @@ function addNotAvailableClassOrEnumeInFile(str) {
           return;
      }
      notAvailableAttribute.push(str);
+}
+
+function addNotLinkedTypeClass(str) {
+     /* check and avoid inserting duplicate msg  */
+     let result = notLinkedType.filter(function (msg) {
+          return msg == str;
+     });
+     if (result.length != 0) {
+          return;
+     }
+     notLinkedType.push(str);
+}
+
+function addNotLinkedType(className, attr, attributeType) {
+     let str = className + '/' + attr.name + ': ' + attributeType
+     addNotLinkedTypeClass(str);
+
 }
 
 /**
@@ -96,6 +134,9 @@ function isAvailable(className) {
 module.exports.resetNotAvailableClassOrEnumeInFile = resetNotAvailableClassOrEnumeInFile;
 module.exports.getNotAvailableAttribute = getNotAvailableAttribute;
 module.exports.showDialogNotAvailableAttribute = showDialogNotAvailableAttribute;
+module.exports.showDialogNotLinkedType = showDialogNotLinkedType;
 module.exports.addNotAvailableClassOrEnumeInFile = addNotAvailableClassOrEnumeInFile;
 module.exports.addNotAvailableAttribute = addNotAvailableAttribute;
 module.exports.isAvailabl = isAvailable;
+module.exports.addNotLinkedType = addNotLinkedType;
+module.exports.resetNotLinkedType = resetNotLinkedType;

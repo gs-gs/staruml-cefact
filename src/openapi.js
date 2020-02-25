@@ -666,8 +666,7 @@ class OpenApi {
                          /* Generate JSON-Schema Specification */
                          let component = new Component();
 
-                         /* Resetting for not available class or enum for Qualified attribute type */
-                         notAvailElement.resetNotAvailableClassOrEnumeInFile();
+                         
 
                          /* Add JSONSchema object in JSONSchema */                         
                          MainJSON.addJSONSchema(component);
@@ -679,6 +678,7 @@ class OpenApi {
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
                               notAvailElement.showDialogNotAvailableAttribute();
+                              notAvailElement.showDialogNotLinkedType();
                               resolve(fileGenerate);
                          }).catch(function (err) {
                               reject(err);
@@ -686,8 +686,7 @@ class OpenApi {
 
 
                     } else {
-                         /* Resetting for not available class or enum for Qualified attribute type */
-                         notAvailElement.resetNotAvailableClassOrEnumeInFile();
+                         
                          // Generate OpenAPI Specification
 
                          /*  Add openapi version */
@@ -713,6 +712,7 @@ class OpenApi {
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
                               notAvailElement.showDialogNotAvailableAttribute();
+                              notAvailElement.showDialogNotLinkedType();
 
                               /* Validate OpenAPI generated json and alert success or failure according  */
                               generator.validateAndPrompt().then(function (result) {

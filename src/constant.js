@@ -56,6 +56,7 @@ const Constant = {
      JSON_LD_SUCCESS_MSG: "JSON-LD generated successfully at : ",
      DIALOG_MSG_TEST_PICKERDIALOG: "Select package or diagram to test OpenAPI Specs.",
      msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
+     DATA_TYPE_NOTE_LINKED_ERROR:'Data type matches the name of a core type but is not linked to the type :\n',
      FILE_TYPE_JSON: 1,
      FILE_TYPE_YML: 2,
      FILE_TYPE_JSON_YML: 3,
@@ -89,6 +90,7 @@ const Constant = {
           m0:'0',
           m1:'1'
      }
+     
 
 
 }

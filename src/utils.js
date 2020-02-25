@@ -342,12 +342,27 @@ function addJsonRuleType(attr, attributeType, itemsObj) {
 
      } else if (result.length == 0) {
           itemsObj.type = 'string';
-          if (isString(attributeType)) {
+
+          if(isString(attributeType) && isStringCoreType(attributeType)){
+               notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeType);
+          } else if (isString(attributeType)) {
                notAvailElement.addNotAvailableAttribute(attr._parent.name, attr, attributeType);
           } else if (attributeType instanceof type.UMLClass) {
                notAvailElement.addNotAvailableAttribute(attr._parent.name, attr, attributeType.name);
           }
      }
+}
+function isStringCoreType(sCType) {
+
+     let coreTypes=getCoreTypes();
+     let resCType=coreTypes.filter(function(cType){
+          return cType.name == sCType
+     });
+     if(resCType.length==0){
+          return false;
+     }
+
+     return true;
 }
 /**
  * @function isCoreDataType
@@ -591,3 +606,4 @@ module.exports.fetchUMLInterfaceRealization = fetchUMLInterfaceRealization;
 module.exports.fetchUMLAssociation = fetchUMLAssociation;
 module.exports.initCoreTypes = initCoreTypes;
 module.exports.initJsonRuleType = initJsonRuleType;
+module.exports.isStringCoreType = isStringCoreType;

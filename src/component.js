@@ -59,17 +59,23 @@ class Component {
           this.mainComponentObj.schemas = this.mainSchemaObj;
           this.duplicatePropertyError = [];
           let duplicateDeletedReference = [];
-          /* Iterate through all classes*/
+          /**
+           * Iterate through all classes
+           **/
           classes.forEach(objClass => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
 
-               /* Filter Association Class Link of Current Class */
+               /** 
+                * Filter Association Class Link of Current Class 
+                **/
                let assocSideClassLink = assoClassLink.filter(item => {
                     return item.associationSide.end2.reference._id == objClass._id;
                });
 
-               /* Filter Association Class Link of Current Class */
+               /**  
+                * Filter Association Class Link of Current Class 
+                **/
                let assocClassLink = assoClassLink.filter(item => {
                     return item.associationSide.end1.reference._id == objClass._id;
                });
@@ -78,7 +84,9 @@ class Component {
 
                mainClassesObj.type = 'object';
 
-               /* Adding Properties */
+               /** 
+                * Adding Properties 
+                **/
                let properties = new Properties(objClass, assocSideClassLink);
                /* Adds Attributes, With Enum, With Multiplicity */
                mainPropertiesObj = properties.addProperties();
@@ -89,12 +97,16 @@ class Component {
                this.arrAttRequired = properties.getRequiredAttributes();
 
 
-               /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
+               /** 
+                * Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity 
+                **/
                mainPropertiesObj = this.associationClassLink.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef);
 
 
 
-               /* Get generalization of class */
+               /**
+                * Get generalization of class 
+                **/
                let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
                let aggregationClasses = [];
                let classAssociations = this.associationClassLink.getAssociationOfClass(objClass);
@@ -138,7 +150,9 @@ class Component {
                     }
                });
 
-               /* Adding Generalization : Adds refs of Class in 'allOf' object */
+               /** 
+                * Adding Generalization : Adds refs of Class in 'allOf' object 
+                **/
                mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj, compositionRef);
 
 
@@ -146,7 +160,9 @@ class Component {
                     return item.isID;
                });
 
-               /* Generate Ids Class if needed */
+               /** 
+                * Generate Ids Class if needed 
+                **/
                if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
                     let allOfArray = [];
                     mainClassesObj.allOf = allOfArray;
@@ -160,7 +176,9 @@ class Component {
 
                }
 
-               /* Adding Required (Mandatory fields) */
+               /**
+                * Adding Required (Mandatory fields) 
+                **/
                if (this.required.getRequiredAttributes(this.arrAttRequired).length > 0) {
                     mainClassesObj.required = this.required.addRequiredAttributes(this.arrAttRequired);
                }
@@ -182,7 +200,9 @@ class Component {
                          arrIdClasses.push(itemClass)
                     }
                });
-               /* Remove property which is already in ref of other property in the same schema */
+               /**
+                * Remove property which is already in ref of other property in the same schema 
+                **/
                this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
 
                // }
@@ -394,7 +414,55 @@ class Component {
 
           return mainSchemaObj;
      }
-
+     addInheritedProperties(inheritedClasses, layout) {
+          forEach(inheritedClasses, function (mClasses) {
+               forEach(mClasses.attributes, function (attribute) {
+                    /* Add attribute object to layout */
+                    let mAttributeObj = {};
+                    mAttributeObj['key'] = attribute.name;
+                    /* Add required field to attribute */
+                    if (attribute.multiplicity == "1" || attribute.multiplicity == "1..*") {
+                         mAttributeObj['required'] = true;
+                    }
+                    let attrType = attribute.type;
+                    if (attrType instanceof type.UMLEnumeration) {
+                         /* Add type field to attribute */
+                         mAttributeObj['type'] = 'array';
+                         /* Add items array to attribute */
+                         let items = [];
+                         mAttributeObj['items'] = items;
+                         let literals = [];
+                         if (openAPI.isModelPackage()) {
+                              literals = attrType.literals;
+                         } else if (openAPI.isModelDiagram()) {
+                              let enumView = utils.getViewFromCurrentDiagram(attrType);
+                              if (enumView != null) {
+                                   let literalViews = utils.getVisibleLiteralsView(enumView);
+                                   let literals = [];
+                                   forEach(literalViews, function (literalView) {
+                                        literals.push(literalView.model);
+                                   });
+                              }
+                         }
+                         forEach(literals, function (literal) {
+                              let literalObj = {};
+                              literalObj['key'] = literal.name;
+                              items.push(literalObj);
+                         });
+                    } else if (attrType instanceof type.UMLClass || attrType instanceof type.UMLInterface) {
+                         /* Add type field to attribute */
+                         mAttributeObj['type'] = 'section';
+                         /* Add items array to attribute */
+                         let items = [];
+                         mAttributeObj['items'] = items;
+                         let sectionObj = {};
+                         sectionObj['key'] = attrType.name;
+                         items.push(sectionObj);
+                    }
+                    layout.push(mAttributeObj);
+               });
+          });
+     }
      /**
       * @function getJSONSchema
       * @description Returns component object 
@@ -443,61 +511,14 @@ class Component {
                          inheritedClasses.push(obj);
                     });
 
-                    forEach(inheritedClasses, function (mClasses) {
-
-
-                         forEach(mClasses.attributes, function (attribute) {
-
-                              /* Add attribute object to layout */
-                              let mAttributeObj = {};
-                              mAttributeObj['key'] = attribute.name;
-
-                              /* Add required field to attribute */
-                              if (attribute.multiplicity == "1" || attribute.multiplicity == "1..*") {
-                                   mAttributeObj['required'] = true;
-                              }
-
-
-                              let attrType = attribute.type;
-                              if (attrType instanceof type.UMLEnumeration) {
-                                   /* Add type field to attribute */
-                                   mAttributeObj['type'] = 'array';
-                                   /* Add items array to attribute */
-                                   let items = [];
-                                   mAttributeObj['items'] = items;
-                                   let literals = [];
-                                   if (openAPI.isModelPackage()) {
-                                        literals = attrType.literals;
-                                   } else if (openAPI.isModelDiagram()) {
-                                        let enumView = utils.getViewFromCurrentDiagram(attrType);
-                                        let literalViews = utils.getVisibleLiteralsView(enumView);
-                                        let literals = [];
-                                        forEach(literalViews, function (literalView) {
-                                             literals.push(literalView.model);
-                                        });
-                                   }
-
-                                   forEach(literals, function (literal) {
-                                        let literalObj = {};
-                                        literalObj['key'] = literal.name;
-                                        items.push(literalObj);
-                                   });
-                              } else if (attrType instanceof type.UMLClass || attrType instanceof type.UMLInterface) {
-                                   /* Add type field to attribute */
-                                   mAttributeObj['type'] = 'section';
-                                   /* Add items array to attribute */
-                                   let items = [];
-                                   mAttributeObj['items'] = items;
-                                   let sectionObj = {};
-                                   sectionObj['key'] = attrType.name;
-                                   items.push(sectionObj);
-                              }
-                              layout.push(mAttributeObj);
-                         });
-
-                    });
+                    this.addInheritedProperties(inheritedClasses, layout);
 
                     console.log("---------------");
+                    let views = dElement.getUMLAssociationView();
+                    let dCompositionModel = [];
+                    forEach(views, function (view) {
+                         dCompositionModel.push(view.model);
+                    });
                     let referenceClasses = [];
                     forEach(inheritedClasses, function (mClass) {
 
@@ -507,69 +528,25 @@ class Component {
                                    referenceClasses.push(assoc.end2.reference);
                               });
                          } else {
-                              let views = dElement.getUMLAssociationView();
-                              forEach(views, function (item) {
-                                   if (mClass._id == item.model.end1.reference._id) {
-                                        referenceClasses.push(item.model.end2.reference);
+
+                              forEach(dCompositionModel, function (item) {
+                                   if (mClass._id == item.end1.reference._id) {
+                                        referenceClasses.push(item.end2.reference);
                                    }
                               });
 
                          }
                     });
-                    console.log("referenc classes", referenceClasses);
-                    forEach(referenceClasses, function (mClasses) {
-
-
-                         forEach(mClasses.attributes, function (attribute) {
-
-                              /* Add attribute object to layout */
-                              let mAttributeObj = {};
-                              mAttributeObj['key'] = attribute.name;
-
-                              /* Add required field to attribute */
-                              if (attribute.multiplicity == "1" || attribute.multiplicity == "1..*") {
-                                   mAttributeObj['required'] = true;
-                              }
-
-
-                              let attrType = attribute.type;
-                              if (attrType instanceof type.UMLEnumeration) {
-                                   /* Add type field to attribute */
-                                   mAttributeObj['type'] = 'array';
-                                   /* Add items array to attribute */
-                                   let items = [];
-                                   mAttributeObj['items'] = items;
-                                   let literals = [];
-                                   if (openAPI.isModelPackage()) {
-                                        literals = attrType.literals;
-                                   } else if (openAPI.isModelDiagram()) {
-                                        let enumView = utils.getViewFromCurrentDiagram(attrType);
-                                        let literalViews = utils.getVisibleLiteralsView(enumView);
-                                        let literals = [];
-                                        forEach(literalViews, function (literalView) {
-                                             literals.push(literalView.model);
-                                        });
-                                   }
-
-                                   forEach(literals, function (literal) {
-                                        let literalObj = {};
-                                        literalObj['key'] = literal.name;
-                                        items.push(literalObj);
-                                   });
-                              } else if (attrType instanceof type.UMLClass || attrType instanceof type.UMLInterface) {
-                                   /* Add type field to attribute */
-                                   mAttributeObj['type'] = 'section';
-                                   /* Add items array to attribute */
-                                   let items = [];
-                                   mAttributeObj['items'] = items;
-                                   let sectionObj = {};
-                                   sectionObj['key'] = attrType.name;
-                                   items.push(sectionObj);
-                              }
-                              layout.push(mAttributeObj);
+                    let uniqueRefClasses = [];
+                    forEach(referenceClasses, function (mClass) {
+                         let res = uniqueRefClasses.filter(function (item) {
+                              return item._id == mClass._id;
                          });
-
+                         if (res.length == 0) {
+                              uniqueRefClasses.push(mClass);
+                         }
                     });
+                    this.addInheritedProperties(uniqueRefClasses, layout);
                });
           });
           return layout;
@@ -589,10 +566,9 @@ class Component {
                result = app.repository.select(target.name + '::@UMLGeneralization');
           } else {
                let views = dElement.getUMLGeneralizationView();
-               let vModel = [];
                forEach(views, function (item) {
                     if (target._id == item.model.source._id) {
-                         vModel.push(item.model);
+                         result.push(item.model);
                     }
                });
 
