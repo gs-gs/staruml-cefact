@@ -26,6 +26,9 @@ const JSON_FILE_FILTERS = [{
  * @param {Object} options
  */
 function genSpecs(umlPackage, options = getGenOptions()) {
+     /* Clear old msgs from  not availabe class and not linked type */
+     resetOldMsgs();
+
      /* There are two modes of extension, TEST & GENERATE. Here we set APP_MODE_GEN. */
      openAPI.setAppMode(openAPI.APP_MODE_GEN); /* 0 mode for Generate API */
      /* If umlPackage is not assigned, popup ElementPicker */
@@ -84,8 +87,10 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
      const mOpenApi = new openAPI.OpenApi(exportElement, basePath, options, returnValue);
      let dm = app.dialogs;
      vDialog = dm.showModalDialog("", constant.titleopenapi, message, [], true);
+
+     /* Initialize coretypes */
      utils.initCoreTypes();
-     setTimeout(async function(){
+     setTimeout(async function () {
 
           try {
                let result = await mOpenApi.initUMLPackage()
@@ -101,8 +106,8 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
                     }, 10);
                     vDialog = null;
                }
-               
-               
+
+
           } catch (err) {
                vDialog.close();
                setTimeout(function () {
@@ -110,7 +115,7 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
                     console.error("Error getUMLModel", err);
                }, 10);
           }
-     },0);
+     }, 0);
 }
 
 /**
@@ -155,6 +160,8 @@ function fileTypeSelection(tempExportElement, options) {
  * @param {Object} options
  */
 function selectPkgDiagram() {
+     /* Clear old msgs from  not availabe class and not linked type */
+     resetOldMsgs();
 
      app.dialogs.showSelectDropdownDialog(constant.msg_pkg_diagram_select, constant.pkgOptions).then(function ({
           buttonId,
@@ -185,11 +192,20 @@ function getGenOptions() {
      };
 }
 
+function resetOldMsgs() {
+     /* Resetting for not available class or enum for Qualified attribute type */
+     notAvailElement.resetNotAvailableClassOrEnumeInFile();
+     /* Resetting for not linked type */
+     notAvailElement.resetNotLinkedType();
+}
+
 /**
  * @function testSinglePackage
  * @description Test single package which user has selected from elementPickerDialog
  */
 function testSinglePackage() {
+     /* Clear old msgs from  not availabe class and not linked type */
+     resetOldMsgs();
 
      /* There are two modes of extension, TEST & GENERATE. Here we set TEST mode. */
      openAPI.setAppMode(openAPI.APP_MODE_TEST);
@@ -222,7 +238,7 @@ function testSinglePackage() {
                          app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE);
                          return;
                     }
-                    
+
                     message = nodeUtils.format(constant.PROGRESS_MSG, exportElement.name, eleTypeStr);
                     if (utils.isEmpty(exportElement)) {
                          let str = nodeUtils.format(constant.PACKAGE_SELECTION_ERROR, eleTypeStr, eleTypeStr);
@@ -457,7 +473,11 @@ function aboutUsExtension() {
  * @description Display Information about Extension like the title and description of OpenAPI Specification.
  */
 function genJSONLD() {
+     /* Clear old msgs from  not availabe class and not linked type */
+     resetOldMsgs();
 
+     /* Initialize coretypes */
+     utils.initCoreTypes();
      /* Open element picker dialog to pick package */
      app.elementPickerDialog
           .showDialog(constant.JSONLD_MSG_PICKERDIALOG, null, null) /* type.UMLPackage */
@@ -482,11 +502,12 @@ function genJSONLD() {
 
                               console.log("generateJSONLD");
                               jsonld.setExportElement(returnValue);
-                              notAvailElement.resetNotAvailableClassOrEnumeInFile();
+
                               let objJSONLd = jsonld.generateJSONLD();
 
                               /* Will alert dialog for not availabel class or enume in file */
                               notAvailElement.showDialogNotAvailableAttribute();
+                              notAvailElement.showDialogNotLinkedType();
 
                               let generator = new FileGenerator();
                               generator.createJSONLD(basePath, objJSONLd).then(function (res) {
@@ -523,7 +544,6 @@ function init() {
      /* Register command to Generate Generate JSON-LD Specification */
      app.commands.register('jsonld:generate', genJSONLD);
 
-     app.project.on('projectLoaded', utils.initCoreTypes);
      app.project.on('projectLoaded', utils.initJsonRuleType);
 }
 
