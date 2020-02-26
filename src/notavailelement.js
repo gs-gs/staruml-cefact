@@ -1,6 +1,7 @@
 var forEach = require('async-foreach').forEach;
 var constant = require('./constant');
-
+var fs = require('fs');
+var path = require('path');
 var notAvailableAttribute = [];
 var notLinkedType = [];
 /**
@@ -37,10 +38,32 @@ function showDialogNotAvailableAttribute() {
      if (notAvailElement.length > 0) {
 
           let dlgMessage = constant.STR_WARNING_VOCABULARY;
-          forEach(notAvailElement, function (item) {
-               dlgMessage += '\n' + item;
+          /* Display maximum 20 lines in alert. The rest lines write in separate file  */
+          forEach(notAvailElement, function (item, index) {
+               if (index < constant.MAX_LINES) {
+                    dlgMessage += '\n' + item;
+               }
           });
+          if (notAvailElement.length > constant.MAX_LINES) {
+               let basePath = __dirname + constant.IDEAL_VOCAB_ERROR_PATH;
+               basePath = path.join(basePath, constant.VOCABS_FILE_NAME);
+               let writeMsgs = '';
+               forEach(notAvailElement, function (item) {
+                    writeMsgs += item + '\n';
+               });
+               fs.writeFile(basePath, writeMsgs, function (err) {
+                    if (err) {
+                         console.error("Error : ", err.message);
+                         app.dialogs.showErrorDialog(err.message);
+                         return;
+                    }
+               });
+               dlgMessage += '\n\n\n' + constant.MSG_MORE_VOCABS + basePath;
+          }
+
+
           app.dialogs.showAlertDialog(dlgMessage);
+
      }
 }
 
