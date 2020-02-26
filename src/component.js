@@ -28,7 +28,6 @@ class Component {
           this.mainComponentObj = {};
           this.mainSchemaObj = {};
           utils.resetErrorBlock();
-          this.arrAttRequired = [];
           /* this.arrAssoc = []; */
           this.required = new Required();
           this.generalization = new Generalization();
@@ -93,7 +92,7 @@ class Component {
 
                let compositionRef = [];
 
-               this.arrAttRequired = properties.getRequiredAttributes();
+               let arrAttributes = properties.getAttributes();
 
 
                /** 
@@ -135,12 +134,12 @@ class Component {
 
                          if (assoc.end1.aggregation == constant.shared) {
                               /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
-                              let aggregation = new Aggregation(this.arrAttRequired);
+                              let aggregation = new Aggregation(arrAttributes);
                               mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
 
                          } else {
                               /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
-                              let composition = new Composition(this.arrAttRequired);
+                              let composition = new Composition(arrAttributes);
                               mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
 
                          }
@@ -155,7 +154,7 @@ class Component {
                mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj, compositionRef);
 
 
-               let filterAttributes = this.arrAttRequired.filter(item => {
+               let filterAttributes = arrAttributes.filter(item => {
                     return item.isID;
                });
 
@@ -178,8 +177,8 @@ class Component {
                /**
                 * Adding Required (Mandatory fields) 
                 **/
-               if (this.required.getRequiredAttributes(this.arrAttRequired).length > 0) {
-                    mainClassesObj.required = this.required.addRequiredAttributes(this.arrAttRequired);
+               if (this.required.getRequiredAttributes(arrAttributes).length > 0) {
+                    mainClassesObj.required = this.required.addRequiredAttributes(arrAttributes);
                }
 
                /**
@@ -265,7 +264,7 @@ class Component {
 
                let compositionRef = [];
 
-               let arrAttRequired = properties.getRequiredAttributes();
+               let arrAttributes = properties.getAttributes();
 
                /* Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity */
                mainPropertiesObj = this.associationClassLink.addAssociationClassLinkProperties(aclClassSideView, mainPropertiesObj, compositionRef);
@@ -303,12 +302,12 @@ class Component {
 
                          if (assoc.end1.aggregation == constant.shared) {
                               /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
-                              let aggregation = new Aggregation(arrAttRequired);
+                              let aggregation = new Aggregation(arrAttributes);
                               mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
 
                          } else {
                               /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
-                              let composition = new Composition(arrAttRequired);
+                              let composition = new Composition(arrAttributes);
                               mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
 
                          }
@@ -320,7 +319,7 @@ class Component {
                /* Adding Generalization : Adds refs of Class in 'allOf' object */
                mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj, compositionRef);
 
-               let filterAttributes = arrAttRequired.filter(item => {
+               let filterAttributes = arrAttributes.filter(item => {
                     return item.isID;
                });
 
@@ -339,8 +338,8 @@ class Component {
                }
 
                /* Adding Required (Mandatory fields) */
-               if (this.required.getRequiredAttributes(arrAttRequired).length > 0) {
-                    mainClassesObj.required = this.required.addRequiredAttributes(arrAttRequired);
+               if (this.required.getRequiredAttributes(arrAttributes).length > 0) {
+                    mainClassesObj.required = this.required.addRequiredAttributes(arrAttributes);
                }
 
                /**
