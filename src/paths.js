@@ -53,7 +53,6 @@ class Paths {
                     subResource.push(item);
                }
           });
-          console.log("subResource", subResource);
           return subResource;
      }
      /**
@@ -116,20 +115,21 @@ class Paths {
 
                          }
 
-                         /* 1.
-                         write simple path object of GET, POST operations 
+                         /* 
+                         1. Generate query type paramters for all non-id interface attributes for 'GET'
+                         2. write simple path object of POST operations 
                          Pattern : (GET/POST) : '/{pathname}'
                          */
-                         this.writeSimplePathObject(pathsObject, mOperations, mainPathsObject, objInterfaceRealization);
+                         this.writeSimplePathObject(pathsObject, mOperations, objInterfaceRealization);
 
-                         /* 2.
-                         write {id} path object of (GET, PUT, DELETE) Operations
+                         /* 
+                         3. write {id} path object of (GET, PUT, DELETE) Operations
                          Pattern : (GET/PUT/DELETE) : '/{pathname}/{id}'
                          */
                          this.writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization);
 
-                         /* 3.
-                         Write path object for sub-resource pattern #90 
+                         /* 
+                         4. Write path object for sub-resource pattern #90 
                          Pattern : (GET/POST/DELETE/PUT) : '/{pathname}/{id}/{sub-resource-pathname}/{sub-resource-id}'
                          */
                          this.writeSubResourcePathObject(objInterface, objInterfaceRealization, mainPathsObject);
@@ -174,11 +174,11 @@ class Paths {
       * @return {object} mainPathsObject
       * @memberof Paths
       */
-     writeSimplePathObject(pathsObject, mOperations, mainPathsObject, objInterfaceRealization) {
+     writeSimplePathObject(pathsObject, mOperations, objInterfaceRealization) {
           mOperations.forEach(objOperation => {
 
                if (objOperation.name.toUpperCase() == constant.GET) {
-                    pathsObject.get = this.operations.get(mainPathsObject, objInterfaceRealization, objOperation);
+                    pathsObject.get = this.operations.get(objInterfaceRealization, objOperation);
 
 
                } else if (objOperation.name.toUpperCase() == constant.POST) {

@@ -23,7 +23,7 @@ class Operations {
       * @returns {Object} 
       * @memberof Operations
       */
-     get(mainPathsObject,objInterface, objOperation) {
+     get(objInterface, objOperation) {
 
           let wOperationObject = {};
 

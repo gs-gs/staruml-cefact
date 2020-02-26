@@ -13,7 +13,6 @@ const Required = require('./required');
 const openAPI = require('./openapi');
 const constant = require('./constant');
 const dElement = require('./diagram/dElement');
-const notAvailElement = require('./notavailelement');
 
 /**
  * @class Component 
@@ -414,6 +413,14 @@ class Component {
 
           return mainSchemaObj;
      }
+
+     /**
+      * @function addInheritedProperties
+      * @param {Array} inheritedClasses
+      * @param {Array} layout
+      * @description add properties inherited from generalization and composition
+      * @memberof Component
+      */
      addInheritedProperties(inheritedClasses, layout) {
           forEach(inheritedClasses, function (mClasses) {
                forEach(mClasses.attributes, function (attribute) {
@@ -513,7 +520,6 @@ class Component {
 
                     this.addInheritedProperties(inheritedClasses, layout);
 
-                    console.log("---------------");
                     let views = dElement.getUMLAssociationView();
                     let dCompositionModel = [];
                     forEach(views, function (view) {

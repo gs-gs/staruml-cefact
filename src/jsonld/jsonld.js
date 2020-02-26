@@ -227,6 +227,11 @@ function getParentClasses(mElement) {
     return parentClasses;
 }
 
+/**
+ * @function getRdfsInstancesArr
+ * @description returns Rdfs Instance array
+ * @returns {Array}
+ */
 function getRdfsInstancesArr() {
     let rdfsInstancesArr = [ /* {# instances #} */ ];
     let mUMLPackage = getExportElement();
@@ -250,7 +255,6 @@ function getRdfsInstancesArr() {
             }
         });
     }); 
-    console.log("used enum", enumArr);
     */
     let UMLEnumeration = app.repository.select(mUMLPackage.name + "::@UMLEnumeration");
 
@@ -264,7 +268,6 @@ function getRdfsInstancesArr() {
             newallyFiltered.push(enume);
         }
     });
-    console.log("newally filtered enum", newallyFiltered);
     forEach(newallyFiltered, function (enume) {
         forEach(enume.literals, function (literal) {
             let mEnumeObj = {};
@@ -448,6 +451,11 @@ function getExportElement() {
     return UMLPackage;
 }
 
+/**
+ * @function getNotAvailableAttribute
+ * @description return undefined attribute type
+ * @returns {Array}
+ */
 function getNotAvailableAttribute() {
     return notAvailableAttribute;
 }

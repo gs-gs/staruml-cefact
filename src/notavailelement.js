@@ -12,6 +12,10 @@ function resetNotAvailableClassOrEnumeInFile() {
      notAvailableAttribute = [];
 }
 
+/**
+ * @function resetNotLinkedType
+ * @description reset list of not linked types
+ */
 function resetNotLinkedType() {
      notLinkedType = [];
 }
@@ -25,9 +29,15 @@ function getNotAvailableAttribute() {
      return notAvailableAttribute;
 }
 
+/**
+ * @function getNotLinkedType
+ * @description returns list of not linked types
+ * @returns {Array}
+ */
 function getNotLinkedType() {
      return notLinkedType;
 }
+
 /**
  * @function showDialogNotAvailableAttribute
  * @description display alert dialog if not available classes 
@@ -67,6 +77,10 @@ function showDialogNotAvailableAttribute() {
      }
 }
 
+/**
+ * @function showDialogNotLinkedType
+ * @description display alert dialog that for not linked types
+ */
 function showDialogNotLinkedType() {
      let mNotLinkedType = getNotLinkedType();
      if (mNotLinkedType.length > 0) {
@@ -117,6 +131,11 @@ function addNotAvailableClassOrEnumeInFile(str) {
      notAvailableAttribute.push(str);
 }
 
+/**
+ * @function addNotLinkedTypeClass
+ * @param {string} str
+ * @description avoid duplication and adds not linked type to notlinkedtype array 
+ */
 function addNotLinkedTypeClass(str) {
      /* check and avoid inserting duplicate msg  */
      let result = notLinkedType.filter(function (msg) {
@@ -128,6 +147,13 @@ function addNotLinkedTypeClass(str) {
      notLinkedType.push(str);
 }
 
+/**
+ * @function addNotLinkedType
+ * @param {string} className
+ * @param {UMLAttribute} attr
+ * @param {string} attributeType
+ * @description add not linked type to notlinkedtype array 
+ */
 function addNotLinkedType(className, attr, attributeType) {
      let str = className + '/' + attr.name + ': ' + attributeType
      addNotLinkedTypeClass(str);
