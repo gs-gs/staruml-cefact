@@ -59,6 +59,8 @@ const Constant = {
      msg_description: "This OpenAPI Spec was generated using StarUML extension https://github.com/gs-gs/staruml-cefact  version: " + version,
      DATA_TYPE_NOTE_LINKED_ERROR:'Data type matches the name of a core type but is not linked to the type :\n',
      MSG_CORE_TYPE_NOT_AVAILABLE:"Core types not available",
+     NOT_LINKED_TYPE_FILE_NAME:"notlinkedtype.txt",
+     MSG_MORE_NOT_LINKED_TYPE:"There are more not lined types are wrote in file at ",
      MSG_MORE_VOCABS:"There are more vocabulary that is wrote in file at ",
      VOCABS_FILE_NAME:"vocab.txt",
      FILE_TYPE_JSON: 1,

@@ -72,9 +72,30 @@ function showDialogNotLinkedType() {
      if (mNotLinkedType.length > 0) {
 
           let dlgMessage = constant.DATA_TYPE_NOTE_LINKED_ERROR;
-          forEach(mNotLinkedType, function (item) {
-               dlgMessage += '\n' + item;
+          /* Display maximum 20 lines in alert. The rest lines write in separate file  */
+          forEach(mNotLinkedType, function (item, index) {
+               if (index < constant.MAX_LINES) {
+                    dlgMessage += '\n' + item;
+               }
           });
+
+          if (mNotLinkedType.length > constant.MAX_LINES) {
+               let basePath = __dirname + constant.IDEAL_VOCAB_ERROR_PATH;
+               basePath = path.join(basePath, constant.NOT_LINKED_TYPE_FILE_NAME);
+               let writeMsgs = '';
+               forEach(mNotLinkedType, function (item) {
+                    writeMsgs += item + '\n';
+               });
+               fs.writeFile(basePath, writeMsgs, function (err) {
+                    if (err) {
+                         console.error("Error : ", err.message);
+                         app.dialogs.showErrorDialog(err.message);
+                         return;
+                    }
+               });
+               dlgMessage += '\n\n\n' + constant.MSG_MORE_NOT_LINKED_TYPE + basePath;
+          }
+
           app.dialogs.showAlertDialog(dlgMessage);
      }
 }
