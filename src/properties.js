@@ -24,7 +24,7 @@ class Properties {
       * @returns {Array}
       * @memberof Properties
       */
-     getRequiredAttributes() {
+     getAttributes() {
           return this.arrAttRequired;
      }
 

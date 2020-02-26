@@ -237,6 +237,13 @@ function addAttributeType(itemsObj, attr) {
      }
 }
 
+/**
+ * @function addReferenceTypeRule
+ * @description adds reference of compound type to attribute 
+ * @param {Object} itemsObj 
+ * @param {UMLClass} coreType 
+ * @memberof Utils
+ */
 function addReferenceTypeRule(itemsObj, coreType) {
      let allOfArray = [];
      itemsObj.allOf = allOfArray;
@@ -261,6 +268,11 @@ function addReferenceTypeRule(itemsObj, coreType) {
 }
 let mJsonRuleType = [];
 
+/**
+ * @function initJsonRuleType
+ * @description initialize array of attributes to add in attribute type which is used while compound type has no attributes then type which is in string matches in this array 
+ * @memberof Utils
+ */
 function initJsonRuleType() {
      mJsonRuleType = [{
           key: 'Text',
@@ -321,13 +333,25 @@ function initJsonRuleType() {
           key: 'Quantity',
           type: 'integer'
      }];
-     console.log("JsonRuleType initialized", mJsonRuleType);
 }
 
+/**
+ * @function getJsonRuleType
+ * @description returns array of json rule type
+ * @memberof Utils
+ */
 function getJsonRuleType() {
      return mJsonRuleType;
 }
 
+/**
+ * @function addJsonRuleType
+ * @param {attr} UMLAttributeType
+ * @param {attributeType} attributeType
+ * @param {Object} itemsObj
+ * @description add Json Rule Type in attribute type which is used while compound type has no attributes then type which is in string matches in this array 
+ * @memberof Utils
+ */
 function addJsonRuleType(attr, attributeType, itemsObj) {
 
      let result = getJsonRuleType().filter(function (rule) {
@@ -352,6 +376,14 @@ function addJsonRuleType(attr, attributeType, itemsObj) {
           }
      }
 }
+
+/**
+ * @function isStringCoreType
+ * @param {String} sCType
+ * @description check and return boolen that string sCType type name class is available in core types
+ * @returns {boolean}
+ * @memberof Utils
+ */
 function isStringCoreType(sCType) {
 
      let coreTypes=getCoreTypes();
@@ -545,6 +577,12 @@ function fetchUMLInterfaceRealization() {
      return interfaceRealalization;
 }
 
+/**
+ * @function fetchUMLAssociation
+ * @description returns UMLAssociations
+ * @returns {Array}
+ * @memberof Utils
+ */
 function fetchUMLAssociation() {
      let interfaceAssociation = [];
      if (openAPI.isModelPackage()) {
@@ -558,7 +596,11 @@ function fetchUMLAssociation() {
      return interfaceAssociation;
 }
 
-
+/**
+ * @function initCoreTypes
+ * @description initialize core types
+ * @memberof Utils
+ */
 function initCoreTypes() {
 
      let result = app.repository.select('Core::@UMLPackage');
@@ -567,18 +609,31 @@ function initCoreTypes() {
      });
 
      // result = app.repository.select(result.name + '::@UMLPackage');
+     if(result.length==0){
+          app.dialogs.showAlertDialog(constant.MSG_CORE_TYPE_NOT_AVAILABLE);
+          return;
+     }
      let typePkg = result[0];
      let coreTypes = app.repository.select(typePkg.name + "::@UMLClass");
      setCoreTypes(coreTypes);
 
-     console.log("CoreTypes initialized", getCoreTypes());
 }
-let mCoreTypes = [];
 
+let mCoreTypes = [];
+/**
+ * @function setCoreTypes
+ * @description set list of core types
+ * @memberof Utils
+ */
 function setCoreTypes(coreTypes) {
      mCoreTypes = coreTypes;
 }
 
+/**
+ * @function getCoreTypes
+ * @description returns array of core types
+ * @memberof Utils
+ */
 function getCoreTypes() {
      return mCoreTypes;
 }

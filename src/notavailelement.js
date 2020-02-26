@@ -1,6 +1,7 @@
 var forEach = require('async-foreach').forEach;
 var constant = require('./constant');
-
+var fs = require('fs');
+var path = require('path');
 var notAvailableAttribute = [];
 var notLinkedType = [];
 /**
@@ -11,6 +12,10 @@ function resetNotAvailableClassOrEnumeInFile() {
      notAvailableAttribute = [];
 }
 
+/**
+ * @function resetNotLinkedType
+ * @description reset list of not linked types
+ */
 function resetNotLinkedType() {
      notLinkedType = [];
 }
@@ -24,9 +29,15 @@ function getNotAvailableAttribute() {
      return notAvailableAttribute;
 }
 
+/**
+ * @function getNotLinkedType
+ * @description returns list of not linked types
+ * @returns {Array}
+ */
 function getNotLinkedType() {
      return notLinkedType;
 }
+
 /**
  * @function showDialogNotAvailableAttribute
  * @description display alert dialog if not available classes 
@@ -37,21 +48,68 @@ function showDialogNotAvailableAttribute() {
      if (notAvailElement.length > 0) {
 
           let dlgMessage = constant.STR_WARNING_VOCABULARY;
-          forEach(notAvailElement, function (item) {
-               dlgMessage += '\n' + item;
+          /* Display maximum 20 lines in alert. The rest lines write in separate file  */
+          forEach(notAvailElement, function (item, index) {
+               if (index < constant.MAX_LINES) {
+                    dlgMessage += '\n' + item;
+               }
           });
+          if (notAvailElement.length > constant.MAX_LINES) {
+               let basePath = __dirname + constant.IDEAL_VOCAB_ERROR_PATH;
+               basePath = path.join(basePath, constant.VOCABS_FILE_NAME);
+               let writeMsgs = '';
+               forEach(notAvailElement, function (item) {
+                    writeMsgs += item + '\n';
+               });
+               fs.writeFile(basePath, writeMsgs, function (err) {
+                    if (err) {
+                         console.error("Error : ", err.message);
+                         app.dialogs.showErrorDialog(err.message);
+                         return;
+                    }
+               });
+               dlgMessage += '\n\n\n' + constant.MSG_MORE_VOCABS + basePath;
+          }
+
+
           app.dialogs.showAlertDialog(dlgMessage);
+
      }
 }
 
+/**
+ * @function showDialogNotLinkedType
+ * @description display alert dialog that for not linked types
+ */
 function showDialogNotLinkedType() {
      let mNotLinkedType = getNotLinkedType();
      if (mNotLinkedType.length > 0) {
 
           let dlgMessage = constant.DATA_TYPE_NOTE_LINKED_ERROR;
-          forEach(mNotLinkedType, function (item) {
-               dlgMessage += '\n' + item;
+          /* Display maximum 20 lines in alert. The rest lines write in separate file  */
+          forEach(mNotLinkedType, function (item, index) {
+               if (index < constant.MAX_LINES) {
+                    dlgMessage += '\n' + item;
+               }
           });
+
+          if (mNotLinkedType.length > constant.MAX_LINES) {
+               let basePath = __dirname + constant.IDEAL_VOCAB_ERROR_PATH;
+               basePath = path.join(basePath, constant.NOT_LINKED_TYPE_FILE_NAME);
+               let writeMsgs = '';
+               forEach(mNotLinkedType, function (item) {
+                    writeMsgs += item + '\n';
+               });
+               fs.writeFile(basePath, writeMsgs, function (err) {
+                    if (err) {
+                         console.error("Error : ", err.message);
+                         app.dialogs.showErrorDialog(err.message);
+                         return;
+                    }
+               });
+               dlgMessage += '\n\n\n' + constant.MSG_MORE_NOT_LINKED_TYPE + basePath;
+          }
+
           app.dialogs.showAlertDialog(dlgMessage);
      }
 }
@@ -73,6 +131,11 @@ function addNotAvailableClassOrEnumeInFile(str) {
      notAvailableAttribute.push(str);
 }
 
+/**
+ * @function addNotLinkedTypeClass
+ * @param {string} str
+ * @description avoid duplication and adds not linked type to notlinkedtype array 
+ */
 function addNotLinkedTypeClass(str) {
      /* check and avoid inserting duplicate msg  */
      let result = notLinkedType.filter(function (msg) {
@@ -84,6 +147,13 @@ function addNotLinkedTypeClass(str) {
      notLinkedType.push(str);
 }
 
+/**
+ * @function addNotLinkedType
+ * @param {string} className
+ * @param {UMLAttribute} attr
+ * @param {string} attributeType
+ * @description add not linked type to notlinkedtype array 
+ */
 function addNotLinkedType(className, attr, attributeType) {
      let str = className + '/' + attr.name + ': ' + attributeType
      addNotLinkedTypeClass(str);

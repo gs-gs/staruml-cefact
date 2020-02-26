@@ -283,13 +283,10 @@ class OpenApi {
                }
 
           });
-          console.log("Filter class done");
-
           /* ------------ 5. Sort unique classes ------------ */
           resArr.sort(function (a, b) {
                return a.name.localeCompare(b.name);
           });
-          console.log("Sort class done");
           return resArr;
      }
 
@@ -778,7 +775,6 @@ function validateSwagger(pathValidator) {
           try {
                /*  console.log("Filepath :", pathValidator); */
                if (fs.existsSync(pathValidator)) {
-                    console.log("File exist");
                     parser.validate(pathValidator, (err, api) => {
                          if (err) {
                               /* Error */
