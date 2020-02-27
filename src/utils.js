@@ -483,11 +483,10 @@ function getVisibleOperationView(elementView) {
 /**
  * @function getCoreDataTypeAttributeClass
  * @description find and returns list of classes that of CoreTypes
- * @param {Object} classes 
  * @returns {Array}
  * @memberof Utils
  */
-function getCoreDataTypeAttributeClass(classes) {
+function getCoreDataTypeAttributeClass() {
      let arrCoreDataTypeAttr = [];
 
      if (openAPI.isModelDiagram()) {
@@ -508,6 +507,9 @@ function getCoreDataTypeAttributeClass(classes) {
                });
           });
      } else {
+
+          let classes = openAPI.getClasses();
+          
           forEach(classes, function (mClass) {
                /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
                forEach(mClass.attributes, function (attrib) {
