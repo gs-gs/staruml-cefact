@@ -1,3 +1,4 @@
+const openAPI = require('../src/openapi');
 var forEach = require('async-foreach').forEach;
 var constant = require('./constant');
 var fs = require('fs');
@@ -37,7 +38,7 @@ function getNotAvailableAttribute() {
 function getNotLinkedType() {
      return notLinkedType;
 }
-
+const nodeUtils = require('util');
 /**
  * @function showDialogNotAvailableAttribute
  * @description display alert dialog if not available classes 
@@ -47,7 +48,7 @@ function showDialogNotAvailableAttribute() {
      let notAvailElement = getNotAvailableAttribute();
      if (notAvailElement.length > 0) {
 
-          let dlgMessage = constant.STR_WARNING_VOCABULARY;
+          let dlgMessage = nodeUtils.format(constant.STR_WARNING_VOCABULARY, openAPI.getExportElementName(), openAPI.isModelPackage()?constant.STR_PACKAGE:constant.STR_DIAGRAM);
           /* Display maximum 20 lines in alert. The rest lines write in separate file  */
           forEach(notAvailElement, function (item, index) {
                if (index < constant.MAX_LINES) {
@@ -56,7 +57,7 @@ function showDialogNotAvailableAttribute() {
           });
           if (notAvailElement.length > constant.MAX_LINES) {
                let basePath = __dirname + constant.IDEAL_VOCAB_ERROR_PATH;
-               basePath = path.join(basePath, constant.VOCABS_FILE_NAME);
+               basePath = path.join(basePath, openAPI.getExportElementName()+"_"+constant.VOCABS_FILE_NAME);
                let writeMsgs = '';
                forEach(notAvailElement, function (item) {
                     writeMsgs += item + '\n';
@@ -85,7 +86,7 @@ function showDialogNotLinkedType() {
      let mNotLinkedType = getNotLinkedType();
      if (mNotLinkedType.length > 0) {
 
-          let dlgMessage = constant.DATA_TYPE_NOTE_LINKED_ERROR;
+          let dlgMessage = nodeUtils.format(constant.DATA_TYPE_NOTE_LINKED_ERROR, openAPI.getExportElementName(), openAPI.isModelPackage()?constant.STR_PACKAGE:constant.STR_DIAGRAM);
           /* Display maximum 20 lines in alert. The rest lines write in separate file  */
           forEach(mNotLinkedType, function (item, index) {
                if (index < constant.MAX_LINES) {
@@ -95,7 +96,7 @@ function showDialogNotLinkedType() {
 
           if (mNotLinkedType.length > constant.MAX_LINES) {
                let basePath = __dirname + constant.IDEAL_VOCAB_ERROR_PATH;
-               basePath = path.join(basePath, constant.NOT_LINKED_TYPE_FILE_NAME);
+               basePath = path.join(basePath, openAPI.getExportElementName()+"_"+constant.NOT_LINKED_TYPE_FILE_NAME);
                let writeMsgs = '';
                forEach(mNotLinkedType, function (item) {
                     writeMsgs += item + '\n';
