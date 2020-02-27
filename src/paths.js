@@ -152,7 +152,30 @@ class Paths {
       */
      writeSubResourcePathObject(objInterface, objInterfaceRealization, mainPathsObject) {
           if (this.hasSubResources(objInterface)) {
-               if (objInterface.ownedElements.length > 0) {
+
+
+               let interfaceAssociation = utils.fetchUMLAssociation();
+
+               let resFilter = interfaceAssociation.filter(function (item) {
+                    return (item.end1.aggregation == 'composite' && item.end1.reference._id == objInterface._id);
+               });
+
+
+               let filterInterfaceAssociation = resFilter.filter(function (item) {
+                    return item.end2.aggregation == 'none';
+               });
+
+
+               filterInterfaceAssociation.forEach(interAsso => {
+                    if (interAsso instanceof type.UMLAssociation) {
+                         if (interAsso.end1.aggregation == "composite" && interAsso.end2.aggregation == "none") {
+                              this.writeInterfaceComposite(objInterfaceRealization, interAsso, mainPathsObject);
+                         }
+                    }
+               });
+
+
+               /* if (objInterface.ownedElements.length > 0) {
                     let interfaceRelation = objInterface.ownedElements;
                     interfaceRelation.forEach(interAsso => {
                          if (interAsso instanceof type.UMLAssociation) {
@@ -161,7 +184,7 @@ class Paths {
                               }
                          }
                     });
-               }
+               } */
           }
      }
      /**
