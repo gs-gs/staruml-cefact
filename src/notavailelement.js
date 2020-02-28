@@ -49,12 +49,15 @@ function showDialogInvalidAttributeType() {
 
      let eleName = '';
      let selType = '';
+     let basePath='';
      if (openAPI.getAppMode() == openAPI.APP_MODE_JSONLD) {
           eleName = jsonld.getExportElementName();
           selType = constant.STR_PACKAGE;
+          basePath = jsonld.getFilePath();
      } else {
           eleName = openAPI.getExportElementName();
           selType = openAPI.isModelPackage() ? constant.STR_PACKAGE : constant.STR_DIAGRAM;
+          basePath = openAPI.getFilePath();
      }
      let notAvailElement = getInvalidAttributeType();
      if (notAvailElement.length > 0) {
@@ -67,7 +70,6 @@ function showDialogInvalidAttributeType() {
                }
           });
           if (notAvailElement.length > constant.MAX_LINES) {
-               let basePath = __dirname + constant.IDEAL_VOCAB_ERROR_PATH;
                basePath = path.join(basePath, eleName + "_" + constant.VOCABS_FILE_NAME);
                let writeMsgs = '';
                forEach(notAvailElement, function (item) {
@@ -100,12 +102,15 @@ function showDialogInvalidAttributeType() {
 function showDialogNotLinkedType() {
      let eleName = '';
      let selType = '';
+     let basePath = '';
      if (openAPI.getAppMode() == openAPI.APP_MODE_JSONLD) {
           eleName = jsonld.getExportElementName();
           selType = constant.STR_PACKAGE;
+          basePath = jsonld.getFilePath();
      } else {
           eleName = openAPI.getExportElementName();
           selType = openAPI.isModelPackage() ? constant.STR_PACKAGE : constant.STR_DIAGRAM;
+          basePath = openAPI.getFilePath();
      }
 
      let mNotLinkedType = getNotLinkedType();
@@ -120,7 +125,7 @@ function showDialogNotLinkedType() {
           });
 
           if (mNotLinkedType.length > constant.MAX_LINES) {
-               let basePath = __dirname + constant.IDEAL_VOCAB_ERROR_PATH;
+               
                basePath = path.join(basePath, eleName + "_" + constant.NOT_LINKED_TYPE_FILE_NAME);
                let writeMsgs = '';
                forEach(mNotLinkedType, function (item) {

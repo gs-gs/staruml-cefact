@@ -505,7 +505,8 @@ function genJSONLD() {
                               console.log("generateJSONLD");
                               jsonld.setExportElement(returnValue);
                               jsonld.setExportElementName(returnValue.name);
-
+                              let dirPath = path.dirname(basePath);
+                              jsonld.setFilePath(dirPath)
                               let objJSONLd = jsonld.generateJSONLD();
 
                               /* Will alert dialog for not availabel class or enume in file */

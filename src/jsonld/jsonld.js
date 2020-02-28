@@ -147,7 +147,12 @@ function getSeeAlso() {
     ];
     return sAlsoArr;
 }
-
+/**
+ * @function getAttrTypeClass
+ * @description returns array of classes that is referenced as compound type attribute type
+ * @param {*} mClasses
+ * @returns {Array} 
+ */
 function getAttrTypeClass(mClasses) {
     let mNewClasses = [];
     forEach(mClasses, function (mClass) {
@@ -476,9 +481,18 @@ function setExportElementName(mEleName){
 function getExportElementName(){
     return UMLPackageName;
 }
+let filePath='';
+function setFilePath(fPath){
+    filePath = fPath;
+}
+function getFilePath(){
+    return filePath;
+}
 module.exports.generateJSONLD = generateJSONLD;
 module.exports.setExportElement = setExportElement;
 module.exports.getExportElement = getExportElement;
 module.exports.getInvalidAttributeType = getInvalidAttributeType;
 module.exports.setExportElementName = setExportElementName;
 module.exports.getExportElementName = getExportElementName;
+module.exports.setFilePath = setFilePath;
+module.exports.getFilePath = getFilePath;
