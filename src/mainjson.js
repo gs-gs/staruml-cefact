@@ -20,11 +20,7 @@ class MainJSON {
       * @memberof MainJSON
       */
      static saveComponent(component) {
-          if(openAPI.isModelPackage()){
-               MainJSON.mainOpenApiObj.components = component.getComponent();
-          }else if(openAPI.isModelDiagram()){
-               MainJSON.mainOpenApiObj.components = component.getComponentForDiagram();
-          }
+          MainJSON.mainOpenApiObj.components = component.getComponent();
      }
 
      /**
