@@ -474,17 +474,39 @@ function getInvalidAttributeType() {
     return invalidAttributeType;
 }
 
+/**
+ * @function setExportElementName
+ * @description set export element (selected package) name
+ * @param {String} mEleName
+ */
 function setExportElementName(mEleName){
     UMLPackageName = mEleName;
 }
 
+/**
+ * @function getExportElementName
+ * @description return export element (selected package) name
+ * @returns {String}
+ */
 function getExportElementName(){
     return UMLPackageName;
 }
+
 let filePath='';
+/**
+ * @function setFilePath
+ * @description set jsonld export file path 
+ * @param {String} fPath
+ */
 function setFilePath(fPath){
     filePath = fPath;
 }
+
+/**
+ * @function getFilePath
+ * @description return jsonld export file path
+ * @returns {String}
+ */
 function getFilePath(){
     return filePath;
 }

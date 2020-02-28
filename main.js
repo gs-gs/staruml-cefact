@@ -532,6 +532,11 @@ function genJSONLD() {
           });
 
 }
+
+/**
+ * @function initProject
+ * @description initialize basic json rules for jsonld and openapi/jsonschema
+ */
 function initProject(){
      utils.initJsonRuleType();
      utils.initJsonldRuleType();
