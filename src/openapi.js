@@ -674,7 +674,7 @@ class OpenApi {
                          /* Generate file after JSONSchema generated */
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
-                              notAvailElement.showDialogNotAvailableAttribute();
+                              notAvailElement.showDialogInvalidAttributeType();
                               notAvailElement.showDialogNotLinkedType();
                               resolve(fileGenerate);
                          }).catch(function (err) {
@@ -708,7 +708,7 @@ class OpenApi {
                          /* Generate file after OpenAPI specs generated */
                          let generator = new FileGenerator();
                          generator.generate().then(function (fileGenerate) {
-                              notAvailElement.showDialogNotAvailableAttribute();
+                              notAvailElement.showDialogInvalidAttributeType();
                               notAvailElement.showDialogNotLinkedType();
 
                               /* Validate OpenAPI generated json and alert success or failure according  */
@@ -852,10 +852,11 @@ module.exports.getError = OpenApi.getError;
 module.exports.setError = OpenApi.setError;
 module.exports.setAppMode = OpenApi.setAppMode;
 module.exports.getAppMode = OpenApi.getAppMode;
-module.exports.APP_MODE_GEN = 1;
 module.exports.APP_MODEL_PACKAGE = 0;
 module.exports.APP_MODEL_DIAGRAM = 1;
+module.exports.APP_MODE_GEN = 1;
 module.exports.APP_MODE_TEST = 2;
+module.exports.APP_MODE_JSONLD = 3;
 module.exports.setModelType = OpenApi.setModelType;
 module.exports.getModelType = OpenApi.getModelType;
 module.exports.setTestMode = OpenApi.setTestMode;
