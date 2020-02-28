@@ -345,7 +345,7 @@ function getRdfsPropertiesArr() {
 
     return rdfsPropertiesArr;
 }
-let notAvailableAttribute = [];
+let invalidAttributeType = [];
 /**
  * @function getRange
  * @description returns datatype
@@ -370,7 +370,15 @@ function getRange(attr, className) {
     let attributeType = attr.type;
     if (utils.isString(attributeType)) {
 
-        if (attributeType === 'Numeric') {
+        let jsonldRuleType = utils.getJsonldRuleType();
+        let result = jsonldRuleType.filter(function(item){
+            return item.key == attributeType;
+        });
+        if(result.length != 0){
+            range = result.range;
+        }else{
+
+        /* if (attributeType === 'Numeric') {
             range = 'xsd:nonNegativeInteger'; //
         } else if (attributeType === 'Indicator') {
             range = 'xsd:boolean';
@@ -394,7 +402,7 @@ function getRange(attr, className) {
             range = 'xsd:byte';
         } else if (attributeType === 'Quantity') {
             range = 'xsd:nonNegativeInteger';
-        } else {
+        } else { */
 
 
             if (utils.isString(attributeType) && utils.isStringCoreType(attributeType)) {
@@ -402,7 +410,7 @@ function getRange(attr, className) {
             }
             else{
                 /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
-                notAvailElement.addNotAvailableAttribute(className, attr, attributeType);
+                notAvailElement.addInvalidAttributeType(className, attr, attributeType);
             }
 
             if (attributeType === 'Numeric') {
@@ -433,6 +441,7 @@ function getRange(attr, className) {
 
 
 let UMLPackage = null;
+let UMLPackageName = null;
 
 /**
  * @function setExportElement
@@ -452,15 +461,24 @@ function getExportElement() {
 }
 
 /**
- * @function getNotAvailableAttribute
+ * @function getInvalidAttributeType
  * @description return undefined attribute type
  * @returns {Array}
  */
-function getNotAvailableAttribute() {
-    return notAvailableAttribute;
+function getInvalidAttributeType() {
+    return invalidAttributeType;
 }
 
+function setExportElementName(mEleName){
+    UMLPackageName = mEleName;
+}
+
+function getExportElementName(){
+    return UMLPackageName;
+}
 module.exports.generateJSONLD = generateJSONLD;
 module.exports.setExportElement = setExportElement;
 module.exports.getExportElement = getExportElement;
-module.exports.getNotAvailableAttribute = getNotAvailableAttribute;
+module.exports.getInvalidAttributeType = getInvalidAttributeType;
+module.exports.setExportElementName = setExportElementName;
+module.exports.getExportElementName = getExportElementName;

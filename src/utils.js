@@ -266,8 +266,55 @@ function addReferenceTypeRule(itemsObj, coreType) {
      allOfObject.type = 'object';
      allOfArray.push(allOfObject);
 }
-let mJsonRuleType = [];
 
+let mJsonldRuleType=[];
+/**
+ * @function initJsonRuleType
+ * @description initialize array of attributes to add in attribute type which is used while compound type has no attributes then type which is in string matches in this array 
+ * @memberof Utils
+ */
+function initJsonldRuleType() {
+     mJsonldRuleType = [{
+          key: 'Numeric',
+          range: 'xsd:nonNegativeInteger'
+     }, {
+          key: 'Indicator',
+          range: 'xsd:boolean'
+
+     }, {
+          key: 'Date',
+          range: 'xsd:date'
+     }, {
+          key: 'DateTime',
+          range: 'xsd:dateTime'
+     }, {
+          key: 'Int32',
+          range: 'xsd:int'
+     }, {
+          key: 'Int64',
+          range: 'xsd:long'
+     }, {
+          key: 'Number',
+          range: 'xsd:integer'
+     }, {
+          key: 'Float',
+          range: 'xsd:float'
+     }, {
+          key: 'Double',
+          range: 'xsd:double'
+     }, {
+          key: 'Password',
+          range: 'xsd:string'
+     }, {
+          key: 'Byte',
+          range: 'xsd:byte'
+     }, {
+          key: 'Quantity',
+          range: 'xsd:nonNegativeInteger'
+     }];
+}
+
+let mJsonRuleType = [];
 /**
  * @function initJsonRuleType
  * @description initialize array of attributes to add in attribute type which is used while compound type has no attributes then type which is in string matches in this array 
@@ -334,7 +381,14 @@ function initJsonRuleType() {
           type: 'integer'
      }];
 }
-
+/**
+ * @function getJsonldRuleType
+ * @description returns array of jsonld rule type
+ * @memberof Utils
+ */
+function getJsonldRuleType() {
+     return mJsonldRuleType;
+}
 /**
  * @function getJsonRuleType
  * @description returns array of json rule type
@@ -367,12 +421,12 @@ function addJsonRuleType(attr, attributeType, itemsObj) {
      } else if (result.length == 0) {
           itemsObj.type = 'string';
 
-          if(isString(attributeType) && isStringCoreType(attributeType)){
+          if (isString(attributeType) && isStringCoreType(attributeType)) {
                notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeType);
           } else if (isString(attributeType)) {
-               notAvailElement.addNotAvailableAttribute(attr._parent.name, attr, attributeType);
+               notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType);
           } else if (attributeType instanceof type.UMLClass) {
-               notAvailElement.addNotAvailableAttribute(attr._parent.name, attr, attributeType.name);
+               notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name);
           }
      }
 }
@@ -386,11 +440,11 @@ function addJsonRuleType(attr, attributeType, itemsObj) {
  */
 function isStringCoreType(sCType) {
 
-     let coreTypes=getCoreTypes();
-     let resCType=coreTypes.filter(function(cType){
+     let coreTypes = getCoreTypes();
+     let resCType = coreTypes.filter(function (cType) {
           return cType.name == sCType
      });
-     if(resCType.length==0){
+     if (resCType.length == 0) {
           return false;
      }
 
@@ -509,7 +563,7 @@ function getCoreDataTypeAttributeClass() {
      } else {
 
           let classes = openAPI.getClasses();
-          
+
           forEach(classes, function (mClass) {
                /* Iterate to all attributes for check and add for qualified data type all Core Data Type */
                forEach(mClass.attributes, function (attrib) {
@@ -606,12 +660,12 @@ function fetchUMLAssociation() {
 function initCoreTypes() {
 
      let result = app.repository.select('Core::@UMLPackage');
-     result=result.filter(function(pkg){
+     result = result.filter(function (pkg) {
           return pkg instanceof type.UMLPackage && pkg.name == 'Types';
      });
 
      // result = app.repository.select(result.name + '::@UMLPackage');
-     if(result.length==0){
+     if (result.length == 0) {
           app.dialogs.showAlertDialog(constant.MSG_CORE_TYPE_NOT_AVAILABLE);
           return;
      }
@@ -663,4 +717,6 @@ module.exports.fetchUMLInterfaceRealization = fetchUMLInterfaceRealization;
 module.exports.fetchUMLAssociation = fetchUMLAssociation;
 module.exports.initCoreTypes = initCoreTypes;
 module.exports.initJsonRuleType = initJsonRuleType;
+module.exports.initJsonldRuleType = initJsonldRuleType;
+module.exports.getJsonldRuleType = getJsonldRuleType;
 module.exports.isStringCoreType = isStringCoreType;

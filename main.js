@@ -476,6 +476,8 @@ function genJSONLD() {
      /* Clear old msgs from  not availabe class and not linked type */
      resetOldMsgs();
 
+     openAPI.setAppMode(openAPI.APP_MODE_JSONLD)
+
      /* Initialize coretypes */
      utils.initCoreTypes();
      /* Open element picker dialog to pick package */
@@ -502,11 +504,12 @@ function genJSONLD() {
 
                               console.log("generateJSONLD");
                               jsonld.setExportElement(returnValue);
+                              jsonld.setExportElementName(returnValue.name);
 
                               let objJSONLd = jsonld.generateJSONLD();
 
                               /* Will alert dialog for not availabel class or enume in file */
-                              notAvailElement.showDialogNotAvailableAttribute();
+                              notAvailElement.showDialogInvalidAttributeType();
                               notAvailElement.showDialogNotLinkedType();
 
                               let generator = new FileGenerator();
@@ -528,6 +531,10 @@ function genJSONLD() {
           });
 
 }
+function initProject(){
+     utils.initJsonRuleType();
+     utils.initJsonldRuleType();
+}
 /**
  * @function init
  * @description function will be called when the extension is loaded
@@ -544,7 +551,7 @@ function init() {
      /* Register command to Generate Generate JSON-LD Specification */
      app.commands.register('jsonld:generate', genJSONLD);
 
-     app.project.on('projectLoaded', utils.initJsonRuleType);
+     app.project.on('projectLoaded', initProject);
 }
 
 exports.init = init
