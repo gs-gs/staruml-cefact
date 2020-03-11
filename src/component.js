@@ -6,7 +6,7 @@ const utils = require('./utils');
 const camelize = require('../src/camelize');
 const Generalization = require('./generalization');
 const Properties = require('./properties');
-const AssociationClassLink = require('./associationClassLink');
+const Association = require('./association');
 const Aggregation = require('./aggregation');
 const Composition = require('./composition');
 const Required = require('./required');
@@ -31,7 +31,7 @@ class Component {
           /* this.arrAssoc = []; */
           this.required = new Required();
           this.generalization = new Generalization();
-          this.associationClassLink = new AssociationClassLink();
+          this.association = new Association();
      }
 
      /**
@@ -159,13 +159,13 @@ class Component {
                   /** 
                    * Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity 
                    **/
-                  mainPropertiesObj = this.associationClassLink.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef);
+                  mainPropertiesObj = this.association.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef);
                
               } else if (openAPI.isModelDiagram()) {
                   /* 
                   * Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity 
                   */
-                  mainPropertiesObj = this.associationClassLink.addAssociationClassLinkProperties(aclClassSideView, mainPropertiesObj, compositionRef);
+                  mainPropertiesObj = this.association.addAssociationClassLinkProperties(aclClassSideView, mainPropertiesObj, compositionRef);
               }
       
       
@@ -178,8 +178,10 @@ class Component {
               /**
                * Get association class link of class 
                * */
-              let classAssociations = this.associationClassLink.getAssociationOfClass(objClass);
+              let classAssociations = this.association.getAssociationOfClass(objClass);
+              console.log(""+objClass.name,classAssociations);
       
+
               classAssociations.forEach(assoc => {
                   if (assoc instanceof type.UMLAssociation) {
       
@@ -285,7 +287,7 @@ class Component {
                   });
       
                   if (filter.length == 0) {
-                      this.associationClassLink.writeAssociationProperties(mainClassesObj, itemClass, this.mainSchemaObj);
+                      this.association.writeAssociationProperties(mainClassesObj, itemClass, this.mainSchemaObj);
                       arrIdClasses.push(itemClass)
                   }
               });
