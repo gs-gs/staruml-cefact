@@ -6,12 +6,12 @@ const constant = require('./constant');
 const openAPI = require('./openapi');
 const dElement = require('./diagram/dElement');
 /**
- * @class AssociationClassLink
- * @description class returns the API AssociationClassLink 
+ * @class Association
+ * @description class returns the API Association 
  */
-class AssociationClassLink {
+class Association {
      /**
-      * @constructor Creates an instance of AssociationClassLink.
+      * @constructor Creates an instance of Association.
       */
      constructor() {
           utils.resetErrorBlock();
@@ -23,7 +23,7 @@ class AssociationClassLink {
       * @function getAssociations
       * @description returns the array of Associations
       * @returns
-      * @memberof AssociationClassLink
+      * @memberof Association
       */
      getAssociations() {
           return this.arrAssoc;
@@ -35,7 +35,7 @@ class AssociationClassLink {
       * @param {*} assocClassLink
       * @param {*} mainPropertiesObj
       * @returns
-      * @memberof AssociationClassLink
+      * @memberof Association
       */
      addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef) {
 
@@ -328,4 +328,4 @@ class AssociationClassLink {
      }
 }
 
-module.exports = AssociationClassLink;
+module.exports = Association;
