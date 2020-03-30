@@ -116,7 +116,7 @@ class Paths {
                          }
 
                          /* 
-                         1. Generate query type paramters for all non-id interface attributes for 'GET'
+                         1. Generate query type paramters for 'GET' method if non-id parameters (Issue : #6)
                          2. write simple path object of POST operations 
                          Pattern : (GET/POST) : '/{pathname}'
                          */
@@ -124,12 +124,12 @@ class Paths {
 
                          /* 
                          3. write {id} path object of (GET, PUT, DELETE) Operations
-                         Pattern : (GET/PUT/DELETE) : '/{pathname}/{id}'
+                         Pattern : (GET/PUT/DELETE/PATCH) : '/{pathname}/{id}'
                          */
                          this.writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization);
 
                          /* 
-                         4. Write path object for sub-resource pattern #90 
+                         4. Write path object for sub-resource pattern (Issue : #90) 
                          Pattern : (GET/POST/DELETE/PUT) : '/{pathname}/{id}/{sub-resource-pathname}/{sub-resource-id}'
                          */
                          this.writeSubResourcePathObject(objInterface, objInterfaceRealization, mainPathsObject);
@@ -486,7 +486,7 @@ class Paths {
                               mainPathsObject[mICPath] = pathsObject;
                          }
 
-                         pathsObject.delete = this.operations.delete(interfaceRealization, null, end1Interface, end1Interface);
+                         pathsObject.delete = this.operations.delete(interfaceRealization, null, end1Interface, end2Interface);
 
                     } else if (objOperation.name.toUpperCase() == constant.PUT) {
 

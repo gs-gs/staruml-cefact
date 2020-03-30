@@ -2,7 +2,7 @@
     "name": "gs-gs.staruml-cefact",
     "title": "OpenAPI3.0 Generator",
     "description": "StarUML Extension for generating OpenAPI 3.0 Specs from the UML Diagrams. \nImplementation Rules are according to https://edi3.org/uml-profile/ \nExtension Source Code: https://github.com/gs-gs/staruml-cefact \nExtension version: 0.3.7",
-    "version": "0.3.7",
+    "version": "0.3.8",
     "engines": {
         "staruml": ">=3.0.0"
     },
