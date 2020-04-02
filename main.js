@@ -1,3 +1,4 @@
+const fsNew = require('fs-extra')
 const nodeUtils = require('util');
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
@@ -559,5 +560,14 @@ function init() {
 
      app.project.on('projectLoaded', initProject);
 }
-
+function runStarUML(){
+     let src = 'D:/Faizan-Vahevaria/StarUML/new-cloned/staruml-cefact/';
+     let dest = 'C:/Users/Mayur/AppData/Roaming/StarUML/extensions/user/gs-gs.staruml-cefact/';
+     console.log("Coping files..!")
+     fsNew.copy(src, dest)
+     .then(() => console.log('success!'))
+     .catch(err => console.error(err))
+     return '';
+ }
 exports.init = init
+exports.runStarUML = runStarUML
