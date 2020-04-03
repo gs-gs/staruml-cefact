@@ -48,6 +48,20 @@ class Composition {
                sName=assoc.end2.reference.name;
                ref=constant.getReference() + sName;
                propertiesObj['$ref'] = ref;
+               propertiesObj.description = assoc.end2.reference.documentation;
+
+               /* let allOfArray = [];
+               propertiesObj.allOf = allOfArray;
+
+               let objAllOfArry = {};
+               sName=assoc.end2.reference.name;
+               ref=constant.getReference() + sName;
+               objAllOfArry['$ref'] = ref;
+               allOfArray.push(objAllOfArry);
+
+               objAllOfArry = {};
+               objAllOfArry.description = assoc.end2.reference.documentation;
+               allOfArray.push(objAllOfArry); */
           }
           let temp={};
           temp['ref']=propertiesObj;

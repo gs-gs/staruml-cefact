@@ -1,3 +1,4 @@
+const fsNew = require('fs-extra')
 const nodeUtils = require('util');
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
@@ -7,6 +8,7 @@ var fs = require('fs');
 var path = require('path');
 const title = require('./package.json').title;
 const description = require('./package.json').description;
+const baseDirName = require('./package.json').name;
 let vDialog = null;
 var forEach = require('async-foreach').forEach;
 var dElement = require('./src/diagram/dElement');
@@ -559,5 +561,26 @@ function init() {
 
      app.project.on('projectLoaded', initProject);
 }
-
+function runStarUML(){
+     /* possible values of os 'aix', 'darwin', 'freebsd', 'linux', 'openbsd', 'sunos', 'win32' */
+     let homeDirectory = os.homedir();
+     let dest = '';
+     let src = __dirname+path.sep;
+     if(os.platform == 'win32') {
+          dest = homeDirectory+path.sep+'AppData'+path.sep+'Roaming'+path.sep+'StarUML'+path.sep+'extensions'+path.sep+'user'+path.sep+baseDirName+path.sep;
+     }
+     else if(os.platform == 'linux') {
+          dest = homeDirectory+'.config'+path.sep+'StarUML'+path.sep+'extensions'+path.sep+'user'+path.sep+baseDirName+path.sep;
+     }
+     console.log("platform : ",os.platform);
+     console.log("base : ",baseDirName);
+     console.log("src : ",src);
+     console.log("dest : ",dest);
+     console.log("Coping files..!")
+     fsNew.copy(src, dest)
+     .then(() => console.log('success!'))
+     .catch(err => console.error(err));
+     return '';
+}
 exports.init = init
+exports.runStarUML = runStarUML
