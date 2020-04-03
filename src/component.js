@@ -131,7 +131,7 @@ class Component {
                }
 
                this.mainSchemaObj[objClass.name] = mainClassesObj
-
+               mainClassesObj.description = objClass.documentation;
                mainClassesObj.type = 'object';
 
                /** 
