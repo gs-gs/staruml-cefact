@@ -363,6 +363,9 @@ let mJsonRuleType = [];
  * @description initialize array of attributes to add in attribute type which is used while compound type has no attributes then type which is in string matches in this array 
  * @memberof Utils
  */
+
+// JSON Schema primitive types : array, boolean, integer, number, null,  object, string
+// predefined JSON string formats : date, time, date-time, email, and uri
 function initJsonRuleType() {
      mJsonRuleType = [{
           key: 'Text',
