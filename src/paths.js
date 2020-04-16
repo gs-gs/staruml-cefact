@@ -314,7 +314,8 @@ class Paths {
                let resUIR = uIR.filter(irealization => {
                     return end2Interface.reference._id == irealization.target._id;
                });
-               interfaceRealization.target.operations.forEach(objOperation => {
+               end2Interface.reference.operations.forEach(objOperation => {
+               /* interfaceRealization.target.operations.forEach(objOperation => { */
                     /* Filter for visible operation Views from diagram elements (Interface) */
 
 
