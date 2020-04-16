@@ -86,6 +86,12 @@ class Component {
                classEleOrViews = mClassesView;
           }
 
+          utils.resetClassTypeAttribute();
+          let classTypeAttribute = utils.getClassTypeAttribute(classEleOrViews);
+          if(classTypeAttribute.length > 0){
+               classEleOrViews = classEleOrViews.concat(classTypeAttribute);
+          }
+          console.log("classTypeAttribute : ",classTypeAttribute);
           /**
            * Iterate through all classes
            **/

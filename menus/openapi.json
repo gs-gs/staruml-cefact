@@ -17,7 +17,7 @@
                          "id": "tools.openapi.testallextension",
                          "command": "openapi:test-entire-package"
                     }, {
-                         "label": "Extension version : 0.3.7",
+                         "label": "Extension version : 0.3.13",
                          "id": "tools.openapi.version",
                          "command": "generate:show-version-dialog"
                     }, {

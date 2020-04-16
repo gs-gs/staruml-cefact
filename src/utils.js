@@ -221,7 +221,10 @@ function isString(s) {
 function addAttributeType(itemsObj, attr) {
      let attributeType = attr.type;
 
-     if (isCoreDataType(attributeType)) {
+     if (attributeType instanceof type.UMLClass) {
+          addReferenceTypeRuleClass(itemsObj, attributeType);
+          //notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name);
+     }else if (isCoreDataType(attributeType)) {
 
           /* Added reference in allOf object when attribute type is among the Core Data Type */
           let coreType = getCoreDataType(attributeType);
@@ -236,7 +239,23 @@ function addAttributeType(itemsObj, attr) {
           addJsonRuleType(attr, attributeType, itemsObj);
      }
 }
-
+/**
+ * @function addReferenceTypeRuleClass
+ * @description adds reference of compound type to attribute 
+ * @param {Object} itemsObj 
+ * @param {UMLClass} coreType 
+ * @memberof Utils
+ */
+function addReferenceTypeRuleClass(itemsObj, coreType) {
+     let itemObj = {};
+     let ref='';
+     let sName='';
+     itemsObj.items = itemObj;
+     sName=coreType.name;
+     ref=constant.getReference() + sName;
+     itemObj['$ref'] = ref;
+     itemsObj.type = 'array';
+}
 /**
  * @function addReferenceTypeRule
  * @description adds reference of compound type to attribute 
@@ -419,15 +438,17 @@ function addJsonRuleType(attr, attributeType, itemsObj) {
           }
 
      } else if (result.length == 0) {
-          itemsObj.type = 'string';
-
+          
           if (isString(attributeType) && isStringCoreType(attributeType)) {
+               itemsObj.type = 'string';
                notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeType);
           } else if (isString(attributeType)) {
                notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType);
-          } else if (attributeType instanceof type.UMLClass) {
-               notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name);
-          }
+               itemsObj.type = 'string';
+          }/*  else if (attributeType instanceof type.UMLClass) {
+               addReferenceTypeRule(itemsObj, attributeType);
+               //notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name);
+          } */
      }
 }
 
@@ -694,7 +715,38 @@ function getCoreTypes() {
      return mCoreTypes;
 }
 
+let varClassTypeAttribute = [];
+function resetClassTypeAttribute(){
+     varClassTypeAttribute = [];
 
+}
+
+function getClassTypeAttribute(classEleOrViews){
+    
+
+     classEleOrViews.forEach(mCorView => {
+          let mClass ;
+          if (openAPI.isModelPackage()) {
+               mClass = mCorView;
+          } else if (openAPI.isModelDiagram()) {
+               mClass = mCorView.model;
+          }
+
+          let attributes = mClass.attributes;
+          attributes.forEach(attr => {
+               if(attr.type instanceof type.UMLClass){
+                    let resFilter = varClassTypeAttribute.filter(resFilter => {
+                         return resFilter._id == attr.type._id;
+                    });
+                    if(resFilter.length == 0){
+                         varClassTypeAttribute.push(attr.type);
+                    }
+               }
+          });
+     });
+
+     return varClassTypeAttribute;
+}
 module.exports.getViewFromOther = getViewFromOther;
 module.exports.isCoreDataType = isCoreDataType;
 module.exports.getCoreDataType = getCoreDataType;
@@ -720,3 +772,6 @@ module.exports.initJsonRuleType = initJsonRuleType;
 module.exports.initJsonldRuleType = initJsonldRuleType;
 module.exports.getJsonldRuleType = getJsonldRuleType;
 module.exports.isStringCoreType = isStringCoreType;
+module.exports.buildRequestBodyForSubResource = buildRequestBodyForSubResource;
+module.exports.resetClassTypeAttribute = resetClassTypeAttribute;
+module.exports.getClassTypeAttribute = getClassTypeAttribute;
