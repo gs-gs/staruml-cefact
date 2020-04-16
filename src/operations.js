@@ -69,6 +69,65 @@ class Operations {
      }
 
      /**
+      * @function postForSubResource
+      * @description returns object of post method
+      * @param {UMLInterface} objInterface
+      * @param {UMLInterface} end2Interface
+      * @returns {Object}
+      * @memberof Operations
+      */
+     postForSubResource(interfaceRealization, end1Interface, subResourceClass) {
+
+          let wOperationObject = {};
+
+          let tagsArray = [];
+
+          wOperationObject.tags = tagsArray;
+
+          tagsArray.push(interfaceRealization.target.name);
+
+
+          wOperationObject.description = 'Create a new ' + interfaceRealization.source.name;
+
+          if (end1Interface != null) {
+               let parametersArray = [];
+               wOperationObject.parameters = parametersArray;
+               let paramsObject = {};
+               parametersArray.push(paramsObject);
+
+               let objSchema = {};
+               objSchema.type = 'string';
+
+               utils.buildParameter(end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
+          }
+
+          let requestBodyObj = {}
+          wOperationObject.requestBody = requestBodyObj;
+          utils.buildRequestBodyForSubResource(subResourceClass, requestBodyObj);
+
+
+          let responsesObject = {};
+          wOperationObject.responses = responsesObject;
+
+          let created201Object = {};
+          responsesObject['201'] = created201Object;
+
+          let contentObj = {};
+          created201Object.content = contentObj;
+
+          let appJsonObj = {};
+          contentObj['application/json'] = appJsonObj;
+
+          let schemaObj = {};
+          appJsonObj.schema = schemaObj;
+          schemaObj['$ref'] = constant.getReference() + subResourceClass.name;
+
+          created201Object.description = 'Created';
+
+          return wOperationObject;
+     }
+
+     /**
       * @function post
       * @description returns object of post method
       * @param {UMLInterface} objInterface

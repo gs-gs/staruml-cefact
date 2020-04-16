@@ -75,7 +75,31 @@ function buildParameter(name, type, description, required, schema, paramsObject)
 }
 
 
+/**
+ * @function buildRequestBodyForSubResource
+ * @description Adds request body to requestBodyObj
+ * @param {UMLInterfaceRealization} objInterface
+ * @param {Object} requestBodyObj
+ * @memberof Utils
+ */
+function buildRequestBodyForSubResource(subResourceClass, requestBodyObj) {
 
+     let contentObj = {};
+     requestBodyObj.content = contentObj;
+
+     let appJsonObject = {};
+     contentObj['application/json'] = appJsonObject;
+
+     let schemaObj = {};
+     appJsonObject.schema = schemaObj;
+
+     schemaObj['$ref'] = constant.getReference() + subResourceClass.name;
+
+
+     requestBodyObj.description = '';
+     requestBodyObj.required = true;
+
+}
 
 /**
  * @function buildRequestBody

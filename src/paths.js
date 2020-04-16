@@ -174,17 +174,6 @@ class Paths {
                     }
                });
 
-
-               /* if (objInterface.ownedElements.length > 0) {
-                    let interfaceRelation = objInterface.ownedElements;
-                    interfaceRelation.forEach(interAsso => {
-                         if (interAsso instanceof type.UMLAssociation) {
-                              if (interAsso.end1.aggregation == "composite" && interAsso.end2.aggregation == "none") {
-                                   this.writeInterfaceComposite(objInterfaceRealization, interAsso, mainPathsObject);
-                              }
-                         }
-                    });
-               } */
           }
      }
      /**
@@ -318,12 +307,20 @@ class Paths {
 
                let end1Interface = interfaceAssociation.end1; //source example : imprtDeclarations
                let end2Interface = interfaceAssociation.end2; //target : CargoLines
+               if(end2Interface.reference.name == 'travelDocuments'){
+                    console.log("yes");
+               }
+               let uIR = app.repository.select("@UMLInterfaceRealization");
+               let resUIR = uIR.filter(irealization => {
+                    return end2Interface.reference._id == irealization.target._id;
+               });
                interfaceRealization.target.operations.forEach(objOperation => {
                     /* Filter for visible operation Views from diagram elements (Interface) */
 
 
                     let pathsObject = {};
                     let wOperationObject = {};
+                    let refCName = '';
                     if (objOperation.name.toUpperCase() == constant.GET) {
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
                          // let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
@@ -376,10 +373,18 @@ class Paths {
                          let schemaObj = {};
                          appJsonObj.schema = schemaObj;
 
+                         refCName = '';
+                         if(resUIR.length == 1){
+                              let subResourceClass = resUIR[0].source;
+                              refCName = subResourceClass.name
+                         }else{
+                              // This line is optional
+                              refCName = interfaceRealization.source.name;
+                         }
 
                          let itemsObject = {};
                          schemaObj.items = itemsObject;
-                         itemsObject['$ref'] = constant.getReference() + interfaceRealization.source.name;
+                         itemsObject['$ref'] = constant.getReference() + refCName;
                          schemaObj.type = 'object';
 
 
@@ -457,7 +462,16 @@ class Paths {
                          let schemaSingleObj = {};
                          appJsonSingleObj.schema = schemaSingleObj;
 
-                         schemaSingleObj['$ref'] = constant.getReference() + interfaceRealization.source.name;
+                         refCName = '';
+                         if(resUIR.length == 1){
+                              let subResourceClass = resUIR[0].source;
+                              refCName = subResourceClass.name
+                         }else{
+                              // This line is optional
+                              refCName = interfaceRealization.source.name;
+                         }
+
+                         schemaSingleObj['$ref'] = constant.getReference() + refCName;
 
 
 
@@ -472,8 +486,16 @@ class Paths {
                               mainPathsObject[mICPath] = pathsObject;
                          }
 
+                         if(mICPath == '/applicants/{id}/travelDocuments'){
+                              console.log("#111 : ",mICPath);
+                         }
 
-                         pathsObject.post = this.operations.post(interfaceRealization, end1Interface);
+                         
+                         if(resUIR.length == 1){
+                              let subResourceClass = resUIR[0].source;
+                              pathsObject.post = this.operations.postForSubResource(interfaceRealization, end1Interface,subResourceClass);
+                         }
+
 
 
                     } else if (objOperation.name.toUpperCase() == constant.DELETE) {
@@ -562,7 +584,15 @@ class Paths {
                          let schemaSingleObj = {};
                          appJsonSingleObj.schema = schemaSingleObj;
 
-                         schemaSingleObj['$ref'] = constant.getReference() + interfaceRealization.source.name;
+                         refCName = '';
+                         if(resUIR.length == 1){
+                              let subResourceClass = resUIR[0].source;
+                              refCName = subResourceClass.name
+                         }else{
+                              // This line is optional
+                              refCName = interfaceRealization.source.name;
+                         }
+                         schemaSingleObj['$ref'] = constant.getReference() + refCName;
 
                     }
                });
