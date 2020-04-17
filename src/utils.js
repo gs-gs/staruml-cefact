@@ -248,8 +248,8 @@ function addAttributeType(itemsObj, attr) {
      if (attributeType instanceof type.UMLClass) {
           addReferenceTypeRuleClass(itemsObj, attributeType);
           //notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name);
-     }else if (isCoreDataType(attributeType)) {
-
+     } else if (isCoreDataType(attributeType)) {
+          console.log("isTrue ");
           /* Added reference in allOf object when attribute type is among the Core Data Type */
           let coreType = getCoreDataType(attributeType);
           let coreAttribs = coreType.attributes;
@@ -272,11 +272,11 @@ function addAttributeType(itemsObj, attr) {
  */
 function addReferenceTypeRuleClass(itemsObj, coreType) {
      let itemObj = {};
-     let ref='';
-     let sName='';
+     let ref = '';
+     let sName = '';
      itemsObj.items = itemObj;
-     sName=coreType.name;
-     ref=constant.getReference() + sName;
+     sName = coreType.name;
+     ref = constant.getReference() + sName;
      itemObj['$ref'] = ref;
      itemsObj.type = 'array';
 }
@@ -310,7 +310,7 @@ function addReferenceTypeRule(itemsObj, coreType) {
      allOfArray.push(allOfObject);
 }
 
-let mJsonldRuleType=[];
+let mJsonldRuleType = [];
 /**
  * @function initJsonRuleType
  * @description initialize array of attributes to add in attribute type which is used while compound type has no attributes then type which is in string matches in this array 
@@ -370,6 +370,39 @@ function initJsonRuleType() {
      mJsonRuleType = [{
           key: 'Text',
           type: 'string'
+     }, {
+          key: 'boolean',
+          type: 'boolean'
+
+     }, {
+          key: 'integer',
+          type: 'integer'
+     }, {
+          key: 'number',
+          type: 'number'
+     }, {
+          key: 'string',
+          type: 'string'
+     }, {
+          key: 'date',
+          type: 'string',
+          format: 'date'
+     }, {
+          key: 'date-time',
+          type: 'string',
+          format: 'date-time'
+     }, {
+          key: 'time',
+          type: 'string',
+          format: 'time'
+     }, {
+          key: 'email',
+          type: 'email',
+          format: 'email'
+     }, {
+          key: 'uri',
+          type: 'uri',
+          format: 'uri'
      }, {
           key: 'Numeric',
           type: 'number'
@@ -465,17 +498,12 @@ function addJsonRuleType(attr, attributeType, itemsObj) {
           }
 
      } else if (result.length == 0) {
-          
+          itemsObj.type = 'string';
           if (isString(attributeType) && isStringCoreType(attributeType)) {
-               itemsObj.type = 'string';
                notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeType);
           } else if (isString(attributeType)) {
                notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType);
-               itemsObj.type = 'string';
-          }/*  else if (attributeType instanceof type.UMLClass) {
-               addReferenceTypeRule(itemsObj, attributeType);
-               //notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name);
-          } */
+          }
      }
 }
 
@@ -743,16 +771,17 @@ function getCoreTypes() {
 }
 
 let varClassTypeAttribute = [];
-function resetClassTypeAttribute(){
+
+function resetClassTypeAttribute() {
      varClassTypeAttribute = [];
 
 }
 
-function getClassTypeAttribute(classEleOrViews){
-    
+function getClassTypeAttribute(classEleOrViews) {
+
 
      classEleOrViews.forEach(mCorView => {
-          let mClass ;
+          let mClass;
           if (mCorView instanceof type.UMLClassView) {
                mClass = mCorView.model;
           } else if (mCorView instanceof type.UMLClass) {
@@ -761,11 +790,11 @@ function getClassTypeAttribute(classEleOrViews){
 
           let attributes = mClass.attributes;
           attributes.forEach(attr => {
-               if(attr.type instanceof type.UMLClass){
+               if (attr.type instanceof type.UMLClass) {
                     let resFilter = varClassTypeAttribute.filter(resFilter => {
                          return resFilter._id == attr.type._id;
                     });
-                    if(resFilter.length == 0){
+                    if (resFilter.length == 0) {
                          varClassTypeAttribute.push(attr.type);
                     }
                }
