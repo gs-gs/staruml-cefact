@@ -753,10 +753,10 @@ function getClassTypeAttribute(classEleOrViews){
 
      classEleOrViews.forEach(mCorView => {
           let mClass ;
-          if (openAPI.isModelPackage()) {
-               mClass = mCorView;
-          } else if (openAPI.isModelDiagram()) {
+          if (mCorView instanceof type.UMLClassView) {
                mClass = mCorView.model;
+          } else if (mCorView instanceof type.UMLClass) {
+               mClass = mCorView;
           }
 
           let attributes = mClass.attributes;

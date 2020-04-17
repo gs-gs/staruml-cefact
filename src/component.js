@@ -86,15 +86,59 @@ class Component {
                classEleOrViews = mClassesView;
           }
 
+          
+          /**
+           * Add class schema to scham object
+           **/
+          this.addClassSchema(classEleOrViews, assoClassLink, mAssoClassLinkView, arrIdClasses, duplicateDeletedReference, duplicatePropertyError);
+
+          /** 
+           * #113 treat referenced type classes in the same way as composition association targets.
+           * Add Schema of those class which are referenced as Class in attribute type
+           **/
           utils.resetClassTypeAttribute();
           let classTypeAttribute = utils.getClassTypeAttribute(classEleOrViews);
-          if(classTypeAttribute.length > 0){
-               classEleOrViews = classEleOrViews.concat(classTypeAttribute);
-          }
-          console.log("classTypeAttribute : ",classTypeAttribute);
-          /**
-           * Iterate through all classes
-           **/
+          this.addAttrTypeRefClassSchema(classTypeAttribute);
+          openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
+          console.log("classTypeAttribute : ", classTypeAttribute);
+
+
+          return this.mainComponentObj;
+     }
+     addAttrTypeRefClassSchema(refClasses) {
+          refClasses.forEach(objClass => {
+               let mainClassesObj = {};
+               let mainPropertiesObj = {};
+               let assocSideClassLink=[];
+
+               this.mainSchemaObj[objClass.name] = mainClassesObj
+               mainClassesObj.description = objClass.documentation;
+               mainClassesObj.type = 'object';
+
+               /** 
+                * Adding Properties 
+                **/
+               let properties = [];
+               properties = new Properties(objClass, assocSideClassLink);
+
+               /** 
+                * Adds Attributes, With Enum, With Multiplicity 
+                **/
+               mainPropertiesObj = properties.addPropertiesForAttrTypeRefClass();
+               mainClassesObj.properties = mainPropertiesObj;
+
+               let arrAttributes = properties.getAttributes();
+
+               /**
+                * Adding Required (Mandatory fields) 
+                **/
+               if (this.required.getRequiredAttributes(arrAttributes).length > 0) {
+                    mainClassesObj.required = this.required.addRequiredAttributes(arrAttributes);
+               }
+
+          });
+     }
+     addClassSchema(classEleOrViews, assoClassLink, mAssoClassLinkView, arrIdClasses, duplicateDeletedReference, duplicatePropertyError) {
           classEleOrViews.forEach(classEleOrView => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
@@ -190,7 +234,7 @@ class Component {
                 * Sort associations as it is showing in model exploert sequence
                 */
                classAssociations = this.sortAssociationByModelExplorerSequence(objClass, classAssociations);
-               
+
 
 
 
@@ -310,7 +354,6 @@ class Component {
 
                // }
           });
-          return this.mainComponentObj;
      }
 
      sortAssociationByModelExplorerSequence(objClass, classAssociations) {
