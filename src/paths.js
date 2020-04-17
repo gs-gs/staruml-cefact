@@ -383,10 +383,11 @@ class Paths {
                               refCName = interfaceRealization.source.name;
                          }
 
-                         let itemsObject = {};
+                         /* let itemsObject = {};
                          schemaObj.items = itemsObject;
                          itemsObject['$ref'] = constant.getReference() + refCName;
-                         schemaObj.type = 'object';
+                         schemaObj.type = 'object'; */
+                         schemaObj['$ref'] = constant.getReference() + refCName;
 
 
 

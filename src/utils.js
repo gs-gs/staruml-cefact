@@ -363,6 +363,9 @@ let mJsonRuleType = [];
  * @description initialize array of attributes to add in attribute type which is used while compound type has no attributes then type which is in string matches in this array 
  * @memberof Utils
  */
+
+// JSON Schema primitive types : array, boolean, integer, number, null,  object, string
+// predefined JSON string formats : date, time, date-time, email, and uri
 function initJsonRuleType() {
      mJsonRuleType = [{
           key: 'Text',
@@ -750,10 +753,10 @@ function getClassTypeAttribute(classEleOrViews){
 
      classEleOrViews.forEach(mCorView => {
           let mClass ;
-          if (openAPI.isModelPackage()) {
-               mClass = mCorView;
-          } else if (openAPI.isModelDiagram()) {
+          if (mCorView instanceof type.UMLClassView) {
                mClass = mCorView.model;
+          } else if (mCorView instanceof type.UMLClass) {
+               mClass = mCorView;
           }
 
           let attributes = mClass.attributes;

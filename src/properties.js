@@ -71,6 +71,25 @@ class Properties {
           return mainPropertiesObj;
      }
 
+     addPropertiesForAttrTypeRefClass(){
+          let mainPropertiesObj = {};
+          let _this = this;
+          _this.arrAttRequired = [];
+          let propertiesObj = {};
+          let attributes = this.objClass.attributes;
+          forEach(attributes, function (attribute) {
+               
+               propertiesObj = {};
+               let filterAttr = _this.arrAttRequired.filter(item => {
+                    return item.name == attribute.name;
+               });
+               
+               /* Filter for visible attribute Views from diagram elements (Class & Interface) */
+               _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
+               
+          });
+          return mainPropertiesObj;
+     }
      /**
       * @function addPropData
       * @description Adds property data like multiplicity, attribute typ etc to mainPropertiesObject
