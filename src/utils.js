@@ -271,14 +271,31 @@ function addAttributeType(itemsObj, attr) {
  * @memberof Utils
  */
 function addReferenceTypeRuleClass(itemsObj, coreType) {
-     let itemObj = {};
+    /*  let itemObj = {};
      let ref = '';
      let sName = '';
      itemsObj.items = itemObj;
      sName = coreType.name;
      ref = constant.getReference() + sName;
      itemObj['$ref'] = ref;
-     itemsObj.type = 'array';
+     itemsObj.type = 'array'; */
+
+
+     /* Add reference of Schema */
+     let allOfArray = [];
+     itemsObj.allOf = allOfArray;
+
+
+     let allOfObj = {};
+     sName = coreType.name;
+     ref=constant.getReference() + sName;
+     allOfObj['$ref'] = ref;
+     allOfArray.push(allOfObj);
+
+     allOfObj = {};
+     allOfObj['type'] = 'object';
+     allOfArray.push(allOfObj);
+
 }
 /**
  * @function addReferenceTypeRule
