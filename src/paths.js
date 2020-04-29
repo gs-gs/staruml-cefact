@@ -116,21 +116,21 @@ class Paths {
                          }
 
                          /* 
-                         1. Generate query type paramters for 'GET' method if non-id parameters (Issue : #6)
-                         2. write simple path object of POST operations 
-                         Pattern : (GET/POST) : '/{pathname}'
+                         1. Write Simple path : Generate query type paramters for 'GET' method if non-id parameters (Issue : #6)
+                         2. Write Simple path :  
+                              Pattern : (GET/POST) : '/{pathname}'
                          */
                          this.writeSimplePathObject(pathsObject, mOperations, objInterfaceRealization);
 
                          /* 
-                         3. write {id} path object of (GET, PUT, DELETE) Operations
-                         Pattern : (GET/PUT/DELETE/PATCH) : '/{pathname}/{id}'
+                         3. Write {id} path object of (GET, PUT, DELETE) Operations
+                              Pattern : (GET/PUT/DELETE/PATCH) : '/{pathname}/{id}'
                          */
                          this.writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization);
 
                          /* 
                          4. Write path object for sub-resource pattern (Issue : #90) 
-                         Pattern : (GET/POST/DELETE/PUT) : '/{pathname}/{id}/{sub-resource-pathname}/{sub-resource-id}'
+                              Pattern : (GET/POST/DELETE/PUT) : '/{pathname}/{id}/{sub-resource-pathname}/{sub-resource-id}'
                          */
                          this.writeSubResourcePathObject(objInterface, objInterfaceRealization, mainPathsObject);
 
@@ -213,7 +213,7 @@ class Paths {
       */
      writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization) {
           let checkOperationArr = mOperations.filter(item => {
-               return item.name == constant.GET || item.name == constant.PUT || item.name == constant.DELETE;
+               return item.name == constant.GET || item.name == constant.PUT || item.name == constant.DELETE || item.name == constant.PATCH;
           });
 
           if (checkOperationArr.length > 0) {
@@ -307,7 +307,7 @@ class Paths {
 
                let end1Interface = interfaceAssociation.end1; //source example : imprtDeclarations
                let end2Interface = interfaceAssociation.end2; //target : CargoLines
-               if(end2Interface.reference.name == 'travelDocuments'){
+               if (end2Interface.reference.name == 'travelDocuments') {
                     console.log("yes");
                }
                let uIR = app.repository.select("@UMLInterfaceRealization");
@@ -315,7 +315,7 @@ class Paths {
                     return end2Interface.reference._id == irealization.target._id;
                });
                end2Interface.reference.operations.forEach(objOperation => {
-               /* interfaceRealization.target.operations.forEach(objOperation => { */
+                    /* interfaceRealization.target.operations.forEach(objOperation => { */
                     /* Filter for visible operation Views from diagram elements (Interface) */
 
 
@@ -375,10 +375,10 @@ class Paths {
                          appJsonObj.schema = schemaObj;
 
                          refCName = '';
-                         if(resUIR.length == 1){
+                         if (resUIR.length == 1) {
                               let subResourceClass = resUIR[0].source;
                               refCName = subResourceClass.name
-                         }else{
+                         } else {
                               // This line is optional
                               refCName = interfaceRealization.source.name;
                          }
@@ -465,10 +465,10 @@ class Paths {
                          appJsonSingleObj.schema = schemaSingleObj;
 
                          refCName = '';
-                         if(resUIR.length == 1){
+                         if (resUIR.length == 1) {
                               let subResourceClass = resUIR[0].source;
                               refCName = subResourceClass.name
-                         }else{
+                         } else {
                               // This line is optional
                               refCName = interfaceRealization.source.name;
                          }
@@ -488,14 +488,9 @@ class Paths {
                               mainPathsObject[mICPath] = pathsObject;
                          }
 
-                         if(mICPath == '/applicants/{id}/travelDocuments'){
-                              console.log("#111 : ",mICPath);
-                         }
-
-                         
-                         if(resUIR.length == 1){
+                         if (resUIR.length == 1) {
                               let subResourceClass = resUIR[0].source;
-                              pathsObject.post = this.operations.postForSubResource(interfaceRealization, end1Interface,subResourceClass);
+                              pathsObject.post = this.operations.postForSubResource(interfaceRealization, end1Interface, subResourceClass);
                          }
 
 
@@ -567,6 +562,13 @@ class Paths {
                          let description2 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
                          utils.buildParameter(name2, "path", description2, true, objSingleSchema, paramsSingleObject);
 
+                         if (resUIR.length == 1) {
+                              let subResourceClass = resUIR[0].source;
+                              let requestBodyObj = {}
+                              wOperationSingleObject.requestBody = requestBodyObj;
+                              utils.buildRequestBodyForSubResource(subResourceClass, requestBodyObj);
+                         }
+
 
                          /* -------- Add response body -------- */
                          let responsesSingleObj = {};
@@ -587,10 +589,10 @@ class Paths {
                          appJsonSingleObj.schema = schemaSingleObj;
 
                          refCName = '';
-                         if(resUIR.length == 1){
+                         if (resUIR.length == 1) {
                               let subResourceClass = resUIR[0].source;
                               refCName = subResourceClass.name
-                         }else{
+                         } else {
                               // This line is optional
                               refCName = interfaceRealization.source.name;
                          }
