@@ -249,7 +249,6 @@ function addAttributeType(itemsObj, attr) {
           addReferenceTypeRuleClass(itemsObj, attributeType);
           /* notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name); */
      } else if (isCoreDataType(attributeType)) {
-          console.log("isTrue ");
           /* Added reference in allOf object when attribute type is among the Core Data Type */
           let coreType = getCoreDataType(attributeType);
           let coreAttribs = coreType.attributes;
@@ -271,14 +270,14 @@ function addAttributeType(itemsObj, attr) {
  * @memberof Utils
  */
 function addReferenceTypeRuleClass(itemsObj, coreType) {
-    /*  let itemObj = {};
-     let ref = '';
-     let sName = '';
-     itemsObj.items = itemObj;
-     sName = coreType.name;
-     ref = constant.getReference() + sName;
-     itemObj['$ref'] = ref;
-     itemsObj.type = 'array'; */
+     /*  let itemObj = {};
+      let ref = '';
+      let sName = '';
+      itemsObj.items = itemObj;
+      sName = coreType.name;
+      ref = constant.getReference() + sName;
+      itemObj['$ref'] = ref;
+      itemsObj.type = 'array'; */
 
 
      /* Add reference of Schema */
@@ -288,7 +287,7 @@ function addReferenceTypeRuleClass(itemsObj, coreType) {
 
      let allOfObj = {};
      sName = coreType.name;
-     ref=constant.getReference() + sName;
+     ref = constant.getReference() + sName;
      allOfObj['$ref'] = ref;
      allOfArray.push(allOfObj);
 
@@ -382,7 +381,7 @@ let mJsonRuleType = [];
  */
 
 /*  JSON Schema primitive types : array, boolean, integer, number, null,  object, string */
- /* predefined JSON string formats : date, time, date-time, email, and uri */
+/* predefined JSON string formats : date, time, date-time, email, and uri */
 function initJsonRuleType() {
      mJsonRuleType = [{
           key: 'Text',

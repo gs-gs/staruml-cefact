@@ -8,7 +8,7 @@ class Composition {
       * @constructor Creates an instance of Composition.
       */
      constructor(reqAttr) {
-          this.arrAttRequired=reqAttr;
+          this.arrAttRequired = reqAttr;
      }
 
 
@@ -20,22 +20,22 @@ class Composition {
       * @returns {Object}
       * @memberof Composition
       */
-     addComposition(mainPropertiesObj, assoc, assocName,compositionRef) {
+     addComposition(mainPropertiesObj, assoc, assocName, compositionRef) {
           let propertiesObj = {};
           mainPropertiesObj[assocName] = propertiesObj;
-          let ref='';
-          let sName='';
-          let objAttrRe={
-               name:assocName,
-               multiplicity:assoc.end2.multiplicity
+          let ref = '';
+          let sName = '';
+          let objAttrRe = {
+               name: assocName,
+               multiplicity: assoc.end2.multiplicity
           };
           this.arrAttRequired.push(objAttrRe);
           /* mainPropertiesObj[assoc.name] = propertiesObj; */
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                let itemsObj = {};
                propertiesObj.items = itemsObj;
-               sName=assoc.end2.reference.name;
-               ref=constant.getReference() + sName;
+               sName = assoc.end2.reference.name;
+               ref = constant.getReference() + sName;
                itemsObj['$ref'] = ref;
                propertiesObj.type = 'array';
                /**
@@ -45,12 +45,13 @@ class Composition {
                     propertiesObj.minItems = 1;
                }
           } else {
-               sName=assoc.end2.reference.name;
-               ref=constant.getReference() + sName;
+               sName = assoc.end2.reference.name;
+               ref = constant.getReference() + sName;
                propertiesObj['$ref'] = ref;
                propertiesObj.description = assoc.end2.reference.documentation;
 
-               /* let allOfArray = [];
+               /* TODO Do not remove this code for future reference
+               let allOfArray = [];
                propertiesObj.allOf = allOfArray;
 
                let objAllOfArry = {};
@@ -63,9 +64,9 @@ class Composition {
                objAllOfArry.description = assoc.end2.reference.documentation;
                allOfArray.push(objAllOfArry); */
           }
-          let temp={};
-          temp['ref']=propertiesObj;
-          temp['sName']=sName;
+          let temp = {};
+          temp['ref'] = propertiesObj;
+          temp['sName'] = sName;
           compositionRef.push(temp);
           return mainPropertiesObj;
      }

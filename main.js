@@ -95,12 +95,14 @@ async function startOpenApiGenerator(message, exportElement, basePath, options, 
      setTimeout(async function () {
 
           try {
-               let result = await mOpenApi.initUMLPackage()
-               console.log("initialized Package", result);
-               let resultElement = await mOpenApi.getModelElements();
-               console.log("initialized Model Elements", resultElement);
+               /* Initialize package */
+               await mOpenApi.initUMLPackage();
+
+               /* Initialize model elements */
+               await mOpenApi.getModelElements();
+
+               /* Generate OpenAPI */
                let resultGen = await mOpenApi.generateOpenAPI();
-               console.log("result : OpenAPI Generated", resultGen);
                if (resultGen.result == constant.FIELD_SUCCESS) {
                     vDialog.close();
                     setTimeout(function () {
@@ -299,12 +301,15 @@ async function starTestingAllDiagram(diagramList) {
           dElement.filterUMLClassDiagram(mUMLDiagram);
           const mOpenApi = new openAPI.OpenApi(mUMLDiagram, basePath, options, 1);
           try {
-               let result = await mOpenApi.initUMLPackage()
-               console.log("initialized Package", result);
-               let resultElement = await mOpenApi.getModelElements();
-               console.log("initialized Model Elements", resultElement);
-               let resultGen = await mOpenApi.generateOpenAPI();
-               console.log("result : OpenAPI Generated", resultGen);
+               /* Initialize package */
+               await mOpenApi.initUMLPackage()
+
+               /* Initialize model elements */
+               await mOpenApi.getModelElements();
+
+               /* Generate OpenAPI */
+               await mOpenApi.generateOpenAPI();
+
           } catch (err) {
                console.error("Error startTestingAllPackage", err);
                if (openAPI.getError().hasOwnProperty('isDuplicate') && openAPI.getError().isDuplicate == true) {
@@ -353,12 +358,14 @@ async function starTestingAllPackage(pkgList) {
           const options = getGenOptions();
           const mOpenApi = new openAPI.OpenApi(umlPackage, basePath, options, 1);
           try {
-               let result = await mOpenApi.initUMLPackage()
-               console.log("initialize", result);
-               let resultElement = await mOpenApi.getModelElements();
-               console.log("resultElement", resultElement);
-               let resultGen = await mOpenApi.generateOpenAPI();
-               console.log("resultGen", resultGen);
+               /* Initialize package */
+               await mOpenApi.initUMLPackage()
+
+               /* Initialize model elements */
+               await mOpenApi.getModelElements();
+
+               /* Generate OpenAPI */
+               await mOpenApi.generateOpenAPI();
 
           } catch (err) {
                /*  app.dialogs.showErrorDialog(err.message); */
@@ -460,7 +467,7 @@ function testEntireDiagram() {
  */
 function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
-     
+
      /* Script to change multiplicity from '1' to '0..1' */
      /* 
      let allAttrib=app.repository.select("@UMLAttribute");
@@ -540,7 +547,7 @@ function genJSONLD() {
  * @function initProject
  * @description initialize basic json rules for jsonld and openapi/jsonschema
  */
-function initProject(){
+function initProject() {
      utils.initJsonRuleType();
      utils.initJsonldRuleType();
 }
@@ -560,27 +567,32 @@ function init() {
      /* Register command to Generate Generate JSON-LD Specification */
      app.commands.register('jsonld:generate', genJSONLD);
 
+     /* Register command to initialize project */
      app.project.on('projectLoaded', initProject);
 }
-function runStarUML(){
+
+/**
+ * @function runStarUML
+ * @description This is script to run staruml project for Windows and Linux OS. This function will copy all project files in staruml installed directory
+ */
+function runStarUML() {
      /* possible values of os 'aix', 'darwin', 'freebsd', 'linux', 'openbsd', 'sunos', 'win32' */
      let homeDirectory = os.homedir();
      let dest = '';
-     let src = __dirname+path.sep;
-     if(os.platform == 'win32') {
-          dest = homeDirectory+path.sep+'AppData'+path.sep+'Roaming'+path.sep+'StarUML'+path.sep+'extensions'+path.sep+'user'+path.sep+baseDirName+path.sep;
+     let src = __dirname + path.sep;
+     if (os.platform == 'win32') {
+          dest = homeDirectory + path.sep + 'AppData' + path.sep + 'Roaming' + path.sep + 'StarUML' + path.sep + 'extensions' + path.sep + 'user' + path.sep + baseDirName + path.sep;
+     } else if (os.platform == 'linux') {
+          dest = homeDirectory + '.config' + path.sep + 'StarUML' + path.sep + 'extensions' + path.sep + 'user' + path.sep + baseDirName + path.sep;
      }
-     else if(os.platform == 'linux') {
-          dest = homeDirectory+'.config'+path.sep+'StarUML'+path.sep+'extensions'+path.sep+'user'+path.sep+baseDirName+path.sep;
-     }
-     console.log("platform : ",os.platform);
-     console.log("base : ",baseDirName);
-     console.log("src : ",src);
-     console.log("dest : ",dest);
+     console.log("platform : ", os.platform);
+     console.log("base : ", baseDirName);
+     console.log("src : ", src);
+     console.log("dest : ", dest);
      console.log("Coping files..!")
      fsNew.copy(src, dest)
-     .then(() => console.log('success!'))
-     .catch(err => console.error(err));
+          .then(() => console.log('success!'))
+          .catch(err => console.error(err));
      return '';
 }
 exports.init = init

@@ -49,7 +49,7 @@ function showDialogInvalidAttributeType() {
 
      let eleName = '';
      let selType = '';
-     let basePath='';
+     let basePath = '';
      if (openAPI.getAppMode() == openAPI.APP_MODE_JSONLD) {
           eleName = jsonld.getExportElementName();
           selType = constant.STR_PACKAGE;
@@ -125,7 +125,7 @@ function showDialogNotLinkedType() {
           });
 
           if (mNotLinkedType.length > constant.MAX_LINES) {
-               
+
                basePath = path.join(basePath, eleName + "_" + constant.NOT_LINKED_TYPE_FILE_NAME);
                let writeMsgs = '';
                forEach(mNotLinkedType, function (item) {

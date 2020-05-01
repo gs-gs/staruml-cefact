@@ -177,7 +177,7 @@ class Association {
 
                let filterAssociation = [];
                let filter = [];
-               let associations=utils.fetchUMLAssociation();
+               let associations = utils.fetchUMLAssociation();
                if (openAPI.isModelPackage()) {
 
                     filterAssociation = associations.filter(item => {

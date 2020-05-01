@@ -1,10 +1,8 @@
 const forEach = require('async-foreach').forEach;
 const utils = require('./utils');
 const openAPI = require('./openapi');
-/* const Generalization = require('./generalization'); */
 const constant = require('./constant');
 const Operations = require('./operations');
-const dElement = require('./diagram/dElement');
 /**
  * @class Paths
  * @description class returns the Paths
@@ -120,21 +118,23 @@ class Paths {
                          GET : 
 
                               Examples : 
-                                   GET http://www.example.com/customers/12345
-                                   GET http://www.example.com/customers/12345/orders
-                                   GET http://www.example.com/buckets/sample
+                                   GET http://www.appdomain.com/users
+                                   GET http://www.appdomain.com/users?size=20&page=5
+                                   GET http://www.appdomain.com/users/123
+                                   GET http://www.appdomain.com/users/123/address
                               
                               Generating : 
                                    '/{resource}'
+                                   '/{resource}?params1=abc&params2=xyz...' (query parameter)
                                    '/{resource}/{id}'
                                    '/{resource}/{id}/{sub-resource}
-                                   '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
+                                   '/{resource}/{id}/{sub-resource}/{sub-resource-id}' // This is not listed in restfullapi.net
                          
                          POST : 
 
                               Examples : 
-                                   POST http://www.example.com/customers
-                                   POST http://www.example.com/customers/12345/orders
+                                   POST http://www.appdomain.com/users
+                                   POST http://www.appdomain.com/users/123/accounts
 
                               Generating : 
                                    '/{resource}'
@@ -143,9 +143,8 @@ class Paths {
                          PUT :
 
                               Examples : 
-                                   PUT http://www.example.com/customers/12345
-                                   PUT http://www.example.com/customers/12345/orders/98765
-                                   PUT http://www.example.com/buckets/secret_stuff
+                                   PUT http://www.appdomain.com/users/123
+                                   PUT http://www.appdomain.com/users/123/accounts/456
 
                               Generating :
                                    '/{resource}/{id}'
@@ -154,9 +153,8 @@ class Paths {
                          PATCH :
 
                               Examples :
-                                   PATCH http://www.example.com/customers/12345
-                                   PATCH http://www.example.com/customers/12345/orders/98765
-                                   PATCH http://www.example.com/buckets/secret_stuff
+                                   PATCH http://www.appdomain.com/users/123
+                                   PATCH http://www.appdomain.com/users/123/accounts/456
 
                               Generating :
                                    '/{resource}/{id}'  
@@ -164,9 +162,8 @@ class Paths {
                          DELETE : 
 
                               Examples :
-                                   DELETE http://www.example.com/customers/12345
-                                   DELETE http://www.example.com/customers/12345/orders
-                                   DELETE http://www.example.com/bucket/sample
+                                   DELETE http://www.appdomain.com/users/123
+                                   DELETE http://www.appdomain.com/users/123/accounts/456
 
                               Generating :
                                    '/{resource}/{id}'
@@ -174,21 +171,35 @@ class Paths {
 
                          
                          /* 
-                         1. Write Simple path : Generate query type paramters for 'GET' method if non-id parameters (Issue : #6)
-                         2. Write Simple path :  
+                         1. Write Simple path 
+
                               Pattern : (GET/POST) : '/{resource}'
+
+                              Note : in GET method : If paramter name is not 'id' or 'identifier', Generate 'query' parameter (Issue : #6)
+
                          */
                          this.writeSimplePathObject(pathsObject, mOperations, objInterfaceRealization);
 
                          /* 
-                         3. Write {id} path object of (GET, PUT, DELETE, PATCH) Operations
+                         2. Write {id} path object of (GET, PUT, DELETE, PATCH) Operations
+
                               Pattern : (GET/PUT/DELETE/PATCH) : '/{resource}/{id}'
+
                          */
                          this.writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization);
 
                          /* 
-                         4. Write path object for sub-resource pattern (Issue : #90) 
-                              Pattern : (GET/POST/DELETE/PUT) : '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
+                         3. Write path object for sub-resource pattern (Issue : #90) 
+                              Pattern : 
+
+                              GET : '/{resource}/{id}/{sub-resource}'
+                              GET : '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
+
+                              POST : '/{resource}/{id}/{sub-resource}'
+
+                              DELETE : '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
+
+                              PUT : '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
                          */
                          this.writeSubResourcePathObject(objInterface, objInterfaceRealization, mainPathsObject);
 
@@ -365,9 +376,7 @@ class Paths {
 
                let end1Interface = interfaceAssociation.end1; /* source example : imprtDeclarations */
                let end2Interface = interfaceAssociation.end2; /* target : CargoLines */
-               if (end2Interface.reference.name == 'travelDocuments') {
-                    console.log("yes");
-               }
+
                let uIR = app.repository.select("@UMLInterfaceRealization");
                let resUIR = uIR.filter(irealization => {
                     return end2Interface.reference._id == irealization.target._id;
@@ -381,14 +390,18 @@ class Paths {
                     let wOperationObject = {};
                     let refCName = '';
                     if (objOperation.name.toUpperCase() == constant.GET) {
+
+
+                         /* GET all sub-resource list */
+
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
-                         /* let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name; */
+
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
                               pathsObject = mainPathsObject[mICPath];
                          } else {
                               mainPathsObject[mICPath] = pathsObject;
                          }
-                         /* Get all list */
+
 
                          pathsObject.get = wOperationObject;
 
@@ -448,10 +461,9 @@ class Paths {
 
 
 
-                         /* Get single element record */
+                         /* GET single sub-resource */
 
                          let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
-                         /* let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}"; */
 
                          let pathsSingleObject = {};
                          if (mainPathsObject.hasOwnProperty(mICPath1)) {
@@ -536,6 +548,9 @@ class Paths {
 
 
                     } else if (objOperation.name.toUpperCase() == constant.POST) {
+
+                         /* POST single sub-resource */
+
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
                          /* let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name; */
 
@@ -554,6 +569,8 @@ class Paths {
 
                     } else if (objOperation.name.toUpperCase() == constant.DELETE) {
 
+                         /* PUT single sub-resource */
+
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
                          /*  let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}"; */
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
@@ -566,8 +583,7 @@ class Paths {
 
                     } else if (objOperation.name.toUpperCase() == constant.PUT) {
 
-
-                         /* Get single element record */
+                         /* PUT single sub-resource */
 
                          let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
                          /* let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}"; */

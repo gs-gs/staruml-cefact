@@ -103,8 +103,8 @@ class Generalization {
                } else if (openAPI.isModelDiagram()) {
                     let generalizeClassesViews = dElement.getUMLGeneralizationView();
 
-                    let generalizeClasses=[];
-                    forEach(generalizeClassesViews,function(generalizationView){
+                    let generalizeClasses = [];
+                    forEach(generalizeClassesViews, function (generalizationView) {
                          generalizeClasses.push(generalizationView.model);
                     });
 

@@ -431,12 +431,27 @@ class OpenApi {
           return OpenApi.exportElement;
      }
 
+     /**
+      * @function getExportElementName
+      * @description returns export element name
+      * @static
+      * @returns {String}
+      * @memberof OpenApi
+      */
      static getExportElementName() {
           return OpenApi.umlPackageName;
      }
+
+     /**
+      * @function setExportElementName
+      * @description returns set export element name
+      * @static
+      * @memberof OpenApi
+      */
      static setExportElementName(pkgName) {
           OpenApi.umlPackageName = pkgName;
      }
+     
      /**
       * @function getOperations
       * @description returns path operations
@@ -505,7 +520,6 @@ class OpenApi {
                     let umlClasses = app.repository.select(OpenApi.getExportElementName() + "::@UMLClass");
                     forEach(umlClasses, async (objClass, index) => {
                          let umlAssociation = app.repository.select(OpenApi.getExportElementName() + "::" + objClass.name + "::@UMLAssociation");
-                         /* console.log(objClass.name,umlAssociation); */
                          if (umlAssociation.length > 0) {
                               umlAssociation.forEach(function (element) {
                                    tmpAssociation.push(element);
@@ -776,7 +790,6 @@ function validateSwagger(pathValidator) {
      return new Promise((resolve, reject) => {
 
           try {
-               /*  console.log("Filepath :", pathValidator); */
                if (fs.existsSync(pathValidator)) {
                     parser.validate(pathValidator, (err, api) => {
                          if (err) {

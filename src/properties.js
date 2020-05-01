@@ -71,6 +71,12 @@ class Properties {
           return mainPropertiesObj;
      }
 
+     /**
+      * @function addPropertiesForAttrTypeRefClass
+      * @description Adds properties for those classes whose attribute type is reference class
+      * @returns {Object} mainPropertiesObj
+      * @memberof Properties
+      */
      addPropertiesForAttrTypeRefClass(){
           let mainPropertiesObj = {};
           let _this = this;

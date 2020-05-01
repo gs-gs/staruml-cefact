@@ -17,10 +17,9 @@ class Operations {
      /**
       * @function get
       * @description returns the object of get method
-      * @param {Object} mainPathsObject 
-      * @param {UMLInterface} objInterface 
-      * @param {objOperation} objOperation
-      * @returns {Object} 
+      * @param {Object} objInterface 
+      * @param {Object} objOperation 
+      * @returns {Object} wOperationObject
       * @memberof Operations
       */
      get(objInterface, objOperation) {
@@ -71,9 +70,10 @@ class Operations {
      /**
       * @function postForSubResource
       * @description returns object of post method
-      * @param {UMLInterface} objInterface
-      * @param {UMLInterface} end2Interface
-      * @returns {Object}
+      * @param {UMLInterfaceRealization} interfaceRealization
+      * @param {UMLAssociationEnd} end1Interface
+      * @param {UMLClass} subResourceClass
+      * @returns {Object} wOperationObject
       * @memberof Operations
       */
      postForSubResource(interfaceRealization, end1Interface, subResourceClass) {
@@ -131,8 +131,8 @@ class Operations {
       * @function post
       * @description returns object of post method
       * @param {UMLInterface} objInterface
-      * @param {UMLInterface} end2Interface
-      * @returns {Object}
+      * @param {UMLAssociationEnd} end2Interface
+      * @returns {Object} wOperationObject
       * @memberof Operations
       */
      post(objInterface, end2Interface) {
@@ -192,7 +192,7 @@ class Operations {
       * @description returns the object of put method
       * @param {UMLInterfaceRealization} objInterfaceRealization
       * @param {UMLAttribute} operationAttribute
-      * @returns {Object}
+      * @returns {Object} wOperationObject
       * @memberof Operations
       */
      put(objInterfaceRealization, operationAttribute) {
@@ -270,7 +270,7 @@ class Operations {
       * @description returns the object of patch method
       * @param {UMLInterface} objInterface
       * @param {UMLAttribute} operationAttribute
-      * @returns {Object}
+      * @returns {Object} wOperationObject
       * @memberof Operations
       */
      patch(objInterface, operationAttribute) {
@@ -339,7 +339,7 @@ class Operations {
       * @param {UMLAttribute} iAttribute
       * @param {UMLAssociationEnd} end1Interface
       * @param {UMLAssociationEnd} end2Interface
-      * @returns {Object}
+      * @returns {Object} wOperationObject
       * @memberof Operations
       */
      delete(objInterfaceRealization, iAttribute, end1Interface, end2Interface) {
@@ -399,7 +399,7 @@ class Operations {
       * @description returns the attributes object of Operation object
       * @param {UMLInterfaceRealization} objInterfaceRealization
       * @param {UMLAttribute} iAttribute
-      * @returns {Object}
+      * @returns {Object} wOperationObject
       * @memberof Operations
       */
      getOperationAttribute(objInterfaceRealization, iAttribute) {
