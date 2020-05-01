@@ -669,7 +669,10 @@ class OpenApi {
                          MainJSON.addJSONSchema(component);
 
                          /* Add JSONLayout object in JSONSchema */
-                         MainJSON.addJSONLayout(component);
+                         /* 
+                              #122 : Remove layout section from json schema feature
+                              MainJSON.addJSONLayout(component); 
+                         */
 
                          /* Generate file after JSONSchema generated */
                          let generator = new FileGenerator();
