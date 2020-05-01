@@ -240,7 +240,7 @@ function getParentClasses(mElement) {
 function getRdfsInstancesArr() {
     let rdfsInstancesArr = [ /* {# instances #} */ ];
     let mUMLPackage = getExportElement();
-    /* //TODO : Do not remove this code 
+    /* TODO : Do not remove this code 
     let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
 
     let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
@@ -311,7 +311,7 @@ function getRdfsPropertiesArr() {
             objProperty['rdfs:domain'] = mClass.name;
 
             let range = getRange(attr, mClass.name);
-            objProperty['rdfs:range'] = range; //getRange(attr);
+            objProperty['rdfs:range'] = range; /* getRange(attr); */
             /* if(utils.isString(attr.type) && range!=''){
                 rdfsPropertiesArr.push(objProperty);
             }
@@ -384,7 +384,7 @@ function getRange(attr, className) {
         }else{
 
         /* if (attributeType === 'Numeric') {
-            range = 'xsd:nonNegativeInteger'; //
+            range = 'xsd:nonNegativeInteger'; 
         } else if (attributeType === 'Indicator') {
             range = 'xsd:boolean';
         } else if (attributeType === 'Date') {

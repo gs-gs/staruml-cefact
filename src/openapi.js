@@ -687,7 +687,7 @@ class OpenApi {
 
                     } else {
                          
-                         // Generate OpenAPI Specification
+                         /* Generate OpenAPI Specification */
 
                          /*  Add openapi version */
                          MainJSON.addApiVersion('3.0.0');
@@ -833,7 +833,7 @@ function getPackageWiseUMLAssociation() {
  * @param {*} item
  */
 function findParentPackage(ele, item) {
-     // return new Promise((resolve, reject) => {
+     /* return new Promise((resolve, reject) => { */
 
      if (ele instanceof type.UMLPackage) {
           if (ele != null && ele.name == openAPI.getExportElementName()) {
@@ -843,7 +843,7 @@ function findParentPackage(ele, item) {
      } else if (ele.hasOwnProperty('_parent') && ele._parent != null) {
           findParentPackage(ele._parent, item);
      }
-     // return null;
+     /* return null; */
 }
 module.exports.getFilePath = OpenApi.getPath;
 module.exports.OpenApi = OpenApi;

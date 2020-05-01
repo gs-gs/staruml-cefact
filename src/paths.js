@@ -1,7 +1,7 @@
 const forEach = require('async-foreach').forEach;
 const utils = require('./utils');
 const openAPI = require('./openapi');
-// const Generalization = require('./generalization');
+/* const Generalization = require('./generalization'); */
 const constant = require('./constant');
 const Operations = require('./operations');
 const dElement = require('./diagram/dElement');
@@ -15,7 +15,7 @@ class Paths {
       */
      constructor() {
           utils.resetErrorBlock();
-          // this.generalization = new Generalization();
+          /* this.generalization = new Generalization(); */
           this.operations = new Operations();
      }
 
@@ -116,21 +116,79 @@ class Paths {
                          }
 
                          /* 
+                         
+                         GET : 
+
+                              Examples : 
+                                   GET http://www.example.com/customers/12345
+                                   GET http://www.example.com/customers/12345/orders
+                                   GET http://www.example.com/buckets/sample
+                              
+                              Generating : 
+                                   '/{resource}'
+                                   '/{resource}/{id}'
+                                   '/{resource}/{id}/{sub-resource}
+                                   '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
+                         
+                         POST : 
+
+                              Examples : 
+                                   POST http://www.example.com/customers
+                                   POST http://www.example.com/customers/12345/orders
+
+                              Generating : 
+                                   '/{resource}'
+                                   '/{resource}/{id}/{sub-resource}'
+
+                         PUT :
+
+                              Examples : 
+                                   PUT http://www.example.com/customers/12345
+                                   PUT http://www.example.com/customers/12345/orders/98765
+                                   PUT http://www.example.com/buckets/secret_stuff
+
+                              Generating :
+                                   '/{resource}/{id}'
+                                   '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
+                         
+                         PATCH :
+
+                              Examples :
+                                   PATCH http://www.example.com/customers/12345
+                                   PATCH http://www.example.com/customers/12345/orders/98765
+                                   PATCH http://www.example.com/buckets/secret_stuff
+
+                              Generating :
+                                   '/{resource}/{id}'  
+
+                         DELETE : 
+
+                              Examples :
+                                   DELETE http://www.example.com/customers/12345
+                                   DELETE http://www.example.com/customers/12345/orders
+                                   DELETE http://www.example.com/bucket/sample
+
+                              Generating :
+                                   '/{resource}/{id}'
+                                   '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
+
+                         
+                         /* 
                          1. Write Simple path : Generate query type paramters for 'GET' method if non-id parameters (Issue : #6)
                          2. Write Simple path :  
-                              Pattern : (GET/POST) : '/{pathname}'
+                              Pattern : (GET/POST) : '/{resource}'
                          */
                          this.writeSimplePathObject(pathsObject, mOperations, objInterfaceRealization);
 
                          /* 
-                         3. Write {id} path object of (GET, PUT, DELETE) Operations
-                              Pattern : (GET/PUT/DELETE/PATCH) : '/{pathname}/{id}'
+                         3. Write {id} path object of (GET, PUT, DELETE, PATCH) Operations
+                              Pattern : (GET/PUT/DELETE/PATCH) : '/{resource}/{id}'
                          */
                          this.writeIDPathObject(mInterfaceView, objInterface, mOperations, mainPathsObject, objInterfaceRealization);
 
                          /* 
                          4. Write path object for sub-resource pattern (Issue : #90) 
-                              Pattern : (GET/POST/DELETE/PUT) : '/{pathname}/{id}/{sub-resource-pathname}/{sub-resource-id}'
+                              Pattern : (GET/POST/DELETE/PUT) : '/{resource}/{id}/{sub-resource}/{sub-resource-id}'
                          */
                          this.writeSubResourcePathObject(objInterface, objInterfaceRealization, mainPathsObject);
 
@@ -305,8 +363,8 @@ class Paths {
           try {
 
 
-               let end1Interface = interfaceAssociation.end1; //source example : imprtDeclarations
-               let end2Interface = interfaceAssociation.end2; //target : CargoLines
+               let end1Interface = interfaceAssociation.end1; /* source example : imprtDeclarations */
+               let end2Interface = interfaceAssociation.end2; /* target : CargoLines */
                if (end2Interface.reference.name == 'travelDocuments') {
                     console.log("yes");
                }
@@ -324,8 +382,7 @@ class Paths {
                     let refCName = '';
                     if (objOperation.name.toUpperCase() == constant.GET) {
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
-                         // let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
-                         //test
+                         /* let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name; */
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
                               pathsObject = mainPathsObject[mICPath];
                          } else {
@@ -379,7 +436,7 @@ class Paths {
                               let subResourceClass = resUIR[0].source;
                               refCName = subResourceClass.name
                          } else {
-                              // This line is optional
+                              /*  This line is optional */
                               refCName = interfaceRealization.source.name;
                          }
 
@@ -387,14 +444,14 @@ class Paths {
                          schemaObj.items = itemsObject;
                          itemsObject['$ref'] = constant.getReference() + refCName;
                          schemaObj.type = 'array';
-                         // schemaObj['$ref'] = constant.getReference() + refCName;
+                         /* schemaObj['$ref'] = constant.getReference() + refCName; */
 
 
 
                          /* Get single element record */
 
                          let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
-                         //   let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
+                         /* let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}"; */
 
                          let pathsSingleObject = {};
                          if (mainPathsObject.hasOwnProperty(mICPath1)) {
@@ -428,8 +485,8 @@ class Paths {
                          let name1 = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
                          let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
 
-                         //   let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
-                         //   let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
+                         /* let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name; */
+                         /* let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION); */
 
                          utils.buildParameter(name1, "path", description1, true, objSingleSchema, paramsSingleObject);
 
@@ -469,7 +526,7 @@ class Paths {
                               let subResourceClass = resUIR[0].source;
                               refCName = subResourceClass.name
                          } else {
-                              // This line is optional
+                              /* This line is optional */
                               refCName = interfaceRealization.source.name;
                          }
 
@@ -480,7 +537,7 @@ class Paths {
 
                     } else if (objOperation.name.toUpperCase() == constant.POST) {
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
-                         //   let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
+                         /* let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name; */
 
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
                               pathsObject = mainPathsObject[mICPath];
@@ -498,7 +555,7 @@ class Paths {
                     } else if (objOperation.name.toUpperCase() == constant.DELETE) {
 
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
-                         //   let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
+                         /*  let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}"; */
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
                               pathsObject = mainPathsObject[mICPath];
                          } else {
@@ -513,7 +570,7 @@ class Paths {
                          /* Get single element record */
 
                          let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
-                         //   let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
+                         /* let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}"; */
                          let pathsSingleObject = {};
                          if (mainPathsObject.hasOwnProperty(mICPath1)) {
                               pathsSingleObject = mainPathsObject[mICPath1];
@@ -545,8 +602,8 @@ class Paths {
                          let name1 = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
                          let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
 
-                         //   let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
-                         //   let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
+                         /* let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name; */
+                         /* let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION); */
 
                          utils.buildParameter(name1, "path", description1, true, objSingleSchema, paramsSingleObject);
 
@@ -593,7 +650,7 @@ class Paths {
                               let subResourceClass = resUIR[0].source;
                               refCName = subResourceClass.name
                          } else {
-                              // This line is optional
+                              /* This line is optional */
                               refCName = interfaceRealization.source.name;
                          }
                          schemaSingleObj['$ref'] = constant.getReference() + refCName;

@@ -352,7 +352,6 @@ class Component {
                 **/
                this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
 
-               // }
           });
      }
 

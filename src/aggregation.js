@@ -173,7 +173,7 @@ class Aggregation {
           let temp={};
           temp['ref']=propertiesObj;
           temp['sName']=sName
-          // compositionRef.push('1. aggregation : '+ref,temp);
+          /* compositionRef.push('1. aggregation : '+ref,temp); */
           compositionRef.push(temp);
           return mainPropertiesObj;
      }

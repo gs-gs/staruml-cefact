@@ -460,8 +460,9 @@ function testEntireDiagram() {
  */
 function aboutUsExtension() {
      app.dialogs.showInfoDialog(title + "\n\n" + description);
+     
+     /* Script to change multiplicity from '1' to '0..1' */
      /* 
-     // Script to change multiplicity from '1' to '0..1'
      let allAttrib=app.repository.select("@UMLAttribute");
      let attribMulticiplityOne=allAttrib.filter(function(attrib){
           return attrib.multiplicity==="1";

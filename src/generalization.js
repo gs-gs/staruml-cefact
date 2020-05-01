@@ -49,7 +49,7 @@ class Generalization {
                     let temp = {};
                     temp['ref'] = mainClassesObj;
                     temp['sName'] = sName;
-                    // compositionRef.push('7. generalization : '+ref,temp);
+                    /* compositionRef.push('7. generalization : '+ref,temp); */
                     compositionRef.push(temp);
                });
 
@@ -95,7 +95,7 @@ class Generalization {
                if (openAPI.isModelPackage()) {
 
                     let generalizeClasses = app.repository.select(openAPI.getExportElementName() + "::" + objClass.name + "::@UMLGeneralization");
-                    //  let generalizeClasses = app.repository.select("@UMLGeneralization");
+                    /* let generalizeClasses = app.repository.select("@UMLGeneralization"); */
                     filterGeneral = generalizeClasses.filter(item => {
                          return item.source._id == objClass._id
                     });

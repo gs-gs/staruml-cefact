@@ -49,7 +49,7 @@ function toCamelCase(inputArray) {
 
          if (i != 0) {
 
-              // convert first letter to upper case (the word is in lowercase) 
+              /* convert first letter to upper case (the word is in lowercase)  */
               tempStr = tempStr.substr(0, 1).toUpperCase() + tempStr.substr(1);
 
          }
