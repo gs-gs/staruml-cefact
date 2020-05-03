@@ -57,7 +57,7 @@ class Paths {
      }
      /**
       * @function getOperations
-      * @description Return Operations object 
+      * @description Return Operations object
       * @return {object} mainPathsObject
       * @memberof Paths
       */
@@ -307,9 +307,12 @@ class Paths {
 
                let end1Interface = interfaceAssociation.end1; //source example : imprtDeclarations
                let end2Interface = interfaceAssociation.end2; //target : CargoLines
-               if(end2Interface.reference.name == 'travelDocuments'){
-                    console.log("yes");
-               }
+
+               if (end1Interface.reference.attributes[0].name == end2Interface.reference.attributes[0].name) {
+                                           app.dialogs.showAlertDialog('The interface "' + end2Interface.reference.name + '" has the same name "' + end1Interface.reference.attributes[0].name + '" for `id` attribute as the interface "' + end1Interface.reference.name + '", they must be different to generate the paths for sub-resource.');
+                                           return;
+                                       }
+
                let uIR = app.repository.select("@UMLInterfaceRealization");
                let resUIR = uIR.filter(irealization => {
                     return end2Interface.reference._id == irealization.target._id;
@@ -323,7 +326,11 @@ class Paths {
                     let wOperationObject = {};
                     let refCName = '';
                     if (objOperation.name.toUpperCase() == constant.GET) {
-                         let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
+
+
+
+                        let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
+                        // let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
                          // let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name;
                          //test
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
@@ -351,7 +358,7 @@ class Paths {
                          let objSchema = {};
                          objSchema.type = 'string';
 
-                         let name = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
+                         let name = end1Interface.reference.attributes[0].name;
                          let description = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
                          /* let name = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
                          let description = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION); */
@@ -393,7 +400,7 @@ class Paths {
 
                          /* Get single element record */
 
-                         let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
+                         let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}";
                          //   let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
 
                          let pathsSingleObject = {};
@@ -425,7 +432,7 @@ class Paths {
                          let objSingleSchema = {};
                          objSingleSchema.type = 'string';
 
-                         let name1 = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
+                         let name1 = end1Interface.reference.attributes[0].name;
                          let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
 
                          //   let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
@@ -441,7 +448,7 @@ class Paths {
                          objSingleSchema = {};
                          objSingleSchema.type = 'string';
 
-                         let name2 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
+                         let name2 = end2Interface.reference.attributes[0].name;
                          let description2 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
                          utils.buildParameter(name2, "path", description2, true, objSingleSchema, paramsSingleObject);
 
@@ -502,7 +509,7 @@ class Paths {
 
                     } else if (objOperation.name.toUpperCase() == constant.DELETE) {
 
-                         let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
+                         let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}";
                          //   let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
                               pathsObject = mainPathsObject[mICPath];
@@ -517,7 +524,7 @@ class Paths {
 
                          /* Get single element record */
 
-                         let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}";
+                         let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}";
                          //   let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
                          let pathsSingleObject = {};
                          if (mainPathsObject.hasOwnProperty(mICPath1)) {
@@ -547,7 +554,7 @@ class Paths {
                          let objSingleSchema = {};
                          objSingleSchema.type = 'string';
 
-                         let name1 = end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name;
+                         let name1 = end1Interface.reference.attributes[0].name;
                          let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
 
                          //   let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
@@ -563,7 +570,7 @@ class Paths {
                          objSingleSchema = {};
                          objSingleSchema.type = 'string';
 
-                         let name2 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
+                         let name2 = end2Interface.reference.attributes[0].name;
                          let description2 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
                          utils.buildParameter(name2, "path", description2, true, objSingleSchema, paramsSingleObject);
 
