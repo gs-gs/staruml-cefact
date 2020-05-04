@@ -379,9 +379,10 @@ class Paths {
                let end2Interface = interfaceAssociation.end2; //target : CargoLines
 
                if (end1Interface.reference.attributes[0].name == end2Interface.reference.attributes[0].name) {
-                                           app.dialogs.showAlertDialog('The interface "' + end2Interface.reference.name + '" has the same name "' + end1Interface.reference.attributes[0].name + '" for `id` attribute as the interface "' + end1Interface.reference.name + '", they must be different to generate the paths for sub-resource.');
-                                           return;
-                                       }
+                    let duplicateAttriMsg = 'The interface "' + end2Interface.reference.name + '" has the same name "' + end1Interface.reference.attributes[0].name + '" for \'id\' attribute as the interface "' + end1Interface.reference.name + '", they must be different to generate the paths for sub-resource.';
+                    app.dialogs.showAlertDialog(duplicateAttriMsg);
+                    return;
+               }
 
                let uIR = app.repository.select("@UMLInterfaceRealization");
                let resUIR = uIR.filter(irealization => {
@@ -396,8 +397,6 @@ class Paths {
                     let wOperationObject = {};
                     let refCName = '';
                     if (objOperation.name.toUpperCase() == constant.GET) {
-
-
 
                          /* GET all sub-resource list */
 
@@ -430,8 +429,7 @@ class Paths {
 
                          let name = end1Interface.reference.attributes[0].name;
                          let description = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
-                         /* let name = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name;
-                         let description = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION); */
+                         
                          utils.buildParameter(name, "path", description, true, objSchema, paramsObject);
 
                          let responsesObj = {};
@@ -471,7 +469,6 @@ class Paths {
                          /* GET single sub-resource */
 
                          let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}";
-                         //   let mICPath1 = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name + "/{" + end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name + "}";
 
                          let pathsSingleObject = {};
                          if (mainPathsObject.hasOwnProperty(mICPath1)) {
@@ -560,7 +557,6 @@ class Paths {
                          /* POST single sub-resource */
 
                          let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
-                         /* let mICPath = "/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}/" + end1Interface.reference.name; */
 
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
                               pathsObject = mainPathsObject[mICPath];
@@ -626,9 +622,6 @@ class Paths {
 
                          let name1 = end1Interface.reference.attributes[0].name;
                          let description1 = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
-
-                         /* let name1 = end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name; */
-                         /* let description1 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION); */
 
                          utils.buildParameter(name1, "path", description1, true, objSingleSchema, paramsSingleObject);
 
