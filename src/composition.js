@@ -38,6 +38,7 @@ class Composition {
                ref = constant.getReference() + sName;
                itemsObj['$ref'] = ref;
                propertiesObj.type = 'array';
+               propertiesObj['description'] = assoc.documentation;
                /**
                 * Add MinItems of multiplicity is 1..*
                 */
@@ -47,8 +48,14 @@ class Composition {
           } else {
                sName = assoc.end2.reference.name;
                ref = constant.getReference() + sName;
-               propertiesObj['$ref'] = ref;
-               propertiesObj.description = assoc.end2.reference.documentation;
+               let allOfArr = [];
+               let descriptionObj = {};
+               let refObj = {};
+               descriptionObj['description'] = assoc.documentation;
+               refObj['$ref'] = ref;
+               allOfArr.push(descriptionObj);
+               allOfArr.push(refObj);
+               propertiesObj['allOf'] = allOfArr;
 
                /* TODO Do not remove this code for future reference
                let allOfArray = [];
