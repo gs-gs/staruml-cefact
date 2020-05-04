@@ -15,6 +15,7 @@ class Properties {
           this.objClass = objClass;
           this.assocSideClassLink = assocSideClassLink;
           this.arrAttRequired = [];
+          this.enumerations = [];
           utils.resetErrorBlock();
      }
 
@@ -26,6 +27,16 @@ class Properties {
       */
      getAttributes() {
           return this.arrAttRequired;
+     }
+
+     /**
+       * @function getEnumerations
+       * @description Returns the array of enumerations used as data types by properties
+       * @returns {Array}
+       * @memberof Properties
+       */
+     getEnumerations() {
+           return this.enumerations;
      }
 
      /**
@@ -141,13 +152,22 @@ class Properties {
                               propertiesObj.minItems = 1;
                          }
                     } else {
-                         propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
-
-                         utils.addAttributeType(propertiesObj, attribute);
-
+                         /**
+                          * If data type is enumeration, build allOf object with a reference to a corresponding schema
+                          */
                          if (attribute.type instanceof type.UMLEnumeration) {
-                              /* Add Enumeration */
-                              propertiesObj.enum = utils.getEnumerationLiteral(attribute.type);
+                              let allOfArr = [];
+                              let descriptionObj = {};
+                              let refObj = {};
+                              descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
+                              refObj['$ref'] = '#/components/schemas/' + attribute.type.name;
+                              _this.enumerations.push(attribute.type);
+                              allOfArr.push(descriptionObj);
+                              allOfArr.push(refObj);
+                              propertiesObj['allOf'] = allOfArr;
+                         } else{
+                             propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
+                             utils.addAttributeType(propertiesObj, attribute);
                          }
                     }
                     if (attribute.defaultValue != "") {
