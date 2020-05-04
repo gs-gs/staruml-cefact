@@ -86,7 +86,7 @@ class Component {
                classEleOrViews = mClassesView;
           }
 
-          
+
           /**
            * Add class schema to scham object
            **/
@@ -100,16 +100,21 @@ class Component {
           let classTypeAttribute = utils.getClassTypeAttribute(classEleOrViews);
           this.addAttrTypeRefClassSchema(classTypeAttribute);
           openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
-          console.log("classTypeAttribute : ", classTypeAttribute);
-
 
           return this.mainComponentObj;
      }
+
+     /**
+      * @function addAttrTypeRefClassSchema
+      * @description Add schema of such classes of which attribute type is refference of UMLClass
+      * @param {Array} refClasses
+      * @memberof Component
+      */
      addAttrTypeRefClassSchema(refClasses) {
           refClasses.forEach(objClass => {
                let mainClassesObj = {};
                let mainPropertiesObj = {};
-               let assocSideClassLink=[];
+               let assocSideClassLink = [];
 
                this.mainSchemaObj[objClass.name] = mainClassesObj
                mainClassesObj.description = objClass.documentation;
@@ -138,6 +143,18 @@ class Component {
 
           });
      }
+
+     /**
+      * @function addClassSchema
+      * @description Add schema of such classes of which attribute type is refference of UMLClass
+      * @param {Array} classEleOrViews
+      * @param {Object} assoClassLink 
+      * @param {Object} mAssoClassLinkView 
+      * @param {Array} arrIdClasses 
+      * @param {Array} duplicateDeletedReference 
+      * @param {Array} duplicatePropertyError
+      * @memberof Component
+      */
      addClassSchema(classEleOrViews, assoClassLink, mAssoClassLinkView, arrIdClasses, duplicateDeletedReference, duplicatePropertyError) {
           classEleOrViews.forEach(classEleOrView => {
                let mainClassesObj = {};
@@ -352,14 +369,20 @@ class Component {
                 **/
                this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
 
-               // }
           });
      }
 
+     /**
+      * @function sortAssociationByModelExplorerSequence
+      * @description Add schema of such classes of which attribute type is refference of UMLClass
+      * @param {Array} objClass
+      * @param {Object} classAssociations 
+      * @returns {Array} newAssArr
+      * @memberof Component
+      */
      sortAssociationByModelExplorerSequence(objClass, classAssociations) {
           let newAssArr = [];
           let newClassAssociation = classAssociations;
-          console.log("" + objClass.name, newClassAssociation);
           let sortByClassEle = app.repository.select(objClass.name + "::@UMLAssociation");
           let newSort = [];
           forEach(sortByClassEle, function (element) {
@@ -382,10 +405,10 @@ class Component {
                     otherSort.push(element);
                }
           });
-          console.log("" + objClass.name + " - New", newSort.concat(otherSort));
           newAssArr = newSort.concat(otherSort);
           return newAssArr;
      }
+
      /**
       * @function getJSONSchema
       * @description Returns component object 

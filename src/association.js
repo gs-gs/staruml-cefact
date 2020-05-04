@@ -94,7 +94,7 @@ class Association {
                     let temp = {};
                     temp['ref'] = propertiesObj;
                     temp['sName'] = sName;
-                    // compositionRef.push('2. association 1: '+ref,temp);
+                    /* compositionRef.push('2. association 1: '+ref,temp); */
                     compositionRef.push(temp);
 
                     /* Add reference of Class Side Schema */
@@ -108,7 +108,7 @@ class Association {
                     temp = {};
                     temp['ref'] = propertiesObj;
                     temp['sName'] = sName
-                    // compositionRef.push('3. association 2: '+ref,temp);
+                    /* compositionRef.push('3. association 2: '+ref,temp); */
                     compositionRef.push(temp);
                     objAllOfArry = {};
                     objAllOfArry['type'] = 'object';
@@ -137,7 +137,7 @@ class Association {
                     let temp = {};
                     temp['ref'] = propertiesObj;
                     temp['sName'] = sName
-                    // compositionRef.push('4. association 3: '+ref,temp);
+                    /* compositionRef.push('4. association 3: '+ref,temp); */
                     compositionRef.push(temp);
 
                     /* Add reference of Class Side Schema */
@@ -150,7 +150,7 @@ class Association {
                     temp = {};
                     temp['ref'] = propertiesObj;
                     temp['sName'] = sName;
-                    // compositionRef.push('5. association 4: '+ref,temp);
+                    /* compositionRef.push('5. association 4: '+ref,temp); */
                     compositionRef.push(temp);
 
                     objAllOfArry = {};
@@ -177,7 +177,7 @@ class Association {
 
                let filterAssociation = [];
                let filter = [];
-               let associations=utils.fetchUMLAssociation();
+               let associations = utils.fetchUMLAssociation();
                if (openAPI.isModelPackage()) {
 
                     filterAssociation = associations.filter(item => {
@@ -250,7 +250,7 @@ class Association {
                }
 
                let generalization = new Generalization();
-               // let generalizeClasses = generalization.findGeneralizationOfClass(tempClass);
+               /* let generalizeClasses = generalization.findGeneralizationOfClass(tempClass); */
                let generalizeClasses = [];
                generalization.findGeneralizationRecursivelyOfClass(tempClass, generalizeClasses);
 

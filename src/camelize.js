@@ -7,12 +7,12 @@ function convertToString(input) {
 
     if (input) {
 
-         if (typeof input === "string") {
+        if (typeof input === "string") {
 
-              return input;
-         }
+            return input;
+        }
 
-         return String(input);
+        return String(input);
     }
     return '';
 }
@@ -43,18 +43,18 @@ function toCamelCase(inputArray) {
 
     for (let i = 0, len = inputArray.length; i < len; i++) {
 
-         let currentStr = inputArray[i];
+        let currentStr = inputArray[i];
 
-         let tempStr = currentStr.toLowerCase();
+        let tempStr = currentStr.toLowerCase();
 
-         if (i != 0) {
+        if (i != 0) {
 
-              // convert first letter to upper case (the word is in lowercase) 
-              tempStr = tempStr.substr(0, 1).toUpperCase() + tempStr.substr(1);
+            /* convert first letter to upper case (the word is in lowercase)  */
+            tempStr = tempStr.substr(0, 1).toUpperCase() + tempStr.substr(1);
 
-         }
+        }
 
-         result += tempStr;
+        result += tempStr;
 
     }
 
@@ -73,4 +73,4 @@ function toCamelCaseString(input) {
     return toCamelCase(words);
 
 }
-module.exports.toCamelCaseString=toCamelCaseString;
+module.exports.toCamelCaseString = toCamelCaseString;

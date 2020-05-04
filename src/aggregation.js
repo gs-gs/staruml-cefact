@@ -10,7 +10,7 @@ class Aggregation {
       * @constructor Creates an instance of Aggregation.
       */
      constructor(reqAttr) {
-          this.arrAttRequired=reqAttr;
+          this.arrAttRequired = reqAttr;
      }
 
      /**
@@ -53,11 +53,11 @@ class Aggregation {
       * @returns {Object}
       * @memberof Aggregation
       */
-     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName,compositionRef) {
+     addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef) {
           let propertiesObj = {};
-          let objAttrRe={
-               name:assocName,
-               multiplicity:assoc.end2.multiplicity
+          let objAttrRe = {
+               name: assocName,
+               multiplicity: assoc.end2.multiplicity
           };
           aggregationClasses.push(assoc.end2.reference);
           this.arrAttRequired.push(objAttrRe);
@@ -123,15 +123,15 @@ class Aggregation {
           });
           /* If no isID attribute found in Aggregation, Will be prompt error to user. */
           if (arrIsID.length == 0) {
-               let strMsg=nodeUtils.format(constant.STR_ISID_MSG,assoc.end2.reference.name,assoc.end1.reference.name);
+               let strMsg = nodeUtils.format(constant.STR_ISID_MSG, assoc.end2.reference.name, assoc.end1.reference.name);
                let jsonError = {
                     isWarning: true,
                     msg: strMsg
                };
                openAPI.setError(jsonError);
           }
-          let ref='';
-          let sName='';
+          let ref = '';
+          let sName = '';
           /* Check and add multiplicity */
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
 
@@ -141,8 +141,8 @@ class Aggregation {
                itemsObj.allOf = allOfArray;
 
                let objAllOfArry = {};
-               sName=assoc.end2.reference.name + 'Ids';
-               ref=constant.getReference() + sName;
+               sName = assoc.end2.reference.name + 'Ids';
+               ref = constant.getReference() + sName;
                objAllOfArry['$ref'] = ref;
                allOfArray.push(objAllOfArry);
 
@@ -161,8 +161,8 @@ class Aggregation {
 
 
                let allOfObj = {};
-               sName=assoc.end2.reference.name + 'Ids';
-               ref=constant.getReference() + sName;
+               sName = assoc.end2.reference.name + 'Ids';
+               ref = constant.getReference() + sName;
                allOfObj['$ref'] = ref;
                allOfArray.push(allOfObj);
 
@@ -170,10 +170,10 @@ class Aggregation {
                allOfObj['type'] = 'object';
                allOfArray.push(allOfObj);
           }
-          let temp={};
-          temp['ref']=propertiesObj;
-          temp['sName']=sName
-          // compositionRef.push('1. aggregation : '+ref,temp);
+          let temp = {};
+          temp['ref'] = propertiesObj;
+          temp['sName'] = sName
+          /* compositionRef.push('1. aggregation : '+ref,temp); */
           compositionRef.push(temp);
           return mainPropertiesObj;
      }

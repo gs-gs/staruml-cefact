@@ -169,6 +169,7 @@ function getAttrTypeClass(mClasses) {
     });
     return mNewClasses;
 }
+
 let generatedEnumInstance = [];
 /**
  * @function getRdfsClassesArr
@@ -240,7 +241,7 @@ function getParentClasses(mElement) {
 function getRdfsInstancesArr() {
     let rdfsInstancesArr = [ /* {# instances #} */ ];
     let mUMLPackage = getExportElement();
-    /* //TODO : Do not remove this code 
+    /* TODO : Do not remove this code 
     let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
 
     let UMLClasses = app.repository.select(mUMLPackage.name + "::@UMLClass");
@@ -311,7 +312,7 @@ function getRdfsPropertiesArr() {
             objProperty['rdfs:domain'] = mClass.name;
 
             let range = getRange(attr, mClass.name);
-            objProperty['rdfs:range'] = range; //getRange(attr);
+            objProperty['rdfs:range'] = range; /* getRange(attr); */
             /* if(utils.isString(attr.type) && range!=''){
                 rdfsPropertiesArr.push(objProperty);
             }
@@ -376,44 +377,45 @@ function getRange(attr, className) {
     if (utils.isString(attributeType)) {
 
         let jsonldRuleType = utils.getJsonldRuleType();
-        let result = jsonldRuleType.filter(function(item){
+        let result = jsonldRuleType.filter(function (item) {
             return item.key == attributeType;
         });
-        if(result.length != 0){
+        if (result.length != 0) {
             range = result.range;
-        }else{
+        } else {
 
-        /* if (attributeType === 'Numeric') {
-            range = 'xsd:nonNegativeInteger'; //
-        } else if (attributeType === 'Indicator') {
-            range = 'xsd:boolean';
-        } else if (attributeType === 'Date') {
-            range = 'xsd:date';
-        } else if (attributeType === 'DateTime') {
-            range = 'xsd:dateTime';
-        } else if (attributeType === 'Int32') {
-            range = 'xsd:int';
-        } else if (attributeType === 'Int64') {
-            range = 'xsd:long';
-        } else if (attributeType === 'Number') {
-            range = 'xsd:integer';
-        } else if (attributeType === 'Float') {
-            range = 'xsd:float';
-        } else if (attributeType === 'Double') {
-            range = 'xsd:double';
-        } else if (attributeType === 'Password') {
-            range = 'xsd:string';
-        } else if (attributeType === 'Byte') {
-            range = 'xsd:byte';
-        } else if (attributeType === 'Quantity') {
-            range = 'xsd:nonNegativeInteger';
-        } else { */
+            /* 
+            TODO Do not remove this code
+            if (attributeType === 'Numeric') {
+                range = 'xsd:nonNegativeInteger'; 
+            } else if (attributeType === 'Indicator') {
+                range = 'xsd:boolean';
+            } else if (attributeType === 'Date') {
+                range = 'xsd:date';
+            } else if (attributeType === 'DateTime') {
+                range = 'xsd:dateTime';
+            } else if (attributeType === 'Int32') {
+                range = 'xsd:int';
+            } else if (attributeType === 'Int64') {
+                range = 'xsd:long';
+            } else if (attributeType === 'Number') {
+                range = 'xsd:integer';
+            } else if (attributeType === 'Float') {
+                range = 'xsd:float';
+            } else if (attributeType === 'Double') {
+                range = 'xsd:double';
+            } else if (attributeType === 'Password') {
+                range = 'xsd:string';
+            } else if (attributeType === 'Byte') {
+                range = 'xsd:byte';
+            } else if (attributeType === 'Quantity') {
+                range = 'xsd:nonNegativeInteger';
+            } else { */
 
 
             if (utils.isString(attributeType) && utils.isStringCoreType(attributeType)) {
                 notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeType);
-            }
-            else{
+            } else {
                 /* Check that attribute type is available in this model. Alert not availabe class or enumeration in file */
                 notAvailElement.addInvalidAttributeType(className, attr, attributeType);
             }
@@ -479,7 +481,7 @@ function getInvalidAttributeType() {
  * @description set export element (selected package) name
  * @param {String} mEleName
  */
-function setExportElementName(mEleName){
+function setExportElementName(mEleName) {
     UMLPackageName = mEleName;
 }
 
@@ -488,17 +490,17 @@ function setExportElementName(mEleName){
  * @description return export element (selected package) name
  * @returns {String}
  */
-function getExportElementName(){
+function getExportElementName() {
     return UMLPackageName;
 }
 
-let filePath='';
+let filePath = '';
 /**
  * @function setFilePath
  * @description set jsonld export file path 
  * @param {String} fPath
  */
-function setFilePath(fPath){
+function setFilePath(fPath) {
     filePath = fPath;
 }
 
@@ -507,7 +509,7 @@ function setFilePath(fPath){
  * @description return jsonld export file path
  * @returns {String}
  */
-function getFilePath(){
+function getFilePath() {
     return filePath;
 }
 module.exports.generateJSONLD = generateJSONLD;
