@@ -303,9 +303,8 @@ class Paths {
                }
 
                let interfaceAttributes = mAttributes.filter(item => {
-                    return item.name == "id" || item.name == "identifier";
+                    return item.name == "id" || item.name == "identifier" || item.isID == true;
                });
-
                interfaceAttributes.forEach(iAttribute => {
 
 

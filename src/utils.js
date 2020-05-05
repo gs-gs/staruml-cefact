@@ -138,7 +138,7 @@ function writeQueryParameters(parametersArray, objOperation) {
      try {
           objOperation.parameters.forEach(itemParameters => {
                let paramsObject = {};
-               if (itemParameters.name != "id" && itemParameters.name != "identifier") {
+               if (itemParameters.name != "id" && itemParameters.name != "identifier" && itemParameters.isID != true ) {
                     parametersArray.push(paramsObject);
                     let objSchema = {};
                     objSchema.type = 'string';

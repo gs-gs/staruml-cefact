@@ -233,7 +233,7 @@ class Operations {
           /* objInterfaceRealization.target.attributes */
           mAttributes.forEach(itemAttribute => {
                let paramsObject = {};
-               if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
+               if (itemAttribute.name != "id" && itemAttribute.name != "identifier" && itemAttribute.isID != true) {
                     utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                     parametersArray.push(paramsObject);
                }
@@ -311,7 +311,7 @@ class Operations {
           /* objInterface.target.attributes */
           mAttributes.forEach(itemAttribute => {
                let paramsObject = {};
-               if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
+               if (itemAttribute.name != "id" && itemAttribute.name != "identifier" && itemAttribute.isID != true) {
                     utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                     parametersArray.push(paramsObject);
                }
@@ -367,7 +367,7 @@ class Operations {
 
                objInterfaceRealization.target.attributes.forEach(itemAttribute => {
                     let paramsObject = {};
-                    if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
+                    if (itemAttribute.name != "id" && itemAttribute.name != "identifier" && itemAttribute.isID != true) {
                          utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                          parametersArray.push(paramsObject);
                     }
@@ -439,7 +439,7 @@ class Operations {
           }
           /* objInterfaceRealization.target.attributes */
           mAttributes.forEach(itemAttribute => {
-               if (itemAttribute.name != "id" && itemAttribute.name != "identifier") {
+               if (itemAttribute.name != "id" && itemAttribute.name != "identifier" && itemAttribute.isID != true) {
                     let paramsObject = {};
                     utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
                     parametersArray.push(paramsObject);
