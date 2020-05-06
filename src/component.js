@@ -103,6 +103,13 @@ class Component {
 
           return this.mainComponentObj;
      }
+
+     /**
+      * @function addAttrTypeRefClassSchema
+      * @description Add schema of the class which are referenced as UMLClass in attribute type
+      * @param {Object} refClasses
+      * @memberof Component
+      */
      addAttrTypeRefClassSchema(refClasses) {
           refClasses.forEach(objClass => {
                let mainClassesObj = {};
@@ -136,6 +143,18 @@ class Component {
 
           });
      }
+
+     /**
+      * @function addClassSchema
+      * @description Add schema of the class which are referenced as UMLClass in attribute type
+      * @param {Array} classEleOrViews
+      * @param {Array} assoClassLink
+      * @param {Array} mAssoClassLinkView
+      * @param {Array} arrIdClasses
+      * @param {Array} duplicateDeletedReference
+      * @param {Array} duplicatePropertyError
+      * @memberof Component
+      */
      addClassSchema(classEleOrViews, assoClassLink, mAssoClassLinkView, arrIdClasses, duplicateDeletedReference, duplicatePropertyError) {
           classEleOrViews.forEach(classEleOrView => {
                let mainClassesObj = {};
@@ -203,31 +222,31 @@ class Component {
                let arrAttributes = properties.getAttributes();
                let arrEnumerations = properties.getEnumerations();
                arrEnumerations.forEach(enumeration => {
-                    if(this.mainSchemaObj[enumeration.name] == null){
-                        let enumerationObj = {}
-                        enumerationObj.enum = utils.getEnumerationLiteral(enumeration);
-                        enumerationObj.description = enumerationObj.documentation ? utils.buildDescription(enumerationObj.documentation) : constant.STR_MISSING_DESCRIPTION;
-                        enumerationObj.type = 'string';
-                        if(enumerationObj.enum.length == 0) {
-                            /**
-                             * Check if the enumeration has a tag named 'ref'. If it presents use it as '$ref' value instead of including the enum to the specification
-                             */
-                            let refTag;
-                            if(enumeration.tags != null && enumeration.tags.length > 0 ){
-                                forEach(enumeration.tags, function (tag) {
-                                    if(tag.name === 'ref') {
-                                        refTag = tag.value;
-                                    }
-                                });
-                            }
-                            if( refTag != null) {
-                                enumerationObj = {}
-                                enumerationObj.$ref = refTag;
-                            } else {
-                                app.dialogs.showAlertDialog('Enumeration ' + enumeration.name + ' has no values. You can add the enumeration to the diagram to include it or specify "ref" tag to refer to the external definition.');
-                            }
-                        }
-                        this.mainSchemaObj[enumeration.name] = enumerationObj;
+                    if (this.mainSchemaObj[enumeration.name] == null) {
+                         let enumerationObj = {}
+                         enumerationObj.enum = utils.getEnumerationLiteral(enumeration);
+                         enumerationObj.description = enumerationObj.documentation ? utils.buildDescription(enumerationObj.documentation) : constant.STR_MISSING_DESCRIPTION;
+                         enumerationObj.type = 'string';
+                         if (enumerationObj.enum.length == 0) {
+                              /**
+                               * Check if the enumeration has a tag named 'ref'. If it presents use it as '$ref' value instead of including the enum to the specification
+                               */
+                              let refTag;
+                              if (enumeration.tags != null && enumeration.tags.length > 0) {
+                                   forEach(enumeration.tags, function (tag) {
+                                        if (tag.name === 'ref') {
+                                             refTag = tag.value;
+                                        }
+                                   });
+                              }
+                              if (refTag != null) {
+                                   enumerationObj = {}
+                                   enumerationObj.$ref = refTag;
+                              } else {
+                                   app.dialogs.showAlertDialog('Enumeration ' + enumeration.name + ' has no values. You can add the enumeration to the diagram to include it or specify "ref" tag to refer to the external definition.');
+                              }
+                         }
+                         this.mainSchemaObj[enumeration.name] = enumerationObj;
                     }
                });
 
@@ -381,6 +400,12 @@ class Component {
           });
      }
 
+     /**
+      * @function sortAssociationByModelExplorerSequence
+      * @description returns the array of associations in the sequence as shown in staruml model explorer
+      * @returns {Array} newAssArr
+      * @memberof Component
+      */
      sortAssociationByModelExplorerSequence(objClass, classAssociations) {
           let newAssArr = [];
           let newClassAssociation = classAssociations;
@@ -409,6 +434,7 @@ class Component {
           newAssArr = newSort.concat(otherSort);
           return newAssArr;
      }
+
      /**
       * @function getJSONSchema
       * @description Returns component object 
@@ -507,6 +533,7 @@ class Component {
                });
           });
      }
+
      /**
       * @function getJSONSchema
       * @description Returns component object 

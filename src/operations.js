@@ -15,14 +15,14 @@ class Operations {
      }
 
      /**
-      * @function get
-      * @description returns the object of get method
+      * @function simpleGET
+      * @description returns the object of simple GET method having pattern '/resource'
       * @param {Object} objInterface 
       * @param {Object} objOperation 
       * @returns {Object} wOperationObject
       * @memberof Operations
       */
-     get(objInterface, objOperation) {
+     simpleGET(objInterface, objOperation) {
 
           let wOperationObject = {};
 
@@ -128,14 +128,14 @@ class Operations {
      }
 
      /**
-      * @function post
-      * @description returns object of post method
+      * @function simplePOST
+      * @description returns the object of simple POST method having pattern '/resource'
       * @param {UMLInterface} objInterface
       * @param {UMLAssociationEnd} end2Interface
       * @returns {Object} wOperationObject
       * @memberof Operations
       */
-     post(objInterface, end2Interface) {
+     simplePOST(objInterface, end2Interface) {
 
           let wOperationObject = {};
 
@@ -188,14 +188,14 @@ class Operations {
 
 
      /**
-      * @function put
-      * @description returns the object of put method
+      * @function idPathPUT
+      * @description returns the object of id PUT method having pattern '/resource/{id}
       * @param {UMLInterfaceRealization} objInterfaceRealization
       * @param {UMLAttribute} operationAttribute
       * @returns {Object} wOperationObject
       * @memberof Operations
       */
-     put(objInterfaceRealization, operationAttribute) {
+     idPathPUT(objInterfaceRealization, operationAttribute) {
           let wOperationObject = {};
 
           let tagsArray = [];
@@ -266,14 +266,14 @@ class Operations {
      }
 
      /**
-      * @function patch
-      * @description returns the object of patch method
+      * @function idPathPATCH
+      * @description returns the object of id PATCH method  having pattern '/resource/{id}
       * @param {UMLInterface} objInterface
       * @param {UMLAttribute} operationAttribute
       * @returns {Object} wOperationObject
       * @memberof Operations
       */
-     patch(objInterface, operationAttribute) {
+     idPathPATCH(objInterface, operationAttribute) {
           let wOperationObject = {};
 
           let tagsArray = [];
@@ -395,14 +395,14 @@ class Operations {
      }
 
      /**
-      * @function getOperationAttribute
-      * @description returns the attributes object of Operation object
+      * @function idPathGET
+      * @description returns the object of id GET method  having pattern '/resource/{id}
       * @param {UMLInterfaceRealization} objInterfaceRealization
       * @param {UMLAttribute} iAttribute
       * @returns {Object} wOperationObject
       * @memberof Operations
       */
-     getOperationAttribute(objInterfaceRealization, iAttribute) {
+     idPathGET(objInterfaceRealization, iAttribute) {
           let wOperationObject = {};
 
 
