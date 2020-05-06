@@ -375,11 +375,11 @@ class Operations {
 
           } else if (iAttribute == null && end1Interface != null && end2Interface != null) {
 
-               utils.buildParameter(end2Interface.reference.name + "_" + end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
+               utils.buildParameter(end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
 
                /* AskQue */
                let paramsObject1 = {};
-               utils.buildParameter(end1Interface.reference.name + "_" + end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject1);
+               utils.buildParameter(end1Interface.reference.attributes[0].name, "path", (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject1);
                parametersArray.push(paramsObject1);
 
           }
