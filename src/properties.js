@@ -30,13 +30,13 @@ class Properties {
      }
 
      /**
-       * @function getEnumerations
-       * @description Returns the array of enumerations used as data types by properties
-       * @returns {Array}
-       * @memberof Properties
-       */
+      * @function getEnumerations
+      * @description Returns the array of enumerations used as data types by properties
+      * @returns {Array}
+      * @memberof Properties
+      */
      getEnumerations() {
-           return this.enumerations;
+          return this.enumerations;
      }
 
      /**
@@ -47,36 +47,36 @@ class Properties {
      addProperties() {
           let mainPropertiesObj = {};
           let _this = this;
-          if(openAPI.isModelDiagram()){
+          if (openAPI.isModelDiagram()) {
                _this.arrAttRequired = [];
                let propertiesObj = {};
                let attributesView = utils.getVisibleAttributeView(this.objClass);
                forEach(attributesView, function (attrView) {
-                    let attribute=attrView.model;
+                    let attribute = attrView.model;
                     propertiesObj = {};
                     let filterAttr = _this.arrAttRequired.filter(item => {
                          return item.name == attribute.name;
                     });
-                    
+
                     /* Filter for visible attribute Views from diagram elements (Class & Interface) */
                     _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
-                    
+
                });
-          }else{
+          } else {
 
                _this.arrAttRequired = [];
                let propertiesObj = {};
                let attributes = this.objClass.attributes;
                forEach(attributes, function (attribute) {
-                    
+
                     propertiesObj = {};
                     let filterAttr = _this.arrAttRequired.filter(item => {
                          return item.name == attribute.name;
                     });
-                    
+
                     /* Filter for visible attribute Views from diagram elements (Class & Interface) */
                     _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
-                    
+
                });
           }
           return mainPropertiesObj;
@@ -88,22 +88,22 @@ class Properties {
       * @returns {Object} mainPropertiesObj
       * @memberof Properties
       */
-     addPropertiesForAttrTypeRefClass(){
+     addPropertiesForAttrTypeRefClass() {
           let mainPropertiesObj = {};
           let _this = this;
           _this.arrAttRequired = [];
           let propertiesObj = {};
           let attributes = this.objClass.attributes;
           forEach(attributes, function (attribute) {
-               
+
                propertiesObj = {};
                let filterAttr = _this.arrAttRequired.filter(item => {
                     return item.name == attribute.name;
                });
-               
+
                /* Filter for visible attribute Views from diagram elements (Class & Interface) */
                _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
-               
+
           });
           return mainPropertiesObj;
      }
@@ -118,14 +118,13 @@ class Properties {
       */
      addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute) {
           let _this = this;
-          let aclAssoSideArr=[];
-          if(openAPI.isModelDiagram()){
-               forEach(_this.assocSideClassLink,function(aclView){
+          let aclAssoSideArr = [];
+          if (openAPI.isModelDiagram()) {
+               forEach(_this.assocSideClassLink, function (aclView) {
                     aclAssoSideArr.push(aclView.model);
                });
-          }
-          else{
-               aclAssoSideArr=_this.assocSideClassLink;
+          } else {
+               aclAssoSideArr = _this.assocSideClassLink;
           }
           if (filterAttr.length == 0) {
                _this.arrAttRequired.push(attribute);
@@ -165,9 +164,9 @@ class Properties {
                               allOfArr.push(descriptionObj);
                               allOfArr.push(refObj);
                               propertiesObj['allOf'] = allOfArr;
-                         } else{
-                             propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
-                             utils.addAttributeType(propertiesObj, attribute);
+                         } else {
+                              propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
+                              utils.addAttributeType(propertiesObj, attribute);
                          }
                     }
                     if (attribute.defaultValue != "") {

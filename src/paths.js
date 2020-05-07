@@ -259,11 +259,11 @@ class Paths {
           mOperations.forEach(objOperation => {
 
                if (objOperation.name.toUpperCase() == constant.GET) {
-                    pathsObject.get = this.operations.get(objInterfaceRealization, objOperation);
+                    pathsObject.get = this.operations.simpleGET(objInterfaceRealization, objOperation);
 
 
                } else if (objOperation.name.toUpperCase() == constant.POST) {
-                    pathsObject.post = this.operations.post(objInterfaceRealization, null);
+                    pathsObject.post = this.operations.simplePOST(objInterfaceRealization, null);
 
                }
 
@@ -321,13 +321,13 @@ class Paths {
                          let wOperationObject = {};
                          if (objOperation.name.toUpperCase() == constant.GET) {
                               pathsObject.get = wOperationObject;
-                              pathsObject.get = this.operations.getOperationAttribute(objInterfaceRealization, iAttribute)
+                              pathsObject.get = this.operations.idPathGET(objInterfaceRealization, iAttribute)
                          } else if (objOperation.name.toUpperCase() == constant.DELETE) {
                               pathsObject.delete = this.operations.delete(objInterfaceRealization, iAttribute, null, null);
                          } else if (objOperation.name.toUpperCase() == constant.PUT) {
-                              pathsObject.put = this.operations.put(objInterfaceRealization, iAttribute);
+                              pathsObject.put = this.operations.idPathPUT(objInterfaceRealization, iAttribute);
                          } else if (objOperation.name.toUpperCase() == constant.PATCH) {
-                              pathsObject.patch = this.operations.patch(objInterfaceRealization, iAttribute);
+                              pathsObject.patch = this.operations.idPathPATCH(objInterfaceRealization, iAttribute);
                          }
                     });
 
