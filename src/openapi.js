@@ -245,9 +245,9 @@ class OpenApi {
           } else {
                let message = null;
                if (duplicateClasses.length > 1) {
-                    message=nodeUtils.format(constant.STR_DUPLICATE_CLASSES,duplicateClasses.join("\', \'"),'classes');
+                    message = nodeUtils.format(constant.STR_DUPLICATE_CLASSES, duplicateClasses.join("\', \'"), 'classes');
                } else {
-                    message=nodeUtils.format(constant.STR_DUPLICATE_CLASSES,duplicateClasses.join("\', \'"),'class');
+                    message = nodeUtils.format(constant.STR_DUPLICATE_CLASSES, duplicateClasses.join("\', \'"), 'class');
                }
 
                if (openAPI.getAppMode() == openAPI.APP_MODE_TEST && openAPI.getTestMode() == openAPI.TEST_MODE_ALL) {
@@ -451,7 +451,7 @@ class OpenApi {
      static setExportElementName(pkgName) {
           OpenApi.umlPackageName = pkgName;
      }
-     
+
      /**
       * @function getOperations
       * @description returns path operations
@@ -677,9 +677,9 @@ class OpenApi {
                          /* Generate JSON-Schema Specification */
                          let component = new Component();
 
-                         
 
-                         /* Add JSONSchema object in JSONSchema */                         
+
+                         /* Add JSONSchema object in JSONSchema */
                          MainJSON.addJSONSchema(component);
 
                          /* Add JSONLayout object in JSONSchema */
@@ -700,7 +700,7 @@ class OpenApi {
 
 
                     } else {
-                         
+
                          /* Generate OpenAPI Specification */
 
                          /*  Add openapi version */

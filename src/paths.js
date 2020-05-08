@@ -399,7 +399,7 @@ class Paths {
 
                          /* GET all sub-resource list */
 
-                        let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
+                         let mICPath = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name;
 
                          if (mainPathsObject.hasOwnProperty(mICPath)) {
                               pathsObject = mainPathsObject[mICPath];
@@ -428,7 +428,7 @@ class Paths {
 
                          let name = end1Interface.reference.attributes[0].name;
                          let description = (end1Interface.reference.attributes[0].documentation ? utils.buildDescription(end1Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
-                         
+
                          utils.buildParameter(name, "path", description, true, objSchema, paramsObject);
 
                          let responsesObj = {};
@@ -590,7 +590,7 @@ class Paths {
 
 
                          let mICPath1 = "/" + end1Interface.reference.name + "/{" + end1Interface.reference.attributes[0].name + "}/" + end2Interface.reference.name + "/{" + end2Interface.reference.attributes[0].name + "}";
-                         
+
                          let pathsSingleObject = {};
                          if (mainPathsObject.hasOwnProperty(mICPath1)) {
                               pathsSingleObject = mainPathsObject[mICPath1];
