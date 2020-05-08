@@ -417,7 +417,7 @@ function initJsonRuleType() {
           format: 'email'
      }, {
           key: 'uri',
-          type: 'uri',
+          type: 'string',
           format: 'uri'
      }, {
           key: 'Numeric',
