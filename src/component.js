@@ -41,9 +41,12 @@ class Component {
       * @memberof Component
       */
      getComponent() {
-          let classes, assoClassLink, arrCoreDataTypeAttr, mClassesView, mAssoClassLinkView;
+          let classes, dataTypes, enumerations, assoClassLink, arrCoreDataTypeAttr, mClassesView, mDataTypeView, mEnumerationView, mAssoClassLinkView;
           if (openAPI.isModelPackage()) {
                classes = openAPI.getClasses();
+               //TODO: init dataTypes
+               dataTypes = [];
+               enumerations = [];
                assoClassLink = app.repository.select("@UMLAssociationClassLink");
 
                /* Add classes that class's attribute type is Core Data Type  
@@ -55,6 +58,8 @@ class Component {
                classes = classes.concat(arrCoreDataTypeAttr);
           } else if (openAPI.isModelDiagram()) {
                mClassesView = dElement.getUMLClassView();
+               mDataTypeView = dElement.getUMLDataTypeView();
+               mEnumerationView = dElement.getUMLEnumerationView();
                mAssoClassLinkView = dElement.getUMLAssociationClassLinkView();
 
                /* Add classes that class's attribute type is Core Data Type  
@@ -80,25 +85,34 @@ class Component {
           let duplicateDeletedReference = [];
 
           let classEleOrViews = null;
+          let dataTypeEleOrViews = null;
+          let enumerationEleOrViews = null;
           if (openAPI.isModelPackage()) {
                classEleOrViews = classes;
+               dataTypeEleOrViews = dataTypes;
+               enumerationEleOrViews = enumerations;
           } else if (openAPI.isModelDiagram()) {
                classEleOrViews = mClassesView;
+               dataTypeEleOrViews = mDataTypeView;
+               enumerationEleOrViews = mEnumerationView;
           }
 
 
           /**
-           * Add class schema to scham object
+           * Add class schema to schema object
            **/
           this.addClassSchema(classEleOrViews, assoClassLink, mAssoClassLinkView, arrIdClasses, duplicateDeletedReference, duplicatePropertyError);
-
-          /** 
+          this.addDataTypesSchema(dataTypeEleOrViews);
+          this.addEnumerationSchema(enumerationEleOrViews);
+          /**
            * #113 treat referenced type classes in the same way as composition association targets.
            * Add Schema of those class which are referenced as Class in attribute type
            **/
           utils.resetClassTypeAttribute();
           let classTypeAttribute = utils.getClassTypeAttribute(classEleOrViews);
           this.addAttrTypeRefClassSchema(classTypeAttribute);
+          let dataTypeAttribute = utils.getDataTypeAttribute(dataTypeEleOrViews);
+          this.addAttrTypeRefClassSchema(dataTypeAttribute);
           openAPI.setModelType(openAPI.APP_MODEL_PACKAGE);
 
           return this.mainComponentObj;
@@ -144,6 +158,86 @@ class Component {
           });
      }
 
+
+     addDataTypesSchema(dataTypeEleOrViews) {
+          dataTypeEleOrViews.forEach(dataTypeEleOrViews => {
+               let dataTypeObj = {};
+               let dataTypePropertiesObj = {};
+               let mDataTypeView = null;
+               let objDataType = null;
+
+               if (openAPI.isModelPackage()) {
+                    objDataType = dataTypeEleOrViews;
+               } else if (openAPI.isModelDiagram()) {
+                    mDataTypeView = dataTypeEleOrViews;
+                    objDataType = mDataTypeView.model;
+               }
+
+               this.mainSchemaObj[objDataType.name] = dataTypeObj;
+               dataTypeObj.description = objDataType.documentation;
+               dataTypeObj.type = 'object';
+
+               /**
+                * Adding Properties
+                **/
+               let properties = [];
+               if (openAPI.isModelPackage()) {
+                    properties = new Properties(objDataType, []);
+               } else if (openAPI.isModelDiagram()) {
+                    properties = new Properties(mDataTypeView, []);
+               }
+
+               /**
+                * Adds Attributes, With Enum, With Multiplicity
+                **/
+               dataTypePropertiesObj = properties.addProperties();
+               dataTypeObj.properties = dataTypePropertiesObj;
+          });
+     }
+
+
+     addEnumerationSchema(enumerationEleOrViews) {
+          enumerationEleOrViews.forEach(enumerationEleOrView => {
+               let enumerationObj = {};
+               //TODO: check view variable usage
+               let mEnumerationView = null;
+               let objEnumeration = null;
+
+               if(enumerationEleOrView.hasOwnProperty('model')){
+                    mEnumerationView = enumerationEleOrView;
+                    objEnumeration = mEnumerationView.model;
+               } else {
+                    objEnumeration = enumerationEleOrView;
+               }
+
+               if (this.mainSchemaObj[objEnumeration.name] == null) {
+
+                    enumerationObj.enum = utils.getEnumerationLiteral(objEnumeration);
+                    enumerationObj.description = enumerationObj.documentation ? utils.buildDescription(enumerationObj.documentation) : constant.STR_MISSING_DESCRIPTION;
+                    enumerationObj.type = 'string';
+                    if (enumerationObj.enum.length == 0) {
+                         /**
+                          * Check if the enumeration has a tag named 'ref'. If it presents use it as '$ref' value instead of including the enum to the specification
+                          */
+                         let refTag;
+                         if (objEnumeration.tags != null && objEnumeration.tags.length > 0) {
+                              forEach(objEnumeration.tags, function (tag) {
+                                   if (tag.name === 'ref') {
+                                        refTag = tag.value;
+                                   }
+                              });
+                         }
+                         if (refTag != null) {
+                              enumerationObj = {}
+                              enumerationObj.$ref = refTag;
+                         } else {
+                              app.dialogs.showAlertDialog('Enumeration ' + objEnumeration.name + ' has no values. You can add the enumeration to the diagram to include it or specify "ref" tag to refer to the external definition.');
+                         }
+                    }
+                    this.mainSchemaObj[objEnumeration.name] = enumerationObj;
+               }
+          });
+     }
      /**
       * @function addClassSchema
       * @description Add schema of the class which are referenced as UMLClass in attribute type
@@ -221,32 +315,39 @@ class Component {
 
                let arrAttributes = properties.getAttributes();
                let arrEnumerations = properties.getEnumerations();
-               arrEnumerations.forEach(enumeration => {
-                    if (this.mainSchemaObj[enumeration.name] == null) {
-                         let enumerationObj = {}
-                         enumerationObj.enum = utils.getEnumerationLiteral(enumeration);
-                         enumerationObj.description = enumerationObj.documentation ? utils.buildDescription(enumerationObj.documentation) : constant.STR_MISSING_DESCRIPTION;
-                         enumerationObj.type = 'string';
-                         if (enumerationObj.enum.length == 0) {
-                              /**
-                               * Check if the enumeration has a tag named 'ref'. If it presents use it as '$ref' value instead of including the enum to the specification
-                               */
-                              let refTag;
-                              if (enumeration.tags != null && enumeration.tags.length > 0) {
-                                   forEach(enumeration.tags, function (tag) {
-                                        if (tag.name === 'ref') {
-                                             refTag = tag.value;
-                                        }
-                                   });
-                              }
-                              if (refTag != null) {
-                                   enumerationObj = {}
-                                   enumerationObj.$ref = refTag;
-                              } else {
-                                   app.dialogs.showAlertDialog('Enumeration ' + enumeration.name + ' has no values. You can add the enumeration to the diagram to include it or specify "ref" tag to refer to the external definition.');
-                              }
+
+               this.addEnumerationSchema(arrEnumerations);
+
+               let arrDataTypes = properties.getDataTypes();
+               arrDataTypes.forEach(dataType => {
+                    if (this.mainSchemaObj[dataType.name] == null) {
+                         let dataTypeObj = {}
+                         dataTypeObj.description = dataTypeObj.documentation ? utils.buildDescription(dataTypeObj.documentation) : constant.STR_MISSING_DESCRIPTION;
+                         dataTypeObj.type = 'string';
+                         let refTag;
+                         if (dataType.tags != null && dataType.tags.length > 0) {
+                              forEach(dataType.tags, function (tag) {
+                                   if (tag.name === 'ref') {
+                                        refTag = tag.value;
+                                   }
+                              });
                          }
-                         this.mainSchemaObj[enumeration.name] = enumerationObj;
+                         if (refTag != null) {
+                              dataTypeObj = {}
+                              dataTypeObj.$ref = refTag;
+                         } else if(dataType.hasOwnProperty('attributes')) {
+                              dataTypeObj.type = 'object';
+                              let properties = {};
+                              forEach(dataType.attributes, function (attribute) {
+                                   let propertyObj = {};
+                                   propertyObj.description = propertyObj.documentation ? utils.buildDescription(propertyObj.documentation) : constant.STR_MISSING_DESCRIPTION;
+                                   //TODO: check the type
+                                   propertyObj.type = attribute.type;
+                                   properties[attribute.name] = propertyObj;
+                              });
+                              dataTypeObj.properties = properties;
+                         }
+                         this.mainSchemaObj[dataType.name] = dataTypeObj;
                     }
                });
 
@@ -372,7 +473,7 @@ class Component {
                }
 
                /**
-                * Write sceparate schema for isID property of aggregation and relationship class
+                * Write separate schema for isID property of aggregation and relationship class
                 **/
                if (openAPI.isModelPackage() && assocSideClassLink.length > 0) {
                     aggregationClasses.push(objClass);

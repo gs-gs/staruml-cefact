@@ -245,7 +245,7 @@ function isString(s) {
 function addAttributeType(itemsObj, attr) {
      let attributeType = attr.type;
 
-     if (attributeType instanceof type.UMLClass) {
+     if (attributeType instanceof type.UMLClass || attributeType instanceof type.UMLDataType) {
           addReferenceTypeRuleClass(itemsObj, attributeType);
           /* notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name); */
      } else if (isCoreDataType(attributeType)) {
@@ -422,7 +422,6 @@ function initJsonRuleType() {
      }, {
           key: 'Numeric',
           type: 'number'
-
      }, {
           key: 'Indicator',
           type: 'boolean'
@@ -496,15 +495,18 @@ function getJsonRuleType() {
 /**
  * @function addJsonRuleType
  * @param {attr} UMLAttributeType
- * @param {attributeType} attributeType
+ * @param {attributeType} attributeTypeObj
  * @param {Object} itemsObj
  * @description add Json Rule Type in attribute type which is used while compound type has no attributes then type which is in string matches in this array 
  * @memberof Utils
  */
-function addJsonRuleType(attr, attributeType, itemsObj) {
-
+function addJsonRuleType(attr, attributeTypeObj, itemsObj) {
+     let attributeTypeString = attributeTypeObj;
+     if(attributeTypeObj.hasOwnProperty('name')){
+          attributeTypeString = attributeTypeObj['name'];
+     }
      let result = getJsonRuleType().filter(function (rule) {
-          return rule.key == attributeType;
+          return rule.key.toLowerCase() === attributeTypeString.toLowerCase();
      });
      if (result.length > 0) {
           let rule = result[0];
@@ -515,10 +517,10 @@ function addJsonRuleType(attr, attributeType, itemsObj) {
 
      } else if (result.length == 0) {
           itemsObj.type = 'string';
-          if (isString(attributeType) && isStringCoreType(attributeType)) {
-               notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeType);
-          } else if (isString(attributeType)) {
-               notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType);
+          if (isString(attributeTypeObj) && isStringCoreType(attributeTypeObj)) {
+               notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeTypeObj);
+          } else if (isString(attributeTypeObj)) {
+               notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeTypeObj);
           }
      }
 }
@@ -793,8 +795,14 @@ function resetClassTypeAttribute() {
 
 }
 
-function getClassTypeAttribute(classEleOrViews) {
+let varDataTypeAttribute = [];
 
+function resetClassTypeAttribute() {
+     varDataTypeAttribute = [];
+
+}
+
+function getClassTypeAttribute(classEleOrViews) {
 
      classEleOrViews.forEach(mCorView => {
           let mClass;
@@ -819,6 +827,33 @@ function getClassTypeAttribute(classEleOrViews) {
 
      return varClassTypeAttribute;
 }
+
+function getDataTypeAttribute(dataTypeEleOrViews) {
+
+     dataTypeEleOrViews.forEach(mCorView => {
+          let mDataType;
+          if (mCorView instanceof type.UMLDataTypeView) {
+               mDataType = mCorView.model;
+          } else if (mCorView instanceof type.UMLDataType) {
+               mDataType = mCorView;
+          }
+
+          let attributes = mDataType.attributes;
+          attributes.forEach(attr => {
+               if (attr.type instanceof type.UMLDataType) {
+                    let resFilter = varDataTypeAttribute.filter(resFilter => {
+                         return resFilter._id == attr.type._id;
+                    });
+                    if (resFilter.length == 0) {
+                         varDataTypeAttribute.push(attr.type);
+                    }
+               }
+          });
+     });
+
+     return varDataTypeAttribute;
+}
+
 module.exports.getViewFromOther = getViewFromOther;
 module.exports.isCoreDataType = isCoreDataType;
 module.exports.getCoreDataType = getCoreDataType;
@@ -847,3 +882,4 @@ module.exports.isStringCoreType = isStringCoreType;
 module.exports.buildRequestBodyForSubResource = buildRequestBodyForSubResource;
 module.exports.resetClassTypeAttribute = resetClassTypeAttribute;
 module.exports.getClassTypeAttribute = getClassTypeAttribute;
+module.exports.getDataTypeAttribute = getDataTypeAttribute;

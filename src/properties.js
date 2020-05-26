@@ -16,6 +16,7 @@ class Properties {
           this.assocSideClassLink = assocSideClassLink;
           this.arrAttRequired = [];
           this.enumerations = [];
+          this.dataTypes = [];
           utils.resetErrorBlock();
      }
 
@@ -37,6 +38,16 @@ class Properties {
       */
      getEnumerations() {
           return this.enumerations;
+     }
+
+     /**
+      * @function getDataTypes
+      * @description Returns the array of enumerations used as data types by properties
+      * @returns {Array}
+      * @memberof Properties
+      */
+     getDataTypes() {
+          return this.dataTypes;
      }
 
      /**
@@ -109,7 +120,7 @@ class Properties {
      }
      /**
       * @function addPropData
-      * @description Adds property data like multiplicity, attribute typ etc to mainPropertiesObject
+      * @description Adds property data like multiplicity, attribute type etc to mainPropertiesObject
       * @param {Array} filterAttr
       * @param {Object} mainPropertiesObj
       * @param {Object} propertiesObj
@@ -164,9 +175,19 @@ class Properties {
                               allOfArr.push(descriptionObj);
                               allOfArr.push(refObj);
                               propertiesObj['allOf'] = allOfArr;
+                         } else if (attribute.type instanceof type.UMLDataType) {
+                              let allOfArr = [];
+                              let descriptionObj = {};
+                              let refObj = {};
+                              descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
+                              refObj['$ref'] = '#/components/schemas/' + attribute.type.name;
+                              _this.dataTypes.push(attribute.type);
+                              allOfArr.push(descriptionObj);
+                              allOfArr.push(refObj);
+                              propertiesObj['allOf'] = allOfArr;
                          } else {
-                              propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
-                              utils.addAttributeType(propertiesObj, attribute);
+                         propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
+                         utils.addAttributeType(propertiesObj, attribute);
                          }
                     }
                     if (attribute.defaultValue != "") {

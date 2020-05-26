@@ -97,6 +97,7 @@ class OpenApi {
                let exportElement = OpenApi.getExportElement();
                var _pkgName = exportElement.name
                let umlClasses = [];
+               let umlDataTypes = [];
                OpenApi.operations = [];
                let assocCurrentPkg = []
                let generaCurrentPkg = [];

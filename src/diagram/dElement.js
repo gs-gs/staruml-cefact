@@ -1,4 +1,5 @@
 let UMLClassView = [];
+let UMLDataTypeView = [];
 let UMLInterfaceView = [];
 let UMLAssociationView = [];
 let UMLGeneralizationView = [];
@@ -18,6 +19,7 @@ function filterUMLClassDiagram(UMLClassDiagram) {
     let allView = UMLClassDiagram.ownedViews.filter(function (view) {
         return (view instanceof type.UMLClassView ||
                 view instanceof type.UMLAssociationView ||
+                view instanceof type.UMLDataTypeView ||
                 view instanceof type.UMLInterfaceView ||
                 view instanceof type.UMLInterfaceRealizationView ||
                 view instanceof type.UMLGeneralizationView ||
@@ -31,6 +33,12 @@ function filterUMLClassDiagram(UMLClassDiagram) {
         return item instanceof type.UMLClassView;
     });
     setUMLClassView(UMLClassView);
+
+    /* Filter all UMLDataTypeView from selected UMLClassDiagram */
+    let UMLDataTypeView = allView.filter(function (item) {
+        return item instanceof type.UMLDataTypeView;
+    });
+    setUMLDataTypeView(UMLDataTypeView);
 
     /* Filter all UMLInterfaceView from selected UMLClassDiagram */
     let UMLInterfaceView = allView.filter(function (item) {
@@ -91,6 +99,27 @@ function setUMLClassView(mUMLClass) {
  */
 function getUMLClassView() {
     return UMLClassView;
+}
+
+/**
+ * @function setUMLDataTypeView
+ * @description save UMLDataTypeView from UMLClassDiagram
+ * @param {Array} mUMLClass
+ */
+function setUMLDataTypeView(mUMLClass) {
+    mUMLClass.sort(function (a, b) {
+        return a.model.name.localeCompare(b.model.name);
+    });
+    UMLDataTypeView = mUMLClass
+}
+
+/**
+ * @function getUMLDataTypeView
+ * @description retuns the Array of UMLDataTypeView from UMLClassDiagra
+ * @returns {Array} UMLDataTypeView
+ */
+function getUMLDataTypeView() {
+    return UMLDataTypeView;
 }
 
 /**
@@ -206,6 +235,8 @@ function getUMLAssociationClassLinkView() {
 module.exports.filterUMLClassDiagram = filterUMLClassDiagram;
 module.exports.setUMLClassView = setUMLClassView;
 module.exports.getUMLClassView = getUMLClassView;
+module.exports.setUMLDataTypeView = setUMLDataTypeView;
+module.exports.getUMLDataTypeView = getUMLDataTypeView;
 module.exports.setUMLInterfaceView = setUMLInterfaceView;
 module.exports.getUMLInterfaceView = getUMLInterfaceView;
 module.exports.setUMLAssociationView = setUMLAssociationView;
