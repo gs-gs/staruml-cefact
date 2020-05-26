@@ -1,5 +1,6 @@
 const nodeUtils = require('util');
 const openAPI = require('./openapi');
+const utils = require('./utils');
 const constant = require('./constant');
 /**
  * @class Aggregation 
@@ -141,7 +142,7 @@ class Aggregation {
                itemsObj.allOf = allOfArray;
 
                let objAllOfArry = {};
-               sName = assoc.end2.reference.name + 'Ids';
+               sName = utils.upperCamelCase(assoc.end2.reference.name + 'Ids');
                ref = constant.getReference() + sName;
                objAllOfArry['$ref'] = ref;
                allOfArray.push(objAllOfArry);
@@ -161,7 +162,7 @@ class Aggregation {
 
 
                let allOfObj = {};
-               sName = assoc.end2.reference.name + 'Ids';
+               sName = utils.upperCamelCase(assoc.end2.reference.name + 'Ids');
                ref = constant.getReference() + sName;
                allOfObj['$ref'] = ref;
                allOfArray.push(allOfObj);

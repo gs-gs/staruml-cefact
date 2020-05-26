@@ -130,7 +130,7 @@ class Component {
                let mainPropertiesObj = {};
                let assocSideClassLink = [];
 
-               this.mainSchemaObj[objClass.name] = mainClassesObj
+               this.mainSchemaObj[utils.upperCamelCase(objClass.name)] = mainClassesObj
                mainClassesObj.description = objClass.documentation;
                mainClassesObj.type = 'object';
 
@@ -173,7 +173,7 @@ class Component {
                     objDataType = mDataTypeView.model;
                }
 
-               this.mainSchemaObj[objDataType.name] = dataTypeObj;
+               this.mainSchemaObj[utils.upperCamelCase(objDataType.name)] = dataTypeObj;
                dataTypeObj.description = objDataType.documentation;
                dataTypeObj.type = 'object';
 
@@ -210,7 +210,7 @@ class Component {
                     objEnumeration = enumerationEleOrView;
                }
 
-               if (this.mainSchemaObj[objEnumeration.name] == null) {
+               if (this.mainSchemaObj[utils.upperCamelCase(objEnumeration.name)] == null) {
 
                     enumerationObj.enum = utils.getEnumerationLiteral(objEnumeration);
                     enumerationObj.description = enumerationObj.documentation ? utils.buildDescription(enumerationObj.documentation) : constant.STR_MISSING_DESCRIPTION;
@@ -234,7 +234,7 @@ class Component {
                               app.dialogs.showAlertDialog('Enumeration ' + objEnumeration.name + ' has no values. You can add the enumeration to the diagram to include it or specify "ref" tag to refer to the external definition.');
                          }
                     }
-                    this.mainSchemaObj[objEnumeration.name] = enumerationObj;
+                    this.mainSchemaObj[utils.upperCamelCase(objEnumeration.name)] = enumerationObj;
                }
           });
      }
@@ -291,7 +291,7 @@ class Component {
                     });
                }
 
-               this.mainSchemaObj[objClass.name] = mainClassesObj
+               this.mainSchemaObj[utils.upperCamelCase(objClass.name)] = mainClassesObj
                mainClassesObj.description = objClass.documentation;
                mainClassesObj.type = 'object';
 
@@ -320,7 +320,7 @@ class Component {
 
                let arrDataTypes = properties.getDataTypes();
                arrDataTypes.forEach(dataType => {
-                    if (this.mainSchemaObj[dataType.name] == null) {
+                    if (this.mainSchemaObj[utils.upperCamelCase(dataType.name)] == null) {
                          let dataTypeObj = {}
                          dataTypeObj.description = dataTypeObj.documentation ? utils.buildDescription(dataTypeObj.documentation) : constant.STR_MISSING_DESCRIPTION;
                          dataTypeObj.type = 'string';
@@ -347,7 +347,7 @@ class Component {
                               });
                               dataTypeObj.properties = properties;
                          }
-                         this.mainSchemaObj[dataType.name] = dataTypeObj;
+                         this.mainSchemaObj[utils.upperCamelCase(dataType.name)] = dataTypeObj;
                     }
                });
 
@@ -390,7 +390,7 @@ class Component {
 
                          let assocName = assoc.name;
                          if (assocName == '') {
-                              assocName = assoc.end2.reference.name;
+                              assocName = utils.lowerCamelCase(assoc.end2.reference.name);
                          }
 
                          /* Check for duplicate property */
@@ -442,7 +442,7 @@ class Component {
                          let allOfArray = [];
                          mainClassesObj.allOf = allOfArray;
                          let allOfObj = {};
-                         allOfObj['$ref'] = constant.getReference() + objClass.name + 'Ids';
+                         allOfObj['$ref'] = constant.getReference() + utils.upperCamelCase(objClass.name + 'Ids');
                          allOfArray.push(allOfObj);
 
                          allOfObj = {};
@@ -455,7 +455,7 @@ class Component {
                          let allOfArray = [];
                          mainClassesObj.allOf = allOfArray;
                          let allOfObj = {};
-                         allOfObj['$ref'] = constant.getReference() + objClass.name + 'Ids';
+                         allOfObj['$ref'] = constant.getReference() + utils.upperCamelCase(objClass.name + 'Ids');
                          allOfArray.push(allOfObj);
 
                          allOfObj = {};

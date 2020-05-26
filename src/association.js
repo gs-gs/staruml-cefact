@@ -82,10 +82,10 @@ class Association {
                     let sName = '';
                     let objAllOfArry = {};
                     if (associationSide.end1.aggregation == constant.shared) {
-                         sName = associationSide.end2.reference.name + 'Ids';
+                         sName = utils.upperCamelCase(associationSide.end2.reference.name + 'Ids');
                          ref = constant.getReference() + sName;
                     } else {
-                         sName = associationSide.end2.reference.name;
+                         sName = utils.upperCamelCase(associationSide.end2.reference.name);
                          ref = constant.getReference() + sName;
                     }
                     objAllOfArry['$ref'] = ref;
@@ -99,7 +99,7 @@ class Association {
 
                     /* Add reference of Class Side Schema */
                     objAllOfArry = {};
-                    sName = classSide.name;
+                    sName = utils.upperCamelCase(classSide.name);
                     ref = constant.getReference() + sName;
 
                     objAllOfArry['$ref'] = ref;
@@ -126,10 +126,10 @@ class Association {
                     let ref = '';
                     let sName = '';
                     if (associationSide.end1.aggregation == constant.shared) {
-                         sName = associationSide.end2.reference.name + 'Ids';
+                         sName = utils.upperCamelCase(associationSide.end2.reference.name + 'Ids');
                          ref = constant.getReference() + sName;
                     } else {
-                         sName = associationSide.end2.reference.name;
+                         sName = utils.upperCamelCase(associationSide.end2.reference.name);
                          ref = constant.getReference() + sName;
                     }
                     objAllOfArry['$ref'] = ref;
@@ -142,7 +142,7 @@ class Association {
 
                     /* Add reference of Class Side Schema */
                     objAllOfArry = {};
-                    sName = classSide.name;
+                    sName = utils.upperCamelCase(classSide.name);
                     ref = constant.getReference() + sName;
                     objAllOfArry['$ref'] = ref;
                     allOfArray.push(objAllOfArry);
@@ -272,7 +272,7 @@ class Association {
 
                     mainClassesObj = {};
                     let mainPropertiesObj = {}
-                    mainSchemaObj[cName] = mainClassesObj
+                    mainSchemaObj[utils.upperCamelCase(cName)] = mainClassesObj
 
 
                     mainClassesObj.type = 'object';
@@ -283,7 +283,7 @@ class Association {
 
                     filterAttributes.forEach(attr => {
                          let propertiesObj = {};
-                         mainPropertiesObj[attr.name] = propertiesObj;
+                         mainPropertiesObj[utils.lowerCamelCase(attr.name)] = propertiesObj;
                          if (attr.multiplicity === "1..*" || attr.multiplicity === "0..*") {
                               let itemsObj = {};
                               propertiesObj.items = itemsObj;

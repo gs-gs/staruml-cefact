@@ -70,7 +70,8 @@ function buildParameter(name, type, description, required, schema, paramsObject)
      paramsObject.in = type;
      paramsObject.description = description;
      paramsObject.required = required;
-     paramsObject.schema = schema;
+     paramsObject.schema = {};
+     paramsObject.schema.type = schema.type;
 
 }
 
@@ -93,7 +94,7 @@ function buildRequestBodyForSubResource(subResourceClass, requestBodyObj) {
      let schemaObj = {};
      appJsonObject.schema = schemaObj;
 
-     schemaObj['$ref'] = constant.getReference() + subResourceClass.name;
+     schemaObj['$ref'] = constant.getReference() + this.upperCamelCase(subResourceClass.name);
 
 
      requestBodyObj.description = '';
@@ -119,7 +120,7 @@ function buildRequestBody(objInterface, requestBodyObj) {
      let schemaObj = {};
      appJsonObject.schema = schemaObj;
 
-     schemaObj['$ref'] = constant.getReference() + objInterface.source.name;
+     schemaObj['$ref'] = constant.getReference() + this.upperCamelCase(objInterface.source.name);
 
 
      requestBodyObj.description = '';
@@ -274,7 +275,7 @@ function addReferenceTypeRuleClass(itemsObj, coreType) {
       let ref = '';
       let sName = '';
       itemsObj.items = itemObj;
-      sName = coreType.name;
+      sName = utils.upperCamelCase(coreType.name);
       ref = constant.getReference() + sName;
       itemObj['$ref'] = ref;
       itemsObj.type = 'array'; */
@@ -286,7 +287,7 @@ function addReferenceTypeRuleClass(itemsObj, coreType) {
 
 
      let allOfObj = {};
-     sName = coreType.name;
+     sName = this.upperCamelCase(coreType.name);
      ref = constant.getReference() + sName;
      allOfObj['$ref'] = ref;
      allOfArray.push(allOfObj);
@@ -317,7 +318,7 @@ function addReferenceTypeRule(itemsObj, coreType) {
 
      /* Adding reference */
      allOfObject = {};
-     allOfObject['$ref'] = constant.getReference() + coreType.name;
+     allOfObject['$ref'] = constant.getReference() + this.upperCamelCase(coreType.name);
      allOfArray.push(allOfObject);
 
      /* Adding object field */
@@ -470,6 +471,13 @@ function initJsonRuleType() {
           key: 'Binary',
           type: 'string',
           format: 'binary'
+     }, {
+          key: 'Identifier',
+          type: 'string',
+          format: 'uri'
+     }, {
+          key: 'Code',
+          type: 'string'
      }, {
           key: 'Quantity',
           type: 'integer'
@@ -854,6 +862,26 @@ function getDataTypeAttribute(dataTypeEleOrViews) {
      return varDataTypeAttribute;
 }
 
+function lowerCamelCase(str) {
+     if(!app.preferences.get("openapi.ndr"))
+          return str;
+     return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index)
+     {
+          return index == 0 ? word.toLowerCase() : word.toUpperCase();
+     }).replace(/\s+/g, '').replace(/[^a-zA-Z0-9]+/g, '');
+}
+
+function upperCamelCase(str) {
+     if(!app.preferences.get("openapi.ndr"))
+          return str;
+     return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index)
+     {
+          return word.toUpperCase();
+     }).replace(/\s+/g, '').replace(/[^a-zA-Z0-9]+/g, '');
+}
+
+module.exports.lowerCamelCase = lowerCamelCase;
+module.exports.upperCamelCase = upperCamelCase;
 module.exports.getViewFromOther = getViewFromOther;
 module.exports.isCoreDataType = isCoreDataType;
 module.exports.getCoreDataType = getCoreDataType;

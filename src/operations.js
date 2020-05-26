@@ -60,7 +60,7 @@ class Operations {
 
           let itemsObject = {};
           schemaObject.items = itemsObject;
-          itemsObject['$ref'] = constant.getReference() + objInterface.source.name;
+          itemsObject['$ref'] = constant.getReference() + utils.upperCamelCase(objInterface.source.name);
 
           schemaObject.type = 'array';
 
@@ -120,7 +120,7 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + subResourceClass.name;
+          schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(subResourceClass.name);
 
           created201Object.description = 'Created';
 
@@ -179,7 +179,7 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + objInterface.source.name;
+          schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(objInterface.source.name);
 
           created201Object.description = 'Created';
 
@@ -260,7 +260,7 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + objInterfaceRealization.source.name;
+          schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(objInterfaceRealization.source.name);
 
           return wOperationObject;
      }
@@ -355,27 +355,29 @@ class Operations {
 
           let parametersArray = [];
           wOperationObject.parameters = parametersArray;
-          let paramsObject = {};
-          parametersArray.push(paramsObject);
 
           let objSchema = {};
           objSchema.type = 'string';
 
           if (iAttribute != null && end1Interface == null && end2Interface == null) {
 
+               let paramsObject = {};
                utils.buildParameter(iAttribute.name, "path", (iAttribute.documentation ? utils.buildDescription(iAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
+               parametersArray.push(paramsObject);
 
                objInterfaceRealization.target.attributes.forEach(itemAttribute => {
-                    let paramsObject = {};
                     if (itemAttribute.name != "id" && itemAttribute.name != "identifier" && itemAttribute.isID != true) {
-                         utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject);
-                         parametersArray.push(paramsObject);
+                         let paramsObject1 = {};
+                         utils.buildParameter(itemAttribute.name, "query", (itemAttribute.documentation ? utils.buildDescription(itemAttribute.documentation) : constant.STR_MISSING_DESCRIPTION), false, objSchema, paramsObject1);
+                         parametersArray.push(paramsObject1);
                     }
                });
 
           } else if (iAttribute == null && end1Interface != null && end2Interface != null) {
 
+               let paramsObject = {};
                utils.buildParameter(end2Interface.reference.attributes[0].name, "path", (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION), true, objSchema, paramsObject);
+               parametersArray.push(paramsObject);
 
                /* AskQue */
                let paramsObject1 = {};
@@ -463,7 +465,7 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + objInterfaceRealization.source.name;
+          schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(objInterfaceRealization.source.name);
 
           return wOperationObject;
      }

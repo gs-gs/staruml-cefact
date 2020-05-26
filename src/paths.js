@@ -459,9 +459,9 @@ class Paths {
 
                          let itemsObject = {};
                          schemaObj.items = itemsObject;
-                         itemsObject['$ref'] = constant.getReference() + refCName;
+                         itemsObject['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
                          schemaObj.type = 'array';
-                         /* schemaObj['$ref'] = constant.getReference() + refCName; */
+                         /* schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(refCName); */
 
 
 
@@ -546,7 +546,7 @@ class Paths {
                               refCName = interfaceRealization.source.name;
                          }
 
-                         schemaSingleObj['$ref'] = constant.getReference() + refCName;
+                         schemaSingleObj['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
 
 
 
@@ -670,7 +670,7 @@ class Paths {
                               /* This line is optional */
                               refCName = interfaceRealization.source.name;
                          }
-                         schemaSingleObj['$ref'] = constant.getReference() + refCName;
+                         schemaSingleObj['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
 
                     }
                });

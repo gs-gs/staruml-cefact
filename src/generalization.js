@@ -36,7 +36,7 @@ class Generalization {
                arrGeneral.forEach(generalizeClass => {
                     let allOfObj = {};
                     let sName = '';
-                    sName = generalizeClass.target.name;
+                    sName = utils.upperCamelCase(generalizeClass.target.name);
                     let ref = constant.getReference() + sName;
                     allOfObj['$ref'] = ref;
                     allOfArray.push(allOfObj);

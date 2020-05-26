@@ -569,6 +569,27 @@ function init() {
 
      /* Register command to initialize project */
      app.project.on('projectLoaded', initProject);
+
+     var openapiPreferences = {
+          id: "openapi",
+          name: "OpenAPI",
+          schema: {
+               "openapi.output": {
+                    text: "OpenAPI output format",
+                    description: "Pick one of the output formats to be used by default.",
+                    type: "dropdown",
+                    options: constant.fileOptions
+               },
+               "openapi.ndr": {
+                    text: "Apply NDR rules",
+                    description: "Apply NDR rules.",
+                    type: "check",
+                    default: true
+               }
+          }
+     }
+
+     app.preferences.register(openapiPreferences)
 }
 
 /**
@@ -595,5 +616,6 @@ function runStarUML() {
           .catch(err => console.error(err));
      return '';
 }
+
 exports.init = init
 exports.runStarUML = runStarUML

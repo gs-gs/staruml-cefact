@@ -82,7 +82,7 @@ class Properties {
 
                     propertiesObj = {};
                     let filterAttr = _this.arrAttRequired.filter(item => {
-                         return item.name == attribute.name;
+                         return utils.lowerCamelCase(item.name) == utils.lowerCamelCase(attribute.name);
                     });
 
                     /* Filter for visible attribute Views from diagram elements (Class & Interface) */
@@ -145,7 +145,7 @@ class Properties {
                } else {
 
                     /* if(!attribute.isID ){ */
-                    mainPropertiesObj[attribute.name] = propertiesObj;
+                    mainPropertiesObj[utils.lowerCamelCase(attribute.name)] = propertiesObj;
                     /* Add Multiplicity */
                     if (attribute.multiplicity === "1..*" || attribute.multiplicity === "0..*") {
                          let itemsObj = {};
@@ -170,7 +170,7 @@ class Properties {
                               let descriptionObj = {};
                               let refObj = {};
                               descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
-                              refObj['$ref'] = '#/components/schemas/' + attribute.type.name;
+                              refObj['$ref'] = '#/components/schemas/' + utils.upperCamelCase(attribute.type.name);
                               _this.enumerations.push(attribute.type);
                               allOfArr.push(descriptionObj);
                               allOfArr.push(refObj);
@@ -180,7 +180,7 @@ class Properties {
                               let descriptionObj = {};
                               let refObj = {};
                               descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
-                              refObj['$ref'] = '#/components/schemas/' + attribute.type.name;
+                              refObj['$ref'] = '#/components/schemas/' + utils.upperCamelCase(attribute.type.name);
                               _this.dataTypes.push(attribute.type);
                               allOfArr.push(descriptionObj);
                               allOfArr.push(refObj);

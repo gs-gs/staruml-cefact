@@ -1,3 +1,4 @@
+const utils = require('./utils');
 const version = require('../package.json').version
 const reponame = require('../package.json').name
 const openAPI = require('./openapi');

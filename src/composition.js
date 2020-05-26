@@ -1,3 +1,4 @@
+const utils = require('./utils');
 const constant = require('./constant');
 /**
  * @class Composition 
@@ -34,7 +35,7 @@ class Composition {
           if (assoc.end2.multiplicity === "0..*" || assoc.end2.multiplicity === "1..*") {
                let itemsObj = {};
                propertiesObj.items = itemsObj;
-               sName = assoc.end2.reference.name;
+               sName = utils.upperCamelCase(assoc.end2.reference.name);
                ref = constant.getReference() + sName;
                itemsObj['$ref'] = ref;
                propertiesObj.type = 'array';
@@ -46,7 +47,7 @@ class Composition {
                     propertiesObj.minItems = 1;
                }
           } else {
-               sName = assoc.end2.reference.name;
+               sName = utils.upperCamelCase(assoc.end2.reference.name);
                ref = constant.getReference() + sName;
                let allOfArr = [];
                let descriptionObj = {};
@@ -63,7 +64,7 @@ class Composition {
 
                let objAllOfArry = {};
                sName=assoc.end2.reference.name;
-               ref=constant.getReference() + sName;
+               ref=constant.getReference() + utils.upperCamelCase(sName);
                objAllOfArry['$ref'] = ref;
                allOfArray.push(objAllOfArry);
 
