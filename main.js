@@ -578,6 +578,7 @@ function init() {
                     text: "OpenAPI output format",
                     description: "Pick one of the output formats to be used by default.",
                     type: "dropdown",
+                    default: 3,
                     options: constant.fileOptions
                },
                "openapi.ndr": {

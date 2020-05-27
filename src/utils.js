@@ -94,7 +94,7 @@ function buildRequestBodyForSubResource(subResourceClass, requestBodyObj) {
      let schemaObj = {};
      appJsonObject.schema = schemaObj;
 
-     schemaObj['$ref'] = constant.getReference() + this.upperCamelCase(subResourceClass.name);
+     schemaObj['$ref'] = constant.getReference() + upperCamelCase(subResourceClass.name);
 
 
      requestBodyObj.description = '';
@@ -120,7 +120,7 @@ function buildRequestBody(objInterface, requestBodyObj) {
      let schemaObj = {};
      appJsonObject.schema = schemaObj;
 
-     schemaObj['$ref'] = constant.getReference() + this.upperCamelCase(objInterface.source.name);
+     schemaObj['$ref'] = constant.getReference() + upperCamelCase(objInterface.source.name);
 
 
      requestBodyObj.description = '';
@@ -246,10 +246,12 @@ function isString(s) {
 function addAttributeType(itemsObj, attr) {
      let attributeType = attr.type;
 
-     if (attributeType instanceof type.UMLClass || attributeType instanceof type.UMLDataType) {
+     if (attributeType instanceof type.UMLClass) {
           addReferenceTypeRuleClass(itemsObj, attributeType);
           /* notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name); */
-     } else if (isCoreDataType(attributeType)) {
+     } else if (attributeType instanceof type.UMLDataType) {
+          addJsonRuleType(attr, attributeType, itemsObj);
+     } else if (isCoreDataType(attributeType) || attributeType instanceof type.UMLDataType) {
           /* Added reference in allOf object when attribute type is among the Core Data Type */
           let coreType = getCoreDataType(attributeType);
           let coreAttribs = coreType.attributes;
@@ -287,7 +289,7 @@ function addReferenceTypeRuleClass(itemsObj, coreType) {
 
 
      let allOfObj = {};
-     sName = this.upperCamelCase(coreType.name);
+     sName = upperCamelCase(coreType.name);
      ref = constant.getReference() + sName;
      allOfObj['$ref'] = ref;
      allOfArray.push(allOfObj);
@@ -318,7 +320,7 @@ function addReferenceTypeRule(itemsObj, coreType) {
 
      /* Adding reference */
      allOfObject = {};
-     allOfObject['$ref'] = constant.getReference() + this.upperCamelCase(coreType.name);
+     allOfObject['$ref'] = constant.getReference() + upperCamelCase(coreType.name);
      allOfArray.push(allOfObject);
 
      /* Adding object field */
@@ -524,6 +526,7 @@ function addJsonRuleType(attr, attributeTypeObj, itemsObj) {
           }
 
      } else if (result.length == 0) {
+
           itemsObj.type = 'string';
           if (isString(attributeTypeObj) && isStringCoreType(attributeTypeObj)) {
                notAvailElement.addNotLinkedType(attr._parent.name, attr, attributeTypeObj);
@@ -880,6 +883,7 @@ function upperCamelCase(str) {
      }).replace(/\s+/g, '').replace(/[^a-zA-Z0-9]+/g, '');
 }
 
+module.exports.getJsonRuleType = getJsonRuleType;
 module.exports.lowerCamelCase = lowerCamelCase;
 module.exports.upperCamelCase = upperCamelCase;
 module.exports.getViewFromOther = getViewFromOther;

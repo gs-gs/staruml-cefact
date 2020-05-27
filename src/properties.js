@@ -176,18 +176,27 @@ class Properties {
                               allOfArr.push(refObj);
                               propertiesObj['allOf'] = allOfArr;
                          } else if (attribute.type instanceof type.UMLDataType) {
-                              let allOfArr = [];
-                              let descriptionObj = {};
-                              let refObj = {};
-                              descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
-                              refObj['$ref'] = '#/components/schemas/' + utils.upperCamelCase(attribute.type.name);
-                              _this.dataTypes.push(attribute.type);
-                              allOfArr.push(descriptionObj);
-                              allOfArr.push(refObj);
-                              propertiesObj['allOf'] = allOfArr;
+                              let attributeTypeString = attribute['name'];
+                              let result = utils.getJsonRuleType().filter(function (rule) {
+                                   return rule.key.toLowerCase() === attributeTypeString.toLowerCase();
+                              });
+                              if(result!=null){
+                                   propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
+                                   utils.addAttributeType(propertiesObj, attribute);
+                              } else {
+                                   let allOfArr = [];
+                                   let descriptionObj = {};
+                                   let refObj = {};
+                                   descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
+                                   refObj['$ref'] = '#/components/schemas/' + utils.upperCamelCase(attribute.type.name);
+                                   _this.dataTypes.push(attribute.type);
+                                   allOfArr.push(descriptionObj);
+                                   allOfArr.push(refObj);
+                                   propertiesObj['allOf'] = allOfArr;
+                              }
                          } else {
-                         propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
-                         utils.addAttributeType(propertiesObj, attribute);
+                              propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
+                              utils.addAttributeType(propertiesObj, attribute);
                          }
                     }
                     if (attribute.defaultValue != "") {
