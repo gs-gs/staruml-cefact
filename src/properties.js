@@ -170,7 +170,7 @@ class Properties {
                               let descriptionObj = {};
                               let refObj = {};
                               descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
-                              refObj['$ref'] = '#/components/schemas/' + utils.upperCamelCase(attribute.type.name);
+                              refObj['$ref'] = constant.getReference() + utils.upperCamelCase(attribute.type.name);
                               _this.enumerations.push(attribute.type);
                               allOfArr.push(descriptionObj);
                               allOfArr.push(refObj);
@@ -188,7 +188,7 @@ class Properties {
                                    let descriptionObj = {};
                                    let refObj = {};
                                    descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
-                                   refObj['$ref'] = '#/components/schemas/' + utils.upperCamelCase(attribute.type.name);
+                                   refObj['$ref'] = constant.getReference() + utils.upperCamelCase(attribute.type.name);
                                    _this.dataTypes.push(attribute.type);
                                    allOfArr.push(descriptionObj);
                                    allOfArr.push(refObj);

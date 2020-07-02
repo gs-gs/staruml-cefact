@@ -290,214 +290,212 @@ class Component {
                          return viewItem.model.associationSide.end1.reference._id == objClass._id;
                     });
                }
+               if(!utils.isCoreDataType(objClass)) {
 
-               this.mainSchemaObj[utils.upperCamelCase(objClass.name)] = mainClassesObj
-               mainClassesObj.description = objClass.documentation;
-               mainClassesObj.type = 'object';
+                    this.mainSchemaObj[utils.upperCamelCase(objClass.name)] = mainClassesObj
+                    mainClassesObj.description = objClass.documentation;
+                    mainClassesObj.type = 'object';
 
-               /** 
-                * Adding Properties 
-                **/
-               let properties = [];
-               if (openAPI.isModelPackage()) {
-                    properties = new Properties(objClass, assocSideClassLink);
-               } else if (openAPI.isModelDiagram()) {
-                    properties = new Properties(mClassView, aclAssocSideView);
-               }
-
-               /** 
-                * Adds Attributes, With Enum, With Multiplicity 
-                **/
-               mainPropertiesObj = properties.addProperties();
-               mainClassesObj.properties = mainPropertiesObj;
-
-               let compositionRef = [];
-
-               let arrAttributes = properties.getAttributes();
-               let arrEnumerations = properties.getEnumerations();
-
-               this.addEnumerationSchema(arrEnumerations);
-
-               let arrDataTypes = properties.getDataTypes();
-               arrDataTypes.forEach(dataType => {
-                    if (this.mainSchemaObj[utils.upperCamelCase(dataType.name)] == null) {
-                         let dataTypeObj = {}
-                         dataTypeObj.description = dataTypeObj.documentation ? utils.buildDescription(dataTypeObj.documentation) : constant.STR_MISSING_DESCRIPTION;
-                         dataTypeObj.type = 'string';
-                         let refTag;
-                         if (dataType.tags != null && dataType.tags.length > 0) {
-                              forEach(dataType.tags, function (tag) {
-                                   if (tag.name === 'ref') {
-                                        refTag = tag.value;
-                                   }
-                              });
-                         }
-                         if (refTag != null) {
-                              dataTypeObj = {}
-                              dataTypeObj.$ref = refTag;
-                         } else if(dataType.hasOwnProperty('attributes')) {
-                              dataTypeObj.type = 'object';
-                              let properties = {};
-                              forEach(dataType.attributes, function (attribute) {
-                                   let propertyObj = {};
-                                   propertyObj.description = propertyObj.documentation ? utils.buildDescription(propertyObj.documentation) : constant.STR_MISSING_DESCRIPTION;
-                                   //TODO: check the type
-                                   propertyObj.type = attribute.type;
-                                   properties[attribute.name] = propertyObj;
-                              });
-                              dataTypeObj.properties = properties;
-                         }
-                         this.mainSchemaObj[utils.upperCamelCase(dataType.name)] = dataTypeObj;
-                    }
-               });
-
-               if (openAPI.isModelPackage()) {
-                    /** 
-                     * Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity 
+                    /**
+                     * Adding Properties
                      **/
-                    mainPropertiesObj = this.association.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef);
+                    let properties = [];
+                    if (openAPI.isModelPackage()) {
+                         properties = new Properties(objClass, assocSideClassLink);
+                    } else if (openAPI.isModelDiagram()) {
+                         properties = new Properties(mClassView, aclAssocSideView);
+                    }
 
-               } else if (openAPI.isModelDiagram()) {
-                    /* 
-                     * Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity 
-                     */
-                    mainPropertiesObj = this.association.addAssociationClassLinkProperties(aclClassSideView, mainPropertiesObj, compositionRef);
-               }
+                    /**
+                     * Adds Attributes, With Enum, With Multiplicity
+                     **/
+                    mainPropertiesObj = properties.addProperties();
+                    mainClassesObj.properties = mainPropertiesObj;
 
+                    let compositionRef = [];
 
-               /**
-                * Get generalization of class 
-                **/
-               let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
-               let aggregationClasses = [];
+                    let arrAttributes = properties.getAttributes();
+                    let arrEnumerations = properties.getEnumerations();
 
-               /**
-                * Get association class link of class 
-                * */
-               let classAssociations = this.association.getAssociationOfClass(objClass);
+                    this.addEnumerationSchema(arrEnumerations);
 
-               /* 
-                * Sort associations as it is showing in model exploert sequence
-                */
-               classAssociations = this.sortAssociationByModelExplorerSequence(objClass, classAssociations);
-
-
-
-
-               classAssociations.forEach(assoc => {
-                    if (assoc instanceof type.UMLAssociation) {
-
-
-                         let assocName = assoc.name;
-                         if (assocName == '') {
-                              assocName = utils.lowerCamelCase(assoc.end2.reference.name);
-                         }
-
-                         /* Check for duplicate property */
-                         let propKeys = Object.keys(mainPropertiesObj);
-                         propKeys.forEach(prop => {
-                              if (assocName == prop) {
-                                   let error = nodeUtils.format(constant.STR_DUPLICATE_PROPERTY, assoc.end1.reference.name, prop);
-                                   duplicatePropertyError.push(error);
-                                   let jsonError = {
-                                        isDuplicateProp: true,
-                                        msg: duplicatePropertyError
-                                   };
-                                   openAPI.setError(jsonError);
+                    let arrDataTypes = properties.getDataTypes();
+                    arrDataTypes.forEach(dataType => {
+                         if (this.mainSchemaObj[utils.upperCamelCase(dataType.name)] == null) {
+                              let dataTypeObj = {}
+                              dataTypeObj.description = dataTypeObj.documentation ? utils.buildDescription(dataTypeObj.documentation) : constant.STR_MISSING_DESCRIPTION;
+                              dataTypeObj.type = 'string';
+                              let refTag;
+                              if (dataType.tags != null && dataType.tags.length > 0) {
+                                   forEach(dataType.tags, function (tag) {
+                                        if (tag.name === 'ref') {
+                                             refTag = tag.value;
+                                        }
+                                   });
                               }
-                         });
-
-                         if (assoc.end1.aggregation == constant.shared) {
-                              /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
-                              let aggregation = new Aggregation(arrAttributes);
-                              mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
-
-                         } else {
-                              /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
-                              let composition = new Composition(arrAttributes);
-                              mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
-
+                              if (refTag != null) {
+                                   dataTypeObj = {}
+                                   dataTypeObj.$ref = refTag;
+                              } else if (dataType.hasOwnProperty('attributes')) {
+                                   dataTypeObj.type = 'object';
+                                   let properties = {};
+                                   forEach(dataType.attributes, function (attribute) {
+                                        let propertyObj = {};
+                                        propertyObj.description = propertyObj.documentation ? utils.buildDescription(propertyObj.documentation) : constant.STR_MISSING_DESCRIPTION;
+                                        //TODO: check the type
+                                        propertyObj.type = attribute.type;
+                                        properties[attribute.name] = propertyObj;
+                                   });
+                                   dataTypeObj.properties = properties;
+                              }
+                              this.mainSchemaObj[utils.upperCamelCase(dataType.name)] = dataTypeObj;
                          }
-                    } else if (assoc instanceof type.UMLGeneralization) {
-                         arrGeneral.push(assoc);
-                    }
-               });
-
-               /** 
-                * Adding Generalization : Adds refs of Class in 'allOf' object 
-                **/
-               mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj, compositionRef);
-
-
-               let filterAttributes = arrAttributes.filter(item => {
-                    return item.isID;
-               });
-
-               /** 
-                * Generate Ids Class if needed 
-                **/
-               if (openAPI.isModelPackage()) {
-
-                    if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
-                         let allOfArray = [];
-                         mainClassesObj.allOf = allOfArray;
-                         let allOfObj = {};
-                         allOfObj['$ref'] = constant.getReference() + utils.upperCamelCase(objClass.name + 'Ids');
-                         allOfArray.push(allOfObj);
-
-                         allOfObj = {};
-                         allOfObj['type'] = 'object';
-                         allOfArray.push(allOfObj);
-
-                    }
-               } else if (openAPI.isModelDiagram()) {
-                    if (filterAttributes.length > 0 && aclAssocSideView.length > 0) {
-                         let allOfArray = [];
-                         mainClassesObj.allOf = allOfArray;
-                         let allOfObj = {};
-                         allOfObj['$ref'] = constant.getReference() + utils.upperCamelCase(objClass.name + 'Ids');
-                         allOfArray.push(allOfObj);
-
-                         allOfObj = {};
-                         allOfObj['type'] = 'object';
-                         allOfArray.push(allOfObj);
-
-                    }
-               }
-
-               /**
-                * Adding Required (Mandatory fields) 
-                **/
-               if (this.required.getRequiredAttributes(arrAttributes).length > 0) {
-                    mainClassesObj.required = this.required.addRequiredAttributes(arrAttributes);
-               }
-
-               /**
-                * Write separate schema for isID property of aggregation and relationship class
-                **/
-               if (openAPI.isModelPackage() && assocSideClassLink.length > 0) {
-                    aggregationClasses.push(objClass);
-               } else if (openAPI.isModelDiagram() && aclAssocSideView.length > 0) {
-                    aggregationClasses.push(objClass);
-               }
-
-
-
-               aggregationClasses.forEach(itemClass => {
-                    let filter = arrIdClasses.filter(subItem => {
-                         return itemClass.name == subItem.name;
                     });
 
-                    if (filter.length == 0) {
-                         this.association.writeAssociationProperties(mainClassesObj, itemClass, this.mainSchemaObj);
-                         arrIdClasses.push(itemClass)
-                    }
-               });
-               /**
-                * Remove property which is already in ref of other property in the same schema 
-                **/
-               this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
+                    if (openAPI.isModelPackage()) {
+                         /**
+                          * Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity
+                          **/
+                         mainPropertiesObj = this.association.addAssociationClassLinkProperties(assocClassLink, mainPropertiesObj, compositionRef);
 
+                    } else if (openAPI.isModelDiagram()) {
+                         /*
+                          * Adding Association Class Link Properties : Adds Attributes with Multiplicity, without Multiplicity
+                          */
+                         mainPropertiesObj = this.association.addAssociationClassLinkProperties(aclClassSideView, mainPropertiesObj, compositionRef);
+                    }
+
+
+                    /**
+                     * Get generalization of class
+                     **/
+                    let arrGeneral = this.generalization.findGeneralizationOfClass(objClass);
+                    let aggregationClasses = [];
+
+                    /**
+                     * Get association class link of class
+                     * */
+                    let classAssociations = this.association.getAssociationOfClass(objClass);
+
+                    /*
+                     * Sort associations as it is showing in model exploert sequence
+                     */
+                    classAssociations = this.sortAssociationByModelExplorerSequence(objClass, classAssociations);
+
+
+                    classAssociations.forEach(assoc => {
+                         if (assoc instanceof type.UMLAssociation) {
+
+
+                              let assocName = assoc.name;
+                              if (assocName == '') {
+                                   assocName = utils.lowerCamelCase(assoc.end2.reference.name);
+                              }
+
+                              /* Check for duplicate property */
+                              let propKeys = Object.keys(mainPropertiesObj);
+                              propKeys.forEach(prop => {
+                                   if (assocName == prop) {
+                                        let error = nodeUtils.format(constant.STR_DUPLICATE_PROPERTY, assoc.end1.reference.name, prop);
+                                        duplicatePropertyError.push(error);
+                                        let jsonError = {
+                                             isDuplicateProp: true,
+                                             msg: duplicatePropertyError
+                                        };
+                                        openAPI.setError(jsonError);
+                                   }
+                              });
+
+                              if (assoc.end1.aggregation == constant.shared) {
+                                   /* Adding Aggregation : Adds Attributes with Multiplicity, without Multiplicity */
+                                   let aggregation = new Aggregation(arrAttributes);
+                                   mainPropertiesObj = aggregation.addAggregationProperties(mainPropertiesObj, aggregationClasses, assoc, assocName, compositionRef);
+
+                              } else {
+                                   /* Adding composition : Adds Attributes with Multiplicity, without Multiplicity */
+                                   let composition = new Composition(arrAttributes);
+                                   mainPropertiesObj = composition.addComposition(mainPropertiesObj, assoc, assocName, compositionRef);
+
+                              }
+                         } else if (assoc instanceof type.UMLGeneralization) {
+                              arrGeneral.push(assoc);
+                         }
+                    });
+
+                    /**
+                     * Adding Generalization : Adds refs of Class in 'allOf' object
+                     **/
+                    mainClassesObj = this.generalization.addGeneralization(arrGeneral, mainClassesObj, compositionRef);
+
+
+                    let filterAttributes = arrAttributes.filter(item => {
+                         return item.isID;
+                    });
+
+                    /**
+                     * Generate Ids Class if needed
+                     **/
+                    if (openAPI.isModelPackage()) {
+
+                         if (filterAttributes.length > 0 && assocSideClassLink.length > 0) {
+                              let allOfArray = [];
+                              mainClassesObj.allOf = allOfArray;
+                              let allOfObj = {};
+                              allOfObj['$ref'] = constant.getReference() + utils.upperCamelCase(objClass.name + 'Ids');
+                              allOfArray.push(allOfObj);
+
+                              allOfObj = {};
+                              allOfObj['type'] = 'object';
+                              allOfArray.push(allOfObj);
+
+                         }
+                    } else if (openAPI.isModelDiagram()) {
+                         if (filterAttributes.length > 0 && aclAssocSideView.length > 0) {
+                              let allOfArray = [];
+                              mainClassesObj.allOf = allOfArray;
+                              let allOfObj = {};
+                              allOfObj['$ref'] = constant.getReference() + utils.upperCamelCase(objClass.name + 'Ids');
+                              allOfArray.push(allOfObj);
+
+                              allOfObj = {};
+                              allOfObj['type'] = 'object';
+                              allOfArray.push(allOfObj);
+
+                         }
+                    }
+
+                    /**
+                     * Adding Required (Mandatory fields)
+                     **/
+                    if (this.required.getRequiredAttributes(arrAttributes).length > 0) {
+                         mainClassesObj.required = this.required.addRequiredAttributes(arrAttributes);
+                    }
+
+                    /**
+                     * Write separate schema for isID property of aggregation and relationship class
+                     **/
+                    if (openAPI.isModelPackage() && assocSideClassLink.length > 0) {
+                         aggregationClasses.push(objClass);
+                    } else if (openAPI.isModelDiagram() && aclAssocSideView.length > 0) {
+                         aggregationClasses.push(objClass);
+                    }
+
+
+                    aggregationClasses.forEach(itemClass => {
+                         let filter = arrIdClasses.filter(subItem => {
+                              return itemClass.name == subItem.name;
+                         });
+
+                         if (filter.length == 0) {
+                              this.association.writeAssociationProperties(mainClassesObj, itemClass, this.mainSchemaObj);
+                              arrIdClasses.push(itemClass)
+                         }
+                    });
+                    /**
+                     * Remove property which is already in ref of other property in the same schema
+                     **/
+                    this.removeDuplicatePropertyOfRefs(compositionRef, mainPropertiesObj, objClass, duplicateDeletedReference);
+               }
           });
      }
 
