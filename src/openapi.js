@@ -39,6 +39,8 @@ class OpenApi {
           utils.resetErrorBlock();
           OpenApi.fileType = fileType;
           OpenApi.uniqueClassesArr = [];
+          OpenApi.dataTypesArr = [];
+          OpenApi.uniqueEnumerationsArr = [];
           OpenApi.strPackagePath = '';
           OpenApi.error = {};
      }
@@ -97,7 +99,7 @@ class OpenApi {
                let exportElement = OpenApi.getExportElement();
                var _pkgName = exportElement.name
                let umlClasses = [];
-               let umlDataTypes = [];
+               OpenApi.dataTypesArr = [];
                OpenApi.operations = [];
                let assocCurrentPkg = []
                let generaCurrentPkg = [];
@@ -114,6 +116,9 @@ class OpenApi {
 
                     /* ------------ 4. Generalization Class from Package ------------ */
                     generaCurrentPkg = await OpenApi.getUMLGeneralization();
+
+                    /* ------------ 5. UMLDataTypes (including Enumerations) from Package ------------ */
+                    OpenApi.dataTypesArr = app.repository.select(_pkgName + "::@UMLDataType");
 
                } else if (openAPI.isModelDiagram()) {
                     /* ------------ 1. UMLClass from Diagram ------------ */
@@ -408,6 +413,17 @@ class OpenApi {
       */
      static getUniqueClasses() {
           return OpenApi.uniqueClassesArr;
+     }
+
+     /**
+      * @function getUniqueClasses
+      * @description save and returns the array of unique classes
+      * @static
+      * @returns {Array}
+      * @memberof OpenApi
+      */
+     static getDataTypes() {
+          return OpenApi.dataTypesArr;
      }
 
      /**
@@ -862,6 +878,7 @@ function findParentPackage(ele, item) {
 module.exports.getFilePath = OpenApi.getPath;
 module.exports.OpenApi = OpenApi;
 module.exports.getClasses = OpenApi.getUniqueClasses;
+module.exports.getDataTypes = OpenApi.getDataTypes;
 module.exports.getExportElement = OpenApi.getExportElement;
 module.exports.getPaths = OpenApi.getOperations;
 module.exports.getFileType = OpenApi.getFileType;

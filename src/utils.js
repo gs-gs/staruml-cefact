@@ -93,9 +93,11 @@ function buildRequestBodyForSubResource(subResourceClass, requestBodyObj) {
 
      let schemaObj = {};
      appJsonObject.schema = schemaObj;
-
-     schemaObj['$ref'] = constant.getReference() + upperCamelCase(subResourceClass.name);
-
+     schemaObj.type = 'object';
+     schemaObj.properties = {};
+     let objPath = {};
+     objPath ['$ref'] = constant.getReference() + upperCamelCase(subResourceClass.name);
+     schemaObj.properties[lowerCamelCase(subResourceClass.name)] = objPath;
 
      requestBodyObj.description = '';
      requestBodyObj.required = true;
@@ -119,9 +121,11 @@ function buildRequestBody(objInterface, requestBodyObj) {
 
      let schemaObj = {};
      appJsonObject.schema = schemaObj;
-
-     schemaObj['$ref'] = constant.getReference() + upperCamelCase(objInterface.source.name);
-
+     schemaObj.type = 'object';
+     schemaObj.properties = {};
+     let objPath = {};
+     objPath ['$ref'] = constant.getReference() + upperCamelCase(objInterface.source.name);
+     schemaObj.properties[lowerCamelCase(objInterface.source.name)] = objPath;
 
      requestBodyObj.description = '';
      requestBodyObj.required = true;
@@ -208,6 +212,7 @@ function isEmpty(exportElement) {
           exportElement.ownedViews.filter(function (item) {
                if (item instanceof type.UMLClassView ||
                     item instanceof type.UMLInterfaceView ||
+                    item instanceof type.UMLDataTypeView ||
                     item instanceof type.UMLEnumerationView) {
                     ownedElements.push(item);
                }
@@ -216,6 +221,7 @@ function isEmpty(exportElement) {
           exportElement.ownedElements.filter(function (item) {
                if (item instanceof type.UMLClass ||
                     item instanceof type.UMLInterface ||
+                    item instanceof type.UMLDataType ||
                     item instanceof type.UMLEnumeration) {
                     ownedElements.push(item);
                }
@@ -249,18 +255,14 @@ function addAttributeType(itemsObj, attr) {
      if (attributeType instanceof type.UMLClass) {
           addReferenceTypeRuleClass(itemsObj, attributeType);
           /* notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name); */
-     } else if (attributeType instanceof type.UMLDataType) {
-          addJsonRuleType(attr, attributeType, itemsObj);
      } else if (isCoreDataType(attributeType) || attributeType instanceof type.UMLDataType) {
           /* Added reference in allOf object when attribute type is among the Core Data Type */
-          let coreType = getCoreDataType(attributeType);
-          let coreAttribs = coreType.attributes;
+          let coreAttribs = attributeType.attributes;
           if (coreAttribs.length > 0) {
-               addReferenceTypeRule(itemsObj, coreType);
+               addReferenceTypeRule(itemsObj, attributeType);
           } else {
-               addJsonRuleType(attr, coreType.name, itemsObj);
+               addJsonRuleType(attr, attributeType.name, itemsObj);
           }
-
      } else {
           addJsonRuleType(attr, attributeType, itemsObj);
      }
@@ -564,12 +566,15 @@ function isStringCoreType(sCType) {
  */
 function isCoreDataType(attrType) {
 
-     if (attrType instanceof type.UMLClass) {
-          let coreTypes = getCoreTypes();
-          let typeResult = coreTypes.filter(function (types) {
-               return attrType._id == types._id
+     if (attrType instanceof type.UMLClass || attrType instanceof type.UMLDataType) {
+          let attributeTypeString = attrType;
+          if(attrType.hasOwnProperty('name')){
+               attributeTypeString = attrType['name'];
+          }
+          let result = getJsonRuleType().filter(function (rule) {
+               return rule.key.toLowerCase() === attributeTypeString.toLowerCase();
           });
-          if (typeResult.length > 0) {
+          if (result.length > 0) {
                return true;
           }
      }
@@ -585,7 +590,7 @@ function isCoreDataType(attrType) {
  * @memberof Utils
  */
 function getCoreDataType(attrType) {
-     if (attrType instanceof type.UMLClass) {
+     if (attrType instanceof type.UMLClass || attrType instanceof type.UMLDataType) {
           let coreTypes = getCoreTypes();
           let typeResult = coreTypes.filter(function (types) {
                return attrType._id == types._id
@@ -770,8 +775,9 @@ function initCoreTypes() {
      });
 
      /* result = app.repository.select(result.name + '::@UMLPackage'); */
+     //TODO: check if core types can be retired
      if (result.length == 0) {
-          app.dialogs.showAlertDialog(constant.MSG_CORE_TYPE_NOT_AVAILABLE);
+          /*app.dialogs.showAlertDialog(constant.MSG_CORE_TYPE_NOT_AVAILABLE);*/
           return;
      }
      let typePkg = result[0];
@@ -825,12 +831,14 @@ function getClassTypeAttribute(classEleOrViews) {
 
           let attributes = mClass.attributes;
           attributes.forEach(attr => {
-               if (attr.type instanceof type.UMLClass) {
-                    let resFilter = varClassTypeAttribute.filter(resFilter => {
-                         return resFilter._id == attr.type._id;
-                    });
-                    if (resFilter.length == 0) {
-                         varClassTypeAttribute.push(attr.type);
+               if(!isCoreDataType(attr.type)) {
+                    if (attr.type instanceof type.UMLClass) {
+                         let resFilter = varClassTypeAttribute.filter(resFilter => {
+                              return resFilter._id == attr.type._id;
+                         });
+                         if (resFilter.length == 0) {
+                              varClassTypeAttribute.push(attr.type);
+                         }
                     }
                }
           });

@@ -459,7 +459,13 @@ class Paths {
 
                          let itemsObject = {};
                          schemaObj.items = itemsObject;
-                         itemsObject['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
+                         itemsObject.type = 'object';
+                         itemsObject.properties = {};
+
+                         let objPath = {};
+                         objPath ['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
+
+                         itemsObject.properties[utils.lowerCamelCase(refCName)] = objPath;
                          schemaObj.type = 'array';
                          /* schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(refCName); */
 
@@ -546,7 +552,11 @@ class Paths {
                               refCName = interfaceRealization.source.name;
                          }
 
-                         schemaSingleObj['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
+                         schemaSingleObj.type = 'object';
+                         schemaSingleObj.properties = {};
+                         let objPathSchemaSingleObj = {};
+                         objPathSchemaSingleObj ['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
+                         schemaSingleObj.properties[utils.lowerCamelCase(refCName)] = objPathSchemaSingleObj;
 
 
 
@@ -670,8 +680,12 @@ class Paths {
                               /* This line is optional */
                               refCName = interfaceRealization.source.name;
                          }
-                         schemaSingleObj['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
 
+                         schemaSingleObj.type = 'object';
+                         schemaSingleObj.properties = {};
+                         let objPathSchemaSingleObj = {};
+                         objPathSchemaSingleObj ['$ref'] = constant.getReference() + utils.upperCamelCase(refCName);
+                         schemaSingleObj.properties[utils.lowerCamelCase(refCName)] = objPathSchemaSingleObj;
                     }
                });
           } catch (error) {

@@ -90,15 +90,19 @@ class FileGenerator {
           return new Promise((resolve, reject) => {
                try {
                     /* Direct json from JsonOject */
-                    this.basePath = null;
                     let mainJson = null;
-                    this.basePath = path.join(openAPI.getFilePath(), openAPI.getExportElementName() + '.json');
                     mainJson = MainJSON.getJSONSchema();
 
-                    fs.writeFileSync(this.basePath, JSON.stringify(mainJson, null, 4));
+                    let resources = Object.keys(mainJson.schema);
+
+                    resources.forEach(resource => {
+                         let filePath = path.join(openAPI.getFilePath(), resource + '.json');
+                         fs.writeFileSync(filePath, JSON.stringify(mainJson.schema[resource], null, 4));
+                    });
+
                     resolve({
                          result: constant.FIELD_SUCCESS,
-                         message: 'JSON Schema is generated successfully at path : ' + this.basePath
+                         message: 'JSON Schema is generated successfully at path : ' + openAPI.getFilePath()
                     });
                } catch (error) {
 

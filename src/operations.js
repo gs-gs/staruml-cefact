@@ -60,7 +60,13 @@ class Operations {
 
           let itemsObject = {};
           schemaObject.items = itemsObject;
-          itemsObject['$ref'] = constant.getReference() + utils.upperCamelCase(objInterface.source.name);
+          itemsObject.type = 'object';
+          itemsObject.properties = {};
+
+          let objPath = {};
+          objPath ['$ref'] = constant.getReference() + utils.upperCamelCase(objInterface.source.name);
+
+          itemsObject.properties[utils.lowerCamelCase(objInterface.source.name)] = objPath;
 
           schemaObject.type = 'array';
 
@@ -120,7 +126,11 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(subResourceClass.name);
+          schemaObj.type = 'object';
+          schemaObj.properties = {};
+          let objPath = {};
+          objPath ['$ref'] = constant.getReference() + utils.upperCamelCase(subResourceClass.name);
+          schemaObj.properties[utils.lowerCamelCase(subResourceClass.name)] = objPath;
 
           created201Object.description = 'Created';
 
@@ -179,7 +189,11 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(objInterface.source.name);
+          schemaObj.type = 'object';
+          schemaObj.properties = {};
+          let objPath = {};
+          objPath ['$ref'] = constant.getReference() + utils.upperCamelCase(objInterface.source.name);
+          schemaObj.properties[utils.lowerCamelCase(objInterface.source.name)] = objPath;
 
           created201Object.description = 'Created';
 
@@ -260,7 +274,11 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(objInterfaceRealization.source.name);
+          schemaObj.type = 'object';
+          schemaObj.properties = {};
+          let objPath = {};
+          objPath ['$ref'] = constant.getReference() + utils.upperCamelCase(objInterfaceRealization.source.name);
+          schemaObj.properties[utils.lowerCamelCase(objInterfaceRealization.source.name)] = objPath;
 
           return wOperationObject;
      }
@@ -465,7 +483,11 @@ class Operations {
 
           let schemaObj = {};
           appJsonObj.schema = schemaObj;
-          schemaObj['$ref'] = constant.getReference() + utils.upperCamelCase(objInterfaceRealization.source.name);
+          schemaObj.type = 'object';
+          schemaObj.properties = {};
+          let objPath = {};
+          objPath ['$ref'] = constant.getReference() + utils.upperCamelCase(objInterfaceRealization.source.name);
+          schemaObj.properties[utils.lowerCamelCase(objInterfaceRealization.source.name)] = objPath;
 
           return wOperationObject;
      }
