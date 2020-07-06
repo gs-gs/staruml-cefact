@@ -246,7 +246,12 @@ function isString(s) {
 function addAttributeType(itemsObj, attr) {
      let attributeType = attr.type;
 
-     if (isCoreDataType(attributeType) || attributeType instanceof type.UMLDataType) {
+     if (attributeType instanceof type.UMLClass) {
+          addReferenceTypeRuleClass(itemsObj, attributeType);
+          /* notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name); */
+     } else if (attributeType instanceof type.UMLDataType) {
+          addJsonRuleType(attr, attributeType, itemsObj);
+     } else if (isCoreDataType(attributeType) || attributeType instanceof type.UMLDataType) {
           /* Added reference in allOf object when attribute type is among the Core Data Type */
           let coreType = getCoreDataType(attributeType);
           let coreAttribs = coreType.attributes;
@@ -255,11 +260,7 @@ function addAttributeType(itemsObj, attr) {
           } else {
                addJsonRuleType(attr, coreType.name, itemsObj);
           }
-     } else if (attributeType instanceof type.UMLClass) {
-          addReferenceTypeRuleClass(itemsObj, attributeType);
-          /* notAvailElement.addInvalidAttributeType(attr._parent.name, attr, attributeType.name); */
-     } else if (attributeType instanceof type.UMLDataType) {
-          addJsonRuleType(attr, attributeType, itemsObj);
+
      } else {
           addJsonRuleType(attr, attributeType, itemsObj);
      }
@@ -824,14 +825,12 @@ function getClassTypeAttribute(classEleOrViews) {
 
           let attributes = mClass.attributes;
           attributes.forEach(attr => {
-               if(!isCoreDataType(attr.type)) {
-                    if (attr.type instanceof type.UMLClass) {
-                         let resFilter = varClassTypeAttribute.filter(resFilter => {
-                              return resFilter._id == attr.type._id;
-                         });
-                         if (resFilter.length == 0) {
-                              varClassTypeAttribute.push(attr.type);
-                         }
+               if (attr.type instanceof type.UMLClass) {
+                    let resFilter = varClassTypeAttribute.filter(resFilter => {
+                         return resFilter._id == attr.type._id;
+                    });
+                    if (resFilter.length == 0) {
+                         varClassTypeAttribute.push(attr.type);
                     }
                }
           });
