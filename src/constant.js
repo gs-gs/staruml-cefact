@@ -97,9 +97,17 @@ const Constant = {
           m1__star: '1..*',
           m0: '0',
           m1: '1'
-     }
+     },
 
-
+     datatype_pkg_name:'Core Data Types',
+     title_import_mi_1: "Please wait untill model interchange is being processed for the \'",
+     title_import_mi_2: "\' package",
+     title_import_mi: "Model Interchange",
+     title_import_mi_commit_history: "Model Interchange - Commit History",
+     title_import_mi_commit_diff: "Model Interchange - Diff",
+     title_import_mi_commit_status: "Model Interchange - Status",
+     status_code_enum_name:'StatusCode',
+     msg_import_success: ' imported successfully',
 
 }
 

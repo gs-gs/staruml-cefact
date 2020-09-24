@@ -17,7 +17,7 @@
                          "id": "tools.openapi.testallextension",
                          "command": "openapi:test-entire-package"
                     }, {
-                         "label": "Extension version : 0.4.0-rc4",
+                         "label": "Extension version : 0.4.0-rc5",
                          "id": "tools.openapi.version",
                          "command": "generate:show-version-dialog"
                     }, {
@@ -30,10 +30,15 @@
                     "label": "JSON-LD",
                     "id": "tool.jsonld",
                     "submenu": [{
+                          "label": "Import Vocabulary",
+                          "id": "tools.jsold.import",
+                          "command": "jsonld:import"
+                        },{
                          "label": "Generate",
                          "id": "tools.jsold.generate",
                          "command": "jsonld:generate"
-                    }]
+                        }
+                    ]
                }
           ]
      }]

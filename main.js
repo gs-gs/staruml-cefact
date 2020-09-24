@@ -3,6 +3,7 @@ const nodeUtils = require('util');
 const openAPI = require('./src/openapi');
 const constant = require('./src/constant');
 const jsonld = require('./src/jsonld/jsonld');
+const vocabulary = require('./src/vocabulary');
 const FileGenerator = require('./src/filegenerator');
 var fs = require('fs');
 var path = require('path');
@@ -566,6 +567,7 @@ function init() {
      app.commands.register('openapi:about-us', aboutUsExtension);
      /* Register command to Generate Generate JSON-LD Specification */
      app.commands.register('jsonld:generate', genJSONLD);
+     app.commands.register('jsonld:import', vocabulary.importNewModel);
 
      /* Register command to initialize project */
      app.project.on('projectLoaded', initProject);
