@@ -563,7 +563,7 @@ function createRelationshipFromVocabulary(eRelationship, mClass) {
         createEnd1[fields.reference] = {
             '$ref': sourceClass._id
         }
-        createEnd1[fields.aggregation] = 'composition';
+        createEnd1[fields.aggregation] = 'composite';
         let tmpCreatedEnd1 = app.repository.readObject(createEnd1);
         console.log("tmpCreatedEnd1", tmpCreatedEnd1);
 
@@ -576,7 +576,7 @@ function createRelationshipFromVocabulary(eRelationship, mClass) {
         createEnd2[fields.reference] = {
             '$ref': targetClass._id
         }
-        createEnd1[fields.aggregation] = 'none';
+        createEnd2[fields.aggregation] = 'none';
         let tmpCreatedEnd2 = app.repository.readObject(createEnd2);
         console.log("tmpCreatedEnd2", tmpCreatedEnd2);
 
