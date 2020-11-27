@@ -387,6 +387,8 @@ function updateProperty(cProp, property, dataTypes, statusCodes) {
         dataType = "Graphic"
     } else if(property["@id"].endsWith("Identifier")){
         dataType = "Identifier"
+    } else if(property["@id"].endsWith("Id")){
+        dataType = "Identifier"
     } else if(property["@id"].endsWith("Indicator")){
         dataType = "Indicator"
     } else if(property["@id"].endsWith("Measure")){
@@ -411,6 +413,8 @@ function updateProperty(cProp, property, dataTypes, statusCodes) {
         dataType = "Value"
     } else if(property["@id"].endsWith("Video")){
         dataType = "Video"
+    } else {
+        dataType = "Text"
     }
 
     let resDType = dataTypes.filter(dType => {
