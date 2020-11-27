@@ -2,6 +2,7 @@ var forEach = require('async-foreach').forEach;
 var utils = require('./utils');
 var path = require('path');
 const fs = require('fs');
+const got = require('got');
 const fields = require('./fields');
 const constant = require('./constant');
 let otherResources = [];
@@ -57,26 +58,69 @@ function addDatatype(mMainObject) {
     }
 }
 
-
-
-/**
- * @function importFromVocabulary
- * @description Import selected json-ld vocabulary file
- */
-function importFromVocabulary() {
-    var mFiles = app.dialogs.showOpenDialog('Import file As JSON (.json)', null, JSON_FILE_FILTERS)
+function importFromContext() {
+    let mFiles = app.dialogs.showOpenDialog('Import JSON-LD context As JSON (.json) or JSON-LD (.jsonld)', null, JSON_FILE_FILTERS);
     if (mFiles == null) {
         return;
     }
-    finalPath = mFiles[0];
-    let filePath = finalPath;
-    var contentStr = fs.readFileSync(filePath, 'utf8');
-    var content = JSON.parse(contentStr);
-    console.log("File Data : ", content);
+    let filePath = mFiles[0];
+    let contentStr = fs.readFileSync(filePath, 'utf8');
     /*let dataTypesContent = content.dataTypes;*/
 
     let fileName = path.basename(filePath);
-    let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + fileName, [], true);
+    parseContextFile(contentStr, fileName);
+}
+
+
+function importFromContextURL() {
+    app.dialogs.showInputDialog("Enter JSON-LD context URL").then(function ({buttonId, returnValue: contextURL}) {
+        if (buttonId === 'ok') {
+            console.log("Schema url : ", contextURL);
+            got(contextURL)
+                .then(response => parseContextFile(response.body, contextURL))
+                .catch(error => console.log(error.response.body));
+        } else {
+            console.log("User canceled")
+        }
+    });
+}
+
+function parseContextFile(contextFile, contextURL) {
+    var content = JSON.parse(contextFile);
+    var vocab = content["@context"]["@vocab"];
+    var vocabURL = content["@context"][vocab];
+    console.log(vocabURL);
+    vocabURL = vocabURL.replace("#", ".jsonld")
+    got(vocabURL)
+        .then(response => parseVocabulary(response.body, content["@context"], contextURL))
+        .catch(error => console.log(error.response.body));
+}
+
+function parseVocabulary(vocabulary, context, importedUrl) {
+    let vocabularyContent = JSON.parse(vocabulary);
+    let contextItems = [];
+    for(let contextItem in context){
+        if(context[contextItem]["@id"]!= undefined) {
+            contextItems.push(context[contextItem]["@id"]);
+        }
+        console.log();
+        //contextItems.push(["@id"]);
+    }
+    let contextualisedVocabulary = [];
+    forEach(vocabularyContent["@graph"], item => {
+        if(context.length == 0){
+            contextualisedVocabulary.push(item);
+        }
+        else if(contextItems.includes(item["@id"])) {
+            contextualisedVocabulary.push(item);
+        }
+    });
+    console.log(contextualisedVocabulary.length);
+    processVocabularyData(importedUrl, contextualisedVocabulary);
+}
+
+function processVocabularyData(importedUrlOrFilename, vocabulary) {
+    let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, [], true);
     setTimeout(() => {
 
 
@@ -101,15 +145,49 @@ function importFromVocabulary() {
         let dataTypes = app.repository.select('::@UMLDataType');
 
         /* Updating Context -> Class, Properties */
-        updateContextFromVocabulary(statusCodes, dataTypes, content);
+        updateContextFromVocabulary(statusCodes, dataTypes, vocabulary);
 
         app.modelExplorer.rebuild();
 
-        app.dialogs.showInfoDialog(fileName + constant.msg_import_success);
+        app.dialogs.showInfoDialog(importedUrlOrFilename + constant.msg_import_success);
 
         vDialog.close();
 
     }, 5);
+}
+
+
+function importFromVocabularyURL() {
+    app.dialogs.showInputDialog("Enter JSON-LD vocabulary URL").then(function ({buttonId, returnValue: vocabularyURL}) {
+        if (buttonId === 'ok') {
+            console.log("Vocabulary url : ", vocabularyURL);
+            got(vocabularyURL)
+                .then(response => parseVocabulary(response.body, [], vocabularyURL))
+                .catch(error => console.log(error.response.body));
+        } else {
+            console.log("User canceled")
+        }
+    });
+}
+
+
+/**
+ * @function importFromVocabulary
+ * @description Import selected json-ld vocabulary file
+ */
+function importFromVocabulary() {
+    var mFiles = app.dialogs.showOpenDialog('Import JSON-LD vocabulary As JSON (.json) or JSON-LD (.jsonld)', null, JSON_FILE_FILTERS)
+    if (mFiles == null) {
+        return;
+    }
+    let filePath = mFiles[0];
+    let contentStr = fs.readFileSync(filePath, 'utf8');
+    let content = JSON.parse(contentStr);
+    console.log("File Data : ", content);
+    /*let dataTypesContent = content.dataTypes;*/
+
+    let fileName = path.basename(filePath);
+    processVocabularyData(fileName, content['@graph']);
 }
 
 /**
@@ -402,8 +480,8 @@ function updateMultiplicity(cProp, entityProp) {
  * @param {Array} dataTypes
  * @param {Object} content
  */
-function updateContextFromVocabulary(statusCodes, dataTypes, content) {
-    let graph = content['@graph'];
+function updateContextFromVocabulary(statusCodes, dataTypes, graph) {
+    //let graph = content['@graph'];
     let existingPackages = [];
     /**
      * check if all packages(resources) exist in the project
@@ -794,6 +872,7 @@ function addDataTypePackage() {
     dataType.name = "Amount";
     dataType.documentation = "A financial amount with defined currency from ISO-4217.";
     dataTypesContent.push(dataType);
+
     dataType = {};
     dataType.name = "BinaryObject";
     dataType.documentation = "A binary file URL. File type is indicated by file extension which must be a valid MIME type.";
@@ -996,4 +1075,7 @@ function getStringIfArray(obj) {
     else result = obj;
     return result;
 }
-module.exports.importNewModel = importFromVocabulary;
+module.exports.importFromVocabulary = importFromVocabulary;
+module.exports.importFromVocabularyURL = importFromVocabularyURL;
+module.exports.importFromContext = importFromContext;
+module.exports.importFromContextURL = importFromContextURL;

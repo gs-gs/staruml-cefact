@@ -567,7 +567,10 @@ function init() {
      app.commands.register('openapi:about-us', aboutUsExtension);
      /* Register command to Generate Generate JSON-LD Specification */
      app.commands.register('jsonld:generate', genJSONLD);
-     app.commands.register('jsonld:import', vocabulary.importNewModel);
+     app.commands.register('jsonld:import-vocabulary', vocabulary.importFromVocabulary);
+     app.commands.register('jsonld:import-vocabulary-url', vocabulary.importFromVocabularyURL);
+     app.commands.register('jsonld:import-context', vocabulary.importFromContext);
+     app.commands.register('jsonld:import-context-url', vocabulary.importFromContextURL);
 
      /* Register command to initialize project */
      app.project.on('projectLoaded', initProject);

@@ -17,7 +17,7 @@
                          "id": "tools.openapi.testallextension",
                          "command": "openapi:test-entire-package"
                     }, {
-                         "label": "Extension version : 0.4.0-rc6",
+                         "label": "Extension version : 0.5.0-rc1",
                          "id": "tools.openapi.version",
                          "command": "generate:show-version-dialog"
                     }, {
@@ -30,9 +30,21 @@
                     "label": "JSON-LD",
                     "id": "tool.jsonld",
                     "submenu": [{
-                          "label": "Import Vocabulary",
-                          "id": "tools.jsold.import",
-                          "command": "jsonld:import"
+                          "label": "Import locally stored Vocabulary",
+                          "id": "tools.jsold.import-vocabulary",
+                          "command": "jsonld:import-vocabulary"
+                        },{
+                          "label": "Import locally stored Context",
+                          "id": "tools.jsold.import-context",
+                          "command": "jsonld:import-context"
+                        },{
+                          "label": "Import remotely stored Vocabulary",
+                          "id": "tools.jsold.import-vocabulary-url",
+                          "command": "jsonld:import-vocabulary-url"
+                        },{
+                          "label": "Import remotely stored Context",
+                          "id": "tools.jsold.import-context-url",
+                          "command": "jsonld:import-context-url"
                         },{
                          "label": "Generate",
                          "id": "tools.jsold.generate",
