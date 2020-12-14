@@ -571,6 +571,7 @@ function init() {
      app.commands.register('jsonld:import-vocabulary-url', vocabulary.importFromVocabularyURL);
      app.commands.register('jsonld:import-context', vocabulary.importFromContext);
      app.commands.register('jsonld:import-context-url', vocabulary.importFromContextURL);
+     app.commands.register('jsonld:import-uncl', vocabulary.initUNCLEnumerations);
 
      /* Register command to initialize project */
      app.project.on('projectLoaded', initProject);

@@ -71,7 +71,6 @@ function importFromContext() {
     parseContextFile(contentStr, fileName);
 }
 
-
 function importFromContextURL() {
     app.dialogs.showInputDialog("Enter JSON-LD context URL").then(function ({buttonId, returnValue: contextURL}) {
         if (buttonId === 'ok') {
@@ -85,6 +84,38 @@ function importFromContextURL() {
     });
 }
 
+function initUNCLEnumerations() {
+    let enumerationsFromProject = app.repository.select("@UMLEnumeration");
+    let resEnums = enumerationsFromProject.filter(mEnum => {
+        return mEnum.name.startsWith("UNECE");
+    });
+    showPickerDialog("UNCL", null,(importedUrlOrFilename, vocabulary, returnValue) => {
+        let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, [], true);
+        setTimeout(() => {
+            forEach(resEnums, resEnum =>
+            {
+                setTimeout(function() {
+                        let vocabularyURL = "https://edi3.org/vocabulary/uncl"+ resEnum[fields.name].substring(7,11) + ".jsonld";
+                        console.log("Vocabulary url : ", vocabularyURL);
+                        got(vocabularyURL)
+                            .then(response => parseVocabulary(response.body, [], vocabularyURL, false, returnValue))
+                            .catch(error => console.log(error.response.body));
+                }, 500);
+            }, () => {
+                app.modelExplorer.rebuild();
+                app.dialogs.showInfoDialog(importedUrlOrFilename + constant.msg_import_success);
+                vDialog.close();
+            });
+
+
+        }, 500);            });
+
+
+
+
+}
+
+
 function parseContextFile(contextFile, contextURL) {
     var content = JSON.parse(contextFile);
     var vocab = content["@context"]["@vocab"];
@@ -96,7 +127,7 @@ function parseContextFile(contextFile, contextURL) {
         .catch(error => console.log(error.response.body));
 }
 
-function parseVocabulary(vocabulary, context, importedUrl) {
+function parseVocabulary(vocabulary, context, importedUrl, showPicker = true, returnValue) {
     let vocabularyContent = JSON.parse(vocabulary);
     let contextItems = [];
     for(let contextItem in context){
@@ -116,50 +147,64 @@ function parseVocabulary(vocabulary, context, importedUrl) {
         }
     });
     console.log(contextualisedVocabulary.length);
-    processVocabularyData(importedUrl, contextualisedVocabulary);
+    if(showPicker){
+        showPickerDialog(importedUrl, contextualisedVocabulary,processVocabularyData);
+    } else {
+        processVocabularyData(importedUrl, contextualisedVocabulary, returnValue)
+    }
+
 }
 
-function processVocabularyData(importedUrlOrFilename, vocabulary) {
-    let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, [], true);
-    setTimeout(() => {
+function showPickerDialog(importedUrlOrFilename, vocabulary, callback){
+    app.elementPickerDialog
+        .showDialog(constant.DIALOG_MSG_PICKER_DIALOG_VOCABULARY, null, null) /* type.UMLPackage */
+        .then(function ({
+                            buttonId,
+                            returnValue
+                        }) {
+                if (buttonId === "ok") {
+                    if(returnValue == null){
+                        app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE_VOCABULARY);
+                        return;
+                    }
+                    let varSel = returnValue.getClassName();
+                    let eleTypeStr = '';
+                    if (varSel != type.UMLPackage.name) {
+                        app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE_VOCABULARY);
+                        return;
+                    }
+                    let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, [], true);
+                    setTimeout(() => {
+                    callback(importedUrlOrFilename, vocabulary, returnValue, true);
+                        app.modelExplorer.rebuild();
+                        app.dialogs.showInfoDialog(importedUrlOrFilename + constant.msg_import_success);
+                        vDialog.close();
 
+                    }, 5);
+                }
+            }
+        );
+}
 
+function processVocabularyData(importedUrlOrFilename, vocabulary, returnValue) {
         /* Adding Status Code Enum */
         if (!isStatusCodeAvail()) {
             addStatusCodeEnum();
-        }/* else {
-            addtatusCodeIfNotExist(dataTypesContent);
-        }*/
-
+        }
         /* Adding / Updating Data Type Package */
         if (!isDatatypePkgAvail()) {
             addDataTypePackage();
-        } /*else {
-            updateDataTypePackage(dataTypesContent);
-        }*/
-
-
+        }
         let statusCodes = app.repository.select(constant.status_code_enum_name)[0];
         statusCodes = statusCodes.literals;
-        /*let statusCodes = [];*/
-        let dataTypes = app.repository.select('::@UMLDataType');
-
-        /* Updating Context -> Class, Properties */
-        updateContextFromVocabulary(statusCodes, dataTypes, vocabulary);
-
-        app.modelExplorer.rebuild();
-
-        app.dialogs.showInfoDialog(importedUrlOrFilename + constant.msg_import_success);
-
-        vDialog.close();
-
-    }, 5);
+        updateContextFromVocabulary(statusCodes, vocabulary, returnValue.name);
 }
 
 
 function importFromVocabularyURL() {
     app.dialogs.showInputDialog("Enter JSON-LD vocabulary URL").then(function ({buttonId, returnValue: vocabularyURL}) {
         if (buttonId === 'ok') {
+            /*vocabularyURL = 'https://schema.org/version/latest/schemaorg-current-http.jsonld';*/
             console.log("Vocabulary url : ", vocabularyURL);
             got(vocabularyURL)
                 .then(response => parseVocabulary(response.body, [], vocabularyURL))
@@ -187,7 +232,8 @@ function importFromVocabulary() {
     /*let dataTypesContent = content.dataTypes;*/
 
     let fileName = path.basename(filePath);
-    processVocabularyData(fileName, content['@graph']);
+
+    showPickerDialog(fileName, content['@graph'], processVocabularyData);
 }
 
 /**
@@ -198,9 +244,11 @@ function importFromVocabulary() {
  * @param {Array} dataTypes
  * @param {Array} statusCodes
  */
-function updatingPropertiesFromVocabulary(mClass, properties, dataTypes, statusCodes) {
+function updatingPropertiesFromVocabulary(mClass, properties, statusCodes, valPackageName) {
+    let schemaNameSpace = 'schema:';
     let mClassProperties = mClass.attributes;
-    if (properties != null && properties.length > 0) {
+    let dataTypes = app.repository.select('::@UMLDataType')
+    if (properties != null &&   properties.length > 0) {
         let newCreateProperties = [];
         forEach(properties, property => {
             let cProp = mClassProperties.filter(cProp => {
@@ -210,8 +258,13 @@ function updatingPropertiesFromVocabulary(mClass, properties, dataTypes, statusC
                 cProp = cProp[0];
                 updateProperty(cProp, property, dataTypes, statusCodes);
             } else {
-                let dataType = property["schema:rangeIncludes"];
-                if(dataType.startsWith("xsd:")) {
+                let dataType = property[schemaNameSpace+"rangeIncludes"];
+                if(dataType instanceof Array)
+                    dataType = dataType[0];
+                if (dataType instanceof Object && dataType.hasOwnProperty("@id")){
+                    dataType = dataType["@id"];
+                }
+                if(dataType.startsWith("xsd:") || dataType.startsWith(schemaNameSpace)  || stripPrefix(dataType).startsWith("UNECE")) {
                     console.log("Need to create property", stripPrefix(property["@id"]));
                     let createProperty = {};
                     createProperty[fields._type] = 'UMLAttribute';
@@ -237,14 +290,22 @@ function updatingPropertiesFromVocabulary(mClass, properties, dataTypes, statusC
 
         if (newCreateProperties.length > 0) {
             forEach(newCreateProperties, cProp => {
-                let dataType = cProp.propContent["schema:rangeIncludes"];
-                if(dataType.startsWith("xsd:")) {
+                let dataType = cProp.propContent[schemaNameSpace+"rangeIncludes"];
+                if (dataType instanceof Object && dataType.hasOwnProperty("@id")){
+                    dataType = dataType["@id"];
+                } else if (dataType instanceof Array){
+                    //TODO: decide how to deal with it
+                    if (dataType[0] instanceof Object && dataType[0].hasOwnProperty("@id")){
+                        dataType = dataType[0]["@id"];
+                    }
+                }
+                if(dataType.startsWith("xsd:") || dataType.startsWith(schemaNameSpace) || stripPrefix(dataType).startsWith("UNECE")) {
                     app.engine.addItem(mClass, fields.attributes, cProp.propAttrib);
                     updateProperty(cProp.propAttrib, cProp.propContent, dataTypes, statusCodes);
                 } else {
                     console.log("Need to create : composition : ", dataType);
 
-                    let newCreated = createRelationshipFromVocabulary(cProp.propContent, mClass);
+                    let newCreated = createRelationshipFromVocabulary(cProp.propContent, mClass, valPackageName);
                     /*updateCompositeRelationship(cProp.propContent, newCreated, statusCodes);*/
                 }
             });
@@ -368,10 +429,19 @@ function updateProp(cProp, entityProp, dataTypes, statusCodes) {
  */
 function updateProperty(cProp, property, dataTypes, statusCodes) {
     /* Updating datatype */
+    let schemaNameSpace = 'schema:';
+    let dataType = property[schemaNameSpace+"rangeIncludes"];
 
-    let dataType = property["schema:rangeIncludes"];
+    if(dataType.hasOwnProperty("@id")){
+        dataType = stripPrefix(dataType["@id"]);
+    } else {
+        dataType = stripPrefix(dataType[0]["@id"]);
+    }
+    
+if(dataType.startsWith("UNECE")){
 
-    if(property["@id"].endsWith("Text")){
+}
+    else if(property["@id"].endsWith("Text")){
         dataType = "Text"
     } else if(property["@id"].endsWith("Amount")){
         dataType = "Amount"
@@ -484,19 +554,20 @@ function updateMultiplicity(cProp, entityProp) {
  * @param {Array} dataTypes
  * @param {Object} content
  */
-function updateContextFromVocabulary(statusCodes, dataTypes, graph) {
+function updateContextFromVocabulary(statusCodes, graph, valPackageName) {
+    let schemaNameSpace = 'schema:';
     //let graph = content['@graph'];
     let existingPackages = [];
     /**
      * check if all packages(resources) exist in the project
      * create ones which are missing
      */
-    let existingPackage = app.repository.select("::@UMLPackage[name=" + "Vocabulary" + "]");
+    let existingPackage = app.repository.select("::@UMLPackage[name=" + valPackageName + "]");
     if (existingPackage.length === 0) {
-        console.log("Package to create ", "Vocabulary");
+        console.log("Package to create ", valPackageName);
         let createPackage = {};
         createPackage[fields._type] = 'UMLPackage';
-        createPackage[fields.name] = "Vocabulary";
+        createPackage[fields.name] = valPackageName;
         createPackage[fields._parent] = {
             '$ref': app.project.getProject()._id
         };
@@ -510,15 +581,32 @@ function updateContextFromVocabulary(statusCodes, dataTypes, graph) {
         existingPackages.push(existingPackage[0]);
     }
 
+    let unecePackage = app.repository.select("::@UMLPackage[name=" + "UNECE" + "]");
+    if (unecePackage.length === 0) {
+        console.log("Package to create ", "UNECE");
+        let createPackage = {};
+        createPackage[fields._type] = 'UMLPackage';
+        createPackage[fields.name] = "UNECE";
+        createPackage[fields._parent] = {
+            '$ref': app.project.getProject()._id
+        };
+        let newPackage = app.repository.readObject(createPackage);
+        existingPackages.push(newPackage);
+        app.engine.addItem(app.project.getProject(), 'ownedElements', newPackage);
+    }
+
     let classesFromPackage = [];
+    let enumerationsFromUNECEPackage = [];
     let newCreatedClasses = [];
+    let dataTypesContent = [];
     let resourcePackages = existingPackages.filter(res => {
-        return res.name == "Vocabulary";
+        return res.name == valPackageName;
     });
 
     if (resourcePackages.length != 0) {
         let rPackage = resourcePackages[0];
         classesFromPackage = app.repository.select(rPackage.name + "::@UMLClass");
+        enumerationsFromUNECEPackage = app.repository.select("UNECE::@UMLEnumeration");
         forEach(graph, item => {
             if (item.hasOwnProperty("@type") && item["@type"] == "rdfs:Class") {
                 let resClass = classesFromPackage.filter(mClass => {
@@ -529,13 +617,13 @@ function updateContextFromVocabulary(statusCodes, dataTypes, graph) {
                     console.log("---------------Classes to update : " + mClass.name);
 
                     let properties = graph.filter(property => {
-                        let domainIncludes = property["schema:domainIncludes"];
+                        let domainIncludes = property[schemaNameSpace+"domainIncludes"];
                         if (domainIncludes instanceof Array){
-                            return property["schema:domainIncludes"].includes(newClass.name);
+                            return property[schemaNameSpace+"domainIncludes"].includes(mClass.name);
                         }
-                        else return property["schema:domainIncludes"] == newClass.name;
+                        else return property[schemaNameSpace+"domainIncludes"] == mClass.name;
                     });
-                    updatingPropertiesFromVocabulary(mClass, properties, dataTypes, statusCodes);
+                     updatingPropertiesFromVocabulary(mClass, properties, statusCodes, valPackageName);
                     /*
                     updatingProperties(mClass, entity, dataTypes, statusCodes);
                     if (entity.hasOwnProperty(fields.tags)) {
@@ -544,24 +632,62 @@ function updateContextFromVocabulary(statusCodes, dataTypes, graph) {
                     */
 
                 } else {
-                    console.log("Class to create ", stripPrefix(item["@id"]));
                     let createClass = {};
-                    createClass[fields._type] = 'UMLClass';
-                    createClass[fields.name] = stripPrefix(item["@id"]);
-                    createClass[fields.documentation] = getStringIfArray(item["rdfs:comment"]);
-                    createClass[fields._parent] = {
-                        '$ref': rPackage._id
-                    };
-                    let newClass = app.repository.readObject(createClass);
-                    newCreatedClasses.push(newClass);
+                    if(stripPrefix(item["@id"]).startsWith("UNECE")){
+                        let project = app.project.getProject();
+                        let literals = [];
+                        let codeList ={};
+                        codeList[fields.name] = stripPrefix(item["@id"]);
+                        codeList[fields.description] = getStringIfArray(item["rdfs:comment"]);
+                        createEnumeration(codeList, unecePackage[0], literals);
+
+                    } else {
+                        createClass[fields._type] = 'UMLClass';
+                        if(item.hasOwnProperty("rdfs:label")){
+                            createClass[fields.name] = item["rdfs:label"];
+                        } else {
+                            createClass[fields.name] = stripPrefix(item["@id"]);
+                        }
+
+
+                        createClass[fields.documentation] = getStringIfArray(item["rdfs:comment"]);
+                        createClass[fields._parent] = {
+                            '$ref': rPackage._id
+                        };
+
+                        console.log("Class to create ", createClass[fields.name]);
+
+                        let newClass = app.repository.readObject(createClass);
+                        newCreatedClasses.push(newClass);
+                    }
                 }
             }
+            if (item.hasOwnProperty("@type") && item["@type"] != "rdfs:Class" && item["@type"] != "rdf:Property"){
+                let resEnum = enumerationsFromUNECEPackage.filter(mEnum => {
+                    return mEnum.name == stripPrefix(item["@type"]);
+                });
+                if(resEnum[0] != undefined) {
+
+
+                    let code = {};
+                    code[fields.name] = stripPrefix(item["@id"]);
+                    code[fields.description] = getStringIfArray(item["rdfs:comment"])
+                    createLiteral(code, resEnum[0]);
+                }
+
+            }
         });
+
+        createDataType(dataTypesContent, rPackage);
 
         if (newCreatedClasses.length > 0) {
             forEach(newCreatedClasses, newClass => {
                 let resEntities = graph.filter(mEntity => {
-                    return stripPrefix(mEntity["@id"]) == newClass.name;
+                    if(mEntity.hasOwnProperty("rdfs:label")){
+                        return mEntity["rdfs:label"] == newClass.name;
+                    } else {
+                        return stripPrefix(mEntity["@id"]) == newClass.name;
+                    }
                 });
                 if (resEntities.length != 0) {
                     console.log("---------------newClass.name : " + newClass.name);
@@ -570,39 +696,65 @@ function updateContextFromVocabulary(statusCodes, dataTypes, graph) {
                 }
             });
             forEach(newCreatedClasses, newClass => {
-                let resEntities = graph.filter(mEntity => {
-                    return stripPrefix(mEntity["@id"]) == newClass.name;
-                });
-                if (resEntities.length != 0) {
-                    let properties = graph.filter(property => {
-                        if (property.hasOwnProperty("@type") && property["@type"] != "rdfs:Property") {
-                            return false;
-                        }
-                        let domainIncludes = property["schema:domainIncludes"];
-                        if (domainIncludes instanceof Array){
-                            let strippedDomainIncludes = [];
-                            forEach(domainIncludes, domain => {
-                                strippedDomainIncludes.push(stripPrefix(domain));
-                            })
-                            return strippedDomainIncludes.includes(newClass.name);
-                        }
-                        else {
-                            let strippedDomainIncludes = "";
-                            if(property["schema:domainIncludes"] != undefined){
-                                strippedDomainIncludes = stripPrefix(property["schema:domainIncludes"]);
-                            }else {
-                                console.log("schema:domainIncludes is undefined "+ property)
-                            }
-                            return strippedDomainIncludes == newClass.name;
-                        }
-                    });
-                    console.log("---------------Properties size : " + properties.length);
-                    updatingPropertiesFromVocabulary(newClass, properties, dataTypes, statusCodes);
-                }
+                let properties = getPropertiesOfClass(graph, newClass.name, schemaNameSpace, valPackageName);
+                console.log("---------------Properties size : " + properties.length);
+                updatingPropertiesFromVocabulary(newClass, properties, statusCodes, valPackageName);
             });
         }
     }
+}
 
+function getPropertiesOfClass(graph, className, schemaNameSpace, valPackageName) {
+    let result = [];
+    let resEntities = graph.filter(mEntity => {
+        if(mEntity.hasOwnProperty("rdfs:label")){
+            return mEntity["rdfs:label"] == className;
+        } else {
+            return stripPrefix(mEntity["@id"]) == className;
+        }
+    });
+    if (resEntities.length == 0) {
+        console.log("Class " + className + " wasn't found");
+        return result;
+    }
+    result = graph.filter(property => {
+        if (property.hasOwnProperty("@type") && property["@type"] != "rdf:Property") {
+            return false;
+        }
+        let domainIncludes = property[schemaNameSpace+"domainIncludes"];
+        if (domainIncludes instanceof Array){
+            let strippedDomainIncludes = [];
+            forEach(domainIncludes, domain => {
+                if(domain.hasOwnProperty("@id")){
+                    strippedDomainIncludes.push(stripPrefix(domain["@id"]));
+                } else {
+                    strippedDomainIncludes.push(stripPrefix(domain));
+                }
+            })
+            return strippedDomainIncludes.includes(className);
+        }
+        else {
+            let strippedDomainIncludes = "";
+            if(property[schemaNameSpace+"domainIncludes"] != undefined){
+                if(property[schemaNameSpace+"domainIncludes"].hasOwnProperty("@id")) {
+                    strippedDomainIncludes = stripPrefix(property[schemaNameSpace + "domainIncludes"]["@id"]);
+                } else {
+                    strippedDomainIncludes = stripPrefix(property[schemaNameSpace+"domainIncludes"]);
+                }
+            } else {
+                console.log(schemaNameSpace+"domainIncludes is undefined "+ property)
+            }
+            return strippedDomainIncludes == className;
+        }
+    })
+
+    let parents = readValues(resEntities[0],"rdfs:subClassOf");
+    forEach(parents, parent => {
+        console.log(parent);
+        /*result = result.concat(getPropertiesOfClass(graph, stripPrefix(parent, schemaNameSpace), schemaNameSpace));*/
+        createGeneralisationFromVocabulary(stripPrefix(parent), className, valPackageName)
+    });
+    return result;
 }
 
 
@@ -612,13 +764,22 @@ function updateContextFromVocabulary(statusCodes, dataTypes, graph) {
  * @param {Object} eRelationship
  * @param {Object} mClass
  */
-function createRelationshipFromVocabulary(eRelationship, mClass) {
+function createRelationshipFromVocabulary(eRelationship, mClass, valPackageName) {
+    let schemaNameSpace = 'schema:';
     let sourceClass = null,
         targetClass = null;
-    let resourceName = stripPrefix(eRelationship["schema:rangeIncludes"]);
+
+    let resourceName = null;
+    let rangeIncludes = eRelationship[schemaNameSpace+"rangeIncludes"];
+    if(rangeIncludes.hasOwnProperty("@id")){
+        resourceName = stripPrefix(rangeIncludes["@id"]);
+    } else {
+        //TODO: we need to figure out how to support multiple ranges - rare case but still possible
+        resourceName = stripPrefix(rangeIncludes[0]["@id"]);
+    }
 
     sourceClass = mClass;
-    targetClass = app.repository.select("@UMLPackage[name=" + "Vocabulary" + "]::@UMLClass[name=" + resourceName + "]");
+    targetClass = app.repository.select("@UMLPackage[name=" + valPackageName + "]::@UMLClass[name=" + resourceName + "]");
     if (targetClass.length != 0) {
         targetClass = targetClass[0];
     } else {
@@ -676,6 +837,43 @@ function createRelationshipFromVocabulary(eRelationship, mClass) {
         app.engine.addItem(sourceClass, fields.ownedElements, createNewComposition);
 
         return createNewComposition;
+    }
+}
+
+function createGeneralisationFromVocabulary(targetClassName, sourceClassName, valPackageName) {
+    let targetClass, sourceClass;
+
+    sourceClass = app.repository.select("@UMLPackage[name=" + valPackageName + "]::@UMLClass[name=" + sourceClassName + "]");
+    targetClass = app.repository.select("@UMLPackage[name=" + valPackageName + "]::@UMLClass[name=" + targetClassName + "]");
+    if (targetClass.length != 0) {
+        targetClass = targetClass[0];
+    } else {
+        targetClass = null;
+    }
+
+    if (sourceClass.length != 0) {
+        sourceClass = sourceClass[0];
+    } else {
+        sourceClass = null;
+    }
+    if (sourceClass != null && targetClass != null) {
+        let createNewGeneralisation = {};
+        createNewGeneralisation[fields._type] = 'UMLGeneralization';
+        createNewGeneralisation[fields._parent] = {
+            '$ref': targetClass._id
+        };
+        createNewGeneralisation[fields.source] = {
+            '$ref': sourceClass._id
+        };
+        createNewGeneralisation[fields.target] = {
+            '$ref': targetClass._id
+        };
+
+        createNewGeneralisation = app.repository.readObject(createNewGeneralisation);
+        createNewGeneralisation = JSON.parse(app.repository.writeObject(createNewGeneralisation));
+        app.engine.addItem(sourceClass, fields.ownedElements, createNewGeneralisation);
+
+        return createNewGeneralisation;
     }
 }
 
@@ -757,6 +955,7 @@ function createEnumeration(codeList, parentObj, literals) {
     let enumerationObj = {};
     enumerationObj[fields._type] = 'UMLEnumeration';
     enumerationObj[fields.name] = codeList.name;
+    enumerationObj[fields.documentation] = codeList.description;
     enumerationObj[fields.ownedElements] = [];
     enumerationObj[fields._parent] = {
         '$ref': parentObj._id
@@ -796,6 +995,7 @@ function createLiteral(code, parentObj) {
     let literalObj = {};
     literalObj[fields._type] = 'UMLEnumerationLiteral';
     literalObj[fields.name] = code.name;
+    literalObj[fields.documentation] = code.description;
     literalObj[fields._parent] = {
         '$ref': parentObj._id
     }
@@ -1061,10 +1261,10 @@ function createTag(tag, parentObj) {
 
 }
 
-function stripPrefix(idString) {
-    let startIndex = idString.indexOf(":");
+function stripPrefix(idString, prefix=":") {
+    let startIndex = idString.indexOf(prefix);
     if (startIndex!=-1){
-        return idString.substring(startIndex+1);
+        return idString.substring(startIndex+prefix.length);
     } else
         return idString;
 }
@@ -1079,7 +1279,31 @@ function getStringIfArray(obj) {
     else result = obj;
     return result;
 }
+
+function readValues(jsonldObject, propertyName){
+    let result = [];
+    if(jsonldObject.hasOwnProperty(propertyName)){
+        let propertyValueObject = jsonldObject[propertyName];
+        let items = [];
+        if(propertyValueObject instanceof Array){
+            items = propertyValueObject;
+        } else {
+            items.push(propertyValueObject);
+        }
+        forEach(items, item => {
+            if(item instanceof String){
+                result.push(item);
+            } else if(item instanceof Object && item.hasOwnProperty("@id")){
+                result.push(item["@id"])
+            } else {
+                console.error("Unexpected value. Supported valued - String or Object with @id property")
+            }
+        });
+    }
+    return result;
+}
 module.exports.importFromVocabulary = importFromVocabulary;
 module.exports.importFromVocabularyURL = importFromVocabularyURL;
 module.exports.importFromContext = importFromContext;
 module.exports.importFromContextURL = importFromContextURL;
+module.exports.initUNCLEnumerations = initUNCLEnumerations;

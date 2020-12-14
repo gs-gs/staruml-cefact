@@ -17,7 +17,7 @@
                          "id": "tools.openapi.testallextension",
                          "command": "openapi:test-entire-package"
                     }, {
-                         "label": "Extension version : 0.5.0-rc2",
+                         "label": "Extension version : 0.6.0-rc1",
                          "id": "tools.openapi.version",
                          "command": "generate:show-version-dialog"
                     }, {
@@ -45,10 +45,6 @@
                           "label": "Import remotely stored Context",
                           "id": "tools.jsold.import-context-url",
                           "command": "jsonld:import-context-url"
-                        },{
-                         "label": "Generate",
-                         "id": "tools.jsold.generate",
-                         "command": "jsonld:generate"
                         }
                     ]
                }
