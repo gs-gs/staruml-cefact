@@ -102,9 +102,9 @@ const Constant = {
      },
 
      datatype_pkg_name:'Core Data Types',
-     title_import_mi_1: "Please wait untill model interchange is being processed for the \'",
-     title_import_mi_2: "\' package",
-     title_import_mi: "Model Interchange",
+     title_import_mi_1: "Please wait until vocabulary is being processed for the \'",
+     title_import_mi_2: "\' file",
+     title_import_mi: "JSON-LD vocabulary",
      title_import_mi_commit_history: "Model Interchange - Commit History",
      title_import_mi_commit_diff: "Model Interchange - Diff",
      title_import_mi_commit_status: "Model Interchange - Status",

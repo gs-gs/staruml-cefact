@@ -90,7 +90,7 @@ function initUNCLEnumerations() {
         return mEnum.name.startsWith("UNECE");
     });
     showPickerDialog("UNCL", null,(importedUrlOrFilename, vocabulary, returnValue) => {
-        let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, [], true);
+        let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, constant.title_import_mi_2, [], true);
         setTimeout(() => {
             forEach(resEnums, resEnum =>
             {
@@ -173,7 +173,7 @@ function showPickerDialog(importedUrlOrFilename, vocabulary, callback){
                         app.dialogs.showErrorDialog(constant.DIALOG_MSG_ERROR_SELECT_PACKAGE_VOCABULARY);
                         return;
                     }
-                    let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, [], true);
+                    let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, constant.title_import_mi_2, [], true);
                     setTimeout(() => {
                     callback(importedUrlOrFilename, vocabulary, returnValue, true);
                         app.modelExplorer.rebuild();
@@ -593,6 +593,7 @@ function updateContextFromVocabulary(statusCodes, graph, valPackageName) {
         let newPackage = app.repository.readObject(createPackage);
         existingPackages.push(newPackage);
         app.engine.addItem(app.project.getProject(), 'ownedElements', newPackage);
+        unecePackage = app.repository.select("::@UMLPackage[name=" + "UNECE" + "]");
     }
 
     let classesFromPackage = [];
