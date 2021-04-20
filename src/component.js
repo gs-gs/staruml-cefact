@@ -279,7 +279,7 @@ class Component {
                if (this.mainSchemaObj[utils.upperCamelCase(objEnumeration.name)] == null) {
 
                     enumerationObj.enum = utils.getEnumerationLiteral(objEnumeration);
-                    enumerationObj.description = enumerationObj.documentation ? utils.buildDescription(enumerationObj.documentation) : constant.STR_MISSING_DESCRIPTION;
+                    enumerationObj.description = objEnumeration.documentation ? utils.buildDescription(objEnumeration.documentation) : constant.STR_MISSING_DESCRIPTION;
                     enumerationObj.type = 'string';
                     if (enumerationObj.enum.length == 0) {
                          /**

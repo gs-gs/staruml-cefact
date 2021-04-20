@@ -87,7 +87,7 @@ function importFromContextURL() {
 function initUNCLEnumerations() {
     let enumerationsFromProject = app.repository.select("@UMLEnumeration");
     let resEnums = enumerationsFromProject.filter(mEnum => {
-        return mEnum.name.startsWith("UNECE");
+        return mEnum.name.startsWith("UNCL");
     });
     showPickerDialog("UNCL", null,(importedUrlOrFilename, vocabulary, returnValue) => {
         let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, constant.title_import_mi_2, [], true);
@@ -264,7 +264,7 @@ function updatingPropertiesFromVocabulary(mClass, properties, statusCodes, valPa
                 if (dataType instanceof Object && dataType.hasOwnProperty("@id")){
                     dataType = dataType["@id"];
                 }
-                if(dataType.startsWith("xsd:") || dataType.startsWith(schemaNameSpace)  || stripPrefix(dataType).startsWith("UNECE")) {
+                if(dataType.startsWith("xsd:") || dataType.startsWith(schemaNameSpace)  || stripPrefix(dataType).startsWith("UNCL")) {
                     console.log("Need to create property", stripPrefix(property["@id"]));
                     let createProperty = {};
                     createProperty[fields._type] = 'UMLAttribute';
@@ -299,7 +299,7 @@ function updatingPropertiesFromVocabulary(mClass, properties, statusCodes, valPa
                         dataType = dataType[0]["@id"];
                     }
                 }
-                if(dataType.startsWith("xsd:") || dataType.startsWith(schemaNameSpace) || stripPrefix(dataType).startsWith("UNECE")) {
+                if(dataType.startsWith("xsd:") || dataType.startsWith(schemaNameSpace) || stripPrefix(dataType).startsWith("UNCL")) {
                     app.engine.addItem(mClass, fields.attributes, cProp.propAttrib);
                     updateProperty(cProp.propAttrib, cProp.propContent, dataTypes, statusCodes);
                 } else {
@@ -438,7 +438,7 @@ function updateProperty(cProp, property, dataTypes, statusCodes) {
         dataType = stripPrefix(dataType[0]["@id"]);
     }
     
-if(dataType.startsWith("UNECE")){
+if(dataType.startsWith("UNCL")){
 
 }
     else if(property["@id"].endsWith("Text")){
@@ -581,23 +581,23 @@ function updateContextFromVocabulary(statusCodes, graph, valPackageName) {
         existingPackages.push(existingPackage[0]);
     }
 
-    let unecePackage = app.repository.select("::@UMLPackage[name=" + "UNECE" + "]");
-    if (unecePackage.length === 0) {
-        console.log("Package to create ", "UNECE");
+    let unclPackage = app.repository.select("::@UMLPackage[name=" + "UNCL" + "]");
+    if (unclPackage.length === 0) {
+        console.log("Package to create ", "UNCL");
         let createPackage = {};
         createPackage[fields._type] = 'UMLPackage';
-        createPackage[fields.name] = "UNECE";
+        createPackage[fields.name] = "UNCL";
         createPackage[fields._parent] = {
             '$ref': app.project.getProject()._id
         };
         let newPackage = app.repository.readObject(createPackage);
         existingPackages.push(newPackage);
         app.engine.addItem(app.project.getProject(), 'ownedElements', newPackage);
-        unecePackage = app.repository.select("::@UMLPackage[name=" + "UNECE" + "]");
+        unclPackage = app.repository.select("::@UMLPackage[name=" + "UNCL" + "]");
     }
 
     let classesFromPackage = [];
-    let enumerationsFromUNECEPackage = [];
+    let enumerationsFromUNCLPackage = [];
     let newCreatedClasses = [];
     let dataTypesContent = [];
     let resourcePackages = existingPackages.filter(res => {
@@ -607,7 +607,7 @@ function updateContextFromVocabulary(statusCodes, graph, valPackageName) {
     if (resourcePackages.length != 0) {
         let rPackage = resourcePackages[0];
         classesFromPackage = app.repository.select(rPackage.name + "::@UMLClass");
-        enumerationsFromUNECEPackage = app.repository.select("UNECE::@UMLEnumeration");
+        enumerationsFromUNCLPackage = app.repository.select("UNCL::@UMLEnumeration");
         forEach(graph, item => {
             if (item.hasOwnProperty("@type") && item["@type"] == "rdfs:Class") {
                 let resClass = classesFromPackage.filter(mClass => {
@@ -634,13 +634,13 @@ function updateContextFromVocabulary(statusCodes, graph, valPackageName) {
 
                 } else {
                     let createClass = {};
-                    if(stripPrefix(item["@id"]).startsWith("UNECE")){
+                    if(stripPrefix(item["@id"]).startsWith("UNCL")){
                         let project = app.project.getProject();
                         let literals = [];
                         let codeList ={};
                         codeList[fields.name] = stripPrefix(item["@id"]);
                         codeList[fields.description] = getStringIfArray(item["rdfs:comment"]);
-                        createEnumeration(codeList, unecePackage[0], literals);
+                        createEnumeration(codeList, unclPackage[0], literals);
 
                     } else {
                         createClass[fields._type] = 'UMLClass';
@@ -664,7 +664,7 @@ function updateContextFromVocabulary(statusCodes, graph, valPackageName) {
                 }
             }
             if (item.hasOwnProperty("@type") && item["@type"] != "rdfs:Class" && item["@type"] != "rdf:Property"){
-                let resEnum = enumerationsFromUNECEPackage.filter(mEnum => {
+                let resEnum = enumerationsFromUNCLPackage.filter(mEnum => {
                     return mEnum.name == stripPrefix(item["@type"]);
                 });
                 if(resEnum[0] != undefined) {
@@ -1115,7 +1115,7 @@ function addDataTypePackage() {
 
     dataType = {};
     dataType.name = "Measure";
-    dataType.documentation = "A measured value with defined UOM from UNECE-Rec-20.";
+    dataType.documentation = "A measured value with defined UOM from UNCL-Rec-20.";
     dataTypesContent.push(dataType);
 
     dataType = {};

@@ -485,6 +485,60 @@ function initJsonRuleType() {
      }, {
           key: 'Quantity',
           type: 'integer'
+     }, {
+          key: 'Amount',
+          type: 'string'
+     }, {
+          key: 'BinaryObject',
+          type: 'string'
+     }, {
+          key: 'Date',
+          type: 'string'
+     }, {
+          key: 'DateTime',
+          type: 'string'
+     }, {
+          key: 'Graphic',
+          type: 'string'
+     }, {
+          key: 'Identifier',
+          type: 'string'
+     }, {
+          key: 'Id',
+          type: 'string'
+     }, {
+          key: 'Measure',
+          type: 'string'
+     }, {
+          key: 'Numeric',
+          type: 'string'
+     }, {
+          key: 'Percent',
+          type: 'string'
+     }, {
+          key: 'Picture',
+          type: 'string'
+     }, {
+          key: 'Quantity',
+          type: 'string'
+     }, {
+          key: 'Rate',
+          type: 'string'
+     }, {
+          key: 'Sound',
+          type: 'string'
+     }, {
+          key: 'Time',
+          type: 'string'
+     }, {
+          key: 'Type',
+          type: 'string'
+     }, {
+          key: 'Value',
+          type: 'string'
+     }, {
+          key: 'Video',
+          type: 'string'
      }];
 }
 /**
