@@ -85,32 +85,22 @@ function importFromContextURL() {
 }
 
 function initUNCLEnumerations() {
+    let unclPackage = app.repository.select("::@UMLPackage[name=" + "UNCL" + "]")[0];
+    //TODO: add filter by package UNCL
     let enumerationsFromProject = app.repository.select("@UMLEnumeration");
     let resEnums = enumerationsFromProject.filter(mEnum => {
         return mEnum.name.startsWith("UNCL");
     });
-    showPickerDialog("UNCL", null,(importedUrlOrFilename, vocabulary, returnValue) => {
-        let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, constant.title_import_mi_2, [], true);
-        setTimeout(() => {
-            forEach(resEnums, resEnum =>
-            {
-                setTimeout(function() {
-                        let vocabularyURL = "https://edi3.org/vocabulary/uncl"+ resEnum[fields.name].substring(7,11) + ".jsonld";
-                        console.log("Vocabulary url : ", vocabularyURL);
-                        got(vocabularyURL)
-                            .then(response => parseVocabulary(response.body, [], vocabularyURL, false, returnValue))
-                            .catch(error => console.log(error.response.body));
-                }, 500);
-            }, () => {
-                app.modelExplorer.rebuild();
-                app.dialogs.showInfoDialog(importedUrlOrFilename + constant.msg_import_success);
-                vDialog.close();
-            });
-
-
-        }, 500);            });
-
-
+    var dlg = app.elementListPickerDialog.showDialog("Select UN/EDIFACT Code List:", resEnums).then(function ({buttonId, returnValue}) {
+        if (buttonId === 'ok') {
+            console.log("You selected: ", returnValue)
+            let vocabularyURL = "https://service.unece.org/trade/uncefact/vocabulary/uncl"+ returnValue.name.substring(4,8) + ".jsonld";
+            console.log("Vocabulary url: ", vocabularyURL);
+            got(vocabularyURL)
+                .then(response => parseVocabulary(response.body, [], vocabularyURL, false, unclPackage))
+                .catch(error => console.log(error.response.body));
+        }
+    })
 
 
 }
@@ -127,7 +117,7 @@ function parseContextFile(contextFile, contextURL) {
         .catch(error => console.log(error.response.body));
 }
 
-function parseVocabulary(vocabulary, context, importedUrl, showPicker = true, returnValue) {
+function parseVocabulary(vocabulary, context, importedUrl, showPicker = true,  returnValue) {
     let vocabularyContent = JSON.parse(vocabulary);
     let contextItems = [];
     for(let contextItem in context){
@@ -150,7 +140,14 @@ function parseVocabulary(vocabulary, context, importedUrl, showPicker = true, re
     if(showPicker){
         showPickerDialog(importedUrl, contextualisedVocabulary,processVocabularyData);
     } else {
-        processVocabularyData(importedUrl, contextualisedVocabulary, returnValue)
+        let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrl, constant.title_import_mi_2, [], true);
+        setTimeout(() => {
+            processVocabularyData(importedUrl, contextualisedVocabulary, returnValue);
+            app.dialogs.showInfoDialog(importedUrl + constant.msg_import_success);
+            vDialog.close();
+
+        }, 5);
+
     }
 
 }
@@ -175,7 +172,7 @@ function showPickerDialog(importedUrlOrFilename, vocabulary, callback){
                     }
                     let vDialog = app.dialogs.showModalDialog("", constant.title_import_mi, constant.title_import_mi_1 + importedUrlOrFilename, constant.title_import_mi_2, [], true);
                     setTimeout(() => {
-                    callback(importedUrlOrFilename, vocabulary, returnValue, true);
+                        callback(importedUrlOrFilename, vocabulary, returnValue, true);
                         app.modelExplorer.rebuild();
                         app.dialogs.showInfoDialog(importedUrlOrFilename + constant.msg_import_success);
                         vDialog.close();
@@ -186,7 +183,7 @@ function showPickerDialog(importedUrlOrFilename, vocabulary, callback){
         );
 }
 
-function processVocabularyData(importedUrlOrFilename, vocabulary, returnValue) {
+function processVocabularyData(importedUrlOrFilename, vocabulary, package) {
         /* Adding Status Code Enum */
         if (!isStatusCodeAvail()) {
             addStatusCodeEnum();
@@ -197,14 +194,13 @@ function processVocabularyData(importedUrlOrFilename, vocabulary, returnValue) {
         }
         let statusCodes = app.repository.select(constant.status_code_enum_name)[0];
         statusCodes = statusCodes.literals;
-        updateContextFromVocabulary(statusCodes, vocabulary, returnValue.name);
+        updateContextFromVocabulary(statusCodes, vocabulary, package.name);
 }
 
 
 function importFromVocabularyURL() {
     app.dialogs.showInputDialog("Enter JSON-LD vocabulary URL").then(function ({buttonId, returnValue: vocabularyURL}) {
         if (buttonId === 'ok') {
-            /*vocabularyURL = 'https://schema.org/version/latest/schemaorg-current-http.jsonld';*/
             console.log("Vocabulary url : ", vocabularyURL);
             got(vocabularyURL)
                 .then(response => parseVocabulary(response.body, [], vocabularyURL))
@@ -215,6 +211,27 @@ function importFromVocabularyURL() {
     });
 }
 
+function importUNCEFACT() {
+    app.dialogs.showConfirmDialog("You are about to import UN/CEFACT JSON-LD Vocabulary, the import script will create packages, classes and enumerations in your project in your project. The import process may take a while.");
+    let uncefactlPackage = app.repository.select("::@UMLPackage[name=" + "UN/CEFACT" + "]");
+    if (uncefactlPackage.length === 0) {
+        console.log("Package to create ", "UN/CEFACT");
+        let createPackage = {};
+        createPackage[fields._type] = 'UMLPackage';
+        createPackage[fields.name] = "UN/CEFACT";
+        createPackage[fields._parent] = {
+            '$ref': app.project.getProject()._id
+        };
+        let newPackage = app.repository.readObject(createPackage);
+        app.engine.addItem(app.project.getProject(), 'ownedElements', newPackage);
+        uncefactlPackage = app.repository.select("::@UMLPackage[name=" + "UN/CEFACT" + "]");
+    }
+    vocabularyURL = 'https://service.unece.org/trade/uncefact/vocabulary/uncefact.jsonld';
+    console.log("Vocabulary url : ", vocabularyURL);
+    got(vocabularyURL)
+        .then(response => parseVocabulary(response.body, [], vocabularyURL,false,uncefactlPackage))
+        .catch(error => console.log(error.response.body));
+}
 
 /**
  * @function importFromVocabulary
@@ -1307,4 +1324,5 @@ module.exports.importFromVocabulary = importFromVocabulary;
 module.exports.importFromVocabularyURL = importFromVocabularyURL;
 module.exports.importFromContext = importFromContext;
 module.exports.importFromContextURL = importFromContextURL;
+module.exports.importUNCEFACT = importUNCEFACT;
 module.exports.initUNCLEnumerations = initUNCLEnumerations;

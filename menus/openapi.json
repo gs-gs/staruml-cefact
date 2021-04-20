@@ -17,7 +17,7 @@
                          "id": "tools.openapi.testallextension",
                          "command": "openapi:test-entire-package"
                     }, {
-                         "label": "Extension version : 0.7.0-rc1",
+                         "label": "Extension version : 0.7.0-rc2",
                          "id": "tools.openapi.version",
                          "command": "generate:show-version-dialog"
                     }, {
@@ -27,7 +27,7 @@
                     }]
                },
                {
-                    "label": "JSON-LD",
+                    "label": "JSON-LD (v0.7.0-rc2)",
                     "id": "tool.jsonld",
                     "submenu": [{
                           "label": "Import locally stored Vocabulary",
@@ -45,6 +45,20 @@
                           "label": "Import remotely stored Context",
                           "id": "tools.jsold.import-context-url",
                           "command": "jsonld:import-context-url"
+                        },
+                        {
+                            "label": "UN/CEFACT",
+                            "id": "tools.jsold.uncefact",
+                            "submenu": [{
+                                  "label": "1. Import UN/CEFACT Vocabulary",
+                                  "id": "tools.jsold.import-uncefact-vocabulary",
+                                  "command": "jsonld:import-uncefact-vocabulary"
+                                },{
+                                  "label": "2. Init UN/EDIFACT Consolidated Code Lists",
+                                  "id": "tools.jsold.import-uncl",
+                                  "command": "jsonld:import-uncl"
+                                }
+                            ]
                         }
                     ]
                }
