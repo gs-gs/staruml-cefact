@@ -17,7 +17,7 @@
                          "id": "tools.openapi.testallextension",
                          "command": "openapi:test-entire-package"
                     }, {
-                         "label": "Extension version : 0.7.0-rc2",
+                         "label": "Extension version : 0.7.0-rc3",
                          "id": "tools.openapi.version",
                          "command": "generate:show-version-dialog"
                     }, {
@@ -27,7 +27,7 @@
                     }]
                },
                {
-                    "label": "JSON-LD (v0.7.0-rc2)",
+                    "label": "JSON-LD (v0.7.0-rc3)",
                     "id": "tool.jsonld",
                     "submenu": [{
                           "label": "Import locally stored Vocabulary",

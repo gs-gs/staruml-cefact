@@ -229,7 +229,7 @@ function importUNCEFACT() {
     vocabularyURL = 'https://service.unece.org/trade/uncefact/vocabulary/uncefact.jsonld';
     console.log("Vocabulary url : ", vocabularyURL);
     got(vocabularyURL)
-        .then(response => parseVocabulary(response.body, [], vocabularyURL,false,uncefactlPackage))
+        .then(response => parseVocabulary(response.body, [], vocabularyURL,true,uncefactlPackage))
         .catch(error => console.log(error.response.body));
 }
 
