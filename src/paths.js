@@ -372,8 +372,6 @@ class Paths {
      writeInterfaceComposite(interfaceRealization, interfaceAssociation, mainPathsObject) {
           try {
 
-
-
                let end1Interface = interfaceAssociation.end1; //source example : imprtDeclarations
                let end2Interface = interfaceAssociation.end2; //target : CargoLines
 
@@ -387,6 +385,12 @@ class Paths {
                let resUIR = uIR.filter(irealization => {
                     return end2Interface.reference._id == irealization.target._id;
                });
+
+               if (resUIR.length != 1) {
+                    let nonSingleIRMsg = 'The interface "' + end2Interface.reference.name + '" must have a single interface realisation but got ' + resUIR.length + '. Skip generation for this interface.';
+                    app.dialogs.showAlertDialog(nonSingleIRMsg);
+                    return;
+               }
                end2Interface.reference.operations.forEach(objOperation => {
                     /* interfaceRealization.target.operations.forEach(objOperation => { */
                     /* Filter for visible operation Views from diagram elements (Interface) */
@@ -448,14 +452,7 @@ class Paths {
                          let schemaObj = {};
                          appJsonObj.schema = schemaObj;
 
-                         refCName = '';
-                         if (resUIR.length == 1) {
-                              let subResourceClass = resUIR[0].source;
-                              refCName = subResourceClass.name
-                         } else {
-                              /*  This line is optional */
-                              refCName = interfaceRealization.source.name;
-                         }
+                         refCName = resUIR[0].source.name
 
                          let itemsObject = {};
                          schemaObj.items = itemsObject;
@@ -543,14 +540,7 @@ class Paths {
                          let schemaSingleObj = {};
                          appJsonSingleObj.schema = schemaSingleObj;
 
-                         refCName = '';
-                         if (resUIR.length == 1) {
-                              let subResourceClass = resUIR[0].source;
-                              refCName = subResourceClass.name
-                         } else {
-                              /* This line is optional */
-                              refCName = interfaceRealization.source.name;
-                         }
+                         refCName = resUIR[0].source.name
 
                          schemaSingleObj.type = 'object';
                          schemaSingleObj.properties = {};
@@ -573,10 +563,8 @@ class Paths {
                               mainPathsObject[mICPath] = pathsObject;
                          }
 
-                         if (resUIR.length == 1) {
-                              let subResourceClass = resUIR[0].source;
-                              pathsObject.post = this.operations.postForSubResource(interfaceRealization, end1Interface, subResourceClass);
-                         }
+                         let subResourceClass = resUIR[0].source;
+                         pathsObject.post = this.operations.postForSubResource(interfaceRealization, end1Interface, subResourceClass);
 
 
 
@@ -646,12 +634,10 @@ class Paths {
                          let description2 = (end2Interface.reference.attributes[0].documentation ? utils.buildDescription(end2Interface.reference.attributes[0].documentation) : constant.STR_MISSING_DESCRIPTION);
                          utils.buildParameter(name2, "path", description2, true, objSingleSchema, paramsSingleObject);
 
-                         if (resUIR.length == 1) {
-                              let subResourceClass = resUIR[0].source;
-                              let requestBodyObj = {}
-                              wOperationSingleObject.requestBody = requestBodyObj;
-                              utils.buildRequestBodyForSubResource(subResourceClass, requestBodyObj);
-                         }
+                         let subResourceClass = resUIR[0].source;
+                         let requestBodyObj = {}
+                         wOperationSingleObject.requestBody = requestBodyObj;
+                         utils.buildRequestBodyForSubResource(subResourceClass, requestBodyObj);
 
 
                          /* -------- Add response body -------- */
@@ -673,13 +659,8 @@ class Paths {
                          appJsonSingleObj.schema = schemaSingleObj;
 
                          refCName = '';
-                         if (resUIR.length == 1) {
-                              let subResourceClass = resUIR[0].source;
-                              refCName = subResourceClass.name
-                         } else {
-                              /* This line is optional */
-                              refCName = interfaceRealization.source.name;
-                         }
+                         subResourceClass = resUIR[0].source;
+                         refCName = subResourceClass.name
 
                          schemaSingleObj.type = 'object';
                          schemaSingleObj.properties = {};
