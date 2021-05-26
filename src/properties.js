@@ -161,6 +161,10 @@ class Properties {
                          if (attribute.multiplicity === "1..*") {
                               propertiesObj.minItems = 1;
                          }
+
+                         if(attribute.isDerived) {
+                              propertiesObj.readOnly = true;
+                         }
                     } else {
                          /**
                           * If data type is enumeration, build allOf object with a reference to a corresponding schema
@@ -182,6 +186,9 @@ class Properties {
                               });
                               if(result!=null){
                                    propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
+                                   if(attribute.isDerived) {
+                                        propertiesObj.readOnly = true;
+                                   }
                                    utils.addAttributeType(propertiesObj, attribute);
                               } else {
                                    let allOfArr = [];
@@ -196,6 +203,9 @@ class Properties {
                               }
                          } else {
                               propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
+                              if(attribute.isDerived) {
+                                   propertiesObj.readOnly = true;
+                              }
                               utils.addAttributeType(propertiesObj, attribute);
                          }
                     }
