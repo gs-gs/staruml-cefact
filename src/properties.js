@@ -162,7 +162,7 @@ class Properties {
                               propertiesObj.minItems = 1;
                          }
 
-                         if(attribute.isDerived) {
+                         if(attribute.isReadOnly) {
                               propertiesObj.readOnly = true;
                          }
                     } else {
@@ -186,7 +186,7 @@ class Properties {
                               });
                               if(result!=null){
                                    propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
-                                   if(attribute.isDerived) {
+                                   if(attribute.isReadOnly) {
                                         propertiesObj.readOnly = true;
                                    }
                                    utils.addAttributeType(propertiesObj, attribute);
@@ -203,7 +203,7 @@ class Properties {
                               }
                          } else {
                               propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
-                              if(attribute.isDerived) {
+                              if(attribute.isReadOnly) {
                                    propertiesObj.readOnly = true;
                               }
                               utils.addAttributeType(propertiesObj, attribute);
