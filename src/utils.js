@@ -798,6 +798,29 @@ function fetchUMLInterfaceRealization() {
 }
 
 /**
+ * @function fetchUMLInterfaceRealization
+ * @description find and returns view of specified element from the whole project
+ * @returns {Object}
+ * @memberof Utils
+ */
+function getUMLInterfaceRealization(sourceId) {
+     let interfaceRealalization = [];
+     if (openAPI.isModelPackage()) {
+          interfaceRealalization = app.repository.select("@UMLInterfaceRealization");
+     } else if (openAPI.isModelDiagram()) {
+          interfaceRealalization = [];
+          let interfaceRealalizationView = dElement.getUMLInterfaceRealizationView();
+          forEach(interfaceRealalizationView, function (mView) {
+               interfaceRealalization.push(mView.model);
+          });
+     }
+     interfaceRealalization = interfaceRealalization.filter(real => {
+          return real.source._id == sourceId;
+     });
+     return interfaceRealalization;
+}
+
+/**
  * @function fetchUMLAssociation
  * @description returns UMLAssociations
  * @returns {Array}
@@ -977,3 +1000,4 @@ module.exports.buildRequestBodyForSubResource = buildRequestBodyForSubResource;
 module.exports.resetClassTypeAttribute = resetClassTypeAttribute;
 module.exports.getClassTypeAttribute = getClassTypeAttribute;
 module.exports.getDataTypeAttribute = getDataTypeAttribute;
+module.exports.getUMLInterfaceRealization = getUMLInterfaceRealization;

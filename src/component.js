@@ -139,7 +139,7 @@ class Component {
                      * Adding Properties
                      **/
                     let properties = [];
-                    properties = new Properties(objClass, assocSideClassLink);
+                    properties = new Properties(objClass, assocSideClassLink, []);
 
                     /**
                      * Adds Attributes, With Enum, With Multiplicity
@@ -245,9 +245,9 @@ class Component {
                 **/
                let properties = [];
                if (openAPI.isModelPackage()) {
-                    properties = new Properties(objDataType, []);
+                    properties = new Properties(objDataType, [], []);
                } else if (openAPI.isModelDiagram()) {
-                    properties = new Properties(mDataTypeView, []);
+                    properties = new Properties(mDataTypeView, [], []);
                }
 
                /**
@@ -357,6 +357,8 @@ class Component {
                     });
                }
                if(!utils.isCoreDataType(objClass)) {
+                    let interfaceRealalization = utils.getUMLInterfaceRealization(objClass._id);
+
                     this.mainSchemaObj[utils.upperCamelCase(objClass.name)] = mainClassesObj
                     mainClassesObj.description = objClass.documentation;
                     mainClassesObj.type = 'object';
@@ -366,9 +368,9 @@ class Component {
                      **/
                     let properties = [];
                     if (openAPI.isModelPackage()) {
-                         properties = new Properties(objClass, assocSideClassLink);
+                         properties = new Properties(objClass, assocSideClassLink, interfaceRealalization);
                     } else if (openAPI.isModelDiagram()) {
-                         properties = new Properties(mClassView, aclAssocSideView);
+                         properties = new Properties(mClassView, aclAssocSideView, interfaceRealalization);
                     }
 
                     /**

@@ -11,12 +11,13 @@ class Properties {
      /**
       * @constructor Creates an instance of Properties.
       */
-     constructor(objClass, assocSideClassLink) {
+     constructor(objClass, assocSideClassLink, interfaceRealization) {
           this.objClass = objClass;
           this.assocSideClassLink = assocSideClassLink;
           this.arrAttRequired = [];
           this.enumerations = [];
           this.dataTypes = [];
+          this.interfaceRealization = interfaceRealization;
           utils.resetErrorBlock();
      }
 
@@ -90,6 +91,19 @@ class Properties {
 
                });
           }
+          forEach(_this.interfaceRealization, function (interfaceR) {
+               let attributes = interfaceR.target.attributes;
+               let propertiesObj = {};
+               forEach(attributes, function (attribute) {
+                    propertiesObj = {};
+                    let filterAttr = _this.arrAttRequired.filter(item => {
+                         return utils.lowerCamelCase(item.name) == utils.lowerCamelCase(attribute.name);
+                    });
+
+                    /* Filter for visible attribute Views from diagram elements (Class & Interface) */
+                    _this.addPropData(filterAttr, mainPropertiesObj, propertiesObj, attribute);
+               });
+          });
           return mainPropertiesObj;
      }
 
