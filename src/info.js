@@ -10,20 +10,26 @@ class Info {
       * @constructor Creates an instance of Info.
       */
      constructor() {
-          var version = '';
+          var version = 'Please specify version in Project properties';
           var description = '';
           if (openAPI.getExportElement().hasOwnProperty('documentation')) {
-               var re = openAPI.getExportElement().documentation.split("\n");
-               if (re.length >= 1) {
-                    var verArr = re[0].split(":")
-                    if (verArr.length > 1) {
-                         version = verArr[1];
-                    }
+               var docs = openAPI.getExportElement().documentation.split("\n");
+               for (let i in docs){
+                    description += docs[i] + '<br>';
                }
-               if (re.length > 1) {
-                    description = re[1] + '<br><br>' + constant.msg_description;
+               description += '<br>';
+          }
+          var parent = openAPI.getExportElement()['_parent'];
+          while (parent!= null) {
+               if (parent.hasOwnProperty('version')){
+                    version = parent['version'];
+                    break;
+               } else {
+                    parent = parent['_parent'];
                }
           }
+
+          description += constant.msg_description;
           this.mainInfoObj = {};
           this.mainInfoObj.description = description;
           this.mainInfoObj.title = openAPI.getExportElementName();
