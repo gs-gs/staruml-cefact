@@ -152,6 +152,7 @@ class Aggregation {
                allOfArray.push(objAllOfArry);
 
                propertiesObj.type = 'array';
+               propertiesObj['description'] = assoc.documentation;
                if (assoc.end2.multiplicity == "1..*") {
                     propertiesObj.minItems = 1;
                }
@@ -169,6 +170,7 @@ class Aggregation {
 
                allOfObj = {};
                allOfObj['type'] = 'object';
+               allOfObj['description'] = assoc.documentation;
                allOfArray.push(allOfObj);
           }
           let temp = {};
