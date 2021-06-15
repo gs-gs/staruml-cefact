@@ -259,6 +259,7 @@ function addAttributeType(itemsObj, attr) {
           /* Added reference in allOf object when attribute type is among the Core Data Type */
           let coreAttribs = attributeType.attributes;
           if (coreAttribs.length > 0) {
+               //TODO: check this implemetation
                addReferenceTypeRule(itemsObj, attributeType);
           } else {
                addJsonRuleType(attr, attributeType.name, itemsObj);
@@ -297,7 +298,6 @@ function addReferenceTypeRuleClass(itemsObj, coreType) {
      allOfArray.push(allOfObj);
 
      allOfObj = {};
-     allOfObj['type'] = 'object';
      allOfArray.push(allOfObj);
 
 }

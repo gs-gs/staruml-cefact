@@ -163,11 +163,9 @@ class Properties {
                     /* Add Multiplicity */
                     if (attribute.multiplicity === "1..*" || attribute.multiplicity === "0..*") {
                          let itemsObj = {};
-                         propertiesObj.items = itemsObj;
-                         itemsObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
-
                          utils.addAttributeType(itemsObj, attribute);
-
+                         propertiesObj.items = itemsObj;
+                         propertiesObj.description = (attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION);
                          propertiesObj.type = 'array';
                          /**
                           * Add MinItems of multiplicity is 1..*
@@ -185,13 +183,11 @@ class Properties {
                           */
                          if (attribute.type instanceof type.UMLEnumeration) {
                               let allOfArr = [];
-                              let descriptionObj = {};
                               let refObj = {};
-                              descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
                               refObj['$ref'] = constant.getReference() + utils.upperCamelCase(attribute.type.name);
                               _this.enumerations.push(attribute.type);
-                              allOfArr.push(descriptionObj);
                               allOfArr.push(refObj);
+                              propertiesObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
                               propertiesObj['allOf'] = allOfArr;
                          } else if (attribute.type instanceof type.UMLDataType) {
                               let attributeTypeString = attribute['name'];
@@ -206,13 +202,11 @@ class Properties {
                                    utils.addAttributeType(propertiesObj, attribute);
                               } else {
                                    let allOfArr = [];
-                                   let descriptionObj = {};
                                    let refObj = {};
-                                   descriptionObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
                                    refObj['$ref'] = constant.getReference() + utils.upperCamelCase(attribute.type.name);
                                    _this.dataTypes.push(attribute.type);
-                                   allOfArr.push(descriptionObj);
                                    allOfArr.push(refObj);
+                                   propertiesObj['description'] = attribute.documentation ? utils.buildDescription(attribute.documentation) : constant.STR_MISSING_DESCRIPTION;
                                    propertiesObj['allOf'] = allOfArr;
                               }
                          } else {

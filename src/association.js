@@ -111,7 +111,6 @@ class Association {
                     /* compositionRef.push('3. association 2: '+ref,temp); */
                     compositionRef.push(temp);
                     objAllOfArry = {};
-                    objAllOfArry['type'] = 'object';
                     allOfArray.push(objAllOfArry);
                     propertiesObj.type = 'array';
                     if (associationSide.end2.multiplicity == "1..*") {

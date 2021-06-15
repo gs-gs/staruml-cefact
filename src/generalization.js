@@ -41,11 +41,6 @@ class Generalization {
                     allOfObj['$ref'] = ref;
                     allOfArray.push(allOfObj);
 
-
-                    allOfObj = {};
-                    allOfObj['type'] = 'object';
-                    allOfArray.push(allOfObj);
-
                     let temp = {};
                     temp['ref'] = mainClassesObj;
                     temp['sName'] = sName;

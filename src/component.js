@@ -377,7 +377,6 @@ class Component {
                      * Adds Attributes, With Enum, With Multiplicity
                      **/
                     mainPropertiesObj = properties.addProperties();
-                    mainClassesObj.properties = mainPropertiesObj;
 
                     let compositionRef = [];
 
@@ -408,9 +407,9 @@ class Component {
                                    let properties = {};
                                    forEach(dataType.attributes, function (attribute) {
                                         let propertyObj = {};
-                                        propertyObj.description = propertyObj.documentation ? utils.buildDescription(propertyObj.documentation) : constant.STR_MISSING_DESCRIPTION;
                                         //TODO: check the type
                                         propertyObj.type = attribute.type;
+                                        propertyObj.description = propertyObj.documentation ? utils.buildDescription(propertyObj.documentation) : constant.STR_MISSING_DESCRIPTION;
                                         properties[attribute.name] = propertyObj;
                                    });
                                    dataTypeObj.properties = properties;
@@ -510,11 +509,6 @@ class Component {
                               let allOfObj = {};
                               allOfObj['$ref'] = constant.getReference() + utils.upperCamelCase(objClass.name + 'Ids');
                               allOfArray.push(allOfObj);
-
-                              allOfObj = {};
-                              allOfObj['type'] = 'object';
-                              allOfArray.push(allOfObj);
-
                          }
                     } else if (openAPI.isModelDiagram()) {
                          if (filterAttributes.length > 0 && aclAssocSideView.length > 0) {
@@ -524,11 +518,11 @@ class Component {
                               allOfObj['$ref'] = constant.getReference() + utils.upperCamelCase(objClass.name + 'Ids');
                               allOfArray.push(allOfObj);
 
-                              allOfObj = {};
-                              allOfObj['type'] = 'object';
-                              allOfArray.push(allOfObj);
-
                          }
+                    }
+                    let propKeys = Object.keys(mainPropertiesObj);
+                    if (propKeys.length > 0) {
+                         mainClassesObj.properties = mainPropertiesObj;
                     }
 
                     /**

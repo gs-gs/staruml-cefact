@@ -146,13 +146,7 @@ class Aggregation {
                ref = constant.getReference() + sName;
                objAllOfArry['$ref'] = ref;
                allOfArray.push(objAllOfArry);
-
-               objAllOfArry = {};
-               objAllOfArry['type'] = 'object';
-               allOfArray.push(objAllOfArry);
-
                propertiesObj.type = 'array';
-               propertiesObj['description'] = assoc.documentation;
                if (assoc.end2.multiplicity == "1..*") {
                     propertiesObj.minItems = 1;
                }
@@ -168,12 +162,9 @@ class Aggregation {
                allOfObj['$ref'] = ref;
                allOfArray.push(allOfObj);
 
-               allOfObj = {};
-               allOfObj['type'] = 'object';
-               allOfObj['description'] = assoc.documentation;
-               allOfArray.push(allOfObj);
           }
           let temp = {};
+          propertiesObj['description'] = assoc.documentation;
           temp['ref'] = propertiesObj;
           temp['sName'] = sName
           /* compositionRef.push('1. aggregation : '+ref,temp); */
