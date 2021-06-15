@@ -564,7 +564,7 @@ class Paths {
                          }
 
                          let subResourceClass = resUIR[0].source;
-                         pathsObject.post = this.operations.postForSubResource(interfaceRealization, end1Interface, subResourceClass);
+                         pathsObject.post = this.operations.postForSubResource(interfaceRealization, end1Interface, end2Interface, subResourceClass);
 
 
 

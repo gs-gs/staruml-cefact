@@ -78,11 +78,12 @@ class Operations {
       * @description returns object of post method
       * @param {UMLInterfaceRealization} interfaceRealization
       * @param {UMLAssociationEnd} end1Interface
+      * @param {UMLAssociationEnd} end2Interface
       * @param {UMLClass} subResourceClass
       * @returns {Object} wOperationObject
       * @memberof Operations
       */
-     postForSubResource(interfaceRealization, end1Interface, subResourceClass) {
+     postForSubResource(interfaceRealization, end1Interface,end2Interface, subResourceClass) {
 
           let wOperationObject = {};
 

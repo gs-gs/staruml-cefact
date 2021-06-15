@@ -27,7 +27,7 @@
                     }]
                },
                {
-                    "label": "JSON-LD (v0.7.1-rc4)",
+                    "label": "JSON-LD (v0.7.1-rc5)",
                     "id": "tool.jsonld",
                     "submenu": [{
                           "label": "Import locally stored Vocabulary",
